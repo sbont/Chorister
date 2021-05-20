@@ -1,0 +1,21 @@
+{{> header}}
+
+<h1>{{title}}</h1>
+
+<div class="repertoire">
+
+<section>
+    <header class="song-header">
+        <div class="song-meta">By  <strong>{{song.composer}}</strong>, on <strong>{{song.addedAt}}</strong></div>
+        <div class="song-id">{{song.id}}</div>
+    </header>
+    <div class="song-description">
+        <div class="song-player">
+            {{song.recordingUrl}}
+        </div>
+        {{song.scoreUrl}}
+    </div>
+</section>
+</div>
+
+{{> footer}}
