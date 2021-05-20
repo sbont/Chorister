@@ -1,8 +1,6 @@
 package nl.stevenbontenbal.cymbali.configuration
 
-import nl.stevenbontenbal.cymbali.Song
 import nl.stevenbontenbal.cymbali.SongRepository
-import nl.stevenbontenbal.cymbali.User
 import nl.stevenbontenbal.cymbali.UserRepository
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
@@ -14,7 +12,7 @@ class CymbaliConfiguration {
     fun databaseInitializer(userRepository: UserRepository,
                             songRepository: SongRepository
     ) = ApplicationRunner {
-        val smaldini = userRepository.save(
+        /*val smaldini = userRepository.save(
             User(
             email = "smaldini@gmail.com",
             displayName = "Stéphane",
@@ -37,6 +35,6 @@ class CymbaliConfiguration {
             scoreUrl = "https://sheetmusic-free.com/wp-content/uploads/2020/04/Youll-Never-Walk-Alone-Sheet-Music-PDF-Gerry-The-Pacemakers-Youll-Never-Walk-Alone-Piano-Sheet-Music-PDF-Free.png",
             addedBy = smaldini,
         )
-        )
+        )*/
     }
 }
