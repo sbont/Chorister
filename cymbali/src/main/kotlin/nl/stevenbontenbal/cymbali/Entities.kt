@@ -9,9 +9,9 @@ class Song(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
     var title: String,
-    var composer: String,
-    var recordingUrl: String,
-    var scoreUrl: String,
+    var composer: String?,
+    var recordingUrl: String?,
+    var scoreUrl: String?,
     var addedAt: LocalDateTime = LocalDateTime.now(),
     var slug: String = title.toSlug(),
     @ManyToOne(fetch = FetchType.EAGER)

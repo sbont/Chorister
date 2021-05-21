@@ -50,9 +50,9 @@ class HtmlController(private val repository: SongRepository, private val propert
     data class RenderedSong(
         val id: Long?,
         val title: String,
-        val composer: String,
-        val recordingUrl: String,
-        val scoreUrl: String,
+        val composer: String?,
+        val recordingUrl: String?,
+        val scoreUrl: String?,
         val addedAt: String,
         val slug: String)
 
