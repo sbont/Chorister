@@ -22,18 +22,15 @@
 
     <div id="navbarBasicExample" class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item"> Repertoire </a>
-
-        <a class="navbar-item"> My Choir </a>
-
+        <router-link to="/" class="navbar-item"> Repertoire </router-link>
+        <router-link to="/mychoir" class="navbar-item"> My Choir </router-link>
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link"> Settings </a>
-
           <div class="navbar-dropdown">
-            <a class="navbar-item"> Categories </a>
+            <router-link to="/categories" class="navbar-item"> Categories </router-link>
             <hr class="navbar-divider" />
-            <a class="navbar-item"> About </a>
-            <a class="navbar-item"> Report an issue </a>
+            <router-link to="/about" class="navbar-item"> About </router-link>
+            <router-link to="/report" class="navbar-item"> Report an issue </router-link>
           </div>
         </div>
       </div>

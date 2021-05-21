@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import Repertoire from './components/Repertoire.vue'
+import Repertoire from './views/Repertoire.vue'
 import Header from './components/AppHeader.vue'
 import AppMenu from './components/AppMenu.vue'
 
