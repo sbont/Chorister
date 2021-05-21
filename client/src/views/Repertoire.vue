@@ -1,190 +1,29 @@
 <template>
-    <div class="p-2">
-        <div class="is-flex is-justify-content-space-between">
-            <h1 class="title">Repertoire</h1>
-            <button class="button is-primary">Add +</button>       
-        </div>
-        <section v-if="loading" class="section repertoire">
-                <h1 class="title loading">Loading...</h1>
-        </section>
-        <div v-if="error" class="error" @click="handleErrorClick">
-            ERROR: {{ this.error }}
-        </div>
-        <table
-            class="table is-hoverable is-fullwidth"
-            v-if="!loading"
-            v-show="songs.length"
-            v-cloak
-        >
-            <thead>
-                <th title="number"></th>
-                <th>Title</th>
-                <th>Composer</th>
-                <th>Songbook</th>
-                <th>No.</th>
-                <th># Scores</th>
-                <th>Last Played</th>
-                <th>Categories</th>
-            </thead>
-            <tbody>
-                <tr v-for="(song, index) in songs" class="song" :key="song.id">
-                    <td>{{ oneBased(index) }}</td>
-                    <th>{{ song.title }}</th>
-                    <td>{{ song.composer }}</td>
-                    <td>...</td>
-                    <td>...</td>
-                    <td>...</td>
-                    <td>...</td>
-                    <td>...</td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <strong>{{ songs.length }}</strong>
-                {{
-                    songs | pluralize
-                }}
-            </tfoot>
-        </table>
-        <footer class="footer" v-show="songs.length" v-cloak>
-            <input
-                class="new-song-title"
-                autofocus
-                autocomplete="off"
-                :placeholder="this.inputPlaceholder"
-                v-model="newSong"
-                @keyup.enter="addSong"
-            />
-        </footer>
+    <div class="columns">
+      <div class="column is-one-third-tablet is-one-fifth-desktop has-background-grey-darker" id="menu">
+        <RepertoireMenu />
+      </div>
+      <div class="column">
+        <Songs />
+      </div>
     </div>
 </template>
 
 <script>
-import api from "../Api";
+import RepertoireMenu from '@/components/RepertoireMenu.vue'
+import Songs from '@/components/Songs.vue'
+
 
 // app Vue instance
-const Songs = {
-    name: "Songs",
-    props: {
-        activeUser: Object,
-    },
-
-    // app initial state
-    data: function () {
-        return {
-            songs: [],
-            newSong: "",
-            editedSong: null,
-            loading: true,
-            error: null,
-            name: "Steven",
-        };
-    },
-
-    mounted: function () {
-
-        api.getAll()
-            .then((response) => {
-                this.$log.debug("Data loaded: ", response.data);
-                this.songs = response.data;
-            })
-            .catch((error) => {
-                this.$log.debug(error);
-                this.error = "Failed to load repertoire";
-                // inject some startup data
-                this.songs = [
-                    { title: "Drink coffee", composer: "Gert" },
-                    { title: "Write REST API", composer: "Arie" },
-                ];
-            })
-            .finally(() => (this.loading = false));
-    },
-
-    // computed properties
-    // http://vuejs.org/guide/computed.html
-    computed: {
-        userEmail: function () {
-            return this.activeUser ? this.activeUser.email : "";
-        },
-        inputPlaceholder: function () {
-            return this.activeUser
-                ? this.activeUser.given_name + ", what needs to be sung?"
-                : "What needs to be sung?";
-        },
-    },
-
-    filters: {
-        pluralize: function (n) {
-            return n === 1 ? "song" : "songs";
-        },
-    },
-
-    // methods that implement data logic.
-    // note there's no DOM manipulation here at all.
-    methods: {
-        addSong: function () {
-            var value = this.newSong && this.newSong.trim();
-            if (!value) {
-                return;
-            }
-
-            this.songs.push({
-                title: value,
-                author: "Dirk",
-            });
-
-            this.newSong = "";
-        },
-
-        removeSong: function (song) {
-            // notice NOT using "=>" syntax
-            this.songs.splice(this.songs.indexOf(song), 1);
-        },
-
-        editSong: function (song) {
-            this.beforeEditCache = song.title;
-            this.editedSong = song;
-        },
-
-        doneEdit: function (song) {
-            if (!this.editedSong) {
-                return;
-            }
-
-            this.editedSong = null;
-            song.title = song.title.trim();
-
-            if (!song.title) {
-                this.removeSong(song);
-            }
-        },
-
-        cancelEdit: function (song) {
-            this.editedSong = null;
-            song.title = this.beforeEditCache;
-        },
-
-        handleErrorClick: function () {
-            this.error = null;
-        },
-
-        oneBased(index) {
-            return index + 1;
-        },
-    },
-
-    // a custom directive to wait for the DOM to be updated
-    // before focusing on the input field.
-    // http://vuejs.org/guide/custom-directive.html
-    directives: {
-        "song-focus": function (el, binding) {
-            if (binding.value) {
-                el.focus();
-            }
-        },
-    },
+const Repertoire = {
+    name: "Repertoire",
+    components: {
+        RepertoireMenu,
+        Songs
+    }
 };
 
-export default Songs;
+export default Repertoire;
 </script>
 
 <style>

@@ -22,7 +22,7 @@
 
     <div id="navbarBasicExample" class="navbar-menu">
       <div class="navbar-start">
-        <router-link to="/" class="navbar-item"> Repertoire </router-link>
+        <router-link to="/repertoire" class="navbar-item"> Repertoire </router-link>
         <router-link to="/mychoir" class="navbar-item"> My Choir </router-link>
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link"> Settings </a>
