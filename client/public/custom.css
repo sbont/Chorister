@@ -4,3 +4,23 @@
 th {
     font-weight: 600;;
 }
+.field-flex {
+    display: flex;
+}
+.field-flex-col {
+    display: block;
+    flex-basis: 0;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+.field-flex-col.is-one-third {
+    width: 33.33%;
+    flex: none;
+}
+.field-body .tags .tag {
+    margin-bottom: 0;
+}
+.field.static {
+    display: flex;
+    align-items: flex-end;
+}

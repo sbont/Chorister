@@ -4,22 +4,19 @@
         <RepertoireMenu />
       </div>
       <div class="column">
-        <Songs />
+        <router-view></router-view>
       </div>
     </div>
 </template>
 
 <script>
 import RepertoireMenu from '@/components/RepertoireMenu.vue'
-import Songs from '@/components/Songs.vue'
-
 
 // app Vue instance
 const Repertoire = {
     name: "Repertoire",
     components: {
-        RepertoireMenu,
-        Songs
+        RepertoireMenu
     }
 };
 

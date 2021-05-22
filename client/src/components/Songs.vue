@@ -4,9 +4,11 @@
             <h1 class="title">Repertoire</h1>
             <button class="button is-primary">Add +</button>       
         </div>
-        <section v-if="loading" class="section repertoire">
-                <h1 class="title loading">Loading...</h1>
-        </section>
+        <progress
+            v-if="loading"
+            class="progress is-medium is-info"
+            max="100"
+        ></progress>
         <div v-if="error" class="error" @click="handleErrorClick">
             ERROR: {{ this.error }}
         </div>
@@ -29,31 +31,22 @@
             <tbody>
                 <tr v-for="(song, index) in songs" class="song" :key="song.id">
                     <td>{{ oneBased(index) }}</td>
-                    <th>{{ song.title }}</th>
+                    <th><router-link :to="{ name: 'Song', params: { id: song.id }}" append>{{ song.title }}</router-link></th>
                     <td>{{ song.composer }}</td>
-                    <td>...</td>
+                    <td>{{song.id}}</td>
                     <td>...</td>
                     <td>...</td>
                     <td>...</td>
                     <td>...</td>
                 </tr>
             </tbody>
-            <tfoot>
+            <tfoot></tfoot>
+        </table>
+        <footer class="footer" v-show="songs.length" v-cloak>
                 <strong>{{ songs.length }}</strong>
                 {{
                     songs | pluralize
                 }}
-            </tfoot>
-        </table>
-        <footer class="footer" v-show="songs.length" v-cloak>
-            <input
-                class="new-song-title"
-                autofocus
-                autocomplete="off"
-                :placeholder="this.inputPlaceholder"
-                v-model="newSong"
-                @keyup.enter="addSong"
-            />
         </footer>
     </div>
 </template>

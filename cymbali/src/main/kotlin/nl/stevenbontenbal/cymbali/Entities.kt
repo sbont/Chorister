@@ -15,7 +15,7 @@ class Song(
     var addedAt: LocalDateTime = LocalDateTime.now(),
     var slug: String = title.toSlug(),
     @ManyToOne(fetch = FetchType.EAGER)
-    var addedBy: User)
+    var addedBy: User?)
 
 @Entity
 class User(
