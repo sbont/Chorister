@@ -2,7 +2,7 @@
     <div class="p-2">
         <div class="is-flex is-justify-content-space-between">
             <h1 class="title">Repertoire</h1>
-            <button class="button is-primary">Add +</button>       
+            <router-link class="button is-primary" to="song/new" append tag="button">Add +</router-link>
         </div>
         <progress
             v-if="loading"

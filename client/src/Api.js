@@ -9,13 +9,6 @@ const instance = axios.create({
 
 export default {
 
-    createNew: (title, composer, songbook, songbookNumber, recordingUrl) => instance.post('songs', {
-        title: title,
-        composer: composer,
-        recordingUrl: recordingUrl,
-        addedBy: 'http://localhost:8082/api2/users/1'
-    }),
-
     getById: (id) => instance.get('songs/' + id),
 
     getAll: () => instance.get('songs', {
@@ -25,7 +18,9 @@ export default {
         }]
     }),
 
+    createNew: (song) => instance.post('songs', song),
+
     updateForId: (id, song) => instance.put('songs/' + id, song),
 
-    removeForId: (id) => instance.delete('songs/' + id)
+    deleteForId: (id) => instance.delete('songs/' + id)
 }

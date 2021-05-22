@@ -16,8 +16,8 @@
                     </p>
                 </div>
                 <div v-else class="hero-body">
-                    <p class="title">Edit song</p>
-                    <p class="subtitle">&nbsp;</p>
+                    <p class="title">{{ isNew ? 'Add new' : 'Edit' }}</p>
+                    <p class="subtitle">song</p>
                 </div>
             </section>
 
@@ -202,7 +202,7 @@
                     </button>
                 </p>
                 <p v-if="editing" @click="edit" class="control">
-                    <button @click="save" class="button is-link">
+                    <button @click="save" class="button is-link" :class="{'is-loading' : saving}">
                         Save changes
                     </button>
                 </p>
@@ -249,25 +249,36 @@ const Song = {
             editing: false,
             draftValues: null,
             loading: true,
+            saving: false,
             error: null,
         };
     },
 
     mounted: function () {
-        var songId = this.$route.params.id;
-        api.getById(songId)
-            .then((response) => {
-                this.$log.debug("Song loaded: ", response.data);
-                this.song = response.data;
-            })
-            .catch((error) => {
-                this.$log.debug(error);
-                this.error = "Failed to load song";
-            })
-            .finally(() => (this.loading = false));
+        if (this.$route.name === "NewSong") {
+            this.draftValues = {};
+            this.editing = true;
+            this.loading = false;
+        } else {
+            var songId = this.$route.params.id;
+            api.getById(songId)
+                .then((response) => {
+                    this.$log.debug("Song loaded: ", response.data);
+                    this.song = response.data;
+                })
+                .catch((error) => {
+                    this.$log.debug(error);
+                    this.error = "Failed to load song";
+                })
+                .finally(() => (this.loading = false));
+        }
+        
     },
 
     computed: {
+        isNew: function() {
+            return !this.song.id;
+        },
         youtubeId: function () {
             return this.song.recordingUrl
                 ? this.song.recordingUrl.split("?v=")[1]
@@ -277,20 +288,37 @@ const Song = {
 
     methods: {
         save: function () {
+            this.saving = true;
             var song = this.draftValues;
             if (!song) {
                 return;
             }
             if (song.id) {
-                api.updateForId(song.id, song);
+                api.updateForId(song.id, song)
+                    .then((response) => {
+                        this.editing = false;
+                        this.saving = false;
+                        this.draftValues = null;
+                    });
             } else {
-                api.createNew(song);
+                api.createNew(song)
+                    .then((response) => {
+                        console.log(response);
+                        song.id = response.data.id;
+                        this.editing = false;
+                        this.saving = false;
+                        this.draftValues = null;
+                        this.$router.push({ name: 'Song', params : { id: song.id }});
+                    });
             }
-            this.editing = false;
-            this.draftValues = null;
         },
 
-        deleteSong: function () {},
+        deleteSong: function () {
+            api.deleteForId(this.song.id)
+                    .then((response) => {
+                        this.$router.push({ name: 'Repertoire' });
+                    });
+        },
 
         edit: function () {
             this.draftValues = this.song;
