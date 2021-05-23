@@ -11,7 +11,7 @@
                 <div v-if="!editing" class="hero-body">
                     <p class="title">{{ song.title }}</p>
                     <p class="subtitle">
-                        {{ song.composer }} | {{ song.songbook }}
+                        {{ song.composer }} | {{ song.songbook.title }}
                         {{ song.number }}
                     </p>
                 </div>
@@ -85,13 +85,13 @@
                                         <div class="control">
                                             <input
                                                 v-if="editing"
-                                                v-model="draftValues.songbook"
+                                                v-model="draftValues.songbook.title"
                                                 class="input"
                                                 type="text"
                                                 placeholder="Songbook, hymnal or collection title"
                                             />
                                             <span v-else>
-                                                {{ song.songbook }}
+                                                {{ song.songbook.title }}
                                             </span>
                                         </div>
                                     </div>
@@ -256,7 +256,9 @@ const Song = {
 
     mounted: function () {
         if (this.$route.name === "NewSong") {
-            this.draftValues = {};
+            this.draftValues = {
+                songbook: {}
+            };
             this.editing = true;
             this.loading = false;
         } else {
@@ -265,6 +267,9 @@ const Song = {
                 .then((response) => {
                     this.$log.debug("Song loaded: ", response.data);
                     this.song = response.data;
+                    if(!this.song.songbook) {
+                        this.song.songbook = {};
+                    }
                 })
                 .catch((error) => {
                     this.$log.debug(error);
@@ -272,7 +277,6 @@ const Song = {
                 })
                 .finally(() => (this.loading = false));
         }
-        
     },
 
     computed: {

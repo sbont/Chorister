@@ -33,9 +33,9 @@
                     <td>{{ oneBased(index) }}</td>
                     <th><router-link :to="{ name: 'Song', params: { id: song.id }}" append>{{ song.title }}</router-link></th>
                     <td>{{ song.composer }}</td>
-                    <td>{{song.id}}</td>
-                    <td>...</td>
-                    <td>...</td>
+                    <td>{{ (song.songbook || {}).title }}</td>
+                    <td>{{ song.songbookNumber }}</td>
+                    <td>{{ song.id }}</td>
                     <td>...</td>
                     <td>...</td>
                 </tr>
