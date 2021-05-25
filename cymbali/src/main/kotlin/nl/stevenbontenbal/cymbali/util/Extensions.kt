@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.cymbali
+package nl.stevenbontenbal.cymbali.util
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatterBuilder
