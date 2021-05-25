@@ -17,6 +17,9 @@ interface SongbookRepository : CrudRepository<Songbook, Long> {
     fun findByTitle(title: String): Songbook?
 }
 
+@RepositoryRestResource()
+interface ScoreRepository : CrudRepository<Score, Long> {}
+
 @CrossOrigin("http://localhost:8081", maxAge = 3600)
 @RepositoryRestResource
 interface UserRepository : CrudRepository<User, Long> {

@@ -16,7 +16,7 @@
                     </p>
                 </div>
                 <div v-else class="hero-body">
-                    <p class="title">{{ isNew ? 'Add new' : 'Edit' }}</p>
+                    <p class="title">{{ isNew ? "Add new" : "Edit" }}</p>
                     <p class="subtitle">song</p>
                 </div>
             </section>
@@ -85,7 +85,9 @@
                                         <div class="control">
                                             <input
                                                 v-if="editing"
-                                                v-model="draftValues.songbook.title"
+                                                v-model="
+                                                    draftValues.songbook.title
+                                                "
                                                 class="input"
                                                 type="text"
                                                 placeholder="Songbook, hymnal or collection title"
@@ -135,7 +137,10 @@
                                 <label class="label">Youtube video</label>
                             </div>
                             <div class="field-body">
-                                <div class="field" v-bind:class="{ static: !editing }">
+                                <div
+                                    class="field"
+                                    v-bind:class="{ static: !editing }"
+                                >
                                     <div class="control">
                                         <input
                                             v-model="draftValues.recordingUrl"
@@ -173,6 +178,36 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="field is-grouped mt-5">
+                        <p v-if="!editing" class="control">
+                            <button @click="edit" class="button is-link">
+                                Edit
+                            </button>
+                        </p>
+                        <p v-if="!editing" class="control">
+                            <button
+                                @click="remove"
+                                class="button is-danger"
+                            >
+                                Delete
+                            </button>
+                        </p>
+                        <p v-if="editing" @click="edit" class="control">
+                            <button
+                                @click="save"
+                                class="button is-link"
+                                :class="{ 'is-loading': saving }"
+                            >
+                                Save changes
+                            </button>
+                        </p>
+                        <p v-if="editing" class="control">
+                            <button @click="cancelEdit" class="button">
+                                Cancel
+                            </button>
+                        </p>
+                    </div>
                 </div>
 
                 <div class="column">
@@ -192,51 +227,23 @@
                 </div>
             </div>
 
-            <div class="field is-grouped">
-                <p v-if="!editing" class="control">
-                    <button @click="edit" class="button is-link">Edit</button>
-                </p>
-                <p v-if="!editing" class="control">
-                    <button @click="deleteSong" class="button is-danger">
-                        Delete
-                    </button>
-                </p>
-                <p v-if="editing" @click="edit" class="control">
-                    <button @click="save" class="button is-link" :class="{'is-loading' : saving}">
-                        Save changes
-                    </button>
-                </p>
-                <p v-if="editing" class="control">
-                    <button @click="cancelEdit" class="button">Cancel</button>
-                </p>
+            <div class="scores p-3">
+                <div class="is-size-4">Scores</div>
+                <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
+                    <Score v-for="score in scores" :key="score.id" :score="score" @remove="removeScore(score)"></Score>
+                    <div class="m-2">
+                        <button class="button is-primary" @click="addScore">
+                            Add
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <!-- <label @dblclick="edit">{{ song.title }}</label>
-        <button class="destroy" @click="removeSong(song)"></button>
-
-        <input
-            class="edit"
-            type="text"
-            v-model="song.title"
-            v-song-focus="song == editedSong"
-            @blur="doneEdit(song)"
-            @keyup.enter="doneEdit(song)"
-            @keyup.esc="cancelEdit(song)"
-        /> -->
-
-        <!-- <input
-                class="new-song-title"
-                autofocus
-                autocomplete="off"
-                :placeholder="this.inputPlaceholder"
-                v-model="newSong"
-                @keyup.enter="addSong"
-            /> -->
     </div>
 </template>
 <script>
 import api from "../Api";
+import Score from "@/components/Score.vue"
 
 // app Vue instance
 const Song = {
@@ -246,6 +253,7 @@ const Song = {
     data: function () {
         return {
             song: {},
+            scores: [],
             editing: false,
             draftValues: null,
             loading: true,
@@ -257,30 +265,40 @@ const Song = {
     mounted: function () {
         if (this.$route.name === "NewSong") {
             this.draftValues = {
-                songbook: {}
+                songbook: {},
             };
             this.editing = true;
             this.loading = false;
         } else {
             var songId = this.$route.params.id;
-            api.getById(songId)
+            api.getSongById(songId)
                 .then((response) => {
                     this.$log.debug("Song loaded: ", response.data);
                     this.song = response.data;
-                    if(!this.song.songbook) {
+                    if (!this.song.songbook) {
                         this.song.songbook = {};
                     }
+                    api.getScoresBySongId(this.song.id)
+                        .then((response) => {
+                            this.$log.debug("Scores loaded: ", response.data);
+                            this.scores = response.data;
+                        })
+                        .catch((error) => {
+                            this.$log.debug(error);
+                            this.error = "Failed to load scores";
+                        })
+                        .finally(() => (this.loading = false));
                 })
                 .catch((error) => {
                     this.$log.debug(error);
                     this.error = "Failed to load song";
-                })
-                .finally(() => (this.loading = false));
+                    this.loading = false;
+                });
         }
     },
 
     computed: {
-        isNew: function() {
+        isNew: function () {
             return !this.song.id;
         },
         youtubeId: function () {
@@ -298,30 +316,30 @@ const Song = {
                 return;
             }
             if (song.id) {
-                api.updateForId(song.id, song)
-                    .then((response) => {
-                        this.editing = false;
-                        this.saving = false;
-                        this.draftValues = null;
-                    });
+                api.updateSongForId(song.id, song).then((response) => {
+                    this.editing = false;
+                    this.saving = false;
+                    this.draftValues = null;
+                });
             } else {
-                api.createNew(song)
-                    .then((response) => {
-                        console.log(response);
-                        song.id = response.data.id;
-                        this.editing = false;
-                        this.saving = false;
-                        this.draftValues = null;
-                        this.$router.push({ name: 'Song', params : { id: song.id }});
+                api.createNewSong(song).then((response) => {
+                    console.log(response);
+                    song.id = response.data.id;
+                    this.editing = false;
+                    this.saving = false;
+                    this.draftValues = null;
+                    this.$router.push({
+                        name: "Song",
+                        params: { id: song.id },
                     });
+                });
             }
         },
 
-        deleteSong: function () {
-            api.deleteForId(this.song.id)
-                    .then((response) => {
-                        this.$router.push({ name: 'Repertoire' });
-                    });
+        remove: function () {
+            api.deleteSongForId(this.song.id).then((response) => {
+                this.$router.push({ name: "Repertoire" });
+            });
         },
 
         edit: function () {
@@ -329,26 +347,25 @@ const Song = {
             this.editing = true;
         },
 
-        doneEdit: function (song) {
-            if (!this.draftValues) {
-                return;
-            }
-
-            this.editedSong = null;
-            song.title = song.title.trim();
-
-            if (!song.title) {
-                this.removeSong(song);
-            }
-        },
-
         cancelEdit: function () {
             this.draftValues = null;
             this.editing = false;
         },
 
-        handleErrorClick: function () {
-            this.error = null;
+        addScore: function () {
+            var newScore = {
+                id: null,
+                song: this.song._links.self.href
+            };
+            console.log(newScore);
+            this.scores.push(newScore);
+        },
+
+        removeScore: function (score) {
+            if(score.id) {
+                api.deleteScoreForId(score.id);
+            }
+            this.scores = this.scores.filter(current => {current.id !== score.id});
         },
 
         oneBased(index) {
@@ -366,6 +383,10 @@ const Song = {
             }
         },
     },
+
+    components: {
+        Score
+    }
 };
 
 export default Song;

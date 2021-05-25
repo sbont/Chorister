@@ -75,7 +75,7 @@ const Songs = {
 
     mounted: function () {
 
-        api.getAll()
+        api.getAllSongs()
             .then((response) => {
                 this.$log.debug("Data loaded: ", response.data);
                 this.songs = response.data;

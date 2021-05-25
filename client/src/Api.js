@@ -9,18 +9,36 @@ const instance = axios.create({
 
 export default {
 
-    getById: (id) => instance.get('songs/' + id),
+    // Songs
 
-    getAll: () => instance.get('songs', {
+    getSongById: (id) => instance.get('songs/' + id),
+
+    getAllSongs: () => instance.get('songs', {
         transformResponse: [function (data) {
             console.log(data);
             return data ? JSON.parse(data)._embedded.songs : data;
         }]
     }),
 
-    createNew: (song) => instance.post('songs', song),
+    createNewSong: (song) => instance.post('songs', song),
 
-    updateForId: (id, song) => instance.put('songs/' + id, song),
+    updateSongForId: (id, song) => instance.put('songs/' + id, song),
 
-    deleteForId: (id) => instance.delete('songs/' + id)
+    deleteSongForId: (id) => instance.delete('songs/' + id),
+
+    // Scores
+
+    getScoresBySongId: (songId) => instance.get('songs/' + songId + '/scores', {
+        transformResponse: [function (data) {
+            console.log(data);
+            return data ? JSON.parse(data)._embedded.scores : data;
+        }]
+    }),
+
+    createNewScore: (score) => instance.post('scores', score),
+
+    updateScoreForId: (id, score) => instance.put('scores/' + id, score),
+
+    deleteScoreForId: (id) => instance.delete('scores/' + id),
+
 }

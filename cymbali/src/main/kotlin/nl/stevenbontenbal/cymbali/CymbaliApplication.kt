@@ -22,6 +22,7 @@ class RestConfig : RepositoryRestConfigurer {
 	override fun configureRepositoryRestConfiguration(config: RepositoryRestConfiguration, cors: CorsRegistry) {
 		println("RestConfig configured.")
 		config.exposeIdsFor(Song::class.java)
+		config.exposeIdsFor(Score::class.java)
 		cors.addMapping("/api/**")
 			.allowedMethods("*")
 			.allowedOrigins("http://localhost:8081/")
