@@ -1,7 +1,7 @@
 package nl.stevenbontenbal.cymbali.event
 
-import nl.stevenbontenbal.cymbali.SongbookRepository
 import nl.stevenbontenbal.cymbali.model.Song
+import nl.stevenbontenbal.cymbali.repository.SongbookRepository
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate
 import org.springframework.data.rest.core.annotation.HandleBeforeSave
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler
