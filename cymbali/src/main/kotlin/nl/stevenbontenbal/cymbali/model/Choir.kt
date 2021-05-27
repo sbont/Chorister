@@ -3,12 +3,12 @@ package nl.stevenbontenbal.cymbali.model
 import javax.persistence.*
 
 @Entity
-class User(
+class Choir(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CHOIR_ID")
-    var choir: Choir?,
-    var email: String?,
-    var displayName: String?)
+    var name: String,
+    @OneToMany(mappedBy = "choir")
+    var users: MutableList<User>?,
+    @OneToOne
+    var manager: User?)
