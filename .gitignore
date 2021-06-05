@@ -1,3 +1,3 @@
-cymbali/data/db.mv.db
-cymbali/data/db.trace.db
-node_modules/
+backend/data/db.mv.db
+backend/data/db.trace.db
+dev-proxy/node_modules/
