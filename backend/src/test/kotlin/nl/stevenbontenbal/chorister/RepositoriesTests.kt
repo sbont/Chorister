@@ -1,5 +1,8 @@
 package nl.stevenbontenbal.chorister
 
+import nl.stevenbontenbal.chorister.model.Song
+import nl.stevenbontenbal.chorister.repository.SongRepository
+import nl.stevenbontenbal.chorister.repository.UserRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,7 +13,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 class RepositoriesTests @Autowired constructor(
     val entityManager: TestEntityManager,
     val userRepository: UserRepository,
-    val songRepository: SongRepository) {
+    val songRepository: SongRepository
+) {
 
     @Test
     fun `When findByIdOrNull then return Article`() {
