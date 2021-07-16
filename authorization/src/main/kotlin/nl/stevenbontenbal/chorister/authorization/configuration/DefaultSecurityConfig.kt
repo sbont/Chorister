@@ -24,8 +24,9 @@ class DefaultSecurityConfig {
     @Bean
     fun users(): UserDetailsService? {
         val user: UserDetails = User.withDefaultPasswordEncoder()
-            .username("admin")
-            .password("password")
+            .username("a")
+            .password("s")
+            .roles("USER")
             .build()
         return InMemoryUserDetailsManager(user)
     }

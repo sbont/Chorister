@@ -29,8 +29,7 @@ import java.security.interfaces.RSAPublicKey
 import java.util.*
 
 
-@Configuration
-@Import(OAuth2AuthorizationServerConfiguration::class)
+@Configuration(proxyBeanMethods = false)
 class AuthorizationServerConfig {
 
     @Bean
@@ -44,15 +43,15 @@ class AuthorizationServerConfig {
     @Bean
     fun registeredClientRepository(): RegisteredClientRepository {
         val registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-            .clientId("articles-client")
-            .clientSecret("secret")
+            .clientId("chorister-web")
+            .clientSecret("{noop}secret")
             .clientAuthenticationMethod(ClientAuthenticationMethod.BASIC)
             .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
             .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-            .redirectUri("http://localhost:8080/login/oauth2/code/articles-client-oidc")
+//            .redirectUri("http://localhost:8080/login/oauth2/code/articles-client-oidc")
             .redirectUri("http://localhost:8080/authorized")
             .scope(OidcScopes.OPENID)
-            .scope("articles.read")
+            .scope("full")
             .build()
         return InMemoryRegisteredClientRepository(registeredClient)
     }
