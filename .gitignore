@@ -1,3 +1,4 @@
 backend/data/db.mv.db
 backend/data/db.trace.db
 dev-proxy/node_modules/
+keycloak/

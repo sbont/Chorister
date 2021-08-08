@@ -22,4 +22,9 @@ spring:
     rest:
       detection-strategy: default
       basePath: /api
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/auth/realms/Chorister
 debug: true
