@@ -23,7 +23,7 @@ class ChoristerConfiguration {
     fun corsConfigurer(): WebMvcConfigurer? {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/api/**").allowedOrigins("http://localhost:8081/")
+                registry.addMapping("/api/**").allowedOrigins("http://localhost:8080/")
             }
         }
     }
@@ -37,7 +37,7 @@ class ChoristerConfiguration {
             ) {
                 corsRegistry.addMapping("/api/**")
                     .allowedMethods("*")
-                    .allowedOrigins("http://localhost:8081/")
+                    .allowedOrigins("http://localhost:8080/")
             }
         }
     }
@@ -47,7 +47,7 @@ class ChoristerConfiguration {
         val source = UrlBasedCorsConfigurationSource()
         val config = CorsConfiguration()
         config.allowCredentials = true
-        config.addAllowedOrigin("http://localhost:8081/")
+        config.addAllowedOrigin("http://localhost:8080/")
         config.addAllowedHeader("*")
         config.addAllowedMethod("*")
         source.registerCorsConfiguration("/**", config)

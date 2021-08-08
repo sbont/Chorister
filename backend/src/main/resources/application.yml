@@ -3,6 +3,8 @@ chorister:
   banner:
     title: Warning
     content: The blog will be down tomorrow.
+server:
+  port: 8090
 spring:
   datasource:
     url: jdbc:h2:file:./data/db
