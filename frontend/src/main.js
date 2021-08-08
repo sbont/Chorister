@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import App from './App'
-
-Vue.config.productionTip = false
-
 import VueLogger from 'vuejs-logger';
 import router from './router'
+import auth from './auth'
+
+Vue.config.productionTip = false
 
 const options = {
   isEnabled: true,
@@ -17,6 +17,7 @@ const options = {
 };
 
 Vue.use(VueLogger, options);
+Vue.use(auth);
 
 /* eslint-disable no-new */
 new Vue({

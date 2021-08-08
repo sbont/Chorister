@@ -242,7 +242,7 @@
     </div>
 </template>
 <script>
-import api from "../Api";
+import api from "../api";
 import Score from "@/components/Score.vue"
 
 // app Vue instance

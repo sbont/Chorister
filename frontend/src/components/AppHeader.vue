@@ -42,10 +42,42 @@
             <a class="button is-primary">
               <strong>Sign up</strong>
             </a>
-            <a class="button is-light"> Log in </a>
+            <a class="button is-light" @click="onLogin()"> Log in </a>
           </div>
         </div>
       </div>
     </div>
   </nav>
 </template>
+
+<script>
+
+export default {
+  name: 'Home',
+  data () {
+    return {
+      isUserLoggedIn: false
+    }
+  },
+  mounted () {
+    this.$auth.isUserLoggedIn()
+      .then(isLoggedIn => {
+        this.isUserLoggedIn = isLoggedIn
+      })
+      // If somehting goes wrong we assume no user is logged in
+      .catch(error => {
+        console.log(error)
+        this.isUserLoggedIn = false
+      })
+  },
+  methods: {
+    onLogin () {
+      console.log('Click login');
+      this.$auth.login()
+    },
+    onLogout () {
+      this.$auth.logout()
+    }
+  }
+}
+</script>

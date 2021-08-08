@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import api from "../Api";
+import api from "../api";
 
 // app Vue instance
 const Songs = {
