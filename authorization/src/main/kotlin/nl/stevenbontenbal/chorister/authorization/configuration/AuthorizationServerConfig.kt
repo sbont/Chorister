@@ -22,6 +22,8 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPrivateKey
@@ -37,19 +39,30 @@ class AuthorizationServerConfig {
     @Throws(Exception::class)
     fun authorizationServerSecurityFilterChain(http: HttpSecurity): SecurityFilterChain? {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http)
+        http.csrf().disable()
+            .cors(Customizer.withDefaults())
         return http.formLogin(Customizer.withDefaults()).build()
+    }
+
+    @Bean
+    fun corsConfigurer(): WebMvcConfigurer? {
+        return object : WebMvcConfigurer {
+            override fun addCorsMappings(registry: CorsRegistry) {
+                registry.addMapping("/**").allowedOrigins("http://127.0.0.1:8080/")
+            }
+        }
     }
 
     @Bean
     fun registeredClientRepository(): RegisteredClientRepository {
         val registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
             .clientId("chorister-web")
-            .clientSecret("{noop}secret")
-            .clientAuthenticationMethod(ClientAuthenticationMethod.BASIC)
+//            .clientSecret("{noop}secret")
+            .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
             .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
             .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-//            .redirectUri("http://localhost:8080/login/oauth2/code/articles-client-oidc")
-            .redirectUri("http://localhost:8080/authorized")
+            .redirectUri("http://127.0.0.1:8080/login/oauth2/code/articles-client-oidc")
+            .redirectUri("http://127.0.0.1:8080/authorized")
             .scope(OidcScopes.OPENID)
             .scope("full")
             .build()

@@ -16,7 +16,10 @@ class DefaultSecurityConfig {
     @Bean
     @Throws(Exception::class)
     fun defaultSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http.authorizeRequests { authorizeRequests -> authorizeRequests.anyRequest().authenticated() }
+        http
+            .csrf().disable()
+            .cors().disable()
+            .authorizeRequests { authorizeRequests -> authorizeRequests.anyRequest().authenticated() }
             .formLogin( withDefaults() )
         return http.build()
     }

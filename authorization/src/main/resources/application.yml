@@ -2,6 +2,5 @@ server:
     port: 9000
 logging:
     level:
-        org.springframework:
-            web: DEBUG
-            security.oauth2: DEBUG
+        org.springframework.security.experimental:
+            TRACE
