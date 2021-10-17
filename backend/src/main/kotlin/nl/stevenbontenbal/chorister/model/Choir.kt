@@ -8,7 +8,8 @@ class Choir(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
     var name: String,
+    var type: String,
     @OneToMany(mappedBy = "choir")
-    var users: MutableList<User>?,
+    var users: MutableList<User>? = mutableListOf(),
     @OneToOne
     var manager: User?)

@@ -10,7 +10,9 @@ const instance = axios.create({
 instance.interceptors.request.use(
     async config => {
         let accessToken = await authService.getAccessToken()
-        config.headers.common.Authorization = 'Bearer ' + accessToken
+        if(accessToken) {
+            config.headers.common.Authorization = 'Bearer ' + accessToken
+        }
         return config
     }
 )
@@ -48,5 +50,9 @@ export default {
     updateScoreForId: (id, score) => instance.put('scores/' + id, score),
 
     deleteScoreForId: (id) => instance.delete('scores/' + id),
+
+    // Register
+
+    register: (request) => instance.post('registration', request),
 
 }

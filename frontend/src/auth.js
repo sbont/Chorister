@@ -16,61 +16,61 @@ let userManager = new UserManager(settings)
 
 class AuthService {
     
-    login () {
-      userManager.signinRedirect()
-        .catch(error => console.log(error))
-    }
+  login () {
+    return userManager.signinRedirect();
+  }
+
+  logout () {
+    userManager.signoutRedirect()
+      .then(() => console.log('User logged out'))
+      .catch(error => console.log(error))
+  }
+
+  handleLoginRedirect () {
+    return userManager.signinRedirectCallback()
+  }
+
+  handleLogoutRedirect () {
+    return userManager.signoutRedirectCallback()
+  }
+
+  isUserLoggedIn () {
+    return new Promise((resolve, reject) => {
+      userManager.getUser()
+        .then(user => {
+          resolve(user !== null)
+        })
+        .catch(error => reject(error))
+    })
+  }
   
-    logout () {
-      userManager.signoutRedirect()
-        .then(() => console.log('User logged out'))
-        .catch(error => console.log(error))
-    }
-  
-    handleLoginRedirect () {
-      return userManager.signinRedirectCallback()
-    }
-  
-    handleLogoutRedirect () {
-      return userManager.signoutRedirectCallback()
-    }
-  
-    isUserLoggedIn () {
+  getProfile () {
+    return new Promise((resolve, reject) => {
+      userManager.getUser()
+        .then(user => {
+          if (user === null) {
+            resolve(null)
+          }
+          resolve(user.profile)
+      })
+      .catch(error => reject(error))
+      })
+  }
+
+  getAccessToken () {
       return new Promise((resolve, reject) => {
-        userManager.getUser()
+      userManager.getUser()
           .then(user => {
-            if (user === null) {
-              resolve(false)
+            if(user) {
+              console.log('Got access token from user')
+              resolve(user.access_token)
+            } else {
+              resolve(null)
             }
-            resolve(true)
           })
           .catch(error => reject(error))
       })
-    }
-    
-    getProfile () {
-      return new Promise((resolve, reject) => {
-        userManager.getUser()
-          .then(user => {
-            if (user === null) {
-              resolve(null)
-            }
-            resolve(user.profile)
-        })
-        .catch(error => reject(error))
-        })
-    }
-
-    getAccessToken () {
-        return new Promise((resolve, reject) => {
-        userManager.getUser()
-            .then(user => {
-            console.log('Got access token from user')
-            resolve(user.access_token)
-            })
-            .catch(error => reject(error))
-        })
-    }
+  }
 }
 
 export const authService = new AuthService()

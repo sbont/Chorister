@@ -21,7 +21,7 @@
     </div>
 
     <div id="navbarBasicExample" class="navbar-menu">
-      <div class="navbar-start">
+      <div v-if="authenticated" class="navbar-start">
         <router-link to="/repertoire" class="navbar-item"> Repertoire </router-link>
         <router-link to="/mychoir" class="navbar-item"> My Choir </router-link>
         <div class="navbar-item has-dropdown is-hoverable">
@@ -36,14 +36,21 @@
       </div>
 
       <div class="navbar-end">
-        <a class="navbar-item"> My account </a>
         <div class="navbar-item">
           <div class="buttons">
-            <a class="button is-primary">
-              <strong>Sign up</strong>
+            <a v-if="!authenticated" class="button is-primary" @click="onLogin()">
+              <strong>Log in</strong>
             </a>
-            <a class="button is-light" @click="onLogin()"> Log in </a>
           </div>
+        </div>
+        <div v-if="authenticated" class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link"> Account </a>
+            <div class="navbar-dropdown">
+              <router-link to="/profile" class="navbar-item"> Profile </router-link>
+              <hr class="navbar-divider" />
+              <router-link to="/about" class="navbar-item"> About </router-link>
+              <a @click="onLogout()" class="navbar-item"> Log out </a>
+            </div>
         </div>
       </div>
     </div>
@@ -56,27 +63,31 @@ export default {
   name: 'Home',
   data () {
     return {
-      isUserLoggedIn: false
+      authenticated: false
     }
   },
   mounted () {
     this.$auth.isUserLoggedIn()
-      .then(isLoggedIn => {
-        this.isUserLoggedIn = isLoggedIn
+      .then(isUserLoggedIn => {
+        this.authenticated = isUserLoggedIn
       })
-      // If somehting goes wrong we assume no user is logged in
       .catch(error => {
         console.log(error)
-        this.isUserLoggedIn = false
+        this.authenticated = false
       })
   },
+  // watch: {
+  //   '$route': 'refreshIsUserLoggedIn'
+  // },
   methods: {
     onLogin () {
-      console.log('Click login');
       this.$auth.login()
     },
     onLogout () {
       this.$auth.logout()
+    },
+    async refreshIsAuthenticated () {
+      this.authenticated = await this.$auth.isUserLoggedIn()
     }
   }
 }

@@ -3,3 +3,4 @@ backend/data/db.trace.db
 dev-proxy/node_modules/
 keycloak/
 frontend/yarn.lock
+backend/src/main/resources/application.yml

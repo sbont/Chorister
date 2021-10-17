@@ -13,40 +13,45 @@ const routes = [
     component: Home
   },
   {
+    path: '/signup',
+    name: 'Sign Up',
+    component: () => import(/* webpackChunkName: "signup" */ '../views/SignUp.vue')
+  },
+  {
     path: '/about',
     name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
     path: '/repertoire',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "repertoire" */ '../views/Repertoire.vue'),
+    meta: {
+      requiresAuth: true
+    },
     children: [
       {
         path: '',
         name: 'Repertoire',
-        component: () => import(/* webpackChunkName: "songs" */ '../components/Songs.vue')
+        component: () => import(/* webpackChunkName: "songs" */ '../components/Songs.vue'),
+        meta: {
+          requiresAuth: true
+        },
       },
       {
         path: 'song/new',
         name: 'NewSong',
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "song" */ '../components/Song.vue')
+        component: () => import(/* webpackChunkName: "song" */ '../components/Song.vue'),
+        meta: {
+          requiresAuth: true
+        },
       },
       {
         path: 'song/:id',
         name: 'Song',
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "song" */ '../components/Song.vue')
+        component: () => import(/* webpackChunkName: "song" */ '../components/Song.vue'),
+        meta: {
+          requiresAuth: true
+        },
       }
     ]
   }
@@ -78,10 +83,21 @@ router.beforeEach((to, from, next) => {
         console.log(error)
         next('/')
       })
+  } else if(to.matched.some(record => record.meta.requiresAuth)) {
+    authService.isUserLoggedIn().then(isLoggedIn => {
+      if(!isLoggedIn) {
+        authService.login()
+        .then(() => {
+          console.log('Login successful');
+        })
+      } else {
+        next()
+      }
+    });
+  } else {
+    // Default case. The user is send to the desired route.
+    next()
   }
-
-  // Default case. The user is send to the desired route.
-  next()
 })
 
 export default router
