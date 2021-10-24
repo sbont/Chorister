@@ -19,7 +19,6 @@ class HtmlController(private val repository: SongRepository, private val propert
     @GetMapping("/repertoire")
     fun repertoire(model: Model): String {
         model["title"] = properties.title
-        model["banner"] = properties.banner
         model["songs"] = repository.findAllByOrderByAddedAtDesc().map { it.render() }
         return "repertoire"
     }

@@ -4,13 +4,16 @@ import io.netty.channel.ChannelOption
 import io.netty.handler.logging.LogLevel
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
+import nl.stevenbontenbal.chorister.authorization.ChoirAccessPermissionEvaluator
 import nl.stevenbontenbal.chorister.model.Score
 import nl.stevenbontenbal.chorister.model.Song
 import nl.stevenbontenbal.chorister.repository.ChoirRepository
 import nl.stevenbontenbal.chorister.repository.SongRepository
+import nl.stevenbontenbal.chorister.repository.SongbookRepository
 import nl.stevenbontenbal.chorister.repository.UserRepository
 import nl.stevenbontenbal.chorister.service.KeycloakUserService
 import nl.stevenbontenbal.chorister.service.RegistrationService
+import nl.stevenbontenbal.chorister.service.UserService
 import org.modelmapper.ModelMapper
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.web.servlet.FilterRegistrationBean
@@ -21,6 +24,8 @@ import org.springframework.data.rest.core.config.RepositoryRestConfiguration
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer
 import org.springframework.http.HttpMethod
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
+import org.springframework.security.access.PermissionEvaluator
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
@@ -43,6 +48,7 @@ import java.util.concurrent.TimeUnit
 
 
 @EnableWebSecurity(debug = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @Configuration
 class ChoristerConfiguration {
 
@@ -63,6 +69,9 @@ class ChoristerConfiguration {
         http.csrf().disable()
         return http.build()
     }
+
+    @Bean
+    fun permissionEvaluator(userService: UserService): PermissionEvaluator = ChoirAccessPermissionEvaluator(userService)
 
     @Bean
     fun corsConfigurer(): WebMvcConfigurer? {
@@ -157,9 +166,15 @@ class ChoristerConfiguration {
     ): RegistrationService = RegistrationService(userRepository, choirRepository, keycloakUserService)
 
     @Bean
-    fun databaseInitializer(userRepository: UserRepository,
+    fun userService(userRepository: UserRepository): UserService = UserService(userRepository)
+
+    @Bean
+    fun databaseInitializer(choirRepository: ChoirRepository,
+                            userRepository: UserRepository,
+                            songbookRepository: SongbookRepository,
                             songRepository: SongRepository
     ) = ApplicationRunner {
+
 
     }
 

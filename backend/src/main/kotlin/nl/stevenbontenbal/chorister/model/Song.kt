@@ -1,5 +1,6 @@
 package nl.stevenbontenbal.chorister.model
 
+import nl.stevenbontenbal.chorister.interfaces.ChoirOwnedEntity
 import nl.stevenbontenbal.chorister.util.toSlug
 import org.springframework.data.rest.core.annotation.RestResource
 import java.time.LocalDateTime
@@ -12,7 +13,7 @@ class Song(
     var id: Long? = null,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
-    var choir: Choir?,
+    override var choir: Choir?,
     var title: String,
     var composer: String?,
     var recordingUrl: String?,
@@ -26,4 +27,4 @@ class Song(
     var slug: String = title.toSlug(),
     var addedAt: LocalDateTime = LocalDateTime.now(),
     @ManyToOne(fetch = FetchType.EAGER)
-    var addedBy: User?)
+    var addedBy: User?): ChoirOwnedEntity
