@@ -306,7 +306,7 @@ const Song = {
     data: function () {
         return {
             song: {},
-            songCategories: {},
+            songCategories: null,
             scores: [],
             categories: {},
             editing: false,
@@ -320,6 +320,11 @@ const Song = {
 
     mounted: function () {
         let categoriesLoaded = api.getAllCategories()
+            .then(response => {
+                this.$log.debug("Categories loaded: ", response.data);
+                this.categories.season = response.data.filter(category => category.type === "SEASON");
+                this.categories.liturgical = response.data.filter(category => category.type === "LITURGICAL_MOMENT");
+            }) 
             .catch((error) => {
                 this.$log.debug(error);
                 this.error = "Failed to load categories";
@@ -328,11 +333,15 @@ const Song = {
             this.draftValues = {
                 songbook: {},
             };
+            this.draftSongCategories = {
+                season: [],
+                liturgical: []
+            }
             this.editing = true;
-            this.loading = false;
+            categoriesLoaded.finally(() => this.loading = false);
         } else {
             var songId = this.$route.params.id;
-            api.getSongById(songId)
+            let songLoaded = api.getSongById(songId)
                 .then((response) => {
                     this.$log.debug("Song loaded: ", response.data);
                     this.song = response.data;
@@ -347,8 +356,7 @@ const Song = {
                         .catch((error) => {
                             this.$log.debug(error);
                             this.error = "Failed to load scores";
-                        })
-                        .finally(() => (this.loading = false));
+                        });
                 })
                 .catch((error) => {
                     this.$log.debug(error);
@@ -356,22 +364,18 @@ const Song = {
                     this.loading = false;
                 });
             let songCategoriesLoaded = api.getSongCategories(songId)
-                // .then((response) => {
-                //     this.songCategories = response.data;
-                // })
                 .catch((error) => {
                     this.$log.debug(error);
                     this.error = "Failed to load song categories";
                     this.loading = false;
                 });
-            Promise.all([categoriesLoaded, songCategoriesLoaded])
-                .then(([categoryResponse, songCategoryResponse]) => {
-                    this.$log.debug("Categories loaded: ", categoryResponse.data);
-                    this.categories.season = categoryResponse.data.filter(category => category.type === "SEASON");
-                    this.categories.liturgical = categoryResponse.data.filter(category => category.type === "LITURGICAL_MOMENT");
+            Promise.all([songLoaded, categoriesLoaded, songCategoriesLoaded])
+                .then(([songResponse, categoryResponse, songCategoryResponse]) => {
+                    this.songCategories = {};
                     this.songCategories.season = this.categories.season.filter(category => songCategoryResponse.data.some(songCategory => category._links.self.href === songCategory._links.self.href));
                     this.songCategories.liturgical = this.categories.liturgical.filter(category => songCategoryResponse.data.some(songCategory => category._links.self.href === songCategory._links.self.href));
-                });
+                })
+                .finally(() => (this.loading = false));
         }
     },
 
@@ -393,21 +397,32 @@ const Song = {
             if (!song) {
                 return;
             }
+            const isNew = !song.id;
             const promise = this.saveToServer(song);
-            promise.then(() => {
-                let previousSongCategories = this.songCategories.season.concat(this.songCategories.liturgical);
+            promise.then((response) => {
+                if(isNew) {
+                    song.id = response.data.id;
+                }
+                let previousSongCategories = this.songCategories ? this.songCategories.season.concat(this.songCategories.liturgical) : [];
                 let draftSongCategories = this.draftSongCategories.season.concat(this.draftSongCategories.liturgical);
                 let newSongCategories = draftSongCategories.filter(draftSongCategory => !previousSongCategories.some(previousSongCategory => draftSongCategory._links.self.href === previousSongCategory._links.self.href));
                 let deletedSongCategories = previousSongCategories.filter(previousSongCategory => !draftSongCategories.some(draftSongCategory => previousSongCategory._links.self.href === draftSongCategory._links.self.href));
                 if(newSongCategories.length) {
-                    api.postSongCategories(this.song.id, newSongCategories.map(songCategory => songCategory._links.self.href));
+                    api.postSongCategories(song.id, newSongCategories.map(songCategory => songCategory._links.self.href));
                 }
-                deletedSongCategories.forEach(songCategory => api.deleteSongCategory(this.song.id, songCategory.id));
+                deletedSongCategories.forEach(songCategory => api.deleteSongCategory(song.id, songCategory.id));
                 this.editing = false;
                 this.saving = false;
+                this.song = song;
                 this.songCategories = this.draftSongCategories;
                 this.draftValues = null;
                 this.draftSongCategories = [];
+                if(isNew) {
+                    this.$router.push({
+                        name: "Song",
+                        params: { id: song.id },
+                    });
+                } 
             })
         },
 
@@ -415,13 +430,7 @@ const Song = {
             if (song.id) {
                 return api.updateSongForId(song.id, song);
             } else {
-                return api.createNewSong(song).then((response) => {
-                    song.id = response.data.id;
-                    this.$router.push({
-                        name: "Song",
-                        params: { id: song.id },
-                    });
-                });
+                return api.createNewSong(song);
             }
         },
 
