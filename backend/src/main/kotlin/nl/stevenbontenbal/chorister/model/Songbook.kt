@@ -10,4 +10,5 @@ class Songbook(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    var title: String)
+    var title: String?
+)
