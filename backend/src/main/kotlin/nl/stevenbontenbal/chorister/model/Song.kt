@@ -27,4 +27,12 @@ class Song(
     var slug: String = title.toSlug(),
     var addedAt: LocalDateTime = LocalDateTime.now(),
     @ManyToOne(fetch = FetchType.EAGER)
-    var addedBy: User?): ChoirOwnedEntity
+    var addedBy: User?,
+    @ManyToMany
+    @JoinTable(
+        name = "SONG_CATEGORY",
+        joinColumns = [JoinColumn(name = "SONG_ID")],
+        inverseJoinColumns = [JoinColumn(name = "CATEGORY_ID")]
+    )
+    var categories: MutableList<Category>?
+    ): ChoirOwnedEntity

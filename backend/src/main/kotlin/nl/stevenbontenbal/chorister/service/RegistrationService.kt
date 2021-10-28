@@ -11,23 +11,40 @@ import nl.stevenbontenbal.chorister.repository.UserRepository
 class RegistrationService(
     private val userRepository: UserRepository,
     private val choirRepository: ChoirRepository,
-    private val keycloakUserService: KeycloakUserService) {
+    private val keycloakUserService: KeycloakUserService,
+    private val categorisationService: CategorisationService
+) {
 
     fun register(registrationRequest: RegistrationRequest) {
         if (existsUserWithEmail(registrationRequest.email)) throw UsernameAlreadyExistingException("Username ${registrationRequest.email} already in use.")
-        val userPostRequest = createUserPostRequest(registrationRequest)
-        keycloakUserService.postUser(userPostRequest)
-        val user = createUser(registrationRequest)
-        userRepository.save(user)
-        val choir = createChoir(registrationRequest, user)
-        choirRepository.save(choir)
-        user.choir = choir;
-        userRepository.save(user)
+        var user = registerUser(registrationRequest)
+        val choir = registerChoir(registrationRequest, user)
+        initalizeChoirData(choir)
     }
 
     private fun existsUserWithEmail(email: String): Boolean {
         val user = userRepository.findByEmail(email)
         return user != null
+    }
+
+    private fun registerUser(registrationRequest: RegistrationRequest): User {
+        val userPostRequest = createUserPostRequest(registrationRequest)
+        keycloakUserService.postUser(userPostRequest)
+        val user = createUser(registrationRequest)
+        userRepository.save(user)
+        return user
+    }
+
+    private fun registerChoir(registrationRequest: RegistrationRequest, user: User): Choir {
+        val choir = createChoir(registrationRequest, user)
+        choirRepository.save(choir)
+        user.choir = choir
+        userRepository.save(user)
+        return choir
+    }
+
+    private fun initalizeChoirData(choir: Choir) {
+        categorisationService.createDefaultCategories(choir)
     }
 
     private fun createUserPostRequest(registrationRequest: RegistrationRequest): UserPostRequest =

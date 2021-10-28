@@ -3,6 +3,7 @@ package nl.stevenbontenbal.chorister.model
 import java.util.*
 import javax.persistence.*
 
+@Entity
 class Registration(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,4 +18,6 @@ class Registration(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
     var choir: Choir?,
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
     var user: User?)

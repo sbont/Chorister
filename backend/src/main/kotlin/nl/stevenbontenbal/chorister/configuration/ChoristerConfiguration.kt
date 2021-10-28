@@ -5,12 +5,11 @@ import io.netty.handler.logging.LogLevel
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
 import nl.stevenbontenbal.chorister.authorization.ChoirAccessPermissionEvaluator
+import nl.stevenbontenbal.chorister.model.Category
 import nl.stevenbontenbal.chorister.model.Score
 import nl.stevenbontenbal.chorister.model.Song
-import nl.stevenbontenbal.chorister.repository.ChoirRepository
-import nl.stevenbontenbal.chorister.repository.SongRepository
-import nl.stevenbontenbal.chorister.repository.SongbookRepository
-import nl.stevenbontenbal.chorister.repository.UserRepository
+import nl.stevenbontenbal.chorister.repository.*
+import nl.stevenbontenbal.chorister.service.CategorisationService
 import nl.stevenbontenbal.chorister.service.KeycloakUserService
 import nl.stevenbontenbal.chorister.service.RegistrationService
 import nl.stevenbontenbal.chorister.service.UserService
@@ -92,6 +91,7 @@ class ChoristerConfiguration {
             ) {
                 configuration.exposeIdsFor(Song::class.java)
                 configuration.exposeIdsFor(Score::class.java)
+                configuration.exposeIdsFor(Category::class.java)
                 corsRegistry.addMapping("/api/**")
                     .allowedMethods("*")
                     .allowedOrigins("http://localhost:8080/")
@@ -162,11 +162,15 @@ class ChoristerConfiguration {
     fun registrationService(
         userRepository: UserRepository,
         choirRepository: ChoirRepository,
-        keycloakUserService: KeycloakUserService
-    ): RegistrationService = RegistrationService(userRepository, choirRepository, keycloakUserService)
+        keycloakUserService: KeycloakUserService,
+        categorisationService: CategorisationService
+    ): RegistrationService = RegistrationService(userRepository, choirRepository, keycloakUserService, categorisationService)
 
     @Bean
     fun userService(userRepository: UserRepository): UserService = UserService(userRepository)
+
+    @Bean
+    fun categorisationService(choristerProperties: ChoristerProperties, categoryRepository: CategoryRepository): CategorisationService = CategorisationService(choristerProperties, categoryRepository)
 
     @Bean
     fun databaseInitializer(choirRepository: ChoirRepository,

@@ -1,16 +1,16 @@
 package nl.stevenbontenbal.chorister.model
 
-import org.springframework.data.rest.core.annotation.RestResource
+import nl.stevenbontenbal.chorister.interfaces.ChoirOwnedEntity
 import javax.persistence.*
 
 @Entity
-class User(
+class Category(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
-    var choir: Choir? = null,
-    var email: String?,
-    var username: String,
-    var displayName: String?)
+    override var choir: Choir? = null,
+    var name: String,
+    var type: CategoryType
+): ChoirOwnedEntity

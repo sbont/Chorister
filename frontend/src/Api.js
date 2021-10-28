@@ -9,6 +9,7 @@ const instance = axios.create({
 });
 instance.interceptors.request.use(
     async config => {
+        console.log('Starting Request', JSON.stringify(config, null, 2))
         let accessToken = await authService.getAccessToken()
         if(accessToken) {
             config.headers.common.Authorization = 'Bearer ' + accessToken
@@ -40,7 +41,6 @@ export default {
 
     getScoresBySongId: (songId) => instance.get('songs/' + songId + '/scores', {
         transformResponse: [function (data) {
-            console.log(data);
             return data ? JSON.parse(data)._embedded.scores : data;
         }]
     }),
@@ -54,5 +54,29 @@ export default {
     // Register
 
     register: (request) => instance.post('registration', request),
+
+    // Categories
+
+    getAllCategories: () => instance.get('categories', {
+        transformResponse: [function (data) {
+            return data ? JSON.parse(data)._embedded.categories : data;
+        }]
+    }),
+
+    getSongCategories: (songId) => instance.get('songs/' + songId + '/categories', {
+        transformResponse: [function (data) {
+            console.log('Song categories ' + songId + ':');
+            console.log(data);
+            return data ? JSON.parse(data)._embedded.categories : data;
+        }]
+    }),
+
+    postSongCategories: (songId, categoryUris) => instance.post('songs/' + songId + '/categories', categoryUris.join('\r\n'), {
+        headers: {
+            'content-type': 'text/uri-list'
+        }
+    }),
+
+    deleteSongCategory: (songId, categoryId) => instance.delete('songs/' + songId + '/categories/' + categoryId),
 
 }

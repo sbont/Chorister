@@ -159,9 +159,33 @@
                                 <label class="label">Time of the year</label>
                             </div>
                             <div class="field-body">
-                                <div class="tags are-medium">
-                                    <span class="tag">Christmas</span>
-                                    <span class="tag">Advent</span>
+                                <div 
+                                    class="field"
+                                    v-bind:class="{ static: !editing }"
+                                >
+                                    <div class="control">
+                                        <div class="select is-multiple">
+                                            <multiselect 
+                                                v-if="editing"
+                                                v-model="draftSongCategories.season" 
+                                                :multiple="true"
+                                                :options="categories.season"
+                                                track-by="name"
+                                                label="name"
+                                                :close-on-select="false"
+                                            ></multiselect>
+                                                        
+                                            <div v-else class="tags are-medium">
+                                                <span 
+                                                    v-for="(category) in songCategories.season" 
+                                                    :key="category.id"
+                                                    class="tag"
+                                                >
+                                                    {{ category.name }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -170,10 +194,33 @@
                                 <label class="label">Liturgical place</label>
                             </div>
                             <div class="field-body">
-                                <div class="tags are-medium">
-                                    <span class="tag">Gloria</span>
-                                    <span class="tag">Communion</span>
-                                    <span class="tag">Outro</span>
+                                <div 
+                                    class="field"
+                                    v-bind:class="{ static: !editing }"
+                                >
+                                    <div class="control">
+                                        <div class="select is-multiple">
+                                            <multiselect 
+                                                v-if="editing"
+                                                v-model="draftSongCategories.liturgical" 
+                                                :multiple="true"
+                                                :options="categories.liturgical"
+                                                track-by="name"
+                                                label="name"
+                                                :close-on-select="false"
+                                            ></multiselect>
+                                                        
+                                            <div v-else class="tags are-medium">
+                                                <span 
+                                                    v-for="(category) in songCategories.liturgical" 
+                                                    :key="category.id"
+                                                    class="tag"
+                                                >
+                                                    {{ category.name }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -181,7 +228,10 @@
 
                     <div class="field is-grouped mt-5">
                         <p v-if="!editing" class="control">
-                            <button @click="edit" class="button is-link">
+                            <button 
+                                @click="edit" 
+                                class="button is-link"
+                            >
                                 Edit
                             </button>
                         </p>
@@ -193,7 +243,7 @@
                                 Delete
                             </button>
                         </p>
-                        <p v-if="editing" @click="edit" class="control">
+                        <p v-if="editing" class="control">
                             <button
                                 @click="save"
                                 class="button is-link"
@@ -242,8 +292,11 @@
     </div>
 </template>
 <script>
+
 import api from "../api";
 import Score from "@/components/Score.vue"
+import Multiselect from 'vue-multiselect'
+import { Log } from "oidc-client";
 
 // app Vue instance
 const Song = {
@@ -253,9 +306,12 @@ const Song = {
     data: function () {
         return {
             song: {},
+            songCategories: {},
             scores: [],
+            categories: {},
             editing: false,
             draftValues: null,
+            draftSongCategories: null,
             loading: true,
             saving: false,
             error: null,
@@ -263,6 +319,11 @@ const Song = {
     },
 
     mounted: function () {
+        let categoriesLoaded = api.getAllCategories()
+            .catch((error) => {
+                this.$log.debug(error);
+                this.error = "Failed to load categories";
+            });
         if (this.$route.name === "NewSong") {
             this.draftValues = {
                 songbook: {},
@@ -294,6 +355,23 @@ const Song = {
                     this.error = "Failed to load song";
                     this.loading = false;
                 });
+            let songCategoriesLoaded = api.getSongCategories(songId)
+                // .then((response) => {
+                //     this.songCategories = response.data;
+                // })
+                .catch((error) => {
+                    this.$log.debug(error);
+                    this.error = "Failed to load song categories";
+                    this.loading = false;
+                });
+            Promise.all([categoriesLoaded, songCategoriesLoaded])
+                .then(([categoryResponse, songCategoryResponse]) => {
+                    this.$log.debug("Categories loaded: ", categoryResponse.data);
+                    this.categories.season = categoryResponse.data.filter(category => category.type === "SEASON");
+                    this.categories.liturgical = categoryResponse.data.filter(category => category.type === "LITURGICAL_MOMENT");
+                    this.songCategories.season = this.categories.season.filter(category => songCategoryResponse.data.some(songCategory => category._links.self.href === songCategory._links.self.href));
+                    this.songCategories.liturgical = this.categories.liturgical.filter(category => songCategoryResponse.data.some(songCategory => category._links.self.href === songCategory._links.self.href));
+                });
         }
     },
 
@@ -315,19 +393,30 @@ const Song = {
             if (!song) {
                 return;
             }
+            const promise = this.saveToServer(song);
+            promise.then(() => {
+                let previousSongCategories = this.songCategories.season.concat(this.songCategories.liturgical);
+                let draftSongCategories = this.draftSongCategories.season.concat(this.draftSongCategories.liturgical);
+                let newSongCategories = draftSongCategories.filter(draftSongCategory => !previousSongCategories.some(previousSongCategory => draftSongCategory._links.self.href === previousSongCategory._links.self.href));
+                let deletedSongCategories = previousSongCategories.filter(previousSongCategory => !draftSongCategories.some(draftSongCategory => previousSongCategory._links.self.href === draftSongCategory._links.self.href));
+                if(newSongCategories.length) {
+                    api.postSongCategories(this.song.id, newSongCategories.map(songCategory => songCategory._links.self.href));
+                }
+                deletedSongCategories.forEach(songCategory => api.deleteSongCategory(this.song.id, songCategory.id));
+                this.editing = false;
+                this.saving = false;
+                this.songCategories = this.draftSongCategories;
+                this.draftValues = null;
+                this.draftSongCategories = [];
+            })
+        },
+
+        saveToServer: function(song) {
             if (song.id) {
-                api.updateSongForId(song.id, song).then((response) => {
-                    this.editing = false;
-                    this.saving = false;
-                    this.draftValues = null;
-                });
+                return api.updateSongForId(song.id, song);
             } else {
-                api.createNewSong(song).then((response) => {
-                    console.log(response);
+                return api.createNewSong(song).then((response) => {
                     song.id = response.data.id;
-                    this.editing = false;
-                    this.saving = false;
-                    this.draftValues = null;
                     this.$router.push({
                         name: "Song",
                         params: { id: song.id },
@@ -344,11 +433,13 @@ const Song = {
 
         edit: function () {
             this.draftValues = this.song;
+            this.draftSongCategories = Object.assign({}, this.songCategories);
             this.editing = true;
         },
 
         cancelEdit: function () {
             this.draftValues = null;
+            this.draftSongCategories = null;
             this.editing = false;
         },
 
@@ -357,7 +448,6 @@ const Song = {
                 id: null,
                 song: this.song._links.self.href
             };
-            console.log(newScore);
             this.scores.push(newScore);
         },
 
@@ -385,12 +475,15 @@ const Song = {
     },
 
     components: {
-        Score
+        Score,
+        Multiselect
     }
 };
 
 export default Song;
 </script>
+
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <style>
 [v-cloak] {
