@@ -14,7 +14,7 @@ const routes = [
   },
   {
     path: '/signup',
-    name: 'Sign Up',
+    name: 'SignUp',
     component: () => import(/* webpackChunkName: "signup" */ '../views/SignUp.vue')
   },
   {
@@ -32,6 +32,22 @@ const routes = [
       {
         path: '',
         name: 'Repertoire',
+        component: () => import(/* webpackChunkName: "songs" */ '../components/Songs.vue'),
+        meta: {
+          requiresAuth: true
+        },
+      },
+      {
+        path: 'by-season/:id',
+        name: 'CategorySeason',
+        component: () => import(/* webpackChunkName: "songs" */ '../components/Songs.vue'),
+        meta: {
+          requiresAuth: true
+        },
+      },
+      {
+        path: 'by-liturgical-moment/:id',
+        name: 'CategoryLiturgical',
         component: () => import(/* webpackChunkName: "songs" */ '../components/Songs.vue'),
         meta: {
           requiresAuth: true

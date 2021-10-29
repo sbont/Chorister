@@ -18,18 +18,25 @@ instance.interceptors.request.use(
     }
 )
 
-export default {
+const functions = {
+
+    getGetConfig: (embeddedAttributeName) => {
+        return {
+            transformResponse: [
+                function(data) {
+                    return data ? JSON.parse(data)._embedded[embeddedAttributeName] : data;
+                }
+            ]
+        }
+    },
 
     // Songs
 
     getSongById: (id) => instance.get('songs/' + id),
 
-    getAllSongs: () => instance.get('songs', {
-        transformResponse: [function (data) {
-            console.log(data);
-            return data ? JSON.parse(data)._embedded.songs : data;
-        }]
-    }),
+    getAllSongs: () => instance.get('songs', functions.getGetConfig('songs')),
+
+    getSongsByCategoryId: (categoryId) => instance.get('songs/search/bycategory?id=' + categoryId, functions.getGetConfig('songs')),
 
     createNewSong: (song) => instance.post('songs', song),
 
@@ -39,11 +46,7 @@ export default {
 
     // Scores
 
-    getScoresBySongId: (songId) => instance.get('songs/' + songId + '/scores', {
-        transformResponse: [function (data) {
-            return data ? JSON.parse(data)._embedded.scores : data;
-        }]
-    }),
+    getScoresBySongId: (songId) => instance.get('songs/' + songId + '/scores', functions.getGetConfig('scores')),
 
     createNewScore: (score) => instance.post('scores', score),
 
@@ -57,19 +60,9 @@ export default {
 
     // Categories
 
-    getAllCategories: () => instance.get('categories', {
-        transformResponse: [function (data) {
-            return data ? JSON.parse(data)._embedded.categories : data;
-        }]
-    }),
+    getAllCategories: () => instance.get('categories', functions.getGetConfig('categories')),
 
-    getSongCategories: (songId) => instance.get('songs/' + songId + '/categories', {
-        transformResponse: [function (data) {
-            console.log('Song categories ' + songId + ':');
-            console.log(data);
-            return data ? JSON.parse(data)._embedded.categories : data;
-        }]
-    }),
+    getSongCategories: (songId) => instance.get('songs/' + songId + '/categories', functions.getGetConfig('categories')),
 
     postSongCategories: (songId, categoryUris) => instance.post('songs/' + songId + '/categories', categoryUris.join('\r\n'), {
         headers: {
@@ -80,3 +73,5 @@ export default {
     deleteSongCategory: (songId, categoryId) => instance.delete('songs/' + songId + '/categories/' + categoryId),
 
 }
+
+export default functions;

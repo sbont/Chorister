@@ -291,18 +291,15 @@
         </div>
     </div>
 </template>
-<script>
 
+<script>
 import api from "../api";
 import Score from "@/components/Score.vue"
 import Multiselect from 'vue-multiselect'
-import { Log } from "oidc-client";
 
-// app Vue instance
 const Song = {
     name: "Song",
 
-    // app initial state
     data: function () {
         return {
             song: {},

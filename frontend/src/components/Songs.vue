@@ -74,8 +74,12 @@ const Songs = {
     },
 
     mounted: function () {
-
-        api.getAllSongs()
+        const id = this.$route.params.id;
+        console.log(this.$route.params);
+        let songsLoaded = !id ?
+            api.getAllSongs() :
+            api.getSongsByCategoryId(id);
+        songsLoaded
             .then((response) => {
                 this.$log.debug("Data loaded: ", response.data);
                 this.songs = response.data;
