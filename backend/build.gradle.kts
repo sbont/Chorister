@@ -3,12 +3,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 	id("org.springframework.boot") version "2.4.5"
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
-	id("org.jetbrains.kotlin.plugin.noarg") version "1.5.0"
-	kotlin("jvm") version "1.5.0"
-	kotlin("plugin.spring") version "1.5.0"
-	kotlin("plugin.jpa") version "1.5.0"
-	kotlin("plugin.allopen") version "1.5.0"
-	kotlin("kapt") version "1.5.0"
+	id("org.jetbrains.kotlin.plugin.noarg") version "1.6.0"
+	kotlin("jvm") version "1.6.0"
+	kotlin("plugin.spring") version "1.6.0"
+	kotlin("plugin.jpa") version "1.6.0"
+	kotlin("plugin.allopen") version "1.6.0"
+	kotlin("kapt") version "1.6.0"
 }
 
 apply(plugin = "kotlin-jpa")
@@ -33,17 +33,16 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	implementation("org.modelmapper:modelmapper:2.4.2")
+	implementation("org.modelmapper:modelmapper:2.4.5")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.h2database:h2")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
 		exclude(module = "junit")
 		exclude(module = "mockito-core")
 	}
 	testImplementation("org.junit.jupiter:junit-jupiter-api")
+	testImplementation("com.ninja-squad:springmockk:3.1.0")
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-	testImplementation("com.ninja-squad:springmockk:3.0.1")
 	"kapt"("org.springframework.boot:spring-boot-configuration-processor")
 }
 
