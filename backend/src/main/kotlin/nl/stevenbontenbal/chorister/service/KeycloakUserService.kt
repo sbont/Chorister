@@ -1,6 +1,7 @@
 package nl.stevenbontenbal.chorister.service
 
 import nl.stevenbontenbal.chorister.configuration.KeycloakConfiguration
+import nl.stevenbontenbal.chorister.exceptions.UsernameAlreadyExistingException
 import nl.stevenbontenbal.chorister.model.dto.UserPostRequest
 import nl.stevenbontenbal.chorister.model.dto.UserPostResponse
 import org.springframework.http.HttpStatus
@@ -27,11 +28,14 @@ class KeycloakUserService(
         .contentType(MediaType.APPLICATION_JSON)
         .body(BodyInserters.fromValue(request))
         .retrieve()
+        .onStatus({s: HttpStatus -> s.value() == HttpStatus.CONFLICT.value()}) {
+            Mono.error(UsernameAlreadyExistingException("Username already exists in authentication server"))
+        }
         .onStatus(HttpStatus::is4xxClientError) {
-            Mono.error(RuntimeException("400 Error: ${it.statusCode()}"))
+            Mono.error(RuntimeException("Keycloak client error: ${it.statusCode()}"))
         }
         .onStatus(HttpStatus::is5xxServerError) {
-            Mono.error(RuntimeException("500 Error: ${it.statusCode()}"))
+            Mono.error(RuntimeException("Keycloak server error: ${it.statusCode()}"))
         }
         .toEntity(UserPostResponse::class.java)
         .block()
