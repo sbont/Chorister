@@ -7,6 +7,7 @@ import io.netty.handler.timeout.WriteTimeoutHandler
 import nl.stevenbontenbal.chorister.authorization.ChoirAccessPermissionEvaluator
 import nl.stevenbontenbal.chorister.model.Category
 import nl.stevenbontenbal.chorister.model.Score
+import nl.stevenbontenbal.chorister.model.Setlist
 import nl.stevenbontenbal.chorister.model.Song
 import nl.stevenbontenbal.chorister.repository.*
 import nl.stevenbontenbal.chorister.service.CategorisationService
@@ -92,6 +93,7 @@ class ChoristerConfiguration {
                 configuration.exposeIdsFor(Song::class.java)
                 configuration.exposeIdsFor(Score::class.java)
                 configuration.exposeIdsFor(Category::class.java)
+                configuration.exposeIdsFor(Setlist::class.java)
                 corsRegistry.addMapping("/api/**")
                     .allowedMethods("*")
                     .allowedOrigins("http://localhost:8080/")
@@ -178,7 +180,6 @@ class ChoristerConfiguration {
                             songbookRepository: SongbookRepository,
                             songRepository: SongRepository
     ) = ApplicationRunner {
-
 
     }
 

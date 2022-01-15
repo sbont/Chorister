@@ -25,3 +25,12 @@ th {
     display: flex;
     align-items: flex-end;
 }
+.field-label {
+    flex-grow: 2;
+}
+li .menu-header {
+    border-radius: 2px;
+    color: #b5b5b5;
+    display: block;
+    padding: 0.5em 0.75em 0.1em;
+}

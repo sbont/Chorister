@@ -152,8 +152,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div>
                         <div class="field is-horizontal">
                             <div class="field-label is-normal">
                                 <label class="label">Time of the year</label>
@@ -394,10 +392,9 @@ const Song = {
             if (!song) {
                 return;
             }
-            const isNew = !song.id;
             const promise = this.saveToServer(song);
             promise.then((response) => {
-                if(isNew) {
+                if(this.isNew) {
                     song.id = response.data.id;
                 }
                 let previousSongCategories = this.songCategories ? this.songCategories.season.concat(this.songCategories.liturgical) : [];
@@ -414,7 +411,7 @@ const Song = {
                 this.songCategories = this.draftSongCategories;
                 this.draftValues = null;
                 this.draftSongCategories = [];
-                if(isNew) {
+                if(this.isNew) {
                     this.$router.push({
                         name: "Song",
                         params: { id: song.id },

@@ -2,17 +2,19 @@
 	<aside class="menu p-2">
 		<p class="menu-label">Repertoire</p>
 		<ul class="menu-list">
-			<li><a class="is-active">All songs</a></li>
 			<li>
-				By time of the year
+				<router-link :to="{ name: 'Repertoire'}">All songs</router-link>
+			</li>
+			<li v-if="ready">
+				<div class="menu-header">By time of the year</div>
 				<ul>
 					<li v-for="(category) in categories.season" :key="category.id">
 						<router-link :to="{ name: 'CategorySeason', params: { id: category.id }}" append>{{ category.name }}</router-link>
 					</li>
 				</ul>
 			</li>
-			<li>
-				By liturgical place
+			<li v-if="ready">
+				<div class="menu-header">By liturgical place</div>
 				<ul>
 					<li v-for="(category) in categories.liturgical" :key="category.id">
 						<router-link :to="{ name: 'CategoryLiturgical', params: { id: category.id }}" append>{{ category.name }}</router-link>
@@ -22,10 +24,16 @@
 		</ul>
 		<p class="menu-label">Setlists</p>
 		<ul class="menu-list">
-			<li><a>Pentecost Mass</a></li>
-			<li><a>16-05-2021 Sunday Afternoon Mass</a></li>
-			<li><a>09-05-2021 Sunday Afternoon Mass</a></li>
-			<li><a>02-05-2021 Sunday Afternoon Mass</a></li>
+			<li>
+				<router-link :to="{ name: 'NewSetlist' }" append>
+					<span class="icon">
+						<i class="fas fa-plus-square"></i>
+					</span>
+					Create setlist</router-link>
+			</li>
+			<li v-for="(setlist) in setlists" :key="setlist.id">
+				<router-link :to="{ name: 'Setlist', params: { id: setlist.id }}" append>{{ setlist.name }}</router-link>
+			</li>
 		</ul>
 	</aside>
 </template>
@@ -39,7 +47,8 @@ const RepertoireMenu = {
 
 	data: function () {
 		return {
-			categories: null
+			categories: null,
+			setlists: null
 		};
 	},
 
@@ -56,6 +65,17 @@ const RepertoireMenu = {
 				this.$log.debug(error);
 				this.error = "Failed to load categories";
 			});
+		let setlistsLoaded = api.getAllSetlists()
+			.then(response => {
+				this.$log.debug("Setlists loaded: ", response.data);
+				this.setlists = response.data;
+			})
+	},
+
+	computed: {
+		ready: function() {
+			return !!this.categories;
+		}
 	},
 
 	methods: {

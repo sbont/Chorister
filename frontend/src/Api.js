@@ -60,7 +60,11 @@ const functions = {
 
     // Categories
 
+    getCategoryById: (id) => instance.get('categories/' + id),
+
     getAllCategories: () => instance.get('categories', functions.getGetConfig('categories')),
+
+    // Song categories
 
     getSongCategories: (songId) => instance.get('songs/' + songId + '/categories', functions.getGetConfig('categories')),
 
@@ -71,6 +75,23 @@ const functions = {
     }),
 
     deleteSongCategory: (songId, categoryId) => instance.delete('songs/' + songId + '/categories/' + categoryId),
+
+    // Setlists
+
+    getSetlistById: (id) => instance.get('setlists/' + id),
+
+    getAllSetlists: () => instance.get('setlists', functions.getGetConfig('setlists')),
+
+    createNewSetlist: (setlist) => instance.post('setlists', setlist),
+
+    updateSetlistForId: (id, setlist) => instance.put('setlists/' + id, setlist),
+
+    deleteSetlistForId: (id) => instance.delete('setlists/' + id),
+
+    // Setlist songs
+
+    getSetlistSongs: (id) => instance.get('setlists/' + id + '/songs', functions.getGetConfig('songs')),
+
 
 }
 

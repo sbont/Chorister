@@ -1,9 +1,9 @@
 <template>    
     <div class="p-2">
-        <div class="is-flex is-justify-content-space-between">
+        <!-- <div class="is-flex is-justify-content-space-between">
             <h1 class="title">Repertoire</h1>
             <router-link class="button is-primary" to="song/new" append tag="button">Add +</router-link>
-        </div>
+        </div> -->
         <progress
             v-if="loading"
             class="progress is-medium is-info"
@@ -15,7 +15,6 @@
         <table
             class="table is-hoverable is-fullwidth"
             v-if="!loading"
-            v-show="songs.length"
             v-cloak
         >
             <thead>
@@ -42,7 +41,7 @@
             </tbody>
             <tfoot></tfoot>
         </table>
-        <footer class="footer" v-show="songs.length" v-cloak>
+        <footer class="footer" v-cloak>
                 <strong>{{ songs.length }}</strong>
                 {{
                     songs | pluralize
@@ -53,8 +52,8 @@
 
 <script>
 import api from "../api";
+import { Dropdown } from 'buefy'
 
-// app Vue instance
 const Songs = {
     name: "Songs",
     props: {
@@ -74,11 +73,23 @@ const Songs = {
     },
 
     mounted: function () {
-        const id = this.$route.params.id;
         console.log(this.$route.params);
-        let songsLoaded = !id ?
-            api.getAllSongs() :
-            api.getSongsByCategoryId(id);
+        const routeName = this.$route.name;
+        let songsLoaded;
+        switch(routeName) {
+            case 'Repertoire':
+                songsLoaded = api.getAllSongs();
+                break;
+            case 'CategorySeason':
+            case 'CategoryLiturgical':
+                var categoryId = this.$route.params.id;
+                songsLoaded = api.getSongsByCategoryId(categoryId);
+                break;
+            case 'Setlist':
+                var setlistId = this.$route.params.id;
+                songsLoaded = api.getSetlistSongs(setlistId);
+                break;
+        }
         songsLoaded
             .then((response) => {
                 this.$log.debug("Data loaded: ", response.data);
@@ -87,11 +98,6 @@ const Songs = {
             .catch((error) => {
                 this.$log.debug(error);
                 this.error = "Failed to load repertoire";
-                // inject some startup data
-                this.songs = [
-                    { title: "Drink coffee", composer: "Gert" },
-                    { title: "Write REST API", composer: "Arie" },
-                ];
             })
             .finally(() => (this.loading = false));
     },

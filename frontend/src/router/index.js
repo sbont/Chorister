@@ -32,7 +32,7 @@ const routes = [
       {
         path: '',
         name: 'Repertoire',
-        component: () => import(/* webpackChunkName: "songs" */ '../components/Songs.vue'),
+        component: () => import(/* webpackChunkName: "allsongs" */ '../views/AllSongs.vue'),
         meta: {
           requiresAuth: true
         },
@@ -40,7 +40,7 @@ const routes = [
       {
         path: 'by-season/:id',
         name: 'CategorySeason',
-        component: () => import(/* webpackChunkName: "songs" */ '../components/Songs.vue'),
+        component: () => import(/* webpackChunkName: "songsbycategory" */ '../views/SongsByCategory.vue'),
         meta: {
           requiresAuth: true
         },
@@ -48,7 +48,23 @@ const routes = [
       {
         path: 'by-liturgical-moment/:id',
         name: 'CategoryLiturgical',
-        component: () => import(/* webpackChunkName: "songs" */ '../components/Songs.vue'),
+        component: () => import(/* webpackChunkName: "songsbycategory" */ '../views/SongsByCategory.vue'),
+        meta: {
+          requiresAuth: true
+        },
+      },
+      {
+        path: 'setlist/new',
+        name: 'NewSetlist',
+        component: () => import(/* webpackChunkName: "setlist" */ '../components/SetlistDetail.vue'),
+        meta: {
+          requiresAuth: true
+        },
+      },
+      {
+        path: 'setlist/:id',
+        name: 'Setlist',
+        component: () => import(/* webpackChunkName: "songs" */ '../views/Setlist.vue'),
         meta: {
           requiresAuth: true
         },
@@ -76,7 +92,8 @@ const routes = [
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
+  linkExactActiveClass: "is-active",
 })
 
 router.beforeEach((to, from, next) => {
