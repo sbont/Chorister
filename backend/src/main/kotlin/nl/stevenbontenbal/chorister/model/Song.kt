@@ -23,7 +23,7 @@ class Song(
     var songbook: Songbook?,
     var songbookNumber: Int?,
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "song")
-    var scores: MutableList<Score>?,
+    var scores: MutableList<Score>? = mutableListOf(),
     var slug: String = title.toSlug(),
     var addedAt: LocalDateTime = LocalDateTime.now(),
     @ManyToOne(fetch = FetchType.EAGER)
@@ -34,5 +34,7 @@ class Song(
         joinColumns = [JoinColumn(name = "SONG_ID")],
         inverseJoinColumns = [JoinColumn(name = "CATEGORY_ID")]
     )
-    var categories: MutableList<Category>?
-    ): ChoirOwnedEntity
+    var categories: MutableList<Category>? = mutableListOf()
+) : ChoirOwnedEntity {
+    companion object
+}

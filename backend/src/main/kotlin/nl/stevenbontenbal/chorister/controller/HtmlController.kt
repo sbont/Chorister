@@ -16,12 +16,12 @@ import org.springframework.web.server.ResponseStatusException
 @Controller
 class HtmlController(private val repository: SongRepository, private val properties: ChoristerProperties) {
 
-    @GetMapping("/repertoire")
+    /*@GetMapping("/repertoire")
     fun repertoire(model: Model): String {
         model["title"] = properties.title
         model["songs"] = repository.findAllByOrderByAddedAtDesc().map { it.render() }
         return "repertoire"
-    }
+    }*/
 /*
     @GetMapping("/")
     fun index(): String {

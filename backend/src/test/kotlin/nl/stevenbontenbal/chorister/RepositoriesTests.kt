@@ -16,7 +16,7 @@ class RepositoriesTests @Autowired constructor(
     val songRepository: SongRepository
 ) {
 
-    @Test
+    /*@Test
     fun `When findByIdOrNull then return Article`() {
         val juergen = User("springjuergen@gmail.com", "Juergen")
         entityManager.persist(juergen)
@@ -34,5 +34,5 @@ class RepositoriesTests @Autowired constructor(
         entityManager.flush()
         val user = userRepository.findByEmail(juergen.email)
         assertThat(user).isEqualTo(juergen)
-    }
+    }*/
 }
