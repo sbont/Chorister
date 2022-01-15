@@ -4,6 +4,7 @@ import VueLogger from 'vuejs-logger';
 import router from './router'
 import auth from './auth'
 import LoadScript from 'vue-plugin-load-script';
+// import 'buefy/dist/buefy.css'
 
 Vue.config.productionTip = false
 
