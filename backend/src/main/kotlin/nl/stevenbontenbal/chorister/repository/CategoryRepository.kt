@@ -9,7 +9,7 @@ import org.springframework.security.access.prepost.PostFilter
 @RepositoryRestResource
 interface CategoryRepository: CrudRepository<Category, Long> {
     @PostAuthorize("hasPermission(filterObject, 'read')")
-    fun findByName(name: String): Category
+    fun findByName(name: String): Category?
 
     @PostFilter("hasPermission(filterObject, 'read')")
     override fun findAll(): Iterable<Category>

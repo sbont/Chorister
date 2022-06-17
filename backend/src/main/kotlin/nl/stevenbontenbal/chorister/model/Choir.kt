@@ -13,3 +13,6 @@ class Choir(
     var users: MutableList<User>? = mutableListOf(),
     @OneToOne
     var manager: User?)
+{
+    companion object
+}

@@ -14,3 +14,6 @@ class User(
     var email: String?,
     var username: String,
     var displayName: String?)
+{
+    companion object
+}

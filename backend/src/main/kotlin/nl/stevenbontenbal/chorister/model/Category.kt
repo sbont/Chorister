@@ -13,4 +13,6 @@ class Category(
     override var choir: Choir? = null,
     var name: String,
     var type: CategoryType
-): ChoirOwnedEntity
+): ChoirOwnedEntity {
+    companion object
+}
