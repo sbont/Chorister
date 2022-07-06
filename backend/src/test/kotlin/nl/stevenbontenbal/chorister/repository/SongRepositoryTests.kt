@@ -1,6 +1,7 @@
 package nl.stevenbontenbal.chorister.repository
 
 import nl.stevenbontenbal.chorister.create
+import nl.stevenbontenbal.chorister.model.Choir
 import nl.stevenbontenbal.chorister.model.Song
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
@@ -16,8 +17,10 @@ class SongRepositoryTests @Autowired constructor(
     @Test
     fun `When findAll then return all Songs`() {
         // Arrange
-        val song1 = Song.create()
-        val song2 = Song.create()
+        val choir = Choir.create()
+        entityManager.persist(choir)
+        val song1 = Song.create(choir)
+        val song2 = Song.create(choir)
         entityManager.persist(song1)
         entityManager.persist(song2)
         // Act

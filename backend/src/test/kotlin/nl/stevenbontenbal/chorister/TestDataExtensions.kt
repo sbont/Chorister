@@ -4,7 +4,7 @@ import nl.stevenbontenbal.chorister.model.*
 import java.time.LocalDate
 import java.util.*
 
-fun Song.Companion.create(): Song {
+fun Song.Companion.create(choir: Choir): Song {
     return Song(
         title = "My Song",
         composer = "John Doe",
@@ -12,22 +12,23 @@ fun Song.Companion.create(): Song {
         scoreUrl = "http://www.hymnary.com/5678",
         songbook = null,
         songbookNumber = 23,
-        choir =  null,
+        choir = choir,
         addedBy = null,
     )
 }
 
-fun Setlist.Companion.create(): Setlist {
+fun Setlist.Companion.create(choir: Choir): Setlist {
     return Setlist(
+        choir = choir,
         name = "Christmas Morning",
         date = LocalDate.of(2022, 12, 25),
     )
 }
 
-fun Category.Companion.create(categoryType: CategoryType): Category {
+fun Category.Companion.create(choir: Choir, categoryType: CategoryType): Category {
     return Category(
         name = "Christmas",
-        choir = null,
+        choir = choir,
         type = categoryType
     )
 }
@@ -40,11 +41,19 @@ fun User.Companion.create(): User {
     )
 }
 
-fun Choir.Companion.create(manager: User?): Choir {
+fun Choir.Companion.create(manager: User? = null): Choir {
     return Choir(
         name = "MyChoir",
         type = "Band",
         manager = manager
+    )
+}
+
+fun Invite.Companion.create(choir: Choir): Invite {
+    return Invite(
+        email = "new@user.com",
+        choir = choir,
+        invitedBy = User.create()
     )
 }
 // TODO: https://betterprogramming.pub/test-data-creation-using-the-power-of-kotlin-dsl-9526a1fad05b

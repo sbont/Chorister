@@ -20,8 +20,15 @@ class ChoirRepositoryTests @Autowired constructor(
     fun `When findByName and exists then return Choir`() {
         // Arrange
         val manager = User.create()
-        val myChoir = Choir.create(manager)
-        val otherChoir = Choir.create(null)
+        entityManager.persist(manager)
+        val myChoir = Choir(
+            name = "MyChoir",
+            type = "Band",
+            manager = manager)
+        val otherChoir = Choir(
+            name = "OtherChoir",
+            type = "Band",
+            manager = null)
         entityManager.persist(myChoir)
         entityManager.persist(otherChoir)
         // Act

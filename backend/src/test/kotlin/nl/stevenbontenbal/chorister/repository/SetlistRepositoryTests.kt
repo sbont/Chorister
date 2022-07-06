@@ -1,6 +1,7 @@
 package nl.stevenbontenbal.chorister.repository
 
 import nl.stevenbontenbal.chorister.create
+import nl.stevenbontenbal.chorister.model.Choir
 import nl.stevenbontenbal.chorister.model.Setlist
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
@@ -16,8 +17,10 @@ class SetlistRepositoryTests @Autowired constructor(
     @Test
     fun `When findAll then return all Setlists`() {
         // Arrange
-        val setlist1 = Setlist.create()
-        val setlist2 = Setlist.create()
+        val choir = Choir.create()
+        entityManager.persist(choir)
+        val setlist1 = Setlist.create(choir)
+        val setlist2 = Setlist.create(choir)
         entityManager.persist(setlist1)
         entityManager.persist(setlist2)
         // Act

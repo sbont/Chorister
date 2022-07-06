@@ -13,7 +13,7 @@ class Song(
     var id: Long? = null,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
-    override var choir: Choir?,
+    override var choir: Choir,
     var title: String,
     var composer: String?,
     var recordingUrl: String?,

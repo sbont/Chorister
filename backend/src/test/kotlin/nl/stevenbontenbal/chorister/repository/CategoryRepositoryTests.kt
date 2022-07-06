@@ -3,6 +3,7 @@ package nl.stevenbontenbal.chorister.repository
 import nl.stevenbontenbal.chorister.create
 import nl.stevenbontenbal.chorister.model.Category
 import nl.stevenbontenbal.chorister.model.CategoryType
+import nl.stevenbontenbal.chorister.model.Choir
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,8 +18,10 @@ class CategoryRepositoryTests @Autowired constructor(
     @Test
     fun `When findAll then return all Categories`() {
         // Arrange
-        val categoryLiturgical = Category.create(CategoryType.LITURGICAL_MOMENT)
-        val categorySeasonal = Category.create(CategoryType.SEASON)
+        val choir = Choir.create()
+        entityManager.persist(choir)
+        val categoryLiturgical = Category.create(choir, CategoryType.LITURGICAL_MOMENT)
+        val categorySeasonal = Category.create(choir, CategoryType.SEASON)
         entityManager.persist(categoryLiturgical)
         entityManager.persist(categorySeasonal)
         // Act
@@ -30,8 +33,10 @@ class CategoryRepositoryTests @Autowired constructor(
     @Test
     fun `When findByName and Category exists then return Category`() {
         // Arrange
-        val category1 = Category(name = "Advent", type = CategoryType.SEASON)
-        val category2 = Category.create(CategoryType.SEASON)
+        val choir = Choir.create()
+        entityManager.persist(choir)
+        val category1 = Category(name = "Advent", type = CategoryType.SEASON, choir = choir)
+        val category2 = Category.create(choir, CategoryType.SEASON)
         entityManager.persist(category1)
         entityManager.persist(category2)
         // Act
@@ -43,7 +48,9 @@ class CategoryRepositoryTests @Autowired constructor(
     @Test
     fun `When findByName and Category not exists then return nothing`() {
         // Arrange
-        val category1 = Category.create(CategoryType.SEASON)
+        val choir = Choir.create()
+        entityManager.persist(choir)
+        val category1 = Category.create(choir, CategoryType.SEASON)
         entityManager.persist(category1)
         // Act
         val actual = categoryRepository.findByName("Advent")
