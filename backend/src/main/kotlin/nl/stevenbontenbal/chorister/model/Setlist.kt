@@ -13,7 +13,7 @@ class Setlist (
     var date: LocalDate? = null,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
-    override var choir: Choir,
+    override var choir: Choir?,
     @ManyToMany
     @JoinTable(
         name = "SETLIST_SONG",

@@ -10,7 +10,7 @@ class Category(
     var id: Long? = null,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
-    override var choir: Choir,
+    override var choir: Choir?,
     var name: String,
     var type: CategoryType
 ): ChoirOwnedEntity {

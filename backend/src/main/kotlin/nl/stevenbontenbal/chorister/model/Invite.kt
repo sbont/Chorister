@@ -2,6 +2,7 @@ package nl.stevenbontenbal.chorister.model
 
 import nl.stevenbontenbal.chorister.interfaces.ChoirOwnedEntity
 import java.time.LocalDateTime
+import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -12,11 +13,11 @@ class Invite(
     var email: String?,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
-    override var choir: Choir,
+    override var choir: Choir?,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INVITED_BY_ID")
-    var token: String,
-    var invitedBy: User,
+    var invitedBy: User?,
+    var token: String = UUID.randomUUID().toString(),
     var createdDate: LocalDateTime = LocalDateTime.now(),
     var acceptedDate: LocalDateTime? = null,
     var expired: Boolean = false,

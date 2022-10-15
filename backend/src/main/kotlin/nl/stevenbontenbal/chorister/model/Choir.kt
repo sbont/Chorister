@@ -11,7 +11,7 @@ class Choir(
     var type: String,
     @OneToMany(mappedBy = "choir")
     var users: MutableList<User>? = mutableListOf(),
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.ALL])
     var manager: User?)
 {
     companion object

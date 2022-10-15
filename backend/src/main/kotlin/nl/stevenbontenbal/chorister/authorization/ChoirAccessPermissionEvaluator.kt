@@ -19,17 +19,18 @@ class ChoirAccessPermissionEvaluator(
             return false
         }
         val targetType = targetDomainObject.javaClass.simpleName.uppercase(Locale.getDefault())
-        return hasPrivilege(auth, targetDomainObject, permission.toString().uppercase(Locale.getDefault()))
+        return hasPrivilege(targetDomainObject, permission.toString().uppercase(Locale.getDefault()))
     }
 
     override fun hasPermission(
         auth: Authentication?, targetId: Serializable?, targetType: String?, permission: Any
     ): Boolean {
         return auth != null && targetType != null && permission is String &&
-            hasPrivilege(auth, targetType, permission.toString().uppercase(Locale.getDefault()))
+             hasPrivilege(
+            targetType, permission.toString().uppercase(Locale.getDefault()))
     }
 
-    private fun hasPrivilege(auth: Authentication, targetDomainObject: Any?, permission: String): Boolean {
+    private fun hasPrivilege(targetDomainObject: Any?, permission: String): Boolean {
         val currentUser = userService.getCurrentUser()
         return targetDomainObject is ChoirOwnedEntity
                 && (currentUser.choir != null && currentUser.choir == targetDomainObject.choir)

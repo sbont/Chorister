@@ -1,6 +1,6 @@
 package nl.stevenbontenbal.chorister.service
 
-import nl.stevenbontenbal.chorister.exceptions.RegistrationException
+import nl.stevenbontenbal.chorister.exceptions.InvalidInputException
 import nl.stevenbontenbal.chorister.exceptions.UsernameAlreadyExistingException
 import nl.stevenbontenbal.chorister.model.Choir
 import nl.stevenbontenbal.chorister.model.Invite
@@ -12,11 +12,10 @@ import nl.stevenbontenbal.chorister.model.dto.UserPostRequest
 import nl.stevenbontenbal.chorister.repository.ChoirRepository
 import nl.stevenbontenbal.chorister.repository.InviteRepository
 import nl.stevenbontenbal.chorister.repository.UserRepository
-import org.springframework.data.repository.findByIdOrNull
-import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
-class RegistrationService(
+open class RegistrationService(
     private val userRepository: UserRepository,
     private val choirRepository: ChoirRepository,
     private val inviteRepository: InviteRepository,
@@ -24,20 +23,18 @@ class RegistrationService(
     private val categorisationService: CategorisationService
 ) {
 
-    fun register(registrationRequest: RegistrationRequest): User {
+    @Transactional
+    open fun register(registrationRequest: RegistrationRequest): User {
         validate(registrationRequest)
         val user = registerUser(registrationRequest)
         when (registrationRequest) {
-            is NewChoirRegistrationRequest -> {
-                registerNewChoir(user, registrationRequest)
-            }
+            is NewChoirRegistrationRequest -> registerNewChoir(user, registrationRequest)
             is AcceptInviteRequest -> {
                 val invite = getInvite(registrationRequest.token)
                 addInviteeToChoir(user, invite)
             }
         }
         return user
-        // TODO: catch exception & rollback
     }
 
     private fun validate(registrationRequest: RegistrationRequest) {
@@ -45,16 +42,16 @@ class RegistrationService(
     }
 
     private fun getInvite(token: String): Invite {
-        val invite = inviteRepository.findByToken(token) ?: throw RegistrationException("No invite found with token $token")
+        val invite = inviteRepository.findByToken(token) ?: throw InvalidInputException("No invite found with token $token")
         validate(invite)
         return invite
     }
 
     private fun validate(invite: Invite) {
         if (invite.expired)
-            throw RegistrationException("Invite expired")
+            throw InvalidInputException("Invite expired")
         if (invite.acceptedDate != null)
-            throw RegistrationException("Invite already accepted")
+            throw InvalidInputException("Invite already accepted")
     }
 
     private fun validateEmail(email: String) {
@@ -74,7 +71,7 @@ class RegistrationService(
     }
 
     private fun addInviteeToChoir(user: User, invite: Invite) {
-        val choir = invite.choir
+        val choir = invite.choir!!
         addUserToChoir(user, choir)
         invite.user = user
         invite.acceptedDate = LocalDateTime.now()

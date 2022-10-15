@@ -16,20 +16,13 @@ class SongEventHandler(
 
     @HandleBeforeCreate
     fun handleSongCreate(song: Song) {
-        loadChoir(song)
+        song.linkChoir(userService)
         loadSongbook(song)
     }
 
     @HandleBeforeSave
     fun handleSongSave(song: Song) {
         loadSongbook(song)
-    }
-
-    fun loadChoir(song: Song) {
-        val currentUser = userService.getCurrentUser()
-        if(currentUser.choir != null) {
-            song.choir = currentUser.choir!!
-        }
     }
 
     fun loadSongbook(song: Song) {
