@@ -92,6 +92,17 @@ const functions = {
 
     getSetlistSongs: (id) => instance.get('setlists/' + id + '/songs', functions.getGetConfig('songs')),
 
+    // My Choir
+
+    getChoirs: () => instance.get('choirs', functions.getGetConfig('choirs')),
+
+    // Users
+
+    getUsers: () => instance.get('users',  functions.getGetConfig('users')),
+
+    // Invites
+
+    getInvites: () => instance.get('invites', functions.getGetConfig('invites')),
 
 }
 

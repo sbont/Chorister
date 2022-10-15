@@ -11,6 +11,7 @@
     "axios": "^0.21.1",
     "buefy": "^0.9.14",
     "core-js": "^3.6.5",
+    "moment": "^2.29.4",
     "oidc-client": "^1.11.5",
     "vue": "^2.6.11",
     "vue-multiselect": "^2.1.6",

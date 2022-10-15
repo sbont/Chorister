@@ -86,7 +86,12 @@ const routes = [
         },
       }
     ]
-  }
+  },
+  {
+    path: '/mychoir',
+    name: 'My Choir',
+    component: () => import(/* webpackChunkName: "mychoir" */ '../views/MyChoir.vue')
+  },
 ]
 
 const router = new VueRouter({
