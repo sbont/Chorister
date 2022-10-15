@@ -164,9 +164,10 @@ class ChoristerConfiguration {
     fun registrationService(
         userRepository: UserRepository,
         choirRepository: ChoirRepository,
+        inviteRepository: InviteRepository,
         keycloakUserService: KeycloakUserService,
         categorisationService: CategorisationService
-    ): RegistrationService = RegistrationService(userRepository, choirRepository, keycloakUserService, categorisationService)
+    ): RegistrationService = RegistrationService(userRepository, choirRepository, inviteRepository, keycloakUserService, categorisationService)
 
     @Bean
     fun userService(userRepository: UserRepository): UserService = UserService(userRepository)

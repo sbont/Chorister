@@ -1,3 +1,3 @@
 package nl.stevenbontenbal.chorister.exceptions
 
-class UsernameAlreadyExistingException(message: String) : Exception(message)
+class UsernameAlreadyExistingException(message: String) : RegistrationException(message)

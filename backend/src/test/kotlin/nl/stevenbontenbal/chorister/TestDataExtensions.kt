@@ -53,7 +53,8 @@ fun Invite.Companion.create(choir: Choir): Invite {
     return Invite(
         email = "new@user.com",
         choir = choir,
-        invitedBy = User.create()
+        invitedBy = User.create(),
+        token = UUID.randomUUID().toString()
     )
 }
 // TODO: https://betterprogramming.pub/test-data-creation-using-the-power-of-kotlin-dsl-9526a1fad05b
