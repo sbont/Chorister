@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="is-flex is-justify-content-space-between">
+        <div class="is-flex is-justify-content-space-between m-3">
             <h1 class="title">{{ category.name }}</h1>
         </div>
         <Songs />
