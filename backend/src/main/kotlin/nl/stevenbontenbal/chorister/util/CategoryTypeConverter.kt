@@ -1,6 +1,6 @@
 package nl.stevenbontenbal.chorister.util
 
-import nl.stevenbontenbal.chorister.model.CategoryType
+import nl.stevenbontenbal.chorister.model.entities.CategoryType
 import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 

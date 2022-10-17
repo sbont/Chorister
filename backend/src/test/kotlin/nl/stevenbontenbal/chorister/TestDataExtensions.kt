@@ -1,6 +1,6 @@
 package nl.stevenbontenbal.chorister
 
-import nl.stevenbontenbal.chorister.model.*
+import nl.stevenbontenbal.chorister.model.entities.*
 import java.time.LocalDate
 import java.util.*
 

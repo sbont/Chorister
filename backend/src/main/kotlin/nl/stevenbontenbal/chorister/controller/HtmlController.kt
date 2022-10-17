@@ -1,7 +1,7 @@
 package nl.stevenbontenbal.chorister.controller
 
 import nl.stevenbontenbal.chorister.configuration.ChoristerProperties
-import nl.stevenbontenbal.chorister.model.Song
+import nl.stevenbontenbal.chorister.model.entities.Song
 import nl.stevenbontenbal.chorister.repository.SongRepository
 import nl.stevenbontenbal.chorister.util.format
 import org.springframework.data.repository.findByIdOrNull

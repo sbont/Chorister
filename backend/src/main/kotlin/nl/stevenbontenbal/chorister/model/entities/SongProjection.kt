@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.model
+package nl.stevenbontenbal.chorister.model.entities
 
 import org.springframework.data.rest.core.config.Projection
 import java.time.LocalDateTime

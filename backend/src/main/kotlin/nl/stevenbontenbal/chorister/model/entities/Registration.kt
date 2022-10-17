@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.model
+package nl.stevenbontenbal.chorister.model.entities
 
 import java.util.*
 import javax.persistence.*

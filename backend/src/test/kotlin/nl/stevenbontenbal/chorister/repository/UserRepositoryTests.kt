@@ -1,6 +1,6 @@
 package nl.stevenbontenbal.chorister.repository
 
-import nl.stevenbontenbal.chorister.model.User
+import nl.stevenbontenbal.chorister.model.entities.User
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

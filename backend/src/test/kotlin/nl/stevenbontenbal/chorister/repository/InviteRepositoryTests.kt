@@ -1,8 +1,8 @@
 package nl.stevenbontenbal.chorister.repository
 
 import nl.stevenbontenbal.chorister.create
-import nl.stevenbontenbal.chorister.model.Choir
-import nl.stevenbontenbal.chorister.model.Invite
+import nl.stevenbontenbal.chorister.model.entities.Choir
+import nl.stevenbontenbal.chorister.model.entities.Invite
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

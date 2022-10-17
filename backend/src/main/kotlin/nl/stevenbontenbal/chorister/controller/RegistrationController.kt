@@ -1,20 +1,17 @@
 package nl.stevenbontenbal.chorister.controller
 
+import nl.stevenbontenbal.chorister.configuration.ChoristerProperties
 import nl.stevenbontenbal.chorister.model.dto.AcceptInviteRequest
+import nl.stevenbontenbal.chorister.model.dto.InviteDetail
 import nl.stevenbontenbal.chorister.model.dto.NewChoirRegistrationRequest
-import nl.stevenbontenbal.chorister.model.dto.RegistrationRequest
-import nl.stevenbontenbal.chorister.repository.InviteRepository
-import nl.stevenbontenbal.chorister.repository.UserRepository
-import nl.stevenbontenbal.chorister.service.KeycloakUserService
 import nl.stevenbontenbal.chorister.service.RegistrationService
-import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class RegistrationController(
-    private val registrationService: RegistrationService) {
+    private val registrationService: RegistrationService,
+    private val properties: ChoristerProperties
+) {
 
     @PostMapping("/api/registration")
     fun register(@RequestBody registrationRequest: NewChoirRegistrationRequest) {
@@ -26,6 +23,22 @@ class RegistrationController(
     fun register(@RequestBody registrationRequest: AcceptInviteRequest) {
         println("User request: $registrationRequest")
         registrationService.register(registrationRequest)
+    }
+
+    @GetMapping("/api/invite")
+    fun getInviteByToken(@RequestParam(required = true) token: String): InviteDetail {
+        return registrationService.getInviteDetail(token)
+    }
+
+    @GetMapping("/api/choir/invitelink")
+    fun getInviteUrl(): String {
+        val token = registrationService.generateChoirInviteToken()
+        return properties.baseUrl + "signup?invite=" + token
+    }
+
+    @DeleteMapping("/api/choir/invitelink")
+    fun deleteInviteToken() {
+        registrationService.nullifyChoirInviteToken()
     }
 
 }

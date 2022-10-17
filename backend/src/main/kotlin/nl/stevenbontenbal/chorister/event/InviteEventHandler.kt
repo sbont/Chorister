@@ -1,6 +1,6 @@
 package nl.stevenbontenbal.chorister.event
 
-import nl.stevenbontenbal.chorister.model.Invite
+import nl.stevenbontenbal.chorister.model.entities.Invite
 import nl.stevenbontenbal.chorister.service.UserService
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler

@@ -5,10 +5,8 @@ import io.netty.handler.logging.LogLevel
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
 import nl.stevenbontenbal.chorister.authorization.ChoirAccessPermissionEvaluator
-import nl.stevenbontenbal.chorister.model.Category
-import nl.stevenbontenbal.chorister.model.Score
-import nl.stevenbontenbal.chorister.model.Setlist
-import nl.stevenbontenbal.chorister.model.Song
+import nl.stevenbontenbal.chorister.model.*
+import nl.stevenbontenbal.chorister.model.entities.*
 import nl.stevenbontenbal.chorister.repository.*
 import nl.stevenbontenbal.chorister.service.CategorisationService
 import nl.stevenbontenbal.chorister.service.KeycloakUserService
@@ -61,6 +59,10 @@ class ChoristerConfiguration {
                 .permitAll()
                 .and()
             .authorizeRequests()
+                .antMatchers("/api/invite/**")
+                .permitAll()
+                .and()
+            .authorizeRequests()
                 .mvcMatchers("/api/**")
                 .access("hasAuthority('SCOPE_cms')")
                 .and()
@@ -94,6 +96,8 @@ class ChoristerConfiguration {
                 configuration.exposeIdsFor(Score::class.java)
                 configuration.exposeIdsFor(Category::class.java)
                 configuration.exposeIdsFor(Setlist::class.java)
+                configuration.exposeIdsFor(User::class.java)
+                configuration.exposeIdsFor(Invite::class.java)
                 corsRegistry.addMapping("/api/**")
                     .allowedMethods("*")
                     .allowedOrigins("http://localhost:8080/")
@@ -166,8 +170,9 @@ class ChoristerConfiguration {
         choirRepository: ChoirRepository,
         inviteRepository: InviteRepository,
         keycloakUserService: KeycloakUserService,
-        categorisationService: CategorisationService
-    ): RegistrationService = RegistrationService(userRepository, choirRepository, inviteRepository, keycloakUserService, categorisationService)
+        categorisationService: CategorisationService,
+        userService: UserService
+    ): RegistrationService = RegistrationService(userRepository, choirRepository, inviteRepository, keycloakUserService, categorisationService, userService)
 
     @Bean
     fun userService(userRepository: UserRepository): UserService = UserService(userRepository)

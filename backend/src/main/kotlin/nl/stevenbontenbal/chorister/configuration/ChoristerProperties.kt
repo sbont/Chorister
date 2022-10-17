@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.ConstructorBinding
 data class ChoristerProperties(
     var title: String,
     val version: String,
+    val baseUrl: String,
     val defaultCategories: DefaultCategories
 ) {
     data class DefaultCategories(

@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.model
+package nl.stevenbontenbal.chorister.model.entities
 
 import nl.stevenbontenbal.chorister.interfaces.ChoirOwnedEntity
 import javax.persistence.*

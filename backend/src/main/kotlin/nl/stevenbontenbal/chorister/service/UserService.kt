@@ -1,12 +1,10 @@
 package nl.stevenbontenbal.chorister.service
 
 import nl.stevenbontenbal.chorister.exceptions.AuthException
-import nl.stevenbontenbal.chorister.model.User
+import nl.stevenbontenbal.chorister.model.entities.User
 import nl.stevenbontenbal.chorister.repository.UserRepository
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
-import org.springframework.stereotype.Component
-import java.lang.Exception
 
 class UserService(private val userRepository: UserRepository) {
 

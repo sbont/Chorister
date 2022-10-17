@@ -1,6 +1,6 @@
 package nl.stevenbontenbal.chorister.event
 
-import nl.stevenbontenbal.chorister.model.Song
+import nl.stevenbontenbal.chorister.model.entities.Song
 import nl.stevenbontenbal.chorister.repository.SongbookRepository
 import nl.stevenbontenbal.chorister.service.UserService
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate

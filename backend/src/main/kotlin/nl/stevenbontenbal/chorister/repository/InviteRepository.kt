@@ -1,6 +1,6 @@
 package nl.stevenbontenbal.chorister.repository
 
-import nl.stevenbontenbal.chorister.model.Invite
+import nl.stevenbontenbal.chorister.model.entities.Invite
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.rest.core.annotation.RepositoryRestResource
 import org.springframework.security.access.prepost.PostFilter

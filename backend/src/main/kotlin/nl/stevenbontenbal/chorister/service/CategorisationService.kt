@@ -1,9 +1,9 @@
 package nl.stevenbontenbal.chorister.service
 
 import nl.stevenbontenbal.chorister.configuration.ChoristerProperties
-import nl.stevenbontenbal.chorister.model.Category
-import nl.stevenbontenbal.chorister.model.CategoryType
-import nl.stevenbontenbal.chorister.model.Choir
+import nl.stevenbontenbal.chorister.model.entities.Category
+import nl.stevenbontenbal.chorister.model.entities.CategoryType
+import nl.stevenbontenbal.chorister.model.entities.Choir
 import nl.stevenbontenbal.chorister.repository.CategoryRepository
 
 class CategorisationService(

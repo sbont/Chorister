@@ -29,7 +29,7 @@
                     </table>
                 </div>
                 
-                <div class="invites">
+                <div class="invites mt-5">
                     <h4 class="title is-4">Open invites</h4>
                     <table
                         class="table is-hoverable is-fullwidth"
@@ -39,16 +39,54 @@
                         <thead>
                             <th>Email</th>
                             <th>Date sent</th>
+                            <th class="has-text-right">Revoke</th>
                         </thead>
                         <tbody>
                             <tr v-for="invite in invites" class="invite" :key="invite.id">
                                 <td>{{ invite.email }}</td>
                                 <td>{{ invite.createdDate | formatDate }}</td>
+                                <td class="has-text-right">
+                                    <button class="button is-small is-danger is-inverted" @click="revokeInvite(invite)">
+                                        <span class="icon is-small">
+                                            <i class="fas fa-times"></i>
+                                        </span>
+                                    </button>
+                                </td>
                             </tr>
                         </tbody>
                         <tfoot></tfoot>
                     </table>
+                </div>
 
+                <div class="new-invite mt-5">
+                    <h4 class="title is-4">Invite someone</h4>
+                    <button class="button is-info mb-3" @click="generateToken" v-if="inviteLink == null">
+                        Create invite link
+                    </button>
+
+                    <div class="is-flex mb-3" v-if="inviteLink">
+                        <div class="control has-icons-right is-flex-grow-1 mr-2" @click="copyToken">
+                            <input class="button input" v-on:focus="$event.target.select()" ref="token" readonly :value="inviteLink"/>
+                            <span class="icon is-small is-right">
+                                <i class="fas fa-copy"></i>
+                            </span>
+                        </div>
+                        <button class="button is-danger is-outlined" @click="deleteToken">
+                                <span class="icon is-small">
+                                  <i class="fas fa-times"></i>
+                                </span>
+                        </button>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Email</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="email" placeholder="hello@email.com">
+                            <span class="icon is-small is-left">
+                              <i class="fas fa-envelope"></i>
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -68,6 +106,7 @@ const MyChoir = {
             choir: {},
             members: [],
             invites: [],
+            inviteLink: null,
             editing: false,
             draftValues: null,
             loading: true,
@@ -84,6 +123,10 @@ const MyChoir = {
             .then((response) => {
                 this.$log.debug("Choirs loaded: ", response.data);
                 this.choir = response.data[0];
+                if (this.choir.inviteToken) {
+                    let baseUrl = window.location.origin;
+                    this.inviteLink = baseUrl + "/signup?invite=" + this.choir.inviteToken;
+                }
                 this.$log.debug("Choir loaded: ", response.data[0]);
             })
             .catch((error) => {
@@ -102,7 +145,8 @@ const MyChoir = {
         let invitesLoaded = api.getInvites()
             .then((response) => {
                 this.$log.debug("Invites loaded: ", response.data);
-                this.invites = response.data;
+                let allInvites = response.data;
+                this.invites = allInvites.filter(i => !i.expired);
             })
             .catch((error) => {
                 this.$log.debug(error);
@@ -122,34 +166,17 @@ const MyChoir = {
     methods: {
         save: function() {
             this.saving = true;
-            var setlist = this.draftValues;
-            if (!setlist) {
+            var choir = this.draftValues;
+            if (!choir) {
                 return;
             }
-            const promise = this.saveToServer(setlist);
-            promise.then((response) => {
-                if(this.isNew) {
-                    setlist.id = response.data.id;
-                }
+            const promise = api.updateChoirForId(choir.id, choir);
+            promise.then(() => {
                 this.editing = false;
                 this.saving = false;
-                this.setlist = setlist;
+                this.choir = choir;
                 this.draftValues = null;
-                if(this.isNew) {
-                    this.$router.push({
-                        name: "Setlist",
-                        params: { id: setlist.id },
-                    });
-                } 
             })
-        },
-
-        saveToServer: function(setlist) {
-            if (setlist.id) {
-                return api.updateSetlistForId(setlist.id, setlist);
-            } else {
-                return api.createNewSetlist(setlist);
-            }
         },
 
         edit: function() {
@@ -162,10 +189,29 @@ const MyChoir = {
             this.editing = false;
         },
 
-        remove: function() {
-            api.deleteSetlistForId(this.setlist.id).then(() => {
-                this.$router.push({ name: "Repertoire" });
-            });
+        generateToken: function() {
+            api.getToken()
+                .then((response) => {
+                    console.log(response);
+                    this.inviteLink = response.data;
+                });
+        },
+
+        deleteToken: function() {
+            api.deleteToken()
+                .then(() => this.inviteLink = null);
+        },
+
+        copyToken: function () {
+            this.$refs.token.focus();
+            document.execCommand('copy');
+        },
+
+        revokeInvite: function(invite) {
+            console.log(invite);
+            this.invites = this.invites.filter(i => i !== invite);
+            invite.expired = true;
+            api.updateInviteForId(invite.id, invite);
         }
     },
 }

@@ -1,6 +1,6 @@
-package nl.stevenbontenbal.chorister.model
+package nl.stevenbontenbal.chorister.model.entities
 
-import org.springframework.data.rest.core.annotation.RestResource
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import javax.persistence.*
 
 @Entity
@@ -10,6 +10,7 @@ class User(
     var id: Long? = null,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
+    @JsonIgnoreProperties("users")
     var choir: Choir? = null,
     var email: String?,
     var username: String,

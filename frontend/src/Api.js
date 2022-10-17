@@ -30,6 +30,24 @@ const functions = {
         }
     },
 
+    // Register
+
+    register: (request) => instance.post('registration', request),
+
+    // Invites
+
+    getInvites: () => instance.get('invites', functions.getGetConfig('invites')),
+
+    updateInviteForId: (id, invite) => instance.put('invites/' + id, invite),
+
+    getInviteByToken: (token) => instance.get('invite?token=' + token),
+
+    acceptInvite: (request) => instance.post('invite/accept', request),
+
+    getToken: () => instance.get('choir/invitelink'),
+
+    deleteToken: () => instance.delete('choir/invitelink'),
+
     // Songs
 
     getSongById: (id) => instance.get('songs/' + id),
@@ -53,10 +71,6 @@ const functions = {
     updateScoreForId: (id, score) => instance.put('scores/' + id, score),
 
     deleteScoreForId: (id) => instance.delete('scores/' + id),
-
-    // Register
-
-    register: (request) => instance.post('registration', request),
 
     // Categories
 
@@ -96,13 +110,11 @@ const functions = {
 
     getChoirs: () => instance.get('choirs', functions.getGetConfig('choirs')),
 
+    updateChoirForId: (id, choir) => instance.post('choirs/' + id, choir),
+
     // Users
 
     getUsers: () => instance.get('users',  functions.getGetConfig('users')),
-
-    // Invites
-
-    getInvites: () => instance.get('invites', functions.getGetConfig('invites')),
 
 }
 
