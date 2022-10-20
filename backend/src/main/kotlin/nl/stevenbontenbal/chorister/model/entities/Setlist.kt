@@ -14,13 +14,8 @@ class Setlist (
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
     override var choir: Choir?,
-    @ManyToMany
-    @JoinTable(
-        name = "SETLIST_SONG",
-        joinColumns = [JoinColumn(name = "SETLIST_ID")],
-        inverseJoinColumns = [JoinColumn(name = "SONG_ID")]
-    )
-    var songs: MutableList<Song> = mutableListOf(),
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "setlist", cascade=[CascadeType.ALL])
+    var entries: MutableList<SetlistEntry> = mutableListOf(),
 ): ChoirOwnedEntity {
     companion object
 }

@@ -28,7 +28,7 @@
                 <th>Categories</th>
             </thead>
             <tbody>
-                <tr v-for="(song, index) in songs" class="song" :key="song.id">
+                <tr v-for="(song, index) in songs" class="song" :key="song.id" draggable="true" @dragstart="startDrag($event, song)">
                     <td>{{ oneBased(index) }}</td>
                     <th><router-link :to="{ name: 'Song', params: { id: song.id }}" append>{{ song.title }}</router-link></th>
                     <td>{{ song.composer }}</td>
@@ -51,10 +51,9 @@
 </template>
 
 <script>
-import api from "../api";
-import { Dropdown } from 'buefy'
+    import api from "../api";
 
-const Songs = {
+    const Songs = {
     name: "Songs",
     props: {
         activeUser: Object,
@@ -76,28 +75,37 @@ const Songs = {
         console.log(this.$route.params);
         const routeName = this.$route.name;
         let songsLoaded;
+        let transformer;
+        let identity = data => data;
         switch(routeName) {
             case 'Repertoire':
                 songsLoaded = api.getAllSongs();
+                transformer = identity
                 break;
             case 'CategorySeason':
             case 'CategoryLiturgical':
                 var categoryId = this.$route.params.id;
                 songsLoaded = api.getSongsByCategoryId(categoryId);
+                transformer = identity;
                 break;
             case 'Setlist':
                 var setlistId = this.$route.params.id;
-                songsLoaded = api.getSetlistSongs(setlistId);
+                songsLoaded = api.getSetlistEntries(setlistId);
+                transformer = entries => {
+                    let sorted = entries.sort((entryA, entryB) => entryA.number - entryB.number);
+                    console.log(sorted);
+                    return sorted.map(entry => entry._embedded.song);
+                }
                 break;
         }
         songsLoaded
             .then((response) => {
                 this.$log.debug("Data loaded: ", response.data);
-                this.songs = response.data;
+                this.songs = transformer(response.data);
             })
             .catch((error) => {
                 this.$log.debug(error);
-                this.error = "Failed to load repertoire";
+                this.error = "Failed to load songs";
             })
             .finally(() => (this.loading = false));
     },
@@ -173,6 +181,13 @@ const Songs = {
         oneBased(index) {
             return index + 1;
         },
+
+        startDrag: function(event, song) {
+            console.log("dragging");
+            console.log(song);
+            event.dataTransfer.dropEffect = "link";
+            event.dataTransfer.setData("text/plain", song._links.self.href);
+        }
     },
 
     // a custom directive to wait for the DOM to be updated

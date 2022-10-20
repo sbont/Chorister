@@ -104,7 +104,13 @@ const functions = {
 
     // Setlist songs
 
-    getSetlistSongs: (id) => instance.get('setlists/' + id + '/songs', functions.getGetConfig('songs')),
+    getSetlistEntries: (setlistId) => instance.get('setlists/' + setlistId + '/entries', functions.getGetConfig('setlistEntries')),
+
+    postSetlistEntry: (entry) => instance.post("setlistEntries/", entry, {
+        headers: {
+            'content-type': 'application/json'
+        }
+    }),
 
     // My Choir
 

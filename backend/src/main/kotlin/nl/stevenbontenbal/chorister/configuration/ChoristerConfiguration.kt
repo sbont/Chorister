@@ -98,6 +98,7 @@ class ChoristerConfiguration {
                 configuration.exposeIdsFor(Setlist::class.java)
                 configuration.exposeIdsFor(User::class.java)
                 configuration.exposeIdsFor(Invite::class.java)
+                configuration.exposeIdsFor(SetlistEntry::class.java)
                 corsRegistry.addMapping("/api/**")
                     .allowedMethods("*")
                     .allowedOrigins("http://localhost:8080/")

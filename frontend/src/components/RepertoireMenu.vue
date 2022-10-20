@@ -31,7 +31,7 @@
 					</span>
 					Create setlist</router-link>
 			</li>
-			<li v-for="(setlist) in setlists" :key="setlist.id">
+			<li v-for="(setlist) in setlists" :key="setlist.id" class="droppable" @drop="dropSong($event, setlist._links.self.href)" @dragover.prevent @dragenter.prevent>
 				<router-link :to="{ name: 'Setlist', params: { id: setlist.id }}" append>{{ setlist.name }}</router-link>
 			</li>
 		</ul>
@@ -41,6 +41,7 @@
 <script>
 
 import api from "../api";
+import { useSetlists } from "@/stores/setlist";
 
 const RepertoireMenu = {
 	name: 'RepertoireMenu',
@@ -53,23 +54,12 @@ const RepertoireMenu = {
 	},
 
 	mounted: function () {
-		let categoriesLoaded = api.getAllCategories()
-			.then(response => {
-				this.$log.debug("Categories loaded: ", response.data);
-				this.categories = {
-					season: response.data.filter(category => category.type === "SEASON"),
-					liturgical: response.data.filter(category => category.type === "LITURGICAL_MOMENT")
-				}
-			}) 
-			.catch((error) => {
-				this.$log.debug(error);
-				this.error = "Failed to load categories";
-			});
-		let setlistsLoaded = api.getAllSetlists()
-			.then(response => {
-				this.$log.debug("Setlists loaded: ", response.data);
-				this.setlists = response.data;
-			})
+        this.loadCategories();
+        this.loadSetlists();
+
+        eventBus.＄on("refresh-setlists", () => {
+            this.loadSetlists();
+        });
 	},
 
 	computed: {
@@ -79,9 +69,34 @@ const RepertoireMenu = {
 	},
 
 	methods: {
-		click: function() {
+        dropSong: function(event, setlistUri) {
+            let songUri = event.dataTransfer.getData("text");
+            let entry = { setlist: setlistUri, song: songUri }
+            api.postSetlistEntry(entry);
+        },
 
-		}
+        loadSetlists: function() {
+            api.getAllSetlists()
+                .then(response => {
+                    this.$log.debug("Setlists loaded: ", response.data);
+                    this.setlists = response.data;
+                })
+        },
+
+        loadCategories: function() {
+            api.getAllCategories()
+                .then(response => {
+                    this.$log.debug("Categories loaded: ", response.data);
+                    this.categories = {
+                        season: response.data.filter(category => category.type === "SEASON"),
+                        liturgical: response.data.filter(category => category.type === "LITURGICAL_MOMENT")
+                    }
+                })
+                .catch((error) => {
+                    this.$log.debug(error);
+                    this.error = "Failed to load categories";
+                });
+        }
 	}
 }
 

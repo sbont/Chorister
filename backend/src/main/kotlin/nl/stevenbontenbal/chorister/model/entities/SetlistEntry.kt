@@ -3,15 +3,15 @@ package nl.stevenbontenbal.chorister.model.entities
 import javax.persistence.*
 
 @Entity
-@Table(name = "SETLIST_SONG")
-class SetlistSong(
+@Table(name = "SETLIST_ENTRY")
+class SetlistEntry(
     @EmbeddedId
-    var id: SetlistSongId = SetlistSongId(),
+    var id: SetlistEntryId = SetlistEntryId(),
     @ManyToOne
     @MapsId("setlistId")
     var setlist: Setlist,
     @ManyToOne
     @MapsId("songId")
     var song: Song,
-    var number: Int
+    var number: Int = setlist.entries.size + 1
 )

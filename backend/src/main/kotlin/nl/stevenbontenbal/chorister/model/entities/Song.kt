@@ -34,7 +34,9 @@ class Song(
         joinColumns = [JoinColumn(name = "SONG_ID")],
         inverseJoinColumns = [JoinColumn(name = "CATEGORY_ID")]
     )
-    var categories: MutableList<Category>? = mutableListOf()
+    var categories: MutableList<Category>? = mutableListOf(),
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "song", cascade=[CascadeType.ALL])
+    var setlistEntries: MutableList<SetlistEntry>? = mutableListOf()
 ) : ChoirOwnedEntity {
     companion object
 }

@@ -1,99 +1,74 @@
 <template>
     <div class="setlist-detail">
         <div v-if="!loading">
-            <div class="song-info m-2 columns">
-                <div class="column">
-                    <div class="field is-horizontal">
-                        <div class="field-label is-normal">
-                            <label class="label">Name</label>
-                        </div>
-                        <div class="field-body">
-                            <div
-                                class="field"
-                                v-bind:class="{ static: !editing }"
-                            >
-                                <div class="control">
-                                    <input
-                                        v-if="editing"
-                                        v-model="draftValues.name"
-                                        class="input"
-                                        type="text"
-                                        placeholder="Easter Morning Service"
-                                    />
-                                    <span v-else>
-                                        {{ setlist.name }}
-                                    </span>
-                                </div>
+            <div class="setlist-info m-3 is-flex is-align-content-flex-start">
+                <h1 class="title is-flex-grow-1 mr-3" v-if="!editing">{{ setlist.name }}</h1>
+                <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="editing">
+                    <div class="field-label is-normal">
+                        <label class="label">Name</label>
+                    </div>
+                    <div class="field-body">
+                        <div class="field" v-bind:class="{ static: !editing }" >
+                            <div class="control">
+                                <input v-model="draftValues.name" class="input" type="text" placeholder="Easter Morning Service" />
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="column">
-                    <div class="field is-horizontal">
-                        <div class="field-label is-normal">
-                            <label class="label">Date</label>
-                        </div>
-                        <div class="field-body">
-                            <div
-                                class="field"
-                                v-bind:class="{ static: !editing }"
-                            >
-                                <div class="control">
-                                    <input
-                                        v-if="editing"
-                                        v-model="draftValues.date"
-                                        class="input"
-                                        type="date"
-                                    />
-                                    <span v-else>
-                                        {{ setlist.date }}
-                                    </span>
-                                </div>
+                <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="editing">
+                    <div class="field-label is-normal">
+                        <label class="label">Date</label>
+                    </div>
+                    <div class="field-body">
+                        <div class="field" v-bind:class="{ static: !editing }" >
+                            <div class="control">
+                                <input v-model="draftValues.date" class="input" type="date" />
                             </div>
                         </div>
                     </div>
                 </div>
+                <div class="field is-grouped">
+                    <p v-if="!editing" class="control">
+                        <button
+                                @click="edit"
+                                class="button is-link"
+                        >
+                            Edit
+                        </button>
+                    </p>
+                    <p v-if="!editing" class="control">
+                        <button
+                                @click="remove"
+                                class="button is-danger"
+                        >
+                            Delete
+                        </button>
+                    </p>
+                    <p v-if="editing" class="control">
+                        <button
+                                @click="save"
+                                class="button is-link"
+                                :class="{ 'is-loading': saving }"
+                        >
+                            Save changes
+                        </button>
+                    </p>
+                    <p v-if="editing" class="control">
+                        <button @click="cancelEdit" class="button">
+                            Cancel
+                        </button>
+                    </p>
+                </div>
             </div>
-            
-            <div class="field is-grouped mt-5">
-                <p v-if="!editing" class="control">
-                    <button 
-                        @click="edit" 
-                        class="button is-link"
-                    >
-                        Edit
-                    </button>
-                </p>
-                <p v-if="!editing" class="control">
-                    <button
-                        @click="remove"
-                        class="button is-danger"
-                    >
-                        Delete
-                    </button>
-                </p>
-                <p v-if="editing" class="control">
-                    <button
-                        @click="save"
-                        class="button is-link"
-                        :class="{ 'is-loading': saving }"
-                    >
-                        Save changes
-                    </button>
-                </p>
-                <p v-if="editing" class="control">
-                    <button @click="cancelEdit" class="button">
-                        Cancel
-                    </button>
-                </p>
-            </div>
+            <div class="subtitle m-3" v-if="!editing">{{ setlist.date }}</div>
         </div>
     </div>
 </template>
 
 <script>
 import api from "../api";
+import { useSetlists } from "@/stores/setlist";
+
 
 const SetlistDetail = {
     name: "SetlistDetail",
@@ -157,6 +132,8 @@ const SetlistDetail = {
                         name: "Setlist",
                         params: { id: setlist.id },
                     });
+                    let store = useSetlists();
+                    store.add(setlist);
                 } 
             })
         },

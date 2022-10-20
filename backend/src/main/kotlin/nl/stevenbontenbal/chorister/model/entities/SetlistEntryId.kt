@@ -6,7 +6,7 @@ import javax.persistence.Column
 import javax.persistence.Embeddable
 
 @Embeddable
-data class SetlistSongId(
+data class SetlistEntryId(
     @Column(name = "SETLIST_ID")
     var setlistId: Long? = null,
     @Column(name = "SONG_ID")

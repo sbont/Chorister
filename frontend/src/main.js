@@ -4,9 +4,14 @@ import VueLogger from 'vuejs-logger';
 import router from './router'
 import auth from './auth'
 import LoadScript from 'vue-plugin-load-script';
-// import 'buefy/dist/buefy.css'
+import { createPinia, PiniaVuePlugin } from 'pinia'
 
 Vue.config.productionTip = false
+
+Vue.use(VueLogger, options);
+Vue.use(auth);
+Vue.use(LoadScript);
+Vue.use(PiniaVuePlugin)
 
 const options = {
   isEnabled: true,
@@ -18,10 +23,7 @@ const options = {
   showConsoleColors: true
 };
 
-Vue.use(VueLogger, options);
-Vue.use(auth);
-Vue.use(LoadScript);
-
+const pinia = createPinia()
 Vue.loadScript("https://kit.fontawesome.com/e168ca8cb0.js")
 
 /* eslint-disable no-new */
@@ -29,5 +31,8 @@ new Vue({
   el: '#app',
   template: '<App/>',
   router,
-  components: { App }
+  components: { App },
+  pinia,
 });
+
+export const eventBus = new Vue();
