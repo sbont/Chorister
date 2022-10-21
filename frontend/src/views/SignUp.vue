@@ -25,7 +25,7 @@
             <div class="field">
                 <label class="label">Email</label>
                 <div class="control has-icons-left">
-                    <input class="input" type="email" placeholder="you@" value="" v-model="registration.email" />
+                    <input class="input" type="email" placeholder="you@" v-model="registration.email" />
                     <span class="icon is-small is-left">
                         <i class="fas fa-envelope"></i>
                     </span>

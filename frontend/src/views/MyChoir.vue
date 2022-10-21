@@ -44,7 +44,7 @@
                         <tbody>
                             <tr v-for="invite in invites" class="invite" :key="invite.id">
                                 <td>{{ invite.email }}</td>
-                                <td>{{ invite.createdDate | formatDate }}</td>
+                                <td>{{ formatDate(invite.createdDate) }}</td>
                                 <td class="has-text-right">
                                     <button class="button is-small is-danger is-inverted" @click="revokeInvite(invite)">
                                         <span class="icon is-small">
@@ -155,15 +155,13 @@ const MyChoir = {
         Promise.allSettled([choirLoaded, membersLoaded, invitesLoaded]).then(()=> this.loading = false)
     },
 
-    filters: {
+    methods: {
         formatDate: function(date) {
             if (date) {
                 return moment(String(date)).format('DD-MM-YYYY');
             }
-        }
-    },
+        },
 
-    methods: {
         save: function() {
             this.saving = true;
             var choir = this.draftValues;

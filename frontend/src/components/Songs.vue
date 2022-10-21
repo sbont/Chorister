@@ -43,9 +43,7 @@
         </table>
         <footer class="footer" v-cloak>
                 <strong>{{ songs.length }}</strong>
-                {{
-                    songs | pluralize
-                }}
+                {{ pluralize(songs) }}
         </footer>
     </div>
 </template>
@@ -59,7 +57,6 @@
         activeUser: Object,
     },
 
-    // app initial state
     data: function () {
         return {
             songs: [],
@@ -110,8 +107,6 @@
             .finally(() => (this.loading = false));
     },
 
-    // computed properties
-    // http://vuejs.org/guide/computed.html
     computed: {
         userEmail: function () {
             return this.activeUser ? this.activeUser.email : "";
@@ -123,15 +118,11 @@
         },
     },
 
-    filters: {
+    methods: {
         pluralize: function (n) {
             return n === 1 ? "song" : "songs";
         },
-    },
 
-    // methods that implement data logic.
-    // note there's no DOM manipulation here at all.
-    methods: {
         addSong: function () {
             var value = this.newSong && this.newSong.trim();
             if (!value) {

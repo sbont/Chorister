@@ -163,15 +163,15 @@
                                 >
                                     <div class="control">
                                         <div class="select is-multiple">
-                                            <multiselect 
+                                            <VueMultiselect
                                                 v-if="editing"
-                                                v-model="draftSongCategories.season" 
+                                                v-model="draftSongCategories.season"
                                                 :multiple="true"
                                                 :options="categories.season"
                                                 track-by="name"
                                                 label="name"
                                                 :close-on-select="false"
-                                            ></multiselect>
+                                            ></VueMultiselect>
                                                         
                                             <div v-else class="tags are-medium">
                                                 <span 
@@ -198,16 +198,16 @@
                                 >
                                     <div class="control">
                                         <div class="select is-multiple">
-                                            <multiselect 
+                                            <VueMultiselect
                                                 v-if="editing"
-                                                v-model="draftSongCategories.liturgical" 
+                                                v-model="draftSongCategories.liturgical"
                                                 :multiple="true"
                                                 :options="categories.liturgical"
                                                 track-by="name"
                                                 label="name"
                                                 :close-on-select="false"
-                                            ></multiselect>
-                                                        
+                                            ></VueMultiselect>
+
                                             <div v-else class="tags are-medium">
                                                 <span 
                                                     v-for="(category) in songCategories.liturgical" 
@@ -293,7 +293,7 @@
 <script>
 import api from "../api";
 import Score from "@/components/Score.vue"
-import Multiselect from 'vue-multiselect'
+import VueMultiselect from 'vue-multiselect'
 
 const Song = {
     name: "Song",
@@ -479,17 +479,20 @@ const Song = {
 
     components: {
         Score,
-        Multiselect
-    }
+        VueMultiselect,
+    },
+
 };
 
 export default Song;
 </script>
 
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style>
 [v-cloak] {
     display: none;
+}
+.select .is-multiple {
+    width: 100%;
 }
 </style>

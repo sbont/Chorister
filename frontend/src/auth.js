@@ -1,6 +1,5 @@
 import { UserManager, WebStorageStateStore, Log } from 'oidc-client'
 
-
 const settings = {
   userStore: new WebStorageStateStore({ store: window.sessionStorage }),
   authority: 'http://localhost:8080/auth/realms/Chorister',
@@ -79,6 +78,5 @@ export default {
     install: function (Vue) {
         Log.logger = console;
         Log.level = Log.INFO;
-        Vue.prototype.$auth = authService
     }
 }

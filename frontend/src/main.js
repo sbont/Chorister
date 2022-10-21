@@ -1,19 +1,40 @@
-import Vue from 'vue'
+import Vue, { createApp } from 'vue'
 import App from './App'
-import VueLogger from 'vuejs-logger';
+import VueLogger from 'vuejs3-logger';
 import router from './router'
-import auth from './auth'
-import LoadScript from 'vue-plugin-load-script';
-import { createPinia, PiniaVuePlugin } from 'pinia'
+import auth, {authService} from './auth'
+import { loadScript } from 'vue-plugin-load-script';
+import { createPinia } from 'pinia'
+import { configureCompat } from 'vue'
+
+// default everything to Vue 3 behavior, and only enable compat
+// for certain features
+configureCompat({
+  MODE: 3
+})
 
 Vue.config.productionTip = false
+// Vue.use(VueLogger, options);
+// Vue.use(auth);
+// Vue.use(LoadScript);
 
-Vue.use(VueLogger, options);
-Vue.use(auth);
-Vue.use(LoadScript);
-Vue.use(PiniaVuePlugin)
+loadScript("https://kit.fontawesome.com/e168ca8cb0.js")
 
-const options = {
+/* eslint-disable no-new */
+/*new Vue({
+  el: '#app',
+  template: '<App/>',
+  router,
+  components: { App },
+  pinia,
+});*/
+
+const app = createApp(App)
+app.use(router);
+app.use(auth);
+app.config.globalProperties.$auth = authService
+
+const logOptions = {
   isEnabled: true,
   logLevel : 'debug',
   stringifyArguments : false,
@@ -22,17 +43,8 @@ const options = {
   separator: '|',
   showConsoleColors: true
 };
+app.use(VueLogger, logOptions);
 
 const pinia = createPinia()
-Vue.loadScript("https://kit.fontawesome.com/e168ca8cb0.js")
-
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  template: '<App/>',
-  router,
-  components: { App },
-  pinia,
-});
-
-export const eventBus = new Vue();
+app.use(pinia)
+app.mount('#app')

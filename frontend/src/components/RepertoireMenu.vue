@@ -57,9 +57,9 @@ const RepertoireMenu = {
         this.loadCategories();
         this.loadSetlists();
 
-        eventBus.＄on("refresh-setlists", () => {
+        /*eventBus.＄on("refresh-setlists", () => {
             this.loadSetlists();
-        });
+        });*/
 	},
 
 	computed: {
