@@ -39,67 +39,55 @@
 </template>
 
 <script>
-
 import api from "../api";
+import {computed, inject, onMounted, ref} from 'vue'
 import { useSetlists } from "@/stores/setlist";
 
-const RepertoireMenu = {
-	name: 'RepertoireMenu',
+export default {
+    setup() {
+        const logger = inject('vuejs3-logger');
 
-	data: function () {
-		return {
-			categories: null,
-			setlists: null
-		};
-	},
+        // State
+        const categories = ref(null);
+        const setlists = ref(null);
+        const error = ref(null);
 
-	mounted: function () {
-        this.loadCategories();
-        this.loadSetlists();
+        // Computed
+        const ready = computed(() => !!categories.value);
 
-        /*eventBus.＄on("refresh-setlists", () => {
-            this.loadSetlists();
-        });*/
-	},
+        onMounted(() => {
+            loadSetlists();
+            loadCategories();
+        });
 
-	computed: {
-		ready: function() {
-			return !!this.categories;
-		}
-	},
-
-	methods: {
-        dropSong: function(event, setlistUri) {
+        // Methods
+        const dropSong = (event, setlistUri) => {
             let songUri = event.dataTransfer.getData("text");
             let entry = { setlist: setlistUri, song: songUri }
             api.postSetlistEntry(entry);
-        },
-
-        loadSetlists: function() {
+        }
+        const loadSetlists = function() {
             api.getAllSetlists()
                 .then(response => {
-                    this.$log.debug("Setlists loaded: ", response.data);
-                    this.setlists = response.data;
+                    logger.debug("Setlists loaded: ", response.data);
+                    setlists.value = response.data;
                 })
-        },
-
-        loadCategories: function() {
+        }
+        const loadCategories = function() {
             api.getAllCategories()
                 .then(response => {
-                    this.$log.debug("Categories loaded: ", response.data);
-                    this.categories = {
+                    logger.debug("Categories loaded: ", response.data);
+                    categories.value = {
                         season: response.data.filter(category => category.type === "SEASON"),
                         liturgical: response.data.filter(category => category.type === "LITURGICAL_MOMENT")
                     }
                 })
                 .catch((error) => {
-                    this.$log.debug(error);
-                    this.error = "Failed to load categories";
+                    logger.debug(error);
+                    error.value = "Failed to load categories";
                 });
         }
-	}
+        return { categories, setlists, ready, dropSong, error }
+    }
 }
-
-export default RepertoireMenu;
-
 </script>
