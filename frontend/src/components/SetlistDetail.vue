@@ -66,103 +66,85 @@
 </template>
 
 <script>
-import api from "../api";
-import { useSetlists } from "@/stores/setlist";
+import { useSetlists } from "@/stores/setlists";
+import { inject, onMounted, ref } from "vue";
+import {useRoute, useRouter} from "vue-router";
 
+export default {
+    setup() {
+        const logger = inject('vuejs3-logger');
+        const store = useSetlists()
+        const route = useRoute()
+        const router = useRouter()
 
-const SetlistDetail = {
-    name: "SetlistDetail",
+        // State
+        const setlist = ref({});
+        const editing = ref(false);
+        const draftValues = ref(null);
+        const loading = ref(true);
+        const saving = ref(false);
+        const error = ref(null);
 
-    data: function () {
-        return {
-            setlist: {},
-            editing: false,
-            draftValues: null,
-            loading: true,
-            saving: false,
-            error: null,
-        };
-    },
-
-    computed: {
-        isNew: function () {
-            return !this.setlist.id;
-        },
-    },
-
-    mounted: function () {
-        if (this.$route.name === "NewSetlist") {
-            this.draftValues = {};
-            this.editing = true;
-            this.loading = false;
-        } else {
-            var setlistId = this.$route.params.id;
-            let setlistLoaded = api.getSetlistById(setlistId)
-                .then((response) => {
-                    this.$log.debug("Setlist loaded: ", response.data);
-                    this.setlist = response.data;
-                    this.loading = false;
-                })
-                .catch((error) => {
-                    this.$log.debug(error);
-                    this.error = "Failed to load setlist";
-                    this.loading = false;
+        // Mounted
+        onMounted(() => {
+            if (route.name === "NewSetlist") {
+                draftValues.value = {};
+                editing.value = true;
+                loading.value = false;
+            } else {
+                const setlistId = route.params.id;
+                store.get(setlistId).then(value => {
+                    console.log("Loading...", loading.value);
+                    setlist.value = value;
+                    loading.value = false;
+                    console.log("value setlist: ", value);
+                    console.log("value setlist: ", setlist.value);
+                    console.log("Loading..", loading.value);
                 });
-        }
-    },
+            }
+        })
 
-    methods: {
-        save: function() {
-            this.saving = true;
-            var setlist = this.draftValues;
-            if (!setlist) {
+        // Methods
+        const isNew = () => !setlist.value.id;
+        const save = () => {
+            saving.value = true;
+            const newSetlist = draftValues.value;
+            if (!newSetlist) {
                 return;
             }
-            const promise = this.saveToServer(setlist);
+            const promise = store.saveToServer(newSetlist);
             promise.then((response) => {
-                if(this.isNew) {
-                    setlist.id = response.data.id;
+                const isNewSetlist = isNew();
+                if(isNewSetlist) {
+                    newSetlist.id = response.data.id;
                 }
-                this.editing = false;
-                this.saving = false;
-                this.setlist = setlist;
-                this.draftValues = null;
-                if(this.isNew) {
-                    this.$router.push({
+                editing.value = false;
+                saving.value = false;
+                setlist.value = newSetlist;
+                draftValues.value = null;
+                if(isNewSetlist) {
+                    store.add(setlist.value);
+                    router.push({
                         name: "Setlist",
-                        params: { id: setlist.id },
+                        params: { id: newSetlist.id },
                     });
-                    let store = useSetlists();
-                    store.add(setlist);
-                } 
+                }
             })
-        },
-
-        saveToServer: function(setlist) {
-            if (setlist.id) {
-                return api.updateSetlistForId(setlist.id, setlist);
-            } else {
-                return api.createNewSetlist(setlist);
-            }
-        },
-
-        edit: function() {
-            this.draftValues = this.setlist;
-            this.editing = true;
-        },
-
-        cancelEdit: function() {
-            this.draftValues = null;
-            this.editing = false;
-        },
-
-        remove: function() {
-            api.deleteSetlistForId(this.setlist.id).then((response) => {
-                this.$router.push({ name: "Repertoire" });
-            });
         }
-    },
-}
+        const edit = () => {
+            draftValues.value = setlist.value;
+            editing.value = true;
+        }
+        const cancelEdit = () => {
+            draftValues.value = null;
+            editing.value = false;
+        }
+        const remove = () => store.remove(setlist.value.id)
+            .then(() => {
+                router.push({ name: "Repertoire" });
+            });
 
-export default SetlistDetail;
+        return { store, setlist, editing, draftValues, loading, saving, save, edit, cancelEdit, remove }
+    }
+}
 </script>

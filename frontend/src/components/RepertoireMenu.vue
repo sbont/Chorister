@@ -29,9 +29,10 @@
 					<span class="icon">
 						<i class="fas fa-plus-square"></i>
 					</span>
-					Create setlist</router-link>
+					Create setlist
+                </router-link>
 			</li>
-			<li v-for="(setlist) in setlists" :key="setlist.id" class="droppable" @drop="dropSong($event, setlist._links.self.href)" @dragover.prevent @dragenter.prevent>
+			<li v-for="(setlist) in allSetlists" :key="setlist.id" class="droppable" @drop="dropSong($event, setlist._links.self.href)" @dragover.prevent @dragenter.prevent>
 				<router-link :to="{ name: 'Setlist', params: { id: setlist.id }}" append>{{ setlist.name }}</router-link>
 			</li>
 		</ul>
@@ -41,22 +42,23 @@
 <script>
 import api from "../api";
 import {computed, inject, onMounted, ref} from 'vue'
-import { useSetlists } from "@/stores/setlist";
+import { useSetlists } from "@/stores/setlists";
+import {storeToRefs} from "pinia";
 
 export default {
     setup() {
         const logger = inject('vuejs3-logger');
 
         // State
+        const store = useSetlists();
+        const { error, allSetlists } = storeToRefs(store);
         const categories = ref(null);
-        const setlists = ref(null);
-        const error = ref(null);
 
         // Computed
         const ready = computed(() => !!categories.value);
 
         onMounted(() => {
-            loadSetlists();
+            store.fetchAll();
             loadCategories();
         });
 
@@ -65,13 +67,6 @@ export default {
             let songUri = event.dataTransfer.getData("text");
             let entry = { setlist: setlistUri, song: songUri }
             api.postSetlistEntry(entry);
-        }
-        const loadSetlists = function() {
-            api.getAllSetlists()
-                .then(response => {
-                    logger.debug("Setlists loaded: ", response.data);
-                    setlists.value = response.data;
-                })
         }
         const loadCategories = function() {
             api.getAllCategories()
@@ -87,7 +82,7 @@ export default {
                     error.value = "Failed to load categories";
                 });
         }
-        return { categories, setlists, ready, dropSong, error }
+        return { store, categories, ready, dropSong, error }
     }
 }
 </script>

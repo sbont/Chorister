@@ -9,7 +9,7 @@ const instance = axios.create({
 });
 instance.interceptors.request.use(
     async config => {
-        console.log('Starting Request', JSON.stringify(config, null, 2))
+        // console.log('Starting Request', JSON.stringify(config, null, 2))
         let accessToken = await authService.getAccessToken()
         if(accessToken) {
             config.headers.common.Authorization = 'Bearer ' + accessToken
