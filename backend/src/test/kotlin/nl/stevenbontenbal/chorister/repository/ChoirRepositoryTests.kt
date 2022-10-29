@@ -45,4 +45,37 @@ class ChoirRepositoryTests @Autowired constructor(
         // Assert
         Assertions.assertThat(actual).isNull()
     }
+    @Test
+    fun `When findByInviteToken and exists then return Choir`() {
+        // Arrange
+        val manager = User.create()
+        entityManager.persist(manager)
+        val myChoir = Choir(
+            name = "MyChoir",
+            type = "Band",
+            manager = manager,
+            inviteToken = "1234")
+        val otherChoir = Choir(
+            name = "OtherChoir",
+            type = "Band",
+            manager = null,
+            inviteToken = "12345")
+        entityManager.persist(myChoir)
+        entityManager.persist(otherChoir)
+        // Act
+        val actual = choirRepository.findByInviteToken("1234")
+        // Assert
+        Assertions.assertThat(actual!!.id).isEqualTo(myChoir.id)
+    }
+
+    @Test
+    fun `When findByInviteToken and not exists then return null`() {
+        // Arrange
+        val otherChoir = Choir.create(null)
+        entityManager.persist(otherChoir)
+        // Act
+        val actual = choirRepository.findByInviteToken("no-real-token")
+        // Assert
+        Assertions.assertThat(actual).isNull()
+    }
 }

@@ -1,6 +1,7 @@
 package nl.stevenbontenbal.chorister
 
 import nl.stevenbontenbal.chorister.model.entities.*
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import java.time.LocalDate
 import java.util.*
 
@@ -56,5 +57,18 @@ fun Invite.Companion.create(choir: Choir): Invite {
         invitedBy = User.create(),
         token = UUID.randomUUID().toString()
     )
+}
+
+fun SetlistEntry.Companion.create(setlist: Setlist, song: Song): SetlistEntry {
+    return SetlistEntry(
+        setlist = setlist,
+        song = song,
+        number = 1
+    )
+}
+
+fun <T> T.persist(entityManager: TestEntityManager): T {
+    entityManager.persist(this)
+    return this
 }
 // TODO: https://betterprogramming.pub/test-data-creation-using-the-power-of-kotlin-dsl-9526a1fad05b

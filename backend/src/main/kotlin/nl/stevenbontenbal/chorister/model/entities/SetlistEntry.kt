@@ -14,4 +14,6 @@ class SetlistEntry(
     @MapsId("songId")
     var song: Song,
     var number: Int = setlist.entries.size + 1
-)
+) {
+    companion object
+}

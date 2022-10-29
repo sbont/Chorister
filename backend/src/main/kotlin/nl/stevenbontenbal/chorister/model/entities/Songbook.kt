@@ -11,4 +11,6 @@ class Songbook(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
     var title: String?
-)
+) {
+    companion object
+}
