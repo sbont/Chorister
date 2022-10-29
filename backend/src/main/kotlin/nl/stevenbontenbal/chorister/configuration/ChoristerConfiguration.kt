@@ -18,8 +18,10 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.Ordered
+import org.springframework.core.convert.support.ConfigurableConversionService
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer
+import org.springframework.data.rest.webmvc.spi.BackendIdConverter
 import org.springframework.http.HttpMethod
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.security.access.PermissionEvaluator
@@ -102,6 +104,11 @@ class ChoristerConfiguration {
                 corsRegistry.addMapping("/api/**")
                     .allowedMethods("*")
                     .allowedOrigins("http://localhost:8080/")
+            }
+
+            override fun configureConversionService(conversionService: ConfigurableConversionService?) {
+                super.configureConversionService(conversionService)
+                conversionService?.addConverter(SetlistEntryIdConverter())
             }
         }
     }

@@ -11,4 +11,6 @@ data class SetlistEntryId(
     var setlistId: Long? = null,
     @Column(name = "SONG_ID")
     var songId: Long? = null
-): Serializable
+): Serializable {
+    override fun toString(): String = "${setlistId}:${songId}"
+}

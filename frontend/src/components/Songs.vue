@@ -26,6 +26,7 @@
                 <th># Scores</th>
                 <th>Last Played</th>
                 <th>Categories</th>
+                <th v-if="!!setlistId"></th>
             </thead>
             <tbody>
                 <tr v-for="(song, index) in songs" class="song" :key="song.id" draggable="true" @dragstart="startDrag($event, song)">
@@ -37,6 +38,13 @@
                     <td>{{ song.id }}</td>
                     <td>...</td>
                     <td>...</td>
+                    <td v-if="!!setlistId" class="p-1b">
+                        <button class="button is-danger is-inverted is-small" :class="{ 'is-loading': song.deleting }" @click="deleteSong(song)">
+                            <span class="icon is-small">
+                              <i class="fas fa-times"></i>
+                            </span>
+                        </button>
+                    </td>
                 </tr>
             </tbody>
             <tfoot></tfoot>
@@ -54,7 +62,7 @@
     const Songs = {
     name: "Songs",
     props: {
-        activeUser: Object,
+        activeUser: Object
     },
 
     data: function () {
@@ -65,46 +73,12 @@
             loading: true,
             error: null,
             name: "Steven",
+            setlistId: null
         };
     },
 
     mounted: function () {
-        console.log(this.$route.params);
-        const routeName = this.$route.name;
-        let songsLoaded;
-        let transformer;
-        let identity = data => data;
-        switch(routeName) {
-            case 'Repertoire':
-                songsLoaded = api.getAllSongs();
-                transformer = identity
-                break;
-            case 'CategorySeason':
-            case 'CategoryLiturgical':
-                var categoryId = this.$route.params.id;
-                songsLoaded = api.getSongsByCategoryId(categoryId);
-                transformer = identity;
-                break;
-            case 'Setlist':
-                var setlistId = this.$route.params.id;
-                songsLoaded = api.getSetlistEntries(setlistId);
-                transformer = entries => {
-                    let sorted = entries.sort((entryA, entryB) => entryA.number - entryB.number);
-                    console.log(sorted);
-                    return sorted.map(entry => entry._embedded.song);
-                }
-                break;
-        }
-        songsLoaded
-            .then((response) => {
-                this.$log.debug("Data loaded: ", response.data);
-                this.songs = transformer(response.data);
-            })
-            .catch((error) => {
-                this.$log.debug(error);
-                this.error = "Failed to load songs";
-            })
-            .finally(() => (this.loading = false));
+        this.loadSongs();
     },
 
     computed: {
@@ -121,6 +95,43 @@
     methods: {
         pluralize: function (n) {
             return n === 1 ? "song" : "songs";
+        },
+
+        loadSongs: function() {
+            const routeName = this.$route.name;
+            let id = this.$route.params.id;
+            let songsLoaded;
+            let transformer;
+            let identity = data => data;
+            switch(routeName) {
+                case 'Repertoire':
+                    songsLoaded = api.getAllSongs();
+                    transformer = identity
+                    break;
+                case 'CategorySeason':
+                case 'CategoryLiturgical':
+                    songsLoaded = api.getSongsByCategoryId(id);
+                    transformer = identity;
+                    break;
+                case 'Setlist':
+                    this.setlistId = id;
+                    songsLoaded = api.getSetlistEntries(id);
+                    transformer = entries => {
+                        let sorted = entries.sort((entryA, entryB) => entryA.number - entryB.number);
+                        return sorted.map(entry => Object.assign(entry._embedded.song, { setlistEntryUri: entry._links.self.href}));
+                    }
+                    break;
+            }
+            songsLoaded
+                .then((response) => {
+                    this.$log.debug("Data loaded: ", response.data);
+                    this.songs = transformer(response.data);
+                })
+                .catch((error) => {
+                    this.$log.debug(error);
+                    this.error = "Failed to load songs";
+                })
+                .finally(() => (this.loading = false));
         },
 
         addSong: function () {
@@ -178,6 +189,22 @@
             console.log(song);
             event.dataTransfer.dropEffect = "link";
             event.dataTransfer.setData("text/plain", song._links.self.href);
+        },
+
+        deleteSong: function(song) {
+            this.loading = true;
+            song.deleting = true;
+            let entryUri = song.setlistEntryUri;
+            api.delete(entryUri)
+                .then((response) => {
+                    this.$log.debug("Entry removed: " + entryUri);
+                    this.removeSong(song);
+                })
+                .catch((error) => {
+                    this.$log.debug(error);
+                    this.error = "Failed to remove entry";
+                })
+                .finally(() => this.loading = false);
         }
     },
 
@@ -199,5 +226,8 @@ export default Songs;
 <style>
 [v-cloak] {
     display: none;
+}
+td.p-1b {
+    padding: 0.3em;
 }
 </style>

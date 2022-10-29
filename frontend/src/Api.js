@@ -30,6 +30,10 @@ const functions = {
         }
     },
 
+    // Generic
+
+    delete: (resourceUri) => instance.delete(resourceUri),
+
     // Register
 
     register: (request) => instance.post('registration', request),
@@ -112,6 +116,7 @@ const functions = {
         }
     }),
 
+    deleteSetlistEntry: (setlistEntryId) => instance.delete("setlistEntries/" + setlistEntryId),
     // My Choir
 
     getChoirs: () => instance.get('choirs', functions.getGetConfig('choirs')),

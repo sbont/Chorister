@@ -26,4 +26,13 @@ class ExceptionControllerAdvice {
         )
         return message.toResponseEntity()
     }
+
+    @ExceptionHandler
+    fun handleInvalidIdentifierException(ex: InvalidIdentifierException): ResponseEntity<ErrorMessage> {
+        val message = ErrorMessage(
+            HttpStatus.NOT_FOUND,
+            "No resource found at this URL: " + ex.message
+        )
+        return message.toResponseEntity()
+    }
 }
