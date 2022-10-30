@@ -1,36 +1,34 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" v-if="userLoggedIn">
+    <img alt="Vue logo" src="../assets/logo.png" v-if="isLoggedIn">
       {{ user }}
-      {{ userLoggedIn}}
+      {{ isLoggedIn }}
   </div>
 </template>
 
 <script>
-import { authService } from '@/auth'
+import { useAuth } from "@/stores/auth";
 import {inject, onMounted, ref} from "vue";
 import { useRoute, useRouter } from "vue-router";
+import {storeToRefs} from "pinia";
 
 export default {
     setup() {
         const logger = inject('vuejs3-logger');
         const route = useRoute()
         const router = useRouter()
+        const auth = useAuth()
 
         // State
-        let userLoggedIn = false;
-        let user = null;
+        const { user, isLoggedIn } = storeToRefs(auth)
 
         // Mounted
         onMounted(() => {
-            authService.isUserLoggedIn().then(v => userLoggedIn = v);
-            authService.getUser().then(v => user = v);
         })
 
         // Methods
 
-
-        return { userLoggedIn, user }
+        return { user, isLoggedIn }
     }
 
 }

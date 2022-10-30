@@ -1,11 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
-import { authService } from '@/auth'
+import { useAuth } from "@/stores/auth";
 
 const routes = [
   {
-    path: '/',
+    path: '/home',
     name: 'Home',
+    meta: {
+      requiresAuth: true
+    },
     component: Home
   },
   {
@@ -97,37 +100,36 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  const auth = useAuth();
   // This isn't an actual route leading to a component. It is called by the OAuth server once the user logged in.
   // Handling it here prevents us to have an additional callback.html file. An additional file would lead to a short hiccup after logging in.
   // So here we handle the login redirect and then send the user to the "/" route.
   if (to.path === '/authorized') {
     console.log('Login AFTERR');
     // Inform the authentication of the login redirect. Afterwards we send the user to the main page
-    authService.handleLoginRedirect()
-      .then(() => next('/'))
+    auth.handleLoginRedirect()
+      .then(() => next('/home'))
       .catch(error => {
         console.log(error)
         next('/')
       })
   } else if (to.path === '/logout') {
   // This is similar to the "/callback" route not leading to an actual component but only to handle the logout callback from the authentication server.
-    authService.handleLogoutRedirect()
+    auth.handleLogoutRedirect()
       .then(() => next('/'))
       .catch(error => {
         console.log(error)
         next('/')
       })
   } else if(to.matched.some(record => record.meta.requiresAuth)) {
-    authService.isUserLoggedIn().then(isLoggedIn => {
-      if(!isLoggedIn) {
-        authService.login()
-        .then(() => {
-          console.log('Login successful');
-        })
-      } else {
-        next()
-      }
-    });
+    if(!auth.isLoggedIn) {
+      auth.login()
+      .then(() => {
+        console.log('Login successful');
+      })
+    } else {
+      next()
+    }
   } else {
     // Default case. The user is send to the desired route.
     next()

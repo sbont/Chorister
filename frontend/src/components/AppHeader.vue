@@ -1,12 +1,10 @@
 <template>
   <nav class="navbar p-2" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <a class="navbar-item" href="/">
-        <img
-          src="@/assets/logo.png"
-        />
-      </a>
-
+        <router-link to="/home" class="navbar-item">
+            <img src="@/assets/logo.png"
+                 alt="Chorister logo"/>
+        </router-link>
       <a
         role="button"
         class="navbar-burger"
@@ -21,7 +19,7 @@
     </div>
 
     <div id="navbarBasicExample" class="navbar-menu">
-      <div v-if="authenticated" class="navbar-start">
+      <div v-if="isLoggedIn" class="navbar-start">
         <router-link to="/repertoire" class="navbar-item"> Repertoire </router-link>
         <router-link to="/mychoir" class="navbar-item"> My Choir </router-link>
         <div class="navbar-item has-dropdown is-hoverable">
@@ -38,12 +36,12 @@
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
-            <a v-if="!authenticated" class="button is-primary" @click="onLogin()">
+            <a v-if="!isLoggedIn" class="button is-primary" @click="onLogin()">
               <strong>Log in</strong>
             </a>
           </div>
         </div>
-        <div v-if="authenticated" class="navbar-item has-dropdown is-hoverable">
+        <div v-if="isLoggedIn" class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link"> Account </a>
             <div class="navbar-dropdown">
               <router-link to="/profile" class="navbar-item"> Profile </router-link>
@@ -58,38 +56,27 @@
 </template>
 
 <script>
-import { authService} from "@/auth";
+import { useAuth } from "@/stores/auth";
+import { inject, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+
 
 export default {
-  name: 'Home',
-  data () {
-    return {
-      authenticated: false
+    setup() {
+        const logger = inject('vuejs3-logger');
+
+        // State
+        const auth = useAuth();
+        const { user, isLoggedIn } = storeToRefs(auth);
+
+        // Computed
+        onMounted(() => {});
+
+        // Methods
+        const onLogin = () => auth.login()
+        const onLogout = () => auth.logout()
+
+        return { auth, user, isLoggedIn, onLogin, onLogout }
     }
-  },
-  mounted () {
-    authService.isUserLoggedIn()
-      .then(isUserLoggedIn => {
-        this.authenticated = isUserLoggedIn
-      })
-      .catch(error => {
-        console.log(error)
-        this.authenticated = false
-      })
-  },
-  // watch: {
-  //   '$route': 'refreshIsUserLoggedIn'
-  // },
-  methods: {
-    onLogin () {
-      authService.login()
-    },
-    onLogout () {
-      authService.logout()
-    },
-    async refreshIsAuthenticated () {
-      this.authenticated = await authService.isUserLoggedIn()
-    }
-  }
 }
 </script>

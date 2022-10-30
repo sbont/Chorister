@@ -1,8 +1,8 @@
 import axios from 'axios'
-import { authService } from './auth'
+import { useAuth } from "@/stores/auth";
 
 const SERVER_URL = 'http://localhost:8080/api';
-
+const auth = useAuth();
 const instance = axios.create({
     baseURL: SERVER_URL,
     timeout: 5000
@@ -10,7 +10,7 @@ const instance = axios.create({
 instance.interceptors.request.use(
     async config => {
         // console.log('Starting Request', JSON.stringify(config, null, 2))
-        let accessToken = await authService.getAccessToken()
+        let accessToken = await auth.getAccessToken()
         if(accessToken) {
             config.headers.common.Authorization = 'Bearer ' + accessToken
         }

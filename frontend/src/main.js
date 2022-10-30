@@ -2,7 +2,6 @@ import Vue, { createApp } from 'vue'
 import App from './App'
 import VueLogger from 'vuejs3-logger';
 import router from './router'
-import auth, {authService} from './auth'
 import { loadScript } from 'vue-plugin-load-script';
 import { createPinia } from 'pinia'
 import { configureCompat } from 'vue'
@@ -32,6 +31,5 @@ const logOptions = {
 };
 app.use(VueLogger, logOptions);
 app.use(router);
-app.use(auth);
 app.use(pinia)
 app.mount('#app')
