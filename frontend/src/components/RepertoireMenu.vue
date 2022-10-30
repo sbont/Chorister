@@ -42,7 +42,8 @@
 <script>
 import api from "../api";
 import {computed, inject, onMounted, ref} from 'vue'
-import { useSetlists } from "@/stores/setlists";
+import { useSetlists } from "@/stores/setlistStore";
+import { useCategories } from "@/stores/categoryStore";
 import {storeToRefs} from "pinia";
 
 export default {
@@ -50,16 +51,17 @@ export default {
         const logger = inject('vuejs3-logger');
 
         // State
-        const store = useSetlists();
-        const { error, allSetlists } = storeToRefs(store);
-        const categories = ref(null);
+        const setlistStore = useSetlists();
+        const categoryStore = useCategories();
+        const { error, allSetlists } = storeToRefs(setlistStore);
+        const { categories } = storeToRefs(categoryStore);
 
         // Computed
         const ready = computed(() => !!categories.value);
 
         onMounted(() => {
-            store.fetchAll();
-            loadCategories();
+            setlistStore.fetchAll();
+            categoryStore.fetchAll();
         });
 
         // Methods
@@ -68,21 +70,7 @@ export default {
             let entry = { setlist: setlistUri, song: songUri }
             api.postSetlistEntry(entry);
         }
-        const loadCategories = function() {
-            api.getAllCategories()
-                .then(response => {
-                    logger.debug("Categories loaded: ", response.data);
-                    categories.value = {
-                        season: response.data.filter(category => category.type === "SEASON"),
-                        liturgical: response.data.filter(category => category.type === "LITURGICAL_MOMENT")
-                    }
-                })
-                .catch((error) => {
-                    logger.debug(error);
-                    error.value = "Failed to load categories";
-                });
-        }
-        return { store, allSetlists, categories, ready, dropSong, error }
+        return { setlistStore, allSetlists, categories, ready, dropSong, error }
     }
 }
 </script>

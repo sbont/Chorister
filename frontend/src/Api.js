@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useAuth } from "@/stores/auth";
+import { useAuth } from "@/stores/authStore";
 
 const SERVER_URL = 'http://localhost:8080/api';
 const auth = useAuth();

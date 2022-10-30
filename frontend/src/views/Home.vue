@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { useAuth } from "@/stores/auth";
+import { useAuth } from "@/stores/authStore";
 import {inject, onMounted, ref} from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {storeToRefs} from "pinia";

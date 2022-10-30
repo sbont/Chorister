@@ -6,17 +6,17 @@ const logger = inject('vuejs3-logger');
 
 export const useSetlists = defineStore('setlists', {
     state: () => ({
-        setlists2: new Map(),
+        setlists: new Map(),
         loading: false,
         error: null
     }),
     getters: {
         allSetlists(state) {
-            console.log("All setlists:", [...state.setlists2.values()]);
-            return [...state.setlists2.values()];
+            console.log("All setlists:", [...state.setlists.values()]);
+            return [...state.setlists.values()];
         },
         count(state) {
-            return state.setlists2.size;
+            return state.setlists.size;
         }
     },
     actions: {
@@ -28,7 +28,7 @@ export const useSetlists = defineStore('setlists', {
                     this.error = "Failed to load setlists";
                 })
             console.log("setlists loaded:", response);
-            response.data.forEach(setlist => this.setlists2.set(setlist.id, setlist));
+            response.data.forEach(setlist => this.setlists.set(setlist.id, setlist));
             this.loading = false
         },
         async fetch(setlistId) {
@@ -39,21 +39,21 @@ export const useSetlists = defineStore('setlists', {
                     this.error = "Failed to load setlist";
                 });
             console.log("Setlist loaded: ", response.data);
-            this.setlists2.set(response.data.id, response.data);
+            this.setlists.set(response.data.id, response.data);
             this.loading = false;
             return response.data;
         },
         async get(setlistId) {
-            if (!this.setlists2.has(setlistId)) {
+            if (!this.setlists.has(setlistId)) {
                 console.log(setlistId);
                 return await this.fetch(setlistId);
             } else {
-                console.log(JSON.stringify(this.setlists2));
-                return this.setlists2.get(setlistId);
+                console.log(JSON.stringify(this.setlists));
+                return this.setlists.get(setlistId);
             }
         },
         add(setlist) {
-            this.setlists2.set(setlist.id, setlist);
+            this.setlists.set(setlist.id, setlist);
         },
         async saveToServer(setlist) {
             if (setlist.id) {
@@ -65,7 +65,7 @@ export const useSetlists = defineStore('setlists', {
         async remove(setlistId) {
             return api.deleteSetlistForId(setlistId)
                 .then((response) => {
-                    this.setlists2.delete(setlistId);
+                    this.setlists.delete(setlistId);
             });
         }
     }

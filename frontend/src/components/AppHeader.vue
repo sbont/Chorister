@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { useAuth } from "@/stores/auth";
+import { useAuth } from "@/stores/authStore";
 import { inject, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 
