@@ -58,6 +58,7 @@
 </template>
 
 <script>
+import { authService} from "@/auth";
 
 export default {
   name: 'Home',
@@ -67,7 +68,7 @@ export default {
     }
   },
   mounted () {
-    this.$auth.isUserLoggedIn()
+    authService.isUserLoggedIn()
       .then(isUserLoggedIn => {
         this.authenticated = isUserLoggedIn
       })
@@ -81,13 +82,13 @@ export default {
   // },
   methods: {
     onLogin () {
-      this.$auth.login()
+      authService.login()
     },
     onLogout () {
-      this.$auth.logout()
+      authService.logout()
     },
     async refreshIsAuthenticated () {
-      this.authenticated = await this.$auth.isUserLoggedIn()
+      this.authenticated = await authService.isUserLoggedIn()
     }
   }
 }

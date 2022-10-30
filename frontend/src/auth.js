@@ -42,17 +42,14 @@ class AuthService {
         .catch(error => reject(error))
     })
   }
-  
-  getProfile () {
-    return new Promise((resolve, reject) => {
-      userManager.getUser()
-        .then(user => {
-          if (user === null) {
-            resolve(null)
-          }
-          resolve(user.profile)
-      })
-      .catch(error => reject(error))
+
+  getUser() {
+      return new Promise((resolve, reject) => {
+          userManager.getUser()
+              .then(user => {
+                  resolve(user)
+              })
+              .catch(error => reject(error))
       })
   }
 

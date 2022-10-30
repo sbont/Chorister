@@ -97,8 +97,9 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  // This isn't an actual route leading to a component. It is called by the OAuth server once the user logged in. Handling it her prevents us to have an additional callback.html file. An additional file would lead to a short hick-up after logging in. (callback.html is loaded and than the actual route.)
-  // So here we handle the login redirect and than send the user to the "/" route.
+  // This isn't an actual route leading to a component. It is called by the OAuth server once the user logged in.
+  // Handling it here prevents us to have an additional callback.html file. An additional file would lead to a short hiccup after logging in.
+  // So here we handle the login redirect and then send the user to the "/" route.
   if (to.path === '/authorized') {
     console.log('Login AFTERR');
     // Inform the authentication of the login redirect. Afterwards we send the user to the main page

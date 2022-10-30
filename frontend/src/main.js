@@ -14,26 +14,13 @@ configureCompat({
 })
 
 Vue.config.productionTip = false
-// Vue.use(VueLogger, options);
-// Vue.use(auth);
 // Vue.use(LoadScript);
 
 loadScript("https://kit.fontawesome.com/e168ca8cb0.js")
 
-/* eslint-disable no-new */
-/*new Vue({
-  el: '#app',
-  template: '<App/>',
-  router,
-  components: { App },
-  pinia,
-});*/
-
 const app = createApp(App)
-app.use(router);
-app.use(auth);
-app.config.globalProperties.$auth = authService
-
+const pinia = createPinia()
+// app.config.globalProperties.$auth = authService
 const logOptions = {
   isEnabled: true,
   logLevel : 'debug',
@@ -44,7 +31,7 @@ const logOptions = {
   showConsoleColors: true
 };
 app.use(VueLogger, logOptions);
-
-const pinia = createPinia()
+app.use(router);
+app.use(auth);
 app.use(pinia)
 app.mount('#app')
