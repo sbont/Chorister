@@ -82,7 +82,7 @@ export default {
                     error.value = "Failed to load categories";
                 });
         }
-        return { store, categories, ready, dropSong, error }
+        return { store, allSetlists, categories, ready, dropSong, error }
     }
 }
 </script>
