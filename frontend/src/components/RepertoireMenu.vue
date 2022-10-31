@@ -49,10 +49,10 @@ import {storeToRefs} from "pinia";
 export default {
     setup() {
         const logger = inject('vuejs3-logger');
+        const categoryStore = useCategories();
+        const setlistStore = useSetlists();
 
         // State
-        const setlistStore = useSetlists();
-        const categoryStore = useCategories();
         const { error, allSetlists } = storeToRefs(setlistStore);
         const { categories } = storeToRefs(categoryStore);
 

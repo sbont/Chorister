@@ -294,181 +294,150 @@
 import api from "../api";
 import Score from "@/components/Score.vue"
 import VueMultiselect from 'vue-multiselect'
+import {computed, onMounted, ref } from 'vue' // or '@vue/composition-api' in Vue 2.x
+import { useVuelidate } from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
+import { useSongs } from "@/stores/songStore";
+import { useCategories } from "@/stores/categoryStore";
+import { useScores } from "@/stores/scoreStore";
+import { storeToRefs } from "pinia";
+import { useRoute, useRouter } from "vue-router";
 
-const Song = {
-    name: "Song",
+export default {
+    setup () {
+        const songStore = useSongs();
+        const categoryStore = useCategories();
+        const scoreStore = useScores();
+        const route = useRoute();
+        const router = useRouter()
 
-    data: function () {
-        return {
-            song: {},
-            songCategories: null,
-            scores: [],
-            categories: {},
-            editing: false,
-            draftValues: null,
-            draftSongCategories: null,
-            loading: true,
-            saving: false,
-            error: null,
-        };
-    },
+        /*const state = reactive({})
+        const rules = {}
 
-    mounted: function () {
-        let categoriesLoaded = api.getAllCategories()
-            .then(response => {
-                this.$log.debug("Categories loaded: ", response.data);
-                this.categories.season = response.data.filter(category => category.type === "SEASON");
-                this.categories.liturgical = response.data.filter(category => category.type === "LITURGICAL_MOMENT");
-            }) 
-            .catch((error) => {
-                this.$log.debug(error);
-                this.error = "Failed to load categories";
-            });
-        if (this.$route.name === "NewSong") {
-            this.draftValues = {
-                songbook: {},
-            };
-            this.draftSongCategories = {
-                season: [],
-                liturgical: []
+        const v$ = useVuelidate(rules, state)
+
+        return { state, v$ }*/
+
+        // state
+        const { categories } = storeToRefs(categoryStore);
+        const song = ref({});
+        const songCategories = ref();
+        const scores = ref([]);
+        const editing = ref(false);
+        const draftValues = ref();
+        const draftSongCategories = ref();
+        const loading = ref(true);
+        const saving = ref(false);
+        const error = ref(null);
+
+        // Computed
+        const isNew = computed(() => !song.id);
+        const youtubeId = computed(() => song.recordingUrl ? song.recordingUrl.split("?v=")[1] : null);
+
+        onMounted(() => {
+            const categoriesLoaded = categoryStore.fetchAll();
+            if (route.name === "NewSong") {
+                draftValues.value = {
+                    songbook: {},
+                };
+                draftSongCategories.value = {
+                    season: [],
+                    liturgical: []
+                }
+                editing.value = true;
+                categoriesLoaded.finally(() => loading.value = false);
+            } else {
+                const songId = route.params.id;
+                const songLoaded = songStore.get(songId)
+                    .then((value) => {
+                        if (!value.songbook) {
+                            value.songbook = {};
+                        }
+                        song.value = value;
+                    });
+                scoreStore.fetchForSong(songId).then((value) => scores.value = value);
+                const songCategoriesLoaded = categoryStore.getForSong(songId);
+                Promise.all([songLoaded, categoriesLoaded, songCategoriesLoaded])
+                    .then(([, , songCategoryResponse]) => {
+                        songCategories.value = {};
+                        songCategories.value.season = categories.value.season.filter(category => songCategoryResponse.some(songCategory => category._links.self.href === songCategory._links.self.href));
+                        songCategories.value.liturgical = categories.value.liturgical.filter(category => songCategoryResponse.some(songCategory => category._links.self.href === songCategory._links.self.href));
+                    })
+                    .finally(() => loading.value = false);
             }
-            this.editing = true;
-            categoriesLoaded.finally(() => this.loading = false);
-        } else {
-            var songId = this.$route.params.id;
-            let songLoaded = api.getSongById(songId)
-                .then((response) => {
-                    this.$log.debug("Song loaded: ", response.data);
-                    this.song = response.data;
-                    if (!this.song.songbook) {
-                        this.song.songbook = {};
-                    }
-                    api.getScoresBySongId(this.song.id)
-                        .then((response) => {
-                            this.$log.debug("Scores loaded: ", response.data);
-                            this.scores = response.data;
-                        })
-                        .catch((error) => {
-                            this.$log.debug(error);
-                            this.error = "Failed to load scores";
-                        });
-                })
-                .catch((error) => {
-                    this.$log.debug(error);
-                    this.error = "Failed to load song";
-                    this.loading = false;
-                });
-            let songCategoriesLoaded = api.getSongCategories(songId)
-                .catch((error) => {
-                    this.$log.debug(error);
-                    this.error = "Failed to load song categories";
-                    this.loading = false;
-                });
-            Promise.all([songLoaded, categoriesLoaded, songCategoriesLoaded])
-                .then(([songResponse, categoryResponse, songCategoryResponse]) => {
-                    this.songCategories = {};
-                    this.songCategories.season = this.categories.season.filter(category => songCategoryResponse.data.some(songCategory => category._links.self.href === songCategory._links.self.href));
-                    this.songCategories.liturgical = this.categories.liturgical.filter(category => songCategoryResponse.data.some(songCategory => category._links.self.href === songCategory._links.self.href));
-                })
-                .finally(() => (this.loading = false));
-        }
-    },
+        })
 
-    computed: {
-        isNew: function () {
-            return !this.song.id;
-        },
-        youtubeId: function () {
-            return this.song.recordingUrl
-                ? this.song.recordingUrl.split("?v=")[1]
-                : null;
-        },
-    },
-
-    methods: {
-        save: function () {
-            this.saving = true;
-            var song = this.draftValues;
-            if (!song) {
+        // methods
+        const save = () => {
+            saving.value = true;
+            const songDraft = draftValues.value;
+            if (!songDraft) {
                 return;
             }
-            const promise = this.saveToServer(song);
+            const promise = saveToServer(songDraft);
             promise.then((response) => {
-                if(this.isNew) {
-                    song.id = response.data.id;
+                if(isNew.value) {
+                    songDraft.id = response.data.id;
                 }
-                let previousSongCategories = this.songCategories ? this.songCategories.season.concat(this.songCategories.liturgical) : [];
-                let draftSongCategories = this.draftSongCategories.season.concat(this.draftSongCategories.liturgical);
-                let newSongCategories = draftSongCategories.filter(draftSongCategory => !previousSongCategories.some(previousSongCategory => draftSongCategory._links.self.href === previousSongCategory._links.self.href));
-                let deletedSongCategories = previousSongCategories.filter(previousSongCategory => !draftSongCategories.some(draftSongCategory => previousSongCategory._links.self.href === draftSongCategory._links.self.href));
-                if(newSongCategories.length) {
-                    api.postSongCategories(song.id, newSongCategories.map(songCategory => songCategory._links.self.href));
-                }
-                deletedSongCategories.forEach(songCategory => api.deleteSongCategory(song.id, songCategory.id));
-                this.editing = false;
-                this.saving = false;
-                this.song = song;
-                this.songCategories = this.draftSongCategories;
-                this.draftValues = null;
-                this.draftSongCategories = [];
-                if(this.isNew) {
-                    this.$router.push({
+                categoryStore.putForSong(songDraft.id.toString(), draftSongCategories.value.season.concat(draftSongCategories.value.liturgical));
+                editing.value = false;
+                saving.value = false;
+                song.value = songDraft;
+                songCategories.value = draftSongCategories.value;
+                draftValues.value = null;
+                draftSongCategories.value = [];
+                if(isNew.value) {
+                    router.push({
                         name: "Song",
-                        params: { id: song.id },
+                        params: { id: songDraft.id },
                     });
-                } 
+                }
             })
-        },
+        }
 
-        saveToServer: function(song) {
+        const saveToServer = (song) => { // TODO
             if (song.id) {
                 return api.updateSongForId(song.id, song);
             } else {
                 return api.createNewSong(song);
             }
-        },
+        }
 
-        remove: function () {
-            api.deleteSongForId(this.song.id).then((response) => {
-                this.$router.push({ name: "Repertoire" });
+        const remove = () => {
+            api.deleteSongForId(song.value.id).then((response) => {
+                router.push({ name: "Repertoire" });
             });
-        },
+        }
 
-        edit: function () {
-            this.draftValues = this.song;
-            this.draftSongCategories = Object.assign({}, this.songCategories);
-            this.editing = true;
-        },
+        const edit = () => {
+            draftValues.value = song.value;
+            draftSongCategories.value = Object.assign({}, songCategories.value);
+            editing.value = true;
+        }
 
-        cancelEdit: function () {
-            this.draftValues = null;
-            this.draftSongCategories = null;
-            this.editing = false;
-        },
+        const cancelEdit = () => {
+            draftValues.value = null;
+            draftSongCategories.value = null;
+            editing.value = false;
+        }
 
-        addScore: function () {
-            var newScore = {
+        const addScore = () => {
+            let newScore = {
                 id: null,
-                song: this.song._links.self.href
+                song: song.value._links.self.href
             };
-            this.scores.push(newScore);
-        },
+            scores.value.push(newScore);
+        }
 
-        removeScore: function (score) {
+        const removeScore = (score) => {
             if(score.id) {
                 api.deleteScoreForId(score.id);
             }
-            this.scores = this.scores.filter(current => {current.id !== score.id});
-        },
+            scores.value = scores.value.filter(current => current.id !== score.id);
+        }
 
-        oneBased(index) {
-            return index + 1;
-        },
+        return { categories, song, isNew, youtubeId, songCategories, scores, editing, draftValues, draftSongCategories, loading, saving, error, save, saveToServer, remove, edit, cancelEdit, addScore, removeScore };
     },
-
-    // a custom directive to wait for the DOM to be updated
-    // before focusing on the input field.
-    // http://vuejs.org/guide/custom-directive.html
     directives: {
         "song-focus": function (el, binding) {
             if (binding.value) {
@@ -476,15 +445,12 @@ const Song = {
             }
         },
     },
-
     components: {
         Score,
         VueMultiselect,
-    },
+    }
+}
 
-};
-
-export default Song;
 </script>
 
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>

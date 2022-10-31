@@ -45,14 +45,12 @@ export const useSetlists = defineStore('setlists', {
         },
         async get(setlistId) {
             if (!this.setlists.has(setlistId)) {
-                console.log(setlistId);
                 return await this.fetch(setlistId);
             } else {
-                console.log(JSON.stringify(this.setlists));
                 return this.setlists.get(setlistId);
             }
         },
-        add(setlist) {
+        put(setlist) {
             this.setlists.set(setlist.id, setlist);
         },
         async saveToServer(setlist) {

@@ -123,7 +123,7 @@ export default {
                 setlist.value = newSetlist;
                 draftValues.value = null;
                 if(isNewSetlist) {
-                    store.add(setlist.value);
+                    store.put(setlist.value);
                     router.push({
                         name: "Setlist",
                         params: { id: newSetlist.id },
