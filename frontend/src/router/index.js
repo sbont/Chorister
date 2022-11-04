@@ -126,6 +126,7 @@ router.beforeEach((to, from, next) => {
       auth.login()
       .then(() => {
         console.log('Login successful');
+        next()
       })
     } else {
       next()

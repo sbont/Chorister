@@ -4,7 +4,7 @@ import {Log, UserManager, WebStorageStateStore} from 'oidc-client'
 
 const logger = inject('vuejs3-logger');
 const settings = {
-    userStore: new WebStorageStateStore({ store: window.sessionStorage }),
+    userStore: new WebStorageStateStore({ store: window.localStorage }),
     authority: 'http://localhost:8080/auth/realms/Chorister',
     client_id: 'chorister-web',
     response_type: 'code',
@@ -27,6 +27,10 @@ export const useAuth = defineStore('auth', {
         isLoggedIn: (state) => state.user !== null
     },
     actions: {
+        init() {
+            userManager.getUser().then(user => this.user = user);
+        },
+
         login () {
             return userManager.signinRedirect();
         },
