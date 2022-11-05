@@ -50,7 +50,7 @@ export const useScores = defineStore('scores', {
                 return api.createNewScore(score);
             }
         },
-        async remove(scoreId) {
+        async delete(scoreId) {
             return api.deleteScoreForId(scoreId)
                 .then((response) => {
                     this.scores.delete(scoreId);

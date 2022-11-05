@@ -23,6 +23,7 @@ export const useSongs = defineStore('songs', {
             response.data.forEach(song => this.songs.set(song.id, song));
             this.loading = false
         },
+
         async fetch(songId) {
             this.loading = true;
             const response = await api.getSongById(songId)
@@ -35,6 +36,7 @@ export const useSongs = defineStore('songs', {
             this.loading = false;
             return response.data;
         },
+
         async get(songId) {
             if (!this.songs.has(songId)) {
                 return await this.fetch(songId);
@@ -42,18 +44,25 @@ export const useSongs = defineStore('songs', {
                 return this.setlists.get(songId);
             }
         },
+
         put(song) {
             this.songs.set(song.id, song);
         },
-        async saveToServer(song) {
+
+        save(song) {
+            this.saveToServer(song).then(savedSong => this.songs.set(savedSong.id, savedSong));
+        },
+
+        saveToServer(song) {
             if (song.id) {
-                return api.updateSetlistForId(song.id, song);
+                return api.updateSongForId(song.id, song);
             } else {
-                return api.createNewSetlist(song);
+                return api.createNewSong(song);
             }
         },
-        async remove(songId) {
-            return api.deleteSetlistForId(songId)
+
+        delete(songId) {
+            return api.deleteSongForId(songId)
                 .then((response) => {
                     this.songs.delete(songId);
                 });

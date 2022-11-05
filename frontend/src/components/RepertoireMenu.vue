@@ -57,7 +57,7 @@ export default {
         const { categories } = storeToRefs(categoryStore);
 
         // Computed
-        const ready = computed(() => !!categories.value);
+        const ready = computed(() => !!categories);
 
         onMounted(() => {
             setlistStore.fetchAll();

@@ -291,7 +291,6 @@
 </template>
 
 <script>
-import api from "../api";
 import Score from "@/components/Score.vue"
 import VueMultiselect from 'vue-multiselect'
 import {computed, onMounted, ref } from 'vue' // or '@vue/composition-api' in Vue 2.x
@@ -310,13 +309,6 @@ export default {
         const scoreStore = useScores();
         const route = useRoute();
         const router = useRouter()
-
-        /*const state = reactive({})
-        const rules = {}
-
-        const v$ = useVuelidate(rules, state)
-
-        return { state, v$ }*/
 
         // state
         const { categories } = storeToRefs(categoryStore);
@@ -374,7 +366,7 @@ export default {
             if (!songDraft) {
                 return;
             }
-            const promise = saveToServer(songDraft);
+            const promise = songStore.save(songDraft);
             promise.then((response) => {
                 if(isNew.value) {
                     songDraft.id = response.data.id;
@@ -395,19 +387,11 @@ export default {
             })
         }
 
-        const saveToServer = (song) => { // TODO
-            if (song.id) {
-                return api.updateSongForId(song.id, song);
-            } else {
-                return api.createNewSong(song);
-            }
-        }
-
-        const remove = () => {
-            api.deleteSongForId(song.value.id).then((response) => {
-                router.push({ name: "Repertoire" });
-            });
-        }
+        const remove = () =>
+            songStore.delete(song.value.id.toString())
+                .then((response) => {
+                    router.push({ name: "Repertoire" });
+                });
 
         const edit = () => {
             draftValues.value = song.value;
@@ -431,12 +415,12 @@ export default {
 
         const removeScore = (score) => {
             if(score.id) {
-                api.deleteScoreForId(score.id);
+                scoreStore.delete(score.id);
             }
             scores.value = scores.value.filter(current => current.id !== score.id);
         }
 
-        return { categories, song, isNew, youtubeId, songCategories, scores, editing, draftValues, draftSongCategories, loading, saving, error, save, saveToServer, remove, edit, cancelEdit, addScore, removeScore };
+        return { categories, song, isNew, youtubeId, songCategories, scores, editing, draftValues, draftSongCategories, loading, saving, error, save, remove, edit, cancelEdit, addScore, removeScore };
     },
     directives: {
         "song-focus": function (el, binding) {

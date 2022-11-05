@@ -17,7 +17,7 @@
             </div>
             <footer class="card-footer">
                 <a @click.prevent="edit" href="#" class="card-footer-item">Edit</a>
-                <a @click.prevent="remove" href="#" class="card-footer-item has-text-danger">Delete</a>
+                <a @click.prevent="$emit('remove')" href="#" class="card-footer-item has-text-danger">Delete</a>
             </footer>
         </div>
         <div v-if="editing" class="card m-2">
@@ -60,71 +60,65 @@
 </template>
 <script>
 import api from "../api";
+import {computed, onMounted, ref } from 'vue'
+import { useScores } from "@/stores/scoreStore";
+import { useRoute, useRouter } from "vue-router";
 
-// app Vue instance
-const Score = {
-    name: "Score",
-    props: ["score"],
-
-    // app initial state
-    data: function () {
-        return {
-            editing: false,
-            draftValues: null,
-            saving: false,
-            error: null,
-        };
+export default {
+    props: {
+        score: Object
     },
+    emits: ["remove"],
+    setup(props, { emit }) {
+        const scoreStore = useScores();
+        const route = useRoute();
+        const router = useRouter()
 
-    mounted: function () {
-        if (!this.score.id) {
-            this.draftValues = this.score;
-            this.editing = true;
-        } 
-    },
+        // state
+        const score = ref(props.score);
+        const editing = ref(false);
+        const draftValues = ref();
+        const saving = ref(false);
+        const error = ref(null);
 
-    computed: {
-        isNew: function () {
-            return !this.score.id;
-        },
-        previewUrl: function () {
-            return this.score.fileUrl.replace("/view", "/preview");
+        // Computed
+        const isNew = computed(() => !score.value.id);
+        const previewUrl = computed(() => score.value.fileUrl?.replace("/view", "/preview"));
+
+        onMounted(() => {
+            if (!score.value.id) {
+                draftValues.value = score.value;
+                editing.value = true;
+            }
+        });
+
+        // Methods
+        const edit = () => {
+            draftValues.value = score.value;
+            editing.value = true;
         }
-    },
 
-    methods: {
-        edit: function () {
-            this.draftValues = this.score;
-            this.editing = true;
-        },
-
-        save: function () {
-            this.score = this.draftValues;
-            this.editing = false;
-                        console.log(this.score);
-            if(this.score.id) {
-                api.updateScoreForId(this.score.id, this.score);
+        const save = () => {
+            score.value = draftValues.value;
+            editing.value = false;
+            console.log(score.value);
+            if(score.value.id) {
+                api.updateScoreForId(score.value.id, score.value);
             } else {
-                api.createNewScore(this.score);
+                api.createNewScore(score.value);
             }
-        },
+        }
 
-        cancelEdit: function () {
-            this.editing = false;
-            this.draftValues = null;
-            if(!this.score.id) {
-                this.$emit("remove");
+        const cancelEdit = () => {
+            editing.value = false;
+            draftValues.value = null;
+            if(!score.value.id) {
+                emit("remove");
             }
-        },
-
-        remove: function () {
-            this.$emit("remove");
-        },
-    },
-
-};
-
-export default Score;
+        }
+        return { score, editing, draftValues, saving, previewUrl, edit, save, cancelEdit }
+    }
+}
 </script>
 
 <style>
