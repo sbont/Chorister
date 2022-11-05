@@ -50,7 +50,9 @@ export const useSongs = defineStore('songs', {
         },
 
         save(song) {
-            this.saveToServer(song).then(savedSong => this.songs.set(savedSong.id, savedSong));
+            const savePromise = this.saveToServer(song);
+            savePromise.then(savedSong => this.songs.set(savedSong.id, savedSong));
+            return savePromise;
         },
 
         saveToServer(song) {

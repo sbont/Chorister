@@ -18,7 +18,7 @@ th {
     flex: none;
 }
 .field-body .tags .tag {
-    margin-bottom: 0;
+    /*margin-bottom: 0;*/
 }
 .field.static {
     height: 100%;

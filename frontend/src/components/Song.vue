@@ -10,14 +10,12 @@
             <section class="hero is-info">
                 <div v-if="!editing" class="hero-body">
                     <p class="title">{{ song.title }}</p>
-                    <p class="subtitle">
-                        {{ song.composer }} | {{ song.songbook.title }}
-                        {{ song.number }}
+                    <p class="subtitle" v-if="subtitle">
+                        {{ subtitle }}
                     </p>
                 </div>
                 <div v-else class="hero-body">
                     <p class="title">{{ isNew ? "Add new" : "Edit" }}</p>
-                    <p class="subtitle">song</p>
                 </div>
             </section>
 
@@ -38,8 +36,10 @@
                                             v-if="editing"
                                             v-model="draftValues.title"
                                             class="input"
+                                            :class="{'is-danger': v$.title.$error}"
                                             type="text"
                                             placeholder="The name of the song or hymn"
+                                            @blur="v$.title.$touch"
                                         />
                                         <span v-else>
                                             {{ song.title }}
@@ -321,10 +321,26 @@ export default {
         const loading = ref(true);
         const saving = ref(false);
         const error = ref(null);
+        const rules = {
+            title: { required },
+        }
+        const v$ = useVuelidate(rules, draftValues)
 
         // Computed
         const isNew = computed(() => !song.id);
         const youtubeId = computed(() => song.recordingUrl ? song.recordingUrl.split("?v=")[1] : null);
+        const subtitle = computed(() => {
+            let result = "";
+            if (song.value.composer)
+                result += song.value.composer
+            if (song.value.composer && song.value.songbook.title)
+                result += " | ";
+            if (song.value.songbook?.title)
+                result += song.value.songbook.title;
+            if (song.value.songbook?.title && song.value.songbookNumber)
+                result += " " + song.value.songbookNumber;
+            return result;
+        });
 
         onMounted(() => {
             const categoriesLoaded = categoryStore.fetchAll();
@@ -360,10 +376,12 @@ export default {
         })
 
         // methods
-        const save = () => {
+        const save = async () => {
             saving.value = true;
             const songDraft = draftValues.value;
-            if (!songDraft) {
+            const isFormCorrect = await v$.value.$validate()
+            if (!songDraft || !isFormCorrect) {
+                saving.value = false;
                 return;
             }
             const promise = songStore.save(songDraft);
@@ -403,6 +421,8 @@ export default {
             draftValues.value = null;
             draftSongCategories.value = null;
             editing.value = false;
+            if (isNew)
+                router.push({ name: "Repertoire" });
         }
 
         const addScore = () => {
@@ -420,7 +440,7 @@ export default {
             scores.value = scores.value.filter(current => current.id !== score.id);
         }
 
-        return { categories, song, isNew, youtubeId, songCategories, scores, editing, draftValues, draftSongCategories, loading, saving, error, save, remove, edit, cancelEdit, addScore, removeScore };
+        return { categories, song, isNew, youtubeId, songCategories, scores, editing, draftValues, draftSongCategories, loading, saving, error, v$, subtitle, save, remove, edit, cancelEdit, addScore, removeScore };
     },
     directives: {
         "song-focus": function (el, binding) {
@@ -442,7 +462,7 @@ export default {
 [v-cloak] {
     display: none;
 }
-.select .is-multiple {
+.select.is-multiple {
     width: 100%;
 }
 </style>
