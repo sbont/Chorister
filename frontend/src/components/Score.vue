@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="!editing" class="card score m-2">
+        <div v-if="!editing" class="card score mr-2">
             <header class="card-header">
                 <p class="card-header-title">
                     {{ score.description }}
@@ -10,8 +10,8 @@
                 <div class="content is-flex">
                     <iframe
                         :src="previewUrl"
-                        width="318"
-                        height="450"
+                        width="200"
+                        height="200"
                     ></iframe>
                 </div>
             </div>
@@ -20,8 +20,8 @@
                 <a @click.prevent="$emit('remove')" href="#" class="card-footer-item has-text-danger">Delete</a>
             </footer>
         </div>
-        <div v-if="editing" class="card m-2">
-            <div class="card-content">
+        <div v-if="editing" class="card mr-2">
+            <div class="card-content card-content-editing">
                 <div class="content is-flex is-flex-direction-column">
                     <div class="field">
                         <label class="label">Description</label>
@@ -127,5 +127,8 @@ export default {
 }
 .score {
     max-width: 20rem;
+}
+.card-content-editing {
+    height: 249px;
 }
 </style>

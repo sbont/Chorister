@@ -44,7 +44,7 @@ export const useCategories = defineStore('categories', {
             return this.categoriesBySongId.has(songId) ? this.categoriesBySongId.get(songId) : this.fetchForSong(songId)
         },
         putForSong(songId, categories) {
-            let previousCategories = this.categoriesBySongId.get(songId);
+            let previousCategories = this.categoriesBySongId.get(songId) ?? [];
             let newCategories = categories.filter(draftCategory => !previousCategories.some(previousCategory => draftCategory._links.self.href === previousCategory._links.self.href));
             let deletedCategories = previousCategories.filter(previousCategory => !categories.some(draftCategory => previousCategory._links.self.href === draftCategory._links.self.href));
             const promises = [];

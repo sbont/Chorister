@@ -259,27 +259,52 @@
                 </div>
 
                 <div class="column">
-                    <iframe
-                        v-if="youtubeId"
-                        id="ytplayer"
-                        type="text/html"
-                        width="640"
-                        height="360"
-                        :src="
+                    <div class="is-size-4">Play</div>
+                    <div v-if="youtubeId && !editing" class="yt-wrapper">
+                        <iframe
+                                id="ytplayer"
+                                type="text/html"
+                                :src="
                             'https://www.youtube.com/embed/' +
                             youtubeId +
                             '?autoplay=0'
                         "
-                        frameborder="0"
-                    ></iframe>
+                                frameborder="0"
+                        ></iframe>
+                    </div>
+                    <div v-else class="field is-horizontal">
+                        <div class="field-body">
+                            <div
+                                class="field"
+                                v-bind:class="{ static: !editing }"
+                            >
+                                <div class="control">
+                                    <input
+                                        v-model="draftValues.recordingUrl"
+                                        class="input"
+                                        type="url"
+                                        placeholder="https://www.youtube.com/watch?v=..."
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text">
+                        <div class="is-size-4">Text</div>
+                        <div v-if="!editing" v-html="song.text" />
+                        <div v-else>
+                            <editor-content :editor="editor"/>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="scores p-3">
+            <div class="scores m-2 p-3">
                 <div class="is-size-4">Scores</div>
                 <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
                     <Score v-for="score in scores" :key="score.id" :score="score" @remove="removeScore(score)"></Score>
-                    <div class="m-2">
+                    <div class="">
                         <button class="button is-primary" @click="addScore">
                             Add
                         </button>
@@ -293,7 +318,12 @@
 <script>
 import Score from "@/components/Score.vue"
 import VueMultiselect from 'vue-multiselect'
-import {computed, onMounted, ref } from 'vue' // or '@vue/composition-api' in Vue 2.x
+import { useEditor, EditorContent } from '@tiptap/vue-3'
+import StarterKit from '@tiptap/starter-kit'
+import Document from '@tiptap/extension-document'
+import Paragraph from '@tiptap/extension-paragraph'
+import Text from '@tiptap/extension-text'
+import { computed, onMounted, ref } from 'vue' // or '@vue/composition-api' in Vue 2.x
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { useSongs } from "@/stores/songStore";
@@ -325,10 +355,25 @@ export default {
             title: { required },
         }
         const v$ = useVuelidate(rules, draftValues)
+        const editor = useEditor({
+            content: null,
+            extensions: [
+                StarterKit,
+                Document,
+                Paragraph,
+                Text,
+            ],
+            editorProps: {
+                attributes: {
+                    class: 'textarea textarea-resizable focus:outline-none',
+                },
+            },
+            editable: true,
+        })
 
         // Computed
-        const isNew = computed(() => !song.id);
-        const youtubeId = computed(() => song.recordingUrl ? song.recordingUrl.split("?v=")[1] : null);
+        const isNew = computed(() => !song.value.id);
+        const youtubeId = computed(() => song.value.recordingUrl ? song.value.recordingUrl.split("?v=")[1] : null);
         const subtitle = computed(() => {
             let result = "";
             if (song.value.composer)
@@ -362,6 +407,8 @@ export default {
                             value.songbook = {};
                         }
                         song.value = value;
+                        const content = value.text;
+                        editor.value.commands.setContent(content)
                     });
                 scoreStore.fetchForSong(songId).then((value) => scores.value = value);
                 const songCategoriesLoaded = categoryStore.getForSong(songId);
@@ -378,15 +425,18 @@ export default {
         // methods
         const save = async () => {
             saving.value = true;
+            const lyricsHtml = editor.value.getHTML();
             const songDraft = draftValues.value;
+            songDraft.text = lyricsHtml;
             const isFormCorrect = await v$.value.$validate()
             if (!songDraft || !isFormCorrect) {
                 saving.value = false;
                 return;
             }
             const promise = songStore.save(songDraft);
+            const isNewSong = isNew.value
             promise.then((response) => {
-                if(isNew.value) {
+                if(isNewSong) {
                     songDraft.id = response.data.id;
                 }
                 categoryStore.putForSong(songDraft.id.toString(), draftSongCategories.value.season.concat(draftSongCategories.value.liturgical));
@@ -396,7 +446,7 @@ export default {
                 songCategories.value = draftSongCategories.value;
                 draftValues.value = null;
                 draftSongCategories.value = [];
-                if(isNew.value) {
+                if(isNewSong) {
                     router.push({
                         name: "Song",
                         params: { id: songDraft.id },
@@ -421,7 +471,7 @@ export default {
             draftValues.value = null;
             draftSongCategories.value = null;
             editing.value = false;
-            if (isNew)
+            if (!song.value.id)
                 router.push({ name: "Repertoire" });
         }
 
@@ -440,7 +490,8 @@ export default {
             scores.value = scores.value.filter(current => current.id !== score.id);
         }
 
-        return { categories, song, isNew, youtubeId, songCategories, scores, editing, draftValues, draftSongCategories, loading, saving, error, v$, subtitle, save, remove, edit, cancelEdit, addScore, removeScore };
+        return { categories, song, isNew, youtubeId, songCategories, scores, editing, draftValues, draftSongCategories, loading, saving, error, v$, subtitle, editor,
+            save, remove, edit, cancelEdit, addScore, removeScore };
     },
     directives: {
         "song-focus": function (el, binding) {
@@ -452,6 +503,7 @@ export default {
     components: {
         Score,
         VueMultiselect,
+        EditorContent
     }
 }
 
@@ -464,5 +516,24 @@ export default {
 }
 .select.is-multiple {
     width: 100%;
+}
+.yt-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    padding-top: 25px;
+    height: 0;
+}
+.yt-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.textarea-resizable {
+    height: initial;
+}
+.text p {
+    min-height: 18px;
 }
 </style>
