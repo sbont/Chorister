@@ -55,7 +55,7 @@ const routes = [
       {
         path: 'setlist/new',
         name: 'NewSetlist',
-        component: () => import(/* webpackChunkName: "setlist" */ '../components/SetlistDetail.vue'),
+        component: () => import(/* webpackChunkName: "setlistdetail" */ '../components/SetlistDetail.vue'),
         meta: {
           requiresAuth: true
         },
@@ -63,10 +63,21 @@ const routes = [
       {
         path: 'setlist/:id',
         name: 'Setlist',
-        component: () => import(/* webpackChunkName: "songs" */ '../views/Setlist.vue'),
+        component: () => import(/* webpackChunkName: "setlist" */ '../views/Setlist.vue'),
         meta: {
           requiresAuth: true
         },
+        // children : [
+        //   {
+        //     path: 'texts',
+        //     name: 'Export',
+        //     component: () => import(/* webpackChunkName: "setlisttextexport" */ '../views/SetlistTextExport.vue'),
+        //     meta: {
+        //       requiresAuth: true,
+        //       hideHeader: true
+        //     },
+        //   }
+        // ]
       },
       {
         path: 'song/new',
@@ -91,6 +102,15 @@ const routes = [
     name: 'My Choir',
     component: () => import(/* webpackChunkName: "mychoir" */ '../views/MyChoir.vue')
   },
+  {
+    path: '/repertoire/setlist/:id/texts',
+    name: 'Export',
+    component: () => import(/* webpackChunkName: "setlisttextexport" */ '../views/SetlistTextExport.vue'),
+    meta: {
+      requiresAuth: true,
+      hideHeader: true
+    },
+  }
 ]
 
 const router = createRouter({

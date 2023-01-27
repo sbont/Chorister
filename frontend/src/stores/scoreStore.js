@@ -15,7 +15,7 @@ export const useScores = defineStore('scores', {
             console.log("All scores:", [...state.scores.values()]);
             return [...state.scores.values()];
         },
-        categoriesForSongId: (state) => (songId) => state.scores.filter((score) => score.songId === songId), // TODO
+        scoresForSongId: (state) => (songId) => state.scores.filter((score) => score.songId === songId), // TODO
         count(state) {
             return state.scores.size;
         }

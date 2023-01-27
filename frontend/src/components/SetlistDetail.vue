@@ -30,6 +30,14 @@
                 <div class="field is-grouped">
                     <p v-if="!editing" class="control">
                         <button
+                                @click="exportText"
+                                class="button is-link"
+                        >
+                            Export texts
+                        </button>
+                    </p>
+                    <p v-if="!editing" class="control">
+                        <button
                                 @click="edit"
                                 class="button is-link"
                         >
@@ -144,7 +152,15 @@ export default {
                 router.push({ name: "Repertoire" });
             });
 
-        return { store, setlist, editing, draftValues, loading, saving, save, edit, cancelEdit, remove }
+        const exportText = () => {
+            const link = router.resolve({
+                name: "Export",
+                params: { id: setlist.value.id },
+            });
+            window.open(link.href, '_blank');
+        }
+
+        return { store, setlist, editing, draftValues, loading, saving, save, edit, cancelEdit, remove, exportText }
     }
 }
 </script>

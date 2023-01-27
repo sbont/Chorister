@@ -15,4 +15,5 @@ interface SongProjection {
     var scores: MutableList<Score>?
     var addedAt: LocalDateTime
     var slug: String
+    var text: String?
 }

@@ -272,13 +272,13 @@
                                 frameborder="0"
                         ></iframe>
                     </div>
-                    <div v-else class="field is-horizontal">
+                    <div v-if="editing" class="field is-horizontal">
                         <div class="field-body">
                             <div
                                 class="field"
                                 v-bind:class="{ static: !editing }"
                             >
-                                <div class="control">
+                                <div class="control" v-if="editing">
                                     <input
                                         v-model="draftValues.recordingUrl"
                                         class="input"
