@@ -13,19 +13,19 @@
             ERROR: {{ this.error }}
         </div>
         <table
-            class="table is-hoverable is-fullwidth"
+            class="table is-hoverable is-fullwidth song-table"
             v-if="!loading"
             v-cloak
         >
             <thead>
-                <th title="number"></th>
-                <th>Title</th>
-                <th>Composer</th>
-                <th>Songbook</th>
-                <th>No.</th>
-                <th># Scores</th>
-                <th>Last Played</th>
-                <th>Categories</th>
+                <th class="col1" title="number"></th>
+                <th class="col2">Title</th>
+                <th class="col3">Composer</th>
+                <th class="col4">Songbook</th>
+                <th class="col5">No.</th>
+                <th class="col6"># Scores</th>
+                <th class="col7">Last Played</th>
+                <th class="category-col">Categories</th>
                 <th v-if="!!setlistId"></th>
             </thead>
             <tbody>
@@ -35,9 +35,15 @@
                     <td>{{ song.composer }}</td>
                     <td>{{ (song.songbook || {}).title }}</td>
                     <td>{{ song.songbookNumber }}</td>
-                    <td>{{ song.id }}</td>
-                    <td>...</td>
-                    <td>...</td>
+                    <td>{{ song.scores.length }}</td>
+                    <td>{{ song.lastSetlist?.date }}</td>
+                    <td class="category-col">
+                        <div class="tags">
+                            <span v-for="(category, index) in song.categories" class="song-category tag is-normal" :key="index">
+                                {{ category.name }}
+                            </span>
+                        </div>
+                    </td>
                     <td v-if="!!setlistId" class="p-1b">
                         <button class="button is-danger is-inverted is-small" :class="{ 'is-loading': song.deleting }" @click="deleteSong(song)">
                             <span class="icon is-small">
@@ -102,16 +108,16 @@
             let id = this.$route.params.id;
             let songsLoaded;
             let transformer;
-            let identity = data => data;
+            let sortTransformer = data => data.sort((songA, songB) => songA.title.localeCompare(songB.title));
             switch(routeName) {
                 case 'Repertoire':
                     songsLoaded = api.getAllSongs();
-                    transformer = identity
+                    transformer = sortTransformer;
                     break;
                 case 'CategorySeason':
                 case 'CategoryLiturgical':
                     songsLoaded = api.getSongsByCategoryId(id);
-                    transformer = identity;
+                    transformer = sortTransformer;
                     break;
                 case 'Setlist':
                     this.setlistId = id;
@@ -227,7 +233,37 @@ export default Songs;
 [v-cloak] {
     display: none;
 }
+.song-table {
+    table-layout: fixed;
+}
 td.p-1b {
     padding: 0.3em;
+}
+.col1 {
+    width: 3%;
+}
+.col2 {
+    width: 20%;
+}
+.col3 {
+    width: 15%;
+}
+.col4 {
+    width: 15%;
+}
+.col5 {
+    width: 5%;
+}
+.col6 {
+    width: 10%;
+}
+.col7 {
+    width: 10%;
+}
+.category-col { 
+    width: 22%;
+}
+.category-col .tags {
+    flex-wrap: initial;
 }
 </style>
