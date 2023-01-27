@@ -18,5 +18,11 @@ module.exports = {
                     }
                 }
             })
+        config
+            .plugin('html')
+            .tap(args => {
+                args[0].title = "Chorister";
+                return args;
+            })
     }
   };
