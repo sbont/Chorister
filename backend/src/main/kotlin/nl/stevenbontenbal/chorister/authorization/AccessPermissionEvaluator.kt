@@ -1,6 +1,8 @@
 package nl.stevenbontenbal.chorister.authorization
 
 import nl.stevenbontenbal.chorister.interfaces.ChoirOwnedEntity
+import nl.stevenbontenbal.chorister.model.entities.Choir
+import nl.stevenbontenbal.chorister.model.entities.User
 import nl.stevenbontenbal.chorister.service.UserService
 import org.springframework.security.access.PermissionEvaluator
 import org.springframework.security.core.Authentication
@@ -8,7 +10,7 @@ import java.io.Serializable
 import java.util.*
 
 
-class ChoirAccessPermissionEvaluator(
+class AccessPermissionEvaluator(
     private val userService: UserService
 ) : PermissionEvaluator {
 
@@ -32,7 +34,11 @@ class ChoirAccessPermissionEvaluator(
 
     private fun hasPrivilege(targetDomainObject: Any?, permission: String): Boolean {
         val currentUser = userService.getCurrentUser()
-        return targetDomainObject is ChoirOwnedEntity
-                && (currentUser.choir != null && currentUser.choir == targetDomainObject.choir)
+        return when(targetDomainObject) {
+            is ChoirOwnedEntity -> currentUser.choir != null && currentUser.choir == targetDomainObject.choir
+            is Choir -> currentUser.choir == targetDomainObject
+            is User -> currentUser == targetDomainObject || currentUser.choir == targetDomainObject.choir
+            else -> false
+        }
     }
 }

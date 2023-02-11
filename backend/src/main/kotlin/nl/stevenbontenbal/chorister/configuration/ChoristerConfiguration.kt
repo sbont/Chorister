@@ -4,7 +4,7 @@ import io.netty.channel.ChannelOption
 import io.netty.handler.logging.LogLevel
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
-import nl.stevenbontenbal.chorister.authorization.ChoirAccessPermissionEvaluator
+import nl.stevenbontenbal.chorister.authorization.AccessPermissionEvaluator
 import nl.stevenbontenbal.chorister.model.*
 import nl.stevenbontenbal.chorister.model.entities.*
 import nl.stevenbontenbal.chorister.repository.*
@@ -21,7 +21,6 @@ import org.springframework.core.Ordered
 import org.springframework.core.convert.support.ConfigurableConversionService
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer
-import org.springframework.data.rest.webmvc.spi.BackendIdConverter
 import org.springframework.http.HttpMethod
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.security.access.PermissionEvaluator
@@ -75,7 +74,7 @@ class ChoristerConfiguration {
     }
 
     @Bean
-    fun permissionEvaluator(userService: UserService): PermissionEvaluator = ChoirAccessPermissionEvaluator(userService)
+    fun permissionEvaluator(userService: UserService): PermissionEvaluator = AccessPermissionEvaluator(userService)
 
     @Bean
     fun corsConfigurer(): WebMvcConfigurer? {

@@ -7,7 +7,6 @@ import org.springframework.security.access.prepost.PostFilter
 
 @RepositoryRestResource
 interface SetlistRepository: CrudRepository<Setlist, Long> {
-
     @PostFilter("hasPermission(filterObject, 'read')")
     override fun findAll(): Iterable<Setlist>
 }

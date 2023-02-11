@@ -55,7 +55,6 @@ const MyChoir = {
     mounted: function () {
         api.getChoirs()
             .then((response) => {
-                this.$log.debug("Choirs loaded: ", response.data);
                 this.choir = response.data[0];
                 if (this.choir.inviteToken) {
                     let baseUrl = window.location.origin;

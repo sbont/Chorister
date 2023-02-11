@@ -23,7 +23,7 @@
                     </table>
                 </div>
                 
-                <div class="invites mt-5">
+                <!-- <div class="invites mt-5">
                     <h4 class="title is-4">Open invites</h4>
                     <table
                         class="table is-hoverable is-fullwidth"
@@ -50,7 +50,7 @@
                         </tbody>
                         <tfoot></tfoot>
                     </table>
-                </div>
+                </div> -->
 
                 <div class="new-invite mt-5">
                     <h4 class="title is-4">Invite someone</h4>
@@ -72,7 +72,7 @@
                         </button>
                     </div>
 
-                    <div class="field">
+                    <!-- <div class="field">
                         <label class="label">Email</label>
                         <div class="control has-icons-left">
                             <input class="input" type="email" placeholder="hello@email.com">
@@ -80,7 +80,7 @@
                               <i class="fas fa-envelope"></i>
                             </span>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
             </div>
@@ -114,21 +114,21 @@ export default {
         onMounted(() => {
             let membersLoaded = api.getUsers()
                 .then((response) => {
-                    this.$log.debug("Members loaded: ", response.data);
+                    console.log("Members loaded: ", response.data);
                     members.value = response.data;
                 })
                 .catch((error) => {
-                    this.$log.debug(error);
+                    console.log(error);
                     error.value = "Failed to load members";
                 });
             let invitesLoaded = api.getInvites()
                 .then((response) => {
-                    this.$log.debug("Invites loaded: ", response.data);
+                    console.log("Invites loaded: ", response.data);
                     let allInvites = response.data;
                     invites.value = allInvites.filter(i => !i.expired);
                 })
                 .catch((error) => {
-                    this.$log.debug(error);
+                    console.log(error);
                     error.value = "Failed to load invites";
                 });
             Promise.allSettled([membersLoaded, invitesLoaded]).then(()=> loading.value = false)
