@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar p-2" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-        <router-link to="/home" class="navbar-item">
+        <router-link to="/" class="navbar-item">
             <img src="@/assets/logo.png"
                  alt="Chorister logo"/>
         </router-link>
@@ -22,15 +22,6 @@
       <div v-if="isLoggedIn" class="navbar-start">
         <router-link to="/repertoire" class="navbar-item"> Repertoire </router-link>
         <router-link to="/mychoir" class="navbar-item"> My Choir </router-link>
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link"> Settings </a>
-          <div class="navbar-dropdown">
-            <router-link to="/categories" class="navbar-item"> Categories </router-link>
-            <hr class="navbar-divider" />
-            <router-link to="/about" class="navbar-item"> About </router-link>
-            <router-link to="/report" class="navbar-item"> Report an issue </router-link>
-          </div>
-        </div>
       </div>
 
       <div class="navbar-end">
@@ -47,6 +38,7 @@
               <router-link to="/profile" class="navbar-item"> Profile </router-link>
               <hr class="navbar-divider" />
               <router-link to="/about" class="navbar-item"> About </router-link>
+              <router-link to="/report" class="navbar-item"> Report an issue </router-link>
               <a @click="onLogout()" class="navbar-item"> Log out </a>
             </div>
         </div>

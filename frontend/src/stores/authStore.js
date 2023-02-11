@@ -9,7 +9,7 @@ const settings = {
     client_id: 'chorister-web',
     response_type: 'code',
     redirect_uri: 'http://localhost:8080/authorized',
-    post_logout_redirect_uri: 'http://localhost:8080/logout',
+    post_logout_redirect_uri: 'http://localhost:8080/',
     scope: 'openid cms',
     automaticSilentRenew: true
 }

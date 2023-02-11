@@ -1,15 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
 import { useAuth } from "@/stores/authStore";
 
 const routes = [
   {
-    path: '/home',
-    name: 'Home',
+    path: '/',
+    name: 'Landing',
     meta: {
-      requiresAuth: true
+      hideHeader: true,
+      forwardWhenAuthenticated: '/repertoire'
     },
-    component: Home
+    component: () => import(/* webpackChunkName: "landing" */ '../views/Landing.vue'),
   },
   {
     path: '/signup',
@@ -120,6 +120,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  console.log(to)
   const auth = useAuth();
   // This isn't an actual route leading to a component. It is called by the OAuth server once the user logged in.
   // Handling it here prevents us to have an additional callback.html file. An additional file would lead to a short hiccup after logging in.
@@ -128,7 +129,7 @@ router.beforeEach((to, from, next) => {
     console.log('Login AFTERR');
     // Inform the authentication of the login redirect. Afterwards we send the user to the main page
     auth.handleLoginRedirect()
-      .then(() => next('/home'))
+      .then(() => next('/'))
       .catch(error => {
         console.log(error)
         next('/')
@@ -151,6 +152,8 @@ router.beforeEach((to, from, next) => {
     } else {
       next()
     }
+  } else if(to.matched.some(record => record.meta.forwardWhenAuthenticated) && auth.isLoggedIn) {
+    next(to.meta.forwardWhenAuthenticated)
   } else {
     // Default case. The user is send to the desired route.
     next()
