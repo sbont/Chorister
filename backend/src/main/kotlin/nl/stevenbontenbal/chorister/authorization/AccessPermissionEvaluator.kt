@@ -20,7 +20,6 @@ class AccessPermissionEvaluator(
         if (auth == null || targetDomainObject == null || permission !is String) {
             return false
         }
-        val targetType = targetDomainObject.javaClass.simpleName.uppercase(Locale.getDefault())
         return hasPrivilege(targetDomainObject, permission.toString().uppercase(Locale.getDefault()))
     }
 
@@ -32,6 +31,7 @@ class AccessPermissionEvaluator(
             targetType, permission.toString().uppercase(Locale.getDefault()))
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun hasPrivilege(targetDomainObject: Any?, permission: String): Boolean {
         val currentUser = userService.getCurrentUser()
         return when(targetDomainObject) {
