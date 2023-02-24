@@ -9,9 +9,15 @@ plugins {
 	kotlin("plugin.jpa") version "1.6.0"
 	kotlin("plugin.allopen") version "1.6.0"
 	kotlin("kapt") version "1.6.0"
+	application
+	war
 }
 
 apply(plugin = "kotlin-jpa")
+
+application {
+	mainClass.set("nl.stevenbontenbal.chorister.ChoristerApplication")
+}
 
 group = "nl.stevenbontenbal"
 version = "0.0.1-SNAPSHOT"
