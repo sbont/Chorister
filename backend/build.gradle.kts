@@ -1,14 +1,14 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "2.4.5"
+	id("org.springframework.boot") version "2.7.9"
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
-	id("org.jetbrains.kotlin.plugin.noarg") version "1.6.0"
-	kotlin("jvm") version "1.6.0"
-	kotlin("plugin.spring") version "1.6.0"
-	kotlin("plugin.jpa") version "1.6.0"
-	kotlin("plugin.allopen") version "1.6.0"
-	kotlin("kapt") version "1.6.0"
+	id("org.jetbrains.kotlin.plugin.noarg") version "1.8.0"
+	kotlin("jvm") version "1.8.0"
+	kotlin("plugin.spring") version "1.8.0"
+	kotlin("plugin.jpa") version "1.8.0"
+	kotlin("plugin.allopen") version "1.8.0"
+	kotlin("kapt") version "1.8.0"
 	application
 	war
 }
@@ -21,7 +21,7 @@ application {
 
 group = "nl.stevenbontenbal"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
 	mavenCentral()
@@ -29,7 +29,6 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-mustache")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-rest")
 	implementation("org.springframework.boot:spring-boot-starter-security")
@@ -57,7 +56,7 @@ dependencies {
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=all")
-		jvmTarget = "11"
+		jvmTarget = "17"
 		javaParameters = true
 	}
 }
