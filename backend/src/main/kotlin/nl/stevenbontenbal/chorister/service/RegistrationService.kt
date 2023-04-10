@@ -2,6 +2,7 @@ package nl.stevenbontenbal.chorister.service
 
 import nl.stevenbontenbal.chorister.exceptions.InvalidInputException
 import nl.stevenbontenbal.chorister.exceptions.UsernameAlreadyExistingException
+import nl.stevenbontenbal.chorister.interfaces.UserAuthorizationService
 import nl.stevenbontenbal.chorister.model.entities.Choir
 import nl.stevenbontenbal.chorister.model.entities.Invite
 import nl.stevenbontenbal.chorister.model.entities.User
@@ -17,7 +18,7 @@ open class RegistrationService(
     private val userRepository: UserRepository,
     private val choirRepository: ChoirRepository,
     private val inviteRepository: InviteRepository,
-    private val keycloakUserService: KeycloakUserService,
+    private val authorizationService: UserAuthorizationService,
     private val categorisationService: CategorisationService,
     private val userService: UserService
 ) {
@@ -121,8 +122,7 @@ open class RegistrationService(
     }
 
     private fun registerUser(registrationRequest: RegistrationRequest): User {
-        val userPostRequest = createUserPostRequest(registrationRequest)
-        keycloakUserService.postUser(userPostRequest)
+        authorizationService.postUser(registrationRequest)
         val user = createUser(registrationRequest)
         userRepository.save(user)
         return user
@@ -142,18 +142,6 @@ open class RegistrationService(
     private fun initializeChoirData(choir: Choir) {
         categorisationService.createDefaultCategories(choir)
     }
-
-    private fun createUserPostRequest(registrationRequest: RegistrationRequest): UserPostRequest =
-        UserPostRequest(
-            username = registrationRequest.email,
-            email = registrationRequest.email,
-            credentials = mutableListOf(UserPostRequest.Credential(
-                type = "password",
-                value = registrationRequest.password
-            )),
-            firstName = registrationRequest.displayName,
-            lastName = null
-        )
 
     private fun createUser(registrationRequest: RegistrationRequest): User =
         User(

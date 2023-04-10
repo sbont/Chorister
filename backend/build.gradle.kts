@@ -38,8 +38,8 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	implementation("org.modelmapper:modelmapper:2.4.5")
-    implementation("junit:junit:4.13.1")
+	implementation("org.modelmapper:modelmapper:3.1.1")
+    implementation("junit:junit:4.13.2")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.h2database:h2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
@@ -47,8 +47,8 @@ dependencies {
 		exclude(module = "mockito-core")
 	}
 	testImplementation("org.junit.jupiter:junit-jupiter-api")
-	testImplementation("io.mockk:mockk:1.9.3")
-	testImplementation("com.ninja-squad:springmockk:3.1.0")
+	testImplementation("io.mockk:mockk:1.13.4")
+	testImplementation("com.ninja-squad:springmockk:4.0.2")
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 	"kapt"("org.springframework.boot:spring-boot-configuration-processor")
 }

@@ -1,6 +1,12 @@
-backend/data/db.mv.db
-backend/data/db.trace.db
+backend/data
+cockroachdb/
 dev-proxy/node_modules/
 keycloak/
-frontend/yarn.lock
+zitadel/certs/
+
 backend/src/main/resources/application.yml
+frontend/yarn.lock
+zitadel/zitadel-config-local.yaml
+zitadel/zitadel-config.yaml
+zitadel/zitadel-init-local.yaml
+zitadel/zitadel.exe

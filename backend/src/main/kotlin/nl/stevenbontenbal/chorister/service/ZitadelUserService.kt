@@ -1,6 +1,7 @@
 package nl.stevenbontenbal.chorister.service
 
 import nl.stevenbontenbal.chorister.configuration.KeycloakConfiguration
+import nl.stevenbontenbal.chorister.configuration.ZitadelConfiguration
 import nl.stevenbontenbal.chorister.exceptions.UsernameAlreadyExistingException
 import nl.stevenbontenbal.chorister.interfaces.UserAuthorizationService
 import nl.stevenbontenbal.chorister.model.dto.RegistrationRequest
@@ -15,26 +16,24 @@ import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import java.lang.RuntimeException
 
-class KeycloakUserService(
-    private val keycloakConfiguration: KeycloakConfiguration,
+class ZitadelUserService(
+    private val zitadelConfiguration: ZitadelConfiguration,
     private val webClient: WebClient
 ) : UserAuthorizationService {
-
-    override fun postUser(registrationRequest: RegistrationRequest) : ResponseEntity<UserPostResponse>? {
-        val request = createUserPostRequest(registrationRequest)
+    override fun postUser(registrationRequest: RegistrationRequest): ResponseEntity<UserPostResponse>? {
+        val request =
         webClient
             .post()
             .uri(
                 UriComponentsBuilder
-                    .fromHttpUrl(keycloakConfiguration.url)
-                    .path("/users")
-                    .build()
-                    .toUri()
-            )
+                .fromHttpUrl(zitadelConfiguration.baseUrl)
+                .path("/users/human/_import")
+                .build()
+                .toUri())
             .contentType(MediaType.APPLICATION_JSON)
             .body(BodyInserters.fromValue(request))
             .retrieve()
-            .onStatus({ s: HttpStatus -> s.value() == HttpStatus.CONFLICT.value() }) {
+            .onStatus({s: HttpStatus -> s.value() == HttpStatus.CONFLICT.value()}) {
                 Mono.error(UsernameAlreadyExistingException("Username already exists in authentication server"))
             }
             .onStatus(HttpStatus::is4xxClientError) {
@@ -46,16 +45,4 @@ class KeycloakUserService(
             .toEntity(UserPostResponse::class.java)
             .block()
     }
-
-    private fun createUserPostRequest(registrationRequest: RegistrationRequest): UserPostRequest =
-        UserPostRequest(
-            username = registrationRequest.email,
-            email = registrationRequest.email,
-            credentials = mutableListOf(UserPostRequest.Credential(
-                type = "password",
-                value = registrationRequest.password
-            )),
-            firstName = registrationRequest.displayName,
-            lastName = null
-        )
 }
