@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "2.7.9"
+	id("org.springframework.boot") version "3.0.6"
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 	id("org.jetbrains.kotlin.plugin.noarg") version "1.8.0"
 	kotlin("jvm") version "1.8.0"
@@ -40,8 +40,11 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.modelmapper:modelmapper:3.1.1")
     implementation("junit:junit:4.13.2")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	developmentOnly("org.zalando:logbook-spring-boot-starter:2.16.0")
+//	developmentOnly("org.zalando:logbook-servlet")
 	runtimeOnly("com.h2database:h2")
+	runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
 		exclude(module = "junit")
 		exclude(module = "mockito-core")

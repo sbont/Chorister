@@ -4,7 +4,7 @@ import nl.stevenbontenbal.chorister.interfaces.ChoirOwnedEntity
 import nl.stevenbontenbal.chorister.util.toSlug
 import org.springframework.data.rest.core.annotation.RestResource
 import java.time.LocalDateTime
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 class Song(

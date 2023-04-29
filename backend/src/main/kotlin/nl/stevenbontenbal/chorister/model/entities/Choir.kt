@@ -1,7 +1,7 @@
 package nl.stevenbontenbal.chorister.model.entities
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 class Choir(

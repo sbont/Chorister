@@ -1,9 +1,9 @@
 package nl.stevenbontenbal.chorister.model.entities
 
 import java.io.Serializable
-import javax.persistence.Column
+import jakarta.persistence.Column
 
-import javax.persistence.Embeddable
+import jakarta.persistence.Embeddable
 
 @Embeddable
 data class SetlistEntryId(

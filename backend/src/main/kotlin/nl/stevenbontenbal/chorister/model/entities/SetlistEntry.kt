@@ -1,6 +1,6 @@
 package nl.stevenbontenbal.chorister.model.entities
 
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "SETLIST_ENTRY")

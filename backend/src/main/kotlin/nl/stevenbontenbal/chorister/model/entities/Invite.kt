@@ -3,7 +3,7 @@ package nl.stevenbontenbal.chorister.model.entities
 import nl.stevenbontenbal.chorister.interfaces.ChoirOwnedEntity
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 class Invite(

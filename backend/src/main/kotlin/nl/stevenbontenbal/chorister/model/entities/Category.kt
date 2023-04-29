@@ -1,7 +1,7 @@
 package nl.stevenbontenbal.chorister.model.entities
 
 import nl.stevenbontenbal.chorister.interfaces.ChoirOwnedEntity
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 class Category(

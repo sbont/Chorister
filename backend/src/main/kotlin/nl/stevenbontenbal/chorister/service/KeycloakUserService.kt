@@ -7,6 +7,7 @@ import nl.stevenbontenbal.chorister.model.dto.RegistrationRequest
 import nl.stevenbontenbal.chorister.model.dto.UserPostRequest
 import nl.stevenbontenbal.chorister.model.dto.UserPostResponse
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.reactive.function.BodyInserters
@@ -22,7 +23,7 @@ class KeycloakUserService(
 
     override fun postUser(registrationRequest: RegistrationRequest) : ResponseEntity<UserPostResponse>? {
         val request = createUserPostRequest(registrationRequest)
-        webClient
+        return webClient
             .post()
             .uri(
                 UriComponentsBuilder
@@ -34,13 +35,13 @@ class KeycloakUserService(
             .contentType(MediaType.APPLICATION_JSON)
             .body(BodyInserters.fromValue(request))
             .retrieve()
-            .onStatus({ s: HttpStatus -> s.value() == HttpStatus.CONFLICT.value() }) {
+            .onStatus({ s -> s.value() == HttpStatus.CONFLICT.value()}) {
                 Mono.error(UsernameAlreadyExistingException("Username already exists in authentication server"))
             }
-            .onStatus(HttpStatus::is4xxClientError) {
+            .onStatus(HttpStatusCode::is4xxClientError) {
                 Mono.error(RuntimeException("Keycloak client error: ${it.statusCode()}"))
             }
-            .onStatus(HttpStatus::is5xxServerError) {
+            .onStatus(HttpStatusCode::is5xxServerError) {
                 Mono.error(RuntimeException("Keycloak server error: ${it.statusCode()}"))
             }
             .toEntity(UserPostResponse::class.java)

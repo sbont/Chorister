@@ -5,13 +5,11 @@ import io.netty.handler.logging.LogLevel
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
 import nl.stevenbontenbal.chorister.authorization.AccessPermissionEvaluator
+import nl.stevenbontenbal.chorister.interfaces.UserAuthorizationService
 import nl.stevenbontenbal.chorister.model.*
 import nl.stevenbontenbal.chorister.model.entities.*
 import nl.stevenbontenbal.chorister.repository.*
-import nl.stevenbontenbal.chorister.service.CategorisationService
-import nl.stevenbontenbal.chorister.service.KeycloakUserService
-import nl.stevenbontenbal.chorister.service.RegistrationService
-import nl.stevenbontenbal.chorister.service.UserService
+import nl.stevenbontenbal.chorister.service.*
 import org.modelmapper.ModelMapper
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.web.servlet.FilterRegistrationBean
@@ -24,7 +22,7 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer
 import org.springframework.http.HttpMethod
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.security.access.PermissionEvaluator
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
@@ -47,31 +45,20 @@ import java.util.concurrent.TimeUnit
 
 
 @EnableWebSecurity(debug = true)
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 @Configuration
 class ChoristerConfiguration {
 
     @Bean
     @Throws(Exception::class)
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http.mvcMatcher("/api/**")
-            .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/registration")
-                .permitAll()
-                .and()
-            .authorizeRequests()
-                .antMatchers("/api/invite/**")
-                .permitAll()
-                .and()
-            .authorizeRequests()
-                .mvcMatchers("/api/**")
-                .access("hasAuthority('SCOPE_cms')")
-                .and()
-            .oauth2ResourceServer()
-                .jwt()
-        http.csrf().disable()
-        return http.build()
-    }
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
+        http.authorizeHttpRequests { auth ->
+            auth.requestMatchers(HttpMethod.POST, "/api/registration").permitAll()
+                .requestMatchers("/api/invite/**").permitAll()
+                .requestMatchers("/api/**").hasAuthority("SCOPE_cms")
+                .and().oauth2ResourceServer().jwt()
+        }.csrf().disable()
+            .build()
 
     @Bean
     fun permissionEvaluator(userService: UserService): PermissionEvaluator = AccessPermissionEvaluator(userService)
@@ -163,13 +150,13 @@ class ChoristerConfiguration {
                 )
             )
             .build()
-    }
+
 
     @Bean
-    fun keycloakClientService(
-        webClient: WebClient,
-        keycloakConfiguration: KeycloakConfiguration
-    ): KeycloakUserService = KeycloakUserService(keycloakConfiguration, webClient)
+    fun zitadelClientService(
+        zitadelConfiguration: ZitadelConfiguration,
+        oauthClientManager: OAuth2AuthorizedClientManager
+    ): UserAuthorizationService = ZitadelUserService(zitadelConfiguration, zitadelClient(oauthClientManager))
 
     @Bean
     fun registrationService(

@@ -1,7 +1,7 @@
 package nl.stevenbontenbal.chorister.model.entities
 
 import java.util.*
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 class Registration(

@@ -2,7 +2,7 @@ package nl.stevenbontenbal.chorister.model.entities
 
 import nl.stevenbontenbal.chorister.interfaces.ChoirOwnedEntity
 import java.time.LocalDate
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 class Setlist (
