@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConfigurationProperties("zitadel")
-data class ZitadelConfiguration(
-    var baseUrl: String = "@ConfigurationProperties(\"chorister\")"
+data class ZitadelProperties(
+    var baseUrl: String = "http://localhost:9000/management/v1",
+    var adminAccessToken: String = ""
 )

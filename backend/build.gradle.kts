@@ -53,6 +53,7 @@ dependencies {
 	testImplementation("io.mockk:mockk:1.13.4")
 	testImplementation("com.ninja-squad:springmockk:4.0.2")
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	"kapt"("org.springframework.boot:spring-boot-configuration-processor")
 }
 

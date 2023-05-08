@@ -1,12 +1,12 @@
 <template>
   <div id="app">
-    <Header v-if="showHeader" />
+    <AppHeader v-if="showHeader" />
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Header from './components/AppHeader.vue'
+import AppHeader from './components/AppHeader.vue'
 import {useRoute} from "vue-router";
 
 export default {
@@ -18,7 +18,7 @@ export default {
       }
     },
   components: {
-    Header
+    AppHeader
   },
 
 }

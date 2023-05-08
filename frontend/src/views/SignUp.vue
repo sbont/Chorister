@@ -47,7 +47,10 @@
             </div>
 
             <div v-if="success">
-                success
+                Account created.
+            </div>
+            <div v-if="errorMessage">
+                {{ errorMessage }}
             </div>
         </div>
 
@@ -67,7 +70,8 @@ const Signup = {
             registration: {},
             isInvite: null,
             choir: {},
-			success: null
+			success: null,
+            errorMessage: null
         };
     },
 
@@ -86,7 +90,7 @@ const Signup = {
                 })
                 .catch((error) => {
                     this.$log.debug(error);
-                    this.error = "Failed to load invite";
+                    this.errorMessage = "Failed to load invite";
                     this.loading = false;
                 });
         } else {
@@ -106,7 +110,13 @@ const Signup = {
 				.then((response) => {
 					console.log(response);
 					this.success = true;
-			})
+                    this.errorMessage = null;
+                })
+                .catch((error) => {
+                    this.errorMessage = error.response.data.message;
+                    this.$log.debug(error.response);
+                    this.loading = false;
+                });
         },
 	}
 }

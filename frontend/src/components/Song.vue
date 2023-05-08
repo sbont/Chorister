@@ -303,7 +303,7 @@
             <div class="scores m-2 p-3">
                 <div class="is-size-4">Scores</div>
                 <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
-                    <Score v-for="score in scores" :key="score.id" :score="score" @remove="removeScore(score)"></Score>
+                    <Score v-for="score in scores" :key="score.id" :value="score" @remove="removeScore(score)"></Score>
                     <div class="">
                         <button class="button is-primary" @click="addScore">
                             Add

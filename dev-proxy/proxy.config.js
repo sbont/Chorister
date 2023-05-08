@@ -5,10 +5,11 @@ module.exports = {
         preserveHost: true,
         preservePrefix: true
     },
-    "/auth/": {
+    "/auth": {
         uri: "localhost:9000",
-        preserveHost: true,
-        preservePrefix: true
+        preserveHost: false,
+        preservePrefix: false,
+        log: true
     },
     "/": {
         uri: "localhost:8091",

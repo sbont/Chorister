@@ -66,7 +66,7 @@ import { useRoute, useRouter } from "vue-router";
 
 export default {
     props: {
-        score: Object
+        value: Object
     },
     emits: ["remove"],
     setup(props, { emit }) {
@@ -75,7 +75,7 @@ export default {
         const router = useRouter()
 
         // state
-        const score = ref(props.score);
+        const score = ref(props.value);
         const editing = ref(false);
         const draftValues = ref();
         const saving = ref(false);

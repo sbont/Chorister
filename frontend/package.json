@@ -12,6 +12,7 @@
     "@tiptap/extension-heading": "^2.0.0-beta.202",
     "@tiptap/extension-paragraph": "^2.0.0-beta.202",
     "@tiptap/extension-text": "^2.0.0-beta.202",
+    "@tiptap/pm": "^2.0.3",
     "@tiptap/starter-kit": "^2.0.0-beta.202",
     "@tiptap/vue-3": "^2.0.0-beta.202",
     "@vue/compat": "^3.1.0-0",
@@ -30,14 +31,15 @@
     "vuejs3-logger": "^1.0.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-plugin-router": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-plugin-router": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
     "@vue/compiler-sfc": "^3.1.0-0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2"
+    "@babel/core": "^7.11.0",
+    "@babel/eslint-parser": "^7.21.8",
+    "eslint": "^8.39.0",
+    "eslint-plugin-vue": "^9.11.0"
   },
   "eslintConfig": {
     "root": true,
@@ -49,10 +51,11 @@
       "eslint:recommended"
     ],
     "parserOptions": {
-      "parser": "babel-eslint"
+      "parser": "@babel/eslint-parser"
     },
     "rules": {
-      "no-unused-vars": "off"
+      "no-unused-vars": "off",
+      "vue/multi-word-component-names": "off"
     }
   },
   "browserslist": [

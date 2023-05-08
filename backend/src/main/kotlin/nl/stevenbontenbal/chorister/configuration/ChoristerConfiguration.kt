@@ -22,9 +22,13 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer
 import org.springframework.http.HttpMethod
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.security.access.PermissionEvaluator
+import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer.AuthorizationManagerRequestMatcherRegistry
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
@@ -32,6 +36,7 @@ import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedCli
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
@@ -55,9 +60,16 @@ class ChoristerConfiguration {
         http.authorizeHttpRequests { auth ->
             auth.requestMatchers(HttpMethod.POST, "/api/registration").permitAll()
                 .requestMatchers("/api/invite/**").permitAll()
-                .requestMatchers("/api/**").hasAuthority("SCOPE_cms")
+                .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
+                .requestMatchers("/api/**").hasRole("user")
                 .and().oauth2ResourceServer().jwt()
+        }.headers { headers: HeadersConfigurer<HttpSecurity?> ->
+            headers.frameOptions().disable()
         }.csrf().disable()
+//            .csrf { csrf: CsrfConfigurer<HttpSecurity?> ->
+//                csrf
+//                    .ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**"))
+//            }
             .build()
 
     @Bean
@@ -68,7 +80,7 @@ class ChoristerConfiguration {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/api/**")
-                    .allowedOrigins("http://localhost:8080/")
+                    .allowedOrigins("http://localhost:8080/", "http://localhost:8091/")
             }
         }
     }
@@ -105,6 +117,7 @@ class ChoristerConfiguration {
         val config = CorsConfiguration()
         config.allowCredentials = true
         config.addAllowedOrigin("http://localhost:8080/")
+        config.addAllowedOrigin("http://localhost:8091/")
         config.addAllowedHeader("*")
         config.addAllowedMethod("*")
         source.registerCorsConfiguration("/**", config)
@@ -130,12 +143,24 @@ class ChoristerConfiguration {
     }
 
     @Bean
-    fun keycloakClient(
+    fun authorizedWebClient(
         authorizedClientManager: OAuth2AuthorizedClientManager
     ): WebClient {
         val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
-        oauth2Client.setDefaultClientRegistrationId("keycloak")
-        return WebClient.builder()
+        return buildOAuthClient(oauth2Client)
+    }
+
+    /*@Bean
+    fun zitadelClient(
+        authorizedClientManager: OAuth2AuthorizedClientManager
+    ): WebClient {
+        val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+        oauth2Client.setDefaultClientRegistrationId("zitadel")
+        return buildOAuthClient(oauth2Client)
+    }*/
+
+    private fun buildOAuthClient(oauth2Client: ServletOAuth2AuthorizedClientExchangeFilterFunction) =
+        WebClient.builder()
             .apply(oauth2Client.oauth2Configuration())
             .clientConnector(
                 ReactorClientHttpConnector(
@@ -154,19 +179,19 @@ class ChoristerConfiguration {
 
     @Bean
     fun zitadelClientService(
-        zitadelConfiguration: ZitadelConfiguration,
+        zitadelConfiguration: ZitadelProperties,
         oauthClientManager: OAuth2AuthorizedClientManager
-    ): UserAuthorizationService = ZitadelUserService(zitadelConfiguration, zitadelClient(oauthClientManager))
+    ): UserAuthorizationService = ZitadelUserService(zitadelConfiguration, authorizedWebClient(oauthClientManager))
 
     @Bean
     fun registrationService(
         userRepository: UserRepository,
         choirRepository: ChoirRepository,
         inviteRepository: InviteRepository,
-        keycloakUserService: KeycloakUserService,
+        userAuthorizationService: UserAuthorizationService,
         categorisationService: CategorisationService,
         userService: UserService
-    ): RegistrationService = RegistrationService(userRepository, choirRepository, inviteRepository, keycloakUserService, categorisationService, userService)
+    ): RegistrationService = RegistrationService(userRepository, choirRepository, inviteRepository, userAuthorizationService, categorisationService, userService)
 
     @Bean
     fun userService(userRepository: UserRepository): UserService = UserService(userRepository)
