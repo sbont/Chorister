@@ -7,7 +7,7 @@
                     <p class="title">{{ choir.name }}</p>
                 </div>
             </section>
-            <div class="p-3">
+            <div class="p-3" v-if="!loading">
 
                 <div class="tabs">
                     <ul>
@@ -32,81 +32,74 @@
 <script>
 import ChoirMembers from "../components/ChoirMembers.vue";
 import api from "../api";
+import { onMounted, ref } from 'vue'
 import moment from "moment";
 
-const MyChoir = {
-    name: "MyChoir",
+export default {
+    setup () {
+        // state
+        
+        const choir = ref({})
+        const editing = ref(false)
+        const draftValues = ref(null)
+        const loading = ref(true)
+        const saving = ref(false)
+        const error = ref(null)
+        const activeTab = ref("members")
 
-    data: function () {
-        return {
-            choir: {},
-            editing: false,
-            draftValues: null,
-            loading: true,
-            saving: false,
-            error: null,
-            activeTab: "members"
-        };
-    },
+        // Computed
 
-    computed: {
-    },
-
-    mounted: function () {
-        api.getChoirs()
+        onMounted(() => {
+            api.getChoirs()
             .then((response) => {
-                this.choir = response.data[0];
-                if (this.choir.inviteToken) {
-                    let baseUrl = window.location.origin;
-                    this.inviteLink = baseUrl + "/signup?invite=" + this.choir.inviteToken;
-                }
-                this.$log.debug("Choir loaded: ", response.data[0]);
-                this.loading = false
+                choir.value = response.data[0];
+                console.log("Choir loaded: ", response.data[0]);
+                loading.value = false
             })
             .catch((error) => {
-                this.$log.debug(error);
-                this.error = "Failed to load choir";
+                console.log(error);
+                error.value = "Failed to load choir";
             });
-    },
+        })
 
-    methods: {
-        formatDate: function(date) {
+        // methods
+        const formatDate = function(date) {
             if (date) {
                 return moment(String(date)).format('DD-MM-YYYY');
             }
-        },
+        }
 
-        save: function() {
-            this.saving = true;
-            var choir = this.draftValues;
+        const save = function() {
+            saving.value = true;
+            var choir = draftValues.value;
             if (!choir) {
                 return;
             }
             const promise = api.updateChoirForId(choir.id, choir);
             promise.then(() => {
-                this.editing = false;
-                this.saving = false;
-                this.choir = choir;
-                this.draftValues = null;
+                editing.value = false;
+                saving.value = false;
+                choir.value = choir;
+                draftValues.value = null;
             })
-        },
+        }
 
-        edit: function() {
-            this.draftValues = this.setlist;
-            this.editing = true;
-        },
+        const edit = function() {
+            draftValues.value = this.setlist;
+            editing.value = true;
+        }
 
-        cancelEdit: function() {
-            this.draftValues = null;
-            this.editing = false;
-        },
+        const cancelEdit = function() {
+            draftValues.value = null;
+            editing.value = false;
+        }
 
-    
+        return { choir, editing, draftValues, loading, saving, error, activeTab,
+        formatDate, save, edit, cancelEdit };
     },
     components: {
         ChoirMembers
     }
 }
 
-export default MyChoir;
 </script>

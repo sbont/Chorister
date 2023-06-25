@@ -103,6 +103,7 @@ export default {
         const members = ref([])
         const invites = ref([])
         const inviteLink = ref(null)
+        const token = ref()
         const editing = ref(false)
         const draftValues = ref(null)
         const loading = ref(true)
@@ -112,6 +113,11 @@ export default {
         // Computed
 
         onMounted(() => {
+            console.log(props.choir);
+            if (props.choir.inviteToken) {
+                let baseUrl = window.location.origin;
+                inviteLink.value = baseUrl + "/signup?invite=" + props.choir.inviteToken;
+            }
             let membersLoaded = api.getUsers()
                 .then((response) => {
                     console.log("Members loaded: ", response.data);
@@ -180,7 +186,8 @@ export default {
         }
 
         const copyToken = function() {
-            this.$refs.token.focus();
+            console.log(token.value);
+            token.value.focus();
             document.execCommand('copy');
         }
 
@@ -192,7 +199,7 @@ export default {
         }
 
         return { 
-            members, invites, inviteLink, editing, draftValues, loading, saving, error,
+            members, invites, inviteLink, editing, draftValues, loading, saving, error, token,
             formatDate, save, edit, cancelEdit, generateToken, deleteToken, copyToken, revokeInvite
          };
     },
