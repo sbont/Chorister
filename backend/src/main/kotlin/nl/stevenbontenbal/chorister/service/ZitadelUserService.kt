@@ -19,9 +19,9 @@ class ZitadelUserService(
     private val zitadelConfiguration: ZitadelProperties,
     private val webClient: WebClient
 ) : UserAuthorizationService {
-    override fun postUser(registrationRequest: RegistrationRequest): ResponseEntity<UserPostResponse>? {
+    override fun postUser(registrationRequest: RegistrationRequest): Result<String?> {
         val request = createUserPostRequest(registrationRequest)
-        return webClient
+        val response = webClient
             .post()
             .uri(
                 UriComponentsBuilder
@@ -46,8 +46,9 @@ class ZitadelUserService(
             .onStatus(HttpStatusCode::is5xxServerError) {
                 Mono.error(RuntimeException("Zitadel server error: ${it.statusCode()}"))
             }
-            .toEntity(UserPostResponse::class.java)
+            .toEntity(ZitadelUserPostResponse::class.java)
             .block()
+        return Result.success(response?.body?.userId)
     }
 
     private fun createUserPostRequest(registrationRequest: RegistrationRequest): ZitadelUserPostRequest =

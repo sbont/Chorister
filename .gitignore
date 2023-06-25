@@ -10,3 +10,5 @@ zitadel/zitadel-config-local.yaml
 zitadel/zitadel-config.yaml
 zitadel/zitadel-init-local.yaml
 zitadel/zitadel.exe
+
+secrets/

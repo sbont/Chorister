@@ -122,8 +122,8 @@ open class RegistrationService(
     }
 
     private fun registerUser(registrationRequest: RegistrationRequest): User {
-        authorizationService.postUser(registrationRequest)
-        val user = createUser(registrationRequest)
+        val userId = authorizationService.postUser(registrationRequest)
+        val user = createUser(registrationRequest, userId)
         userRepository.save(user)
         return user
     }
@@ -143,11 +143,12 @@ open class RegistrationService(
         categorisationService.createDefaultCategories(choir)
     }
 
-    private fun createUser(registrationRequest: RegistrationRequest): User =
+    private fun createUser(registrationRequest: RegistrationRequest, userId: Result<String?>): User =
         User(
             username = registrationRequest.email,
             email = registrationRequest.email,
-            displayName = registrationRequest.displayName
+            displayName = registrationRequest.displayName,
+            zitadelId = userId.getOrNull()
     )
 
     private fun createChoir(registrationRequest: NewChoirRegistrationRequest, user: User): Choir =

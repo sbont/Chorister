@@ -10,7 +10,7 @@ class UserService(private val userRepository: UserRepository) {
 
     fun getCurrentUser(): User {
         val jwt = SecurityContextHolder.getContext().authentication.principal as Jwt
-        val username = jwt.getClaimAsString("preferred_username")
-        return userRepository.findByUsername(username) ?: throw AuthException("Username $username not found.")
+        val userId = jwt.subject
+        return userRepository.findByZitadelId(userId) ?: throw AuthException("User with Zitadel ID $userId not found.")
     }
 }

@@ -5,25 +5,22 @@ import nl.stevenbontenbal.chorister.exceptions.UsernameAlreadyExistingException
 import nl.stevenbontenbal.chorister.interfaces.UserAuthorizationService
 import nl.stevenbontenbal.chorister.model.dto.RegistrationRequest
 import nl.stevenbontenbal.chorister.model.dto.UserPostRequest
-import nl.stevenbontenbal.chorister.model.dto.UserPostResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
-import java.lang.RuntimeException
 
 class KeycloakUserService(
     private val keycloakConfiguration: KeycloakConfiguration,
     private val webClient: WebClient
 ) : UserAuthorizationService {
 
-    override fun postUser(registrationRequest: RegistrationRequest) : ResponseEntity<UserPostResponse>? {
+    override fun postUser(registrationRequest: RegistrationRequest): Result<String> {
         val request = createUserPostRequest(registrationRequest)
-        return webClient
+        webClient
             .post()
             .uri(
                 UriComponentsBuilder
@@ -35,7 +32,7 @@ class KeycloakUserService(
             .contentType(MediaType.APPLICATION_JSON)
             .body(BodyInserters.fromValue(request))
             .retrieve()
-            .onStatus({ s -> s.value() == HttpStatus.CONFLICT.value()}) {
+            .onStatus({ s -> s.value() == HttpStatus.CONFLICT.value() }) {
                 Mono.error(UsernameAlreadyExistingException("Username already exists in authentication server"))
             }
             .onStatus(HttpStatusCode::is4xxClientError) {
@@ -44,18 +41,21 @@ class KeycloakUserService(
             .onStatus(HttpStatusCode::is5xxServerError) {
                 Mono.error(RuntimeException("Keycloak server error: ${it.statusCode()}"))
             }
-            .toEntity(UserPostResponse::class.java)
+            .toBodilessEntity()
             .block()
+        return Result.success("")
     }
 
     private fun createUserPostRequest(registrationRequest: RegistrationRequest): UserPostRequest =
         UserPostRequest(
             username = registrationRequest.email,
             email = registrationRequest.email,
-            credentials = mutableListOf(UserPostRequest.Credential(
-                type = "password",
-                value = registrationRequest.password
-            )),
+            credentials = mutableListOf(
+                UserPostRequest.Credential(
+                    type = "password",
+                    value = registrationRequest.password
+                )
+            ),
             firstName = registrationRequest.displayName,
             lastName = null
         )

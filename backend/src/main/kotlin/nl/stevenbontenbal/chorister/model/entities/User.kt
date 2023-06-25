@@ -14,7 +14,9 @@ class User(
     var choir: Choir? = null,
     var email: String?,
     var username: String,
-    var displayName: String?)
+    var displayName: String?,
+    var zitadelId: String?
+    )
 {
     companion object
 }

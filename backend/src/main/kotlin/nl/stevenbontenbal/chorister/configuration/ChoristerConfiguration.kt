@@ -22,12 +22,10 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer
 import org.springframework.http.HttpMethod
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.security.access.PermissionEvaluator
-import org.springframework.security.config.Customizer
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer.AuthorizationManagerRequestMatcherRegistry
-import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder
@@ -61,7 +59,7 @@ class ChoristerConfiguration {
             auth.requestMatchers(HttpMethod.POST, "/api/registration").permitAll()
                 .requestMatchers("/api/invite/**").permitAll()
                 .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
-                .requestMatchers("/api/**").hasRole("user")
+                .requestMatchers("/api/**").authenticated()
                 .and().oauth2ResourceServer().jwt()
         }.headers { headers: HeadersConfigurer<HttpSecurity?> ->
             headers.frameOptions().disable()

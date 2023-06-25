@@ -17,4 +17,7 @@ interface UserRepository : CrudRepository<User, Long> {
 
     @RestResource(exported = false)
     fun findByUsername(username: String): User?
+
+    @RestResource(exported = false)
+    fun findByZitadelId(zitadelId: String): User?
 }
