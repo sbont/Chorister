@@ -4,7 +4,10 @@ import nl.stevenbontenbal.chorister.interfaces.ChoirOwnedEntity
 import nl.stevenbontenbal.chorister.model.entities.Choir
 import nl.stevenbontenbal.chorister.model.entities.User
 import nl.stevenbontenbal.chorister.service.UserService
+import org.springframework.context.annotation.Bean
 import org.springframework.security.access.PermissionEvaluator
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler
 import org.springframework.security.core.Authentication
 import java.io.Serializable
 import java.util.*
