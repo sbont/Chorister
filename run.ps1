@@ -9,12 +9,12 @@ Pop-Location
 
 # DB
 Write-Host "Starting Cockroach..."
-Start-Process -FilePath "$($env:APPDATA)\cockroach\cockroach.exe" -ArgumentList "start-single-node --certs-dir certs --store=D:\db\ --listen-addr=localhost:26258 --http-addr=localhost:8085" -PassThru
+Start-Process -FilePath "$($env:APPDATA)\cockroach\cockroach.exe" -ArgumentList "start-single-node --certs-dir cockroachdb\certs --store=C:\db\ --listen-addr=localhost:26258 --http-addr=localhost:8085" -PassThru
 pause
 
 # Auth server
 Write-Host "Starting Zitadel..."
-Start-Process -FilePath ".\zitadel\zitadel.exe" -ArgumentList "start --masterkey 'evFuvyi4MaFrkpyo8EznFoa8ECfuKgXi' --config .\zitadel\zitadel-config-local-dell.yaml --tlsMode disabled" -PassThru
+Start-Process -FilePath ".\zitadel\zitadel.exe" -ArgumentList "start --masterkey evFuvyi4MaFrkpyo8EznFoa8ECfuKgXi --config .\zitadel\zitadel-config-local-dell.yaml --tlsMode disabled" -PassThru
 pause
 
 # Write-Host "Starting Keycloak..."
