@@ -539,3 +539,11 @@ databaseChangeLog:
         referencedTableName: setlist
         validate: true
 
+databaseChangeLog:
+- changeSet:
+    id: 1688211808071-1
+    author: Steven.Bontenbal (generated)
+    changes:
+    - renameTable:
+          oldTableName: user
+          newTableName: chorister_user
