@@ -4,6 +4,7 @@ plugins {
 	id("org.springframework.boot") version "3.0.6"
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 	id("org.jetbrains.kotlin.plugin.noarg") version "1.8.0"
+	id("org.liquibase.gradle") version "2.2.0"
 	kotlin("jvm") version "1.8.0"
 	kotlin("plugin.spring") version "1.8.0"
 	kotlin("plugin.jpa") version "1.8.0"
@@ -27,6 +28,11 @@ repositories {
 	mavenCentral()
 }
 
+liquibase {
+	activities.register("main")
+	runList = "main"
+}
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
@@ -35,14 +41,15 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+	implementation("org.postgresql:postgresql")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.22")
 	implementation("org.modelmapper:modelmapper:3.1.1")
     implementation("junit:junit:4.13.2")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	developmentOnly("org.zalando:logbook-spring-boot-starter:2.16.0")
-//	developmentOnly("org.zalando:logbook-servlet")
 	runtimeOnly("com.h2database:h2")
 	runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
@@ -55,6 +62,15 @@ dependencies {
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	"kapt"("org.springframework.boot:spring-boot-configuration-processor")
+	liquibaseRuntime("org.jetbrains.kotlin:kotlin-stdlib:1.8.22")
+	liquibaseRuntime("org.liquibase:liquibase-core:4.20.0")
+	liquibaseRuntime("org.liquibase:liquibase-groovy-dsl:3.0.3")
+	liquibaseRuntime("org.liquibase.ext:liquibase-hibernate6:4.23.0")
+	liquibaseRuntime("info.picocli:picocli:4.7.3")
+	liquibaseRuntime("org.postgresql:postgresql:42.5.4")
+	liquibaseRuntime("org.springframework.boot:spring-boot-starter-data-jpa")
+	liquibaseRuntime(sourceSets.getByName("main").output)
+	liquibaseRuntime(files("src/main"))
 }
 
 tasks.withType<KotlinCompile> {

@@ -4,9 +4,9 @@ dev-proxy/node_modules/
 keycloak/
 zitadel/certs/
 
-backend/src/main/resources/application.yml
 frontend/yarn.lock
 zitadel/zitadel-config-local.yaml
+zitadel/zitadel-config-local-dell.yaml
 zitadel/zitadel-config.yaml
 zitadel/zitadel-init-local.yaml
 zitadel/zitadel.exe
