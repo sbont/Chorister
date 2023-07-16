@@ -1,0 +1,44 @@
+chorister:
+  title: Chorister
+  version: 0.1
+  default-categories:
+    liturgical-moment:
+      - Opening
+      - Gloria
+      - Alleluia
+      - Sanctus
+      - Lord's Prayer
+      - Communion
+      - Closing
+    season:
+      - Advent
+      - Christmas
+      - Ordinary Time
+      - Lent
+      - Easter
+      - Pentecost
+server:
+  port: 8090
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.CockroachDialect
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation=true
+        temp.use_jdbc_metadata_defaults: false
+        show-sql: true
+        format-sql: true
+        dialect: org.hibernate.dialect.CockroachDialect
+  liquibase:
+    change-log: classpath:db/changelog/changelog-master.yaml
+    default-schema:
+    drop-first: false
+    contexts: crdb
+    enabled: true
+  data:
+    rest:
+      detection-strategy: default
+      basePath: /api
+debug: true

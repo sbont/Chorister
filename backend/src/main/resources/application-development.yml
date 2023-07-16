@@ -1,0 +1,50 @@
+chorister:
+  base-url: "http://localhost:8080/"
+server:
+  port: 8090
+spring:
+  datasource:
+    url: "jdbc:postgresql://localhost:26258/chorister?sslmode=verify-full&sslrootcert=C:%5CProjects%5Cprivate%5CChorister%5Csecrets%5Ccerts%5Cca.crt"
+    driver-class-name: org.postgresql.Driver
+    username: ${CHORISTER_DATABASE_USER}
+    password: ${CHORISTER_DATABASE_PASSWORD}
+    hikari:
+      connection-test-query: SELECT 1
+      maximum-pool-size: 50
+      minimum-idle: 20
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000
+          jwk-set-uri: http://localhost:9000/oauth/v2/keys
+        opaquetoken:
+          introspection-uri: http://localhost:9000/oauth/v2/introspect
+          client-id: ${CHORISTER_API_CLIENT_ID}
+          client-secret: ${CHORISTER_API_SECRET}
+      client:
+        provider:
+          zitadel:
+            issuerUri: http://localhost:9000
+            user-name-attribute: api@chorister.localhost
+        registration:
+          zitadel:
+            authorization-grant-type: authorization_code
+            client_id: ${CHORISTER_ADMIN_CLIENT_ID}
+            client_secret: ${CHORISTER_ADMIN_SECRET}
+debug: false
+logging:
+  level:
+    org:
+      springframework:
+        security: TRACE
+        web: DEBUG
+      zalando:
+        logbook: TRACE
+    reactor:
+      netty:
+        http:
+          client: DEBUG
+zitadel:
+  base-url: http://localhost:9000/management/v1
+  admin-access-token: ${CHORISTER_ZITADEL_ACCESS_TOKEN}
