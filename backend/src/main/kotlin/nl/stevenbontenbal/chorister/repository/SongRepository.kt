@@ -7,10 +7,17 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.data.rest.core.annotation.RepositoryRestResource
 import org.springframework.data.rest.core.annotation.RestResource
+import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.security.access.prepost.PostFilter
+import java.util.*
 
 @RepositoryRestResource(excerptProjection = SongProjection::class)
 interface SongRepository : CrudRepository<Song, Long> {
+    @RestResource
+    @PostAuthorize("hasPermission(returnObject, 'read')")
+    override fun findById(id: Long): Optional<Song>
+
+    @RestResource
     @PostFilter("hasPermission(filterObject, 'read')")
     override fun findAll(): Iterable<Song>
 

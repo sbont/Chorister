@@ -39,6 +39,6 @@ spring:
     enabled: true
   data:
     rest:
-      detection-strategy: default
+      detection-strategy: annotated
       basePath: /api
 debug: true

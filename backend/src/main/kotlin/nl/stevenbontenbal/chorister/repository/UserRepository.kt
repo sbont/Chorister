@@ -10,18 +10,17 @@ import java.util.*
 
 @RepositoryRestResource
 interface UserRepository : CrudRepository<User, Long> {
+    @RestResource
     @PostFilter("hasPermission(filterObject, 'read')")
     override fun findAll(): Iterable<User>
 
+    @RestResource()
     @PostAuthorize("hasPermission(returnObject, 'read')")
     override fun findById(id: Long): Optional<User>
 
-    @RestResource(exported = false)
     fun findByEmail(email: String): User?
 
-    @RestResource(exported = false)
     fun findByUsername(username: String): User?
 
-    @RestResource(exported = false)
     fun findByZitadelId(zitadelId: String): User?
 }

@@ -85,6 +85,7 @@ class ChoristerConfiguration {
                 configuration: RepositoryRestConfiguration,
                 corsRegistry: CorsRegistry
             ) {
+                configuration.disableDefaultExposure()
                 configuration.exposeIdsFor(Song::class.java)
                 configuration.exposeIdsFor(Score::class.java)
                 configuration.exposeIdsFor(Category::class.java)
