@@ -1,7 +1,6 @@
 package nl.stevenbontenbal.chorister.configuration
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 
 @ConfigurationProperties("chorister")
 data class ChoristerProperties(

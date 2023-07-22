@@ -127,6 +127,12 @@ const functions = {
 
     getUsers: () => instance.get('users',  functions.getGetConfig('users')),
 
+    getUserById: (userId) => instance.get('users/' + userId),
+
+    getUser: () => instance.get('user'),
+
+    updateUserForId: (id, user) => instance.patch('users/' + id, user),
+
 }
 
 export default functions;

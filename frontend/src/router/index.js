@@ -98,6 +98,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "mychoir" */ '../views/MyChoir.vue')
   },
   {
+    path: '/profile',
+    name: 'Profile',
+    component: () => import(/* webpackChunkName: "profile" */ '../views/Profile.vue')
+  },
+  {
     path: '/repertoire/setlist/:id/texts',
     name: 'Export',
     component: () => import(/* webpackChunkName: "setlisttextexport" */ '../views/SetlistTextExport.vue'),

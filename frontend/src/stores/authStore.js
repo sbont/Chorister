@@ -75,6 +75,10 @@ export const useAuth = defineStore('auth', {
                     .catch(error => reject(error))
             })
         },
+
+        getUserZitadelId() {
+            return this.user?.profile?.sub;
+        }
     }
 })
 export default {
