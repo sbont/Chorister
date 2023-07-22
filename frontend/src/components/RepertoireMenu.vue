@@ -41,10 +41,10 @@
 
 <script>
 import api from "../api";
-import {computed, inject, onMounted, ref} from 'vue'
+import { computed, inject, onMounted } from 'vue'
 import { useSetlists } from "@/stores/setlistStore";
 import { useCategories } from "@/stores/categoryStore";
-import {storeToRefs} from "pinia";
+import { storeToRefs } from "pinia";
 
 export default {
     setup() {

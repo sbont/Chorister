@@ -10,7 +10,7 @@
             max="100"
         ></progress>
         <div v-if="error" class="error" @click="handleErrorClick">
-            ERROR: {{ this.error }}
+            ERROR: {{ error.value }}
         </div>
         <table
             class="table is-hoverable is-fullwidth song-table"
@@ -63,49 +63,50 @@
 </template>
 
 <script>
-    import api from "../api";
+import api from "../api";
+import { computed, onMounted, ref } from 'vue'
+import { useSongs } from "@/stores/songStore";
+import { useRoute, useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 
-    const Songs = {
-    name: "Songs",
+
+export default {
     props: {
         activeUser: Object
     },
+    emits: ["remove"],
+    setup(props, { emit }) {
+        const songStore = useSongs();
+        const route = useRoute();
+        const router = useRouter();
 
-    data: function () {
-        return {
-            songs: [],
-            newSong: "",
-            editedSong: null,
-            loading: true,
-            error: null,
-            name: "Steven",
-            setlistId: null
-        };
-    },
+        // state
+        const activeUser = ref(props.activeUser);
+        const songs = ref([]);
+        const newSong = ref();
+        const editedSong = ref(null);
+        const loading = ref(true);
+        const error = ref(null);
+        const setlistId = ref(null);
 
-    mounted: function () {
-        this.loadSongs();
-    },
+        let beforeEditCache = null;
 
-    computed: {
-        userEmail: function () {
-            return this.activeUser ? this.activeUser.email : "";
-        },
-        inputPlaceholder: function () {
-            return this.activeUser
-                ? this.activeUser.given_name + ", what needs to be sung?"
-                : "What needs to be sung?";
-        },
-    },
+        // Computed
+        const userEmail = computed(() => activeUser.value ? activeUser.value.email : "");
+        const inputPlaceholder = computed(() => activeUser.value ? activeUser.value.given_name + ", what needs to be sung?" : "What needs to be sung?")
 
-    methods: {
-        pluralize: function (n) {
+        onMounted(() => {
+            loadSongs();
+        });
+
+        // Methods
+        const pluralize = function (n) {
             return n === 1 ? "song" : "songs";
-        },
-
-        loadSongs: function() {
-            const routeName = this.$route.name;
-            let id = this.$route.params.id;
+        }
+        
+        const loadSongs = function() {
+            const routeName = route.name;
+            let id = route.params.id;
             let songsLoaded;
             let transformer;
             let sortTransformer = data => data.sort((songA, songB) => songA.title.localeCompare(songB.title));
@@ -120,7 +121,7 @@
                     transformer = sortTransformer;
                     break;
                 case 'Setlist':
-                    this.setlistId = id;
+                    setlistId.value = id;
                     songsLoaded = api.getSetlistEntries(id);
                     transformer = entries => {
                         let sorted = entries.sort((entryA, entryB) => entryA.number - entryB.number);
@@ -130,87 +131,89 @@
             }
             songsLoaded
                 .then((response) => {
-                    this.$log.debug("Data loaded: ", response.data);
-                    this.songs = transformer(response.data);
+                    console.log("Data loaded: ", response.data);
+                    songs.value = transformer(response.data);
                 })
                 .catch((error) => {
-                    this.$log.debug(error);
-                    this.error = "Failed to load songs";
+                    console.error(error);
+                    error.value = "Failed to load songs";
                 })
-                .finally(() => (this.loading = false));
-        },
+                .finally(() => (loading.value = false));
+        }
 
-        addSong: function () {
-            var value = this.newSong && this.newSong.trim();
+        const addSong = function () {
+            var value = newSong.value && newSong.value.trim();
             if (!value) {
                 return;
             }
 
-            this.songs.push({
+            songs.value.push({
                 title: value,
                 author: "Dirk",
             });
 
-            this.newSong = "";
-        },
+            newSong.value = "";
+        }
 
-        removeSong: function (song) {
+        const removeSong = function (song) {
             // notice NOT using "=>" syntax
-            this.songs.splice(this.songs.indexOf(song), 1);
-        },
+            songs.value.splice(songs.value.indexOf(song), 1);
+        }
 
-        editSong: function (song) {
-            this.beforeEditCache = song.title;
-            this.editedSong = song;
-        },
+        const editSong = function (song) {
+            beforeEditCache = song.title;
+            editedSong.value = song;
+        }
 
-        doneEdit: function (song) {
-            if (!this.editedSong) {
+        const doneEdit = function (song) {
+            if (!editedSong.value) {
                 return;
             }
 
-            this.editedSong = null;
+            editedSong.value = null;
             song.title = song.title.trim();
 
             if (!song.title) {
-                this.removeSong(song);
+                removeSong(song);
             }
-        },
+        }
 
-        cancelEdit: function (song) {
-            this.editedSong = null;
-            song.title = this.beforeEditCache;
-        },
+        const cancelEdit = function (song) {
+            editedSong.value = null;
+            song.title = beforeEditCache;
+        }
 
-        handleErrorClick: function () {
-            this.error = null;
-        },
+        const handleErrorClick = function () {
+            error.value = null;
+        }
 
-        oneBased(index) {
-            return index + 1;
-        },
+        const oneBased = (index) => index + 1;
 
-        startDrag: function(event, song) {
-            console.log("dragging");
-            console.log(song);
+        const startDrag = function(event, song) {
             event.dataTransfer.dropEffect = "link";
             event.dataTransfer.setData("text/plain", song._links.self.href);
-        },
+        }
 
-        deleteSong: function(song) {
-            this.loading = true;
+        const deleteSong = function(song) {
+            loading.value = true;
             song.deleting = true;
             let entryUri = song.setlistEntryUri;
             api.delete(entryUri)
                 .then((response) => {
-                    this.$log.debug("Entry removed: " + entryUri);
-                    this.removeSong(song);
+                    console.log("Entry removed: " + entryUri);
+                    removeSong(song);
                 })
                 .catch((error) => {
-                    this.$log.debug(error);
-                    this.error = "Failed to remove entry";
+                    console.error(error);
+                    error.value = "Failed to remove entry";
                 })
-                .finally(() => this.loading = false);
+                .finally(() => loading.value = false);
+        }
+
+        return {
+            songs, error, loading, setlistId,
+            userEmail, inputPlaceholder,
+            pluralize, loadSongs, addSong, removeSong, editSong, doneEdit, cancelEdit, handleErrorClick, oneBased, startDrag, deleteSong                
         }
     },
 
@@ -223,10 +226,8 @@
                 el.focus();
             }
         },
-    },
+    }
 };
-
-export default Songs;
 </script>
 
 <style>

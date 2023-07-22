@@ -124,7 +124,7 @@ export default {
                     members.value = response.data;
                 })
                 .catch((error) => {
-                    console.log(error);
+                    console.error(error);
                     error.value = "Failed to load members";
                 });
             let invitesLoaded = api.getInvites()
@@ -134,7 +134,7 @@ export default {
                     invites.value = allInvites.filter(i => !i.expired);
                 })
                 .catch((error) => {
-                    console.log(error);
+                    console.error(error);
                     error.value = "Failed to load invites";
                 });
             Promise.allSettled([membersLoaded, invitesLoaded]).then(()=> loading.value = false)
