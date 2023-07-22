@@ -37,8 +37,7 @@
             <div class="navbar-dropdown">
               <router-link to="/profile" class="navbar-item"> Profile </router-link>
               <hr class="navbar-divider" />
-              <router-link to="/about" class="navbar-item"> About </router-link>
-              <router-link to="/report" class="navbar-item"> Report an issue </router-link>
+              <!-- <router-link to="/report" class="navbar-item"> Report an issue </router-link> -->
               <a @click="onLogout()" class="navbar-item"> Log out </a>
             </div>
         </div>
