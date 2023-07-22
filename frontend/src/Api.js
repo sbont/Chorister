@@ -110,7 +110,7 @@ const functions = {
 
     getSetlistEntries: (setlistId) => instance.get('setlists/' + setlistId + '/entries', functions.getGetConfig('setlistEntries')),
 
-    postSetlistEntry: (entry) => instance.post("setlistEntries/", entry, {
+    postSetlistEntry: (entry) => instance.post("setlistEntries", entry, {
         headers: {
             'content-type': 'application/json'
         }
