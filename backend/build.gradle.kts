@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
 	id("org.springframework.boot") version "3.0.6"
@@ -11,13 +12,13 @@ plugins {
 	kotlin("plugin.allopen") version "1.8.0"
 	kotlin("kapt") version "1.8.0"
 	application
-	war
 }
 
 apply(plugin = "kotlin-jpa")
+apply(plugin = "java")
 
 application {
-	mainClass.set("nl.stevenbontenbal.chorister.ChoristerApplication")
+	mainClass.set("nl.stevenbontenbal.chorister.ChoristerApplicationKt")
 }
 
 group = "nl.stevenbontenbal"
@@ -87,6 +88,10 @@ tasks.withType<Test> {
 
 tasks.getByName<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
 	sourceResources(sourceSets["main"])
+}
+
+tasks.withType<BootJar> {
+	archiveFileName.set("chorister.jar")
 }
 
 allOpen {
