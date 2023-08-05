@@ -3,8 +3,8 @@ Set-Location -Path "c:\Projects\private\Chorister\"
 
 # Proxy server
 Write-Host "Starting proxy..."
-Push-Location "dev-proxy"
-Start-Process -FilePath "caddy" -ArgumentList "run" -PassThru 
+Push-Location "reverse-proxy"
+Start-Process -FilePath "caddy" -ArgumentList "run --config .\Caddyfile-dev" -PassThru 
 Pop-Location
 
 # DB

@@ -1,5 +1,5 @@
 chorister:
-  base-url: "http://localhost:8080/"
+  base-url: "https://chorister.co/"
 server:
   port: 8090
 spring:
@@ -16,16 +16,16 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:9000
-          jwk-set-uri: http://localhost:9000/oauth/v2/keys
+          issuer-uri: https://login.chorister.co
+          jwk-set-uri: https://login.chorister.co/oauth/v2/keys
         opaquetoken:
-          introspection-uri: http://localhost:9000/oauth/v2/introspect
+          introspection-uri: https://login.chorister.co/oauth/v2/introspect
           client-id: ${CHORISTER_API_CLIENT_ID}
           client-secret: ${CHORISTER_API_SECRET}
       client:
         provider:
           zitadel:
-            issuerUri: http://localhost:9000
+            issuerUri: https://login.chorister.co
             user-name-attribute: api@chorister.localhost
         registration:
           zitadel:
@@ -46,5 +46,5 @@ logging:
         http:
           client: DEBUG
 zitadel:
-  base-url: http://localhost:9000/management/v1
+  base-url: https://login.chorister.co/management/v1
   admin-access-token: ${CHORISTER_ZITADEL_ACCESS_TOKEN}
