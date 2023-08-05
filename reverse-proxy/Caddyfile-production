@@ -1,0 +1,23 @@
+chorister.co, www.chorister.co {
+    tls stevenbontenbal@yahoo.com
+
+    handle_path /api/* {
+        rewrite * /api{path}
+        reverse_proxy localhost:8090
+    }
+    handle_path /test {
+        respond "Hello, world!"
+    }
+    handle_path /* {
+        reverse_proxy localhost:8091
+    }
+
+    log {
+        level debug
+    }
+}
+
+login.chorister.co {
+    tls stevenbontenbal@yahoo.com
+    reverse_proxy h2c://localhost:9000
+}
