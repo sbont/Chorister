@@ -38,8 +38,8 @@ fun Category.Companion.create(choir: Choir, categoryType: CategoryType): Categor
 fun User.Companion.create(): User {
     return User(
         displayName = "Me",
-        username = "me@corister.io",
-        email = "me@corister.io"
+        username = "me@chorister.io",
+        email = "me@chorister.io",
     )
 }
 
