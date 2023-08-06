@@ -22,6 +22,7 @@ server:
 spring:
   jpa:
     database-platform: org.hibernate.dialect.CockroachDialect
+    hibernate.ddl-auto: validate
     properties:
       hibernate:
         jdbc:
