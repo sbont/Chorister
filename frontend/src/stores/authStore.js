@@ -5,11 +5,11 @@ import {Log, UserManager, WebStorageStateStore} from 'oidc-client'
 const logger = inject('vuejs3-logger');
 const settings = {
     userStore: new WebStorageStateStore({ store: window.localStorage }),
-    authority: 'http://localhost:9000',
-    client_id: '210852304604209153@chorister',
+    authority: process.env.VUE_APP_AUTHORITY_URL,
+    client_id: process.env.VUE_APP_CHORISTER_WEB_CLIENT_ID,
     response_type: 'code',
-    redirect_uri: 'http://localhost:8080/authorized',
-    post_logout_redirect_uri: 'http://localhost:8080/',
+    redirect_uri: process.env.VUE_APP_BASE_URL + '/authorized',
+    post_logout_redirect_uri: process.env.VUE_APP_BASE_URL,
     scope: 'openid',
     automaticSilentRenew: true
 }
