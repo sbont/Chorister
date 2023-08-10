@@ -10,10 +10,11 @@ chorister.co, www.chorister.co {
         respond "Hello, world!"
     }
 
-    try_files /chorister/www /index.html
-    
-    file_server {
-        root /chorister/www/
+    handle_path /* {
+        root * /chorister/www
+        file_server 
+
+        try_files /chorister/www /index.html
     }
 
     log {
