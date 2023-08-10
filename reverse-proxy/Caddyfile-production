@@ -15,10 +15,6 @@ chorister.co, www.chorister.co {
     file_server {
         root /chorister/www/
     }
-    
-    handle_path /* {
-        reverse_proxy localhost:8091
-    }
 
     log {
         level debug
