@@ -31,7 +31,7 @@
 
 <script>
 import ChoirMembers from "../components/ChoirMembers.vue";
-import api from "../api";
+import api from "../api.js";
 import { onMounted, ref } from 'vue'
 import moment from "moment";
 

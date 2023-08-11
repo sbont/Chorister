@@ -59,7 +59,7 @@
     </div>
 </template>
 <script>
-import api from "../api";
+import api from "../api.js";
 import {computed, onMounted, ref } from 'vue'
 import { useScores } from "@/stores/scoreStore";
 import { useRoute, useRouter } from "vue-router";
