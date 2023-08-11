@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import api from "../api";
+import api from "../api.js";
 import Songs from '@/components/Songs.vue'
 
 const SongsByCategory = {

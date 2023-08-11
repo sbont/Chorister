@@ -12,7 +12,6 @@
 <script>
 import SetlistDetail from '@/components/SetlistDetail.vue';
 import Songs from '@/components/Songs.vue';
-import api from "../api";
 
 // app Vue instance
 const Setlist = {

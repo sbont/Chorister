@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import api from "../api";
+import api from "../api.js";
 import { computed, onMounted, ref } from 'vue'
 import { useSongs } from "@/stores/songStore";
 import { useRoute, useRouter } from "vue-router";

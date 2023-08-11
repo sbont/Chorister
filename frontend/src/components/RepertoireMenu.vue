@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import api from "../api";
+import api from "../api.js";
 import { computed, inject, onMounted } from 'vue'
 import { useSetlists } from "@/stores/setlistStore";
 import { useCategories } from "@/stores/categoryStore";
