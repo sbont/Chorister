@@ -60,6 +60,15 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew bootJar
       working-directory: backend
+    - name: Deploy .jar
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.UBUNTU_USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        source: "backend/build/libs/chorister.jar"
+        target: "/chorister/bin"
+        strip_components: 3
 
   # db-migration: 
   #   runs-on: ubuntu-latest
