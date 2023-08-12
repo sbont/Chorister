@@ -1,16 +1,16 @@
 http://localhost:8080
 
 handle_path /api/* {
-    rewrite * /api{path}
-    reverse_proxy localhost:8090
+	rewrite * /api{path}
+	reverse_proxy localhost:8090
 }
 handle_path /auth/* {
-    reverse_proxy h2c://localhost:9000
+	reverse_proxy h2c://localhost:9000
 }
 handle_path /* {
-    reverse_proxy localhost:8091
+	reverse_proxy localhost:8091
 }
 
 log {
-    level debug
+	level debug
 }
