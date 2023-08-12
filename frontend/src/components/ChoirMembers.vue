@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import api from "../api.js";
+import api from "./../api.js";
 import { onMounted, ref } from 'vue'
 import moment from "moment";
 
