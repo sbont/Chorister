@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import api from "../api.js";
+import api from "./../api.js";
 import {inject} from "vue";
 
 const logger = inject('vuejs3-logger');

@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import api from "../api.js";
+import api from "./../api.js";
 
 const Signup = {
 	name: "SignUp",
