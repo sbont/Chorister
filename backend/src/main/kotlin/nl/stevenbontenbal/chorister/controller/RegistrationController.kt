@@ -33,7 +33,7 @@ class RegistrationController(
     @GetMapping("/api/choir/invitelink")
     fun getInviteUrl(): String {
         val token = registrationService.generateChoirInviteToken()
-        return properties.baseUrl + "signup?invite=" + token
+        return properties.baseUrl + "/signup?invite=" + token
     }
 
     @DeleteMapping("/api/choir/invitelink")

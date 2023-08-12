@@ -1,5 +1,5 @@
 chorister:
-  base-url: "https://chorister.co/"
+  base-url: "https://chorister.co"
 server:
   port: 8090
 spring:

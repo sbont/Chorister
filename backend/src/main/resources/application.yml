@@ -42,4 +42,3 @@ spring:
     rest:
       detection-strategy: default
       basePath: /api
-debug: true
