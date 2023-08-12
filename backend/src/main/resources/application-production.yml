@@ -4,7 +4,7 @@ server:
   port: 8090
 spring:
   datasource:
-    url: "jdbc:postgresql://common-werebat-6703.7tc.cockroachlabs.cloud:26257/zitadel"
+    url: "jdbc:postgresql://common-werebat-6703.7tc.cockroachlabs.cloud:26257/chorister"
     driver-class-name: org.postgresql.Driver
     username: ${CHORISTER_DATABASE_USER}
     password: ${CHORISTER_DATABASE_PASSWORD}

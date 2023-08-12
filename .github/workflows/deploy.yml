@@ -59,16 +59,16 @@ jobs:
 #       with:
 #         arguments: build
 
-#   db-migration: 
-#     runs-on: ubuntu-latest
-#     steps:
-#     - uses: actions/checkout@v3
-#     - name: Migrate DB changes
-#       uses: liquibase-github-actions/update@v4.23.0
-#       with:        
-#         url: "jdbc:postgresql://common-werebat-6703.7tc.cockroachlabs.cloud:26257/zitadel"
-#         classpath: "backend/src/main/resources"
-#         changelogFile: "backend/src/main/resources/db/changelog/changelog-master.yaml"
-#         username: "${{ secrets.PRODUCTION_DB_USERNAME }}"
-#         password: "${{ secrets.PRODUCTION_DB_PASSWORD }}"
-#         driver: "org.postgresql.Driver"
+  db-migration: 
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Migrate DB changes
+      uses: liquibase-github-actions/update@v4.23.0
+      with:        
+        url: "jdbc:postgresql://common-werebat-6703.7tc.cockroachlabs.cloud:26257/chorister"
+        classpath: "backend/src/main/resources"
+        changelogFile: "backend/src/main/resources/db/changelog/changelog-master.yaml"
+        username: "${{ secrets.PRODUCTION_DB_USERNAME }}"
+        password: "${{ secrets.PRODUCTION_DB_PASSWORD }}"
+        driver: "org.postgresql.Driver"
