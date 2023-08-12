@@ -32,7 +32,7 @@ spring:
             authorization-grant-type: authorization_code
             client_id: ${CHORISTER_ADMIN_CLIENT_ID}
             client_secret: ${CHORISTER_ADMIN_SECRET}
-debug: false
+debug: true
 logging:
   level:
     org:

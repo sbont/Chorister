@@ -18,31 +18,31 @@ permissions:
   contents: read
 
 jobs:
-  # build-frontend:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v3
-  #   - uses: actions/setup-node@v3
-  #   - name: Run install
-  #     uses: borales/actions-yarn@v4
-  #     with:
-  #       dir: 'frontend'
-  #       cmd: install
-  #   - name: Run build
-  #     uses: borales/actions-yarn@v4
-  #     with:
-  #       dir: 'frontend'
-  #       cmd: build
-  #   - name: Deploy files
-  #     uses: appleboy/scp-action@v0.1.4
-  #     with:
-  #       host: ${{ secrets.HOST }}
-  #       username: ${{ secrets.UBUNTU_USERNAME }}
-  #       key: ${{ secrets.SSH_KEY }}
-  #       source: "frontend/dist/"
-  #       target: "/chorister/www"
-  #       strip_components: 2
-  #       rm: true
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+    - name: Run install
+      uses: borales/actions-yarn@v4
+      with:
+        dir: 'frontend'
+        cmd: install
+    - name: Run build
+      uses: borales/actions-yarn@v4
+      with:
+        dir: 'frontend'
+        cmd: build
+    - name: Deploy files
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.UBUNTU_USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        source: "frontend/dist/"
+        target: "/chorister/www"
+        strip_components: 2
+        rm: true
 
   build-backend:
     runs-on: ubuntu-latest
@@ -70,16 +70,16 @@ jobs:
         target: "/chorister/bin"
         strip_components: 3
 
-  # db-migration: 
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v3
-  #   - name: Migrate DB changes
-  #     uses: liquibase-github-actions/update@v4.23.0
-  #     with:        
-  #       url: "jdbc:postgresql://common-werebat-6703.7tc.cockroachlabs.cloud:26257/chorister"
-  #       classpath: "backend/src/main/resources"
-  #       changelogFile: "backend/src/main/resources/db/changelog/changelog-master.yaml"
-  #       username: "${{ secrets.PRODUCTION_DB_USERNAME }}"
-  #       password: "${{ secrets.PRODUCTION_DB_PASSWORD }}"
-  #       driver: "org.postgresql.Driver"
+  db-migration: 
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Migrate DB changes
+      uses: liquibase-github-actions/update@v4.23.0
+      with:        
+        url: "jdbc:postgresql://common-werebat-6703.7tc.cockroachlabs.cloud:26257/chorister"
+        classpath: "backend/src/main/resources"
+        changelogFile: "backend/src/main/resources/db/changelog/changelog-master.yaml"
+        username: "${{ secrets.PRODUCTION_DB_USERNAME }}"
+        password: "${{ secrets.PRODUCTION_DB_PASSWORD }}"
+        driver: "org.postgresql.Driver"
