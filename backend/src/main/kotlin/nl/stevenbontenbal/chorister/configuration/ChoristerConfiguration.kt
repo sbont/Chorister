@@ -47,7 +47,9 @@ import java.util.concurrent.TimeUnit
 @EnableWebSecurity(debug = true)
 @EnableMethodSecurity
 @Configuration
-class ChoristerConfiguration {
+class ChoristerConfiguration(
+    private val properties: ChoristerProperties
+) {
 
     @Bean
     @Throws(Exception::class)
@@ -73,7 +75,7 @@ class ChoristerConfiguration {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/api/**")
-                    .allowedOrigins("http://localhost:8080/", "http://localhost:8091/")
+                    .allowedOrigins(properties.baseUrl)
             }
         }
     }
@@ -94,7 +96,7 @@ class ChoristerConfiguration {
                 configuration.exposeIdsFor(SetlistEntry::class.java)
                 corsRegistry.addMapping("/api/**")
                     .allowedMethods("*")
-                    .allowedOrigins("http://localhost:8080/")
+                    .allowedOrigins(properties.baseUrl)
             }
 
             override fun configureConversionService(conversionService: ConfigurableConversionService?) {
@@ -109,8 +111,7 @@ class ChoristerConfiguration {
         val source = UrlBasedCorsConfigurationSource()
         val config = CorsConfiguration()
         config.allowCredentials = true
-        config.addAllowedOrigin("http://localhost:8080/")
-        config.addAllowedOrigin("http://localhost:8091/")
+        config.addAllowedOrigin(properties.baseUrl)
         config.addAllowedHeader("*")
         config.addAllowedMethod("*")
         source.registerCorsConfiguration("/**", config)
