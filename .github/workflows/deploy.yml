@@ -70,7 +70,7 @@ jobs:
         target: "/chorister/bin"
         strip_components: 3
     - name: Restart Chorister service
-      uses: appleboy/scp-action@v0.1.4
+      uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.UBUNTU_USERNAME }}
