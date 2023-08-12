@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useAuth } from "@/stores/authStore";
 
-const SERVER_URL = 'http://localhost:8080/api';
+const SERVER_URL = process.env.VUE_APP_BASE_URL + '/api';
 const auth = useAuth();
 const instance = axios.create({
     baseURL: SERVER_URL,
