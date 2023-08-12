@@ -2,13 +2,8 @@ backend/data
 cockroachdb/
 dev-proxy/node_modules/
 keycloak/
-zitadel/certs/
+zitadel/
 
 frontend/yarn.lock
-zitadel/zitadel-config-local.yaml
-zitadel/zitadel-config-local-dell.yaml
-zitadel/zitadel-config.yaml
-zitadel/zitadel-init-local.yaml
-zitadel/zitadel.exe
 
 secrets/
