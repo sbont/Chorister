@@ -1,17 +1,15 @@
 <template>
     <div class="signup container" v-if="!loading">
-        <section class="hero is-medium is-link">
-            <div class="hero-body">
-                <p class="subtitle">Register as a new chorister user</p>
-                <p class="title" v-if="isInvite">{{ choir.name }}</p>
-            </div>
+        <section class="mt-6">
+            <h1 class="title has-text-primary">Register as a new user</h1>
+            <h2 class="subtitle has-text-info" v-if="isInvite">joining {{ choir.name }}</h2>
         </section>
 
         <div class="pt-5">
             <div class="field">
                 <label class="label">Name</label>
                 <div class="control">
-                    <input class="input" type="text" placeholder="Johnny" v-model="registration.displayName"/>
+                    <input class="input" type="text" placeholder="Elvis" v-model="registration.displayName"/>
                 </div>
             </div>
 
@@ -35,7 +33,7 @@
             <div class="field">
                 <label class="label">Password</label>
                 <p class="control has-icons-left">
-                    <input class="input" type="password" placeholder="Password" v-model="registration.password"/>
+                    <input class="input" type="password" placeholder="Super safe password" v-model="registration.password"/>
                     <span class="icon is-small is-left">
                     <i class="fas fa-lock"></i>
                 </span>
@@ -43,13 +41,18 @@
             </div>
 
             <div class="control">
-                <button class="button is-primary" @click="submit">Create account</button>
+                <button 
+                    class="button is-primary" 
+                    @click="submit"
+                    :class="{ 'is-loading': saving }">
+                    Create account
+                </button>
             </div>
 
-            <div v-if="success">
+            <div v-if="success" class="has-text-success">
                 Account created.
             </div>
-            <div v-if="errorMessage">
+            <div v-if="errorMessage" class="has-text-danger">
                 {{ errorMessage }}
             </div>
         </div>
@@ -67,6 +70,7 @@ const Signup = {
     data: function () {
         return {
             loading: true,
+            saving: false,
             registration: {},
             isInvite: null,
             choir: {},
@@ -102,6 +106,7 @@ const Signup = {
 	methods: {
         submit: function () {
             this.saving = true;
+            this.errorMessage = null;
             if (!this.registration) {
                 return;
             }
@@ -110,13 +115,12 @@ const Signup = {
 				.then((response) => {
 					console.log(response);
 					this.success = true;
-                    this.errorMessage = null;
                 })
                 .catch((error) => {
-                    this.errorMessage = error.response.data.message;
+                    this.errorMessage = error.response.data.message ?? "Error while sending request: " + error.response.statusText;
                     this.$log.debug(error.response);
-                    this.loading = false;
-                });
+                })
+                .finally(() => this.saving = false);
         },
 	}
 }
