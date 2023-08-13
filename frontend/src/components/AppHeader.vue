@@ -5,6 +5,7 @@
             <img src="@/assets/logo.png"
                  alt="Chorister logo"/>
         </router-link>
+        <div class="has-text-primary is-size-7" style="margin-top: 5px; margin-left: -32px; z-index: 2;">beta</div>
       <a
         role="button"
         class="navbar-burger"
@@ -37,7 +38,7 @@
             <div class="navbar-dropdown">
               <router-link to="/profile" class="navbar-item"> Profile </router-link>
               <hr class="navbar-divider" />
-              <!-- <router-link to="/report" class="navbar-item"> Report an issue </router-link> -->
+              <a href="https://github.com/sbont/Chorister/issues" class="navbar-item" target="_blank"> Report an issue </a>
               <a @click="onLogout()" class="navbar-item"> Log out </a>
             </div>
         </div>
