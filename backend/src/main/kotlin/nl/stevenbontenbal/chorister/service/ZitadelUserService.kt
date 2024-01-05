@@ -8,13 +8,14 @@ import nl.stevenbontenbal.chorister.model.dto.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
-import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId
+import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
+import java.net.URI
 
+@Component
 class ZitadelUserService(
     private val zitadelConfiguration: ZitadelProperties,
     private val webClient: WebClient
@@ -23,15 +24,8 @@ class ZitadelUserService(
         val request = createUserPostRequest(registrationRequest)
         val response = webClient
             .post()
-            .uri(
-                UriComponentsBuilder
-                    .fromHttpUrl(zitadelConfiguration.baseUrl)
-                    .path("/users/human/_import")
-                    .build()
-                    .toUri()
-            )
+            .uri(createUri("/users/human/_import"))
             .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
-//            .attributes(clientRegistrationId("zitadel"))
             .contentType(MediaType.APPLICATION_JSON)
             .body(BodyInserters.fromValue(request))
             .retrieve()
@@ -51,6 +45,74 @@ class ZitadelUserService(
         return Result.success(response?.body?.userId)
     }
 
+    fun setEmailAddress(userId: String, email: String): Result<String> {
+        val response = getCurrentEmail(userId)
+        if (response?.body?.email?.email == email)
+            return Result.success(email)
+
+        val emailRequest = ZitadelUserEmailPutRequest(email, false)
+        changeEmail(userId, emailRequest)
+
+        val userNameRequest = ZitadelUsernamePutRequest(email)
+        changeUserName(userId, userNameRequest)
+
+        return Result.success(email)
+    }
+
+    private fun changeUserName(
+        userId: String,
+        request: ZitadelUsernamePutRequest
+    ) {
+        webClient
+            .put()
+            .uri(createUri("/users/$userId/username"))
+            .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(request))
+            .retrieve()
+            .onStatus(HttpStatusCode::is4xxClientError) {
+                it.bodyToMono(ZitadelError::class.java).flatMap { err ->
+                    Mono.error(InvalidInputException("Error while updating user: ${err.message}"))
+                }
+            }
+            .onStatus(HttpStatusCode::is5xxServerError) {
+                Mono.error(RuntimeException("Zitadel server error: ${it.statusCode()}"))
+            }
+            .toEntity(ZitadelResourceDetails::class.java)
+            .block()
+    }
+
+    private fun changeEmail(
+        userId: String,
+        request: ZitadelUserEmailPutRequest
+    ) {
+        webClient
+            .put()
+            .uri(createUri("/users/$userId/email"))
+            .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(request))
+            .retrieve()
+            .onStatus(HttpStatusCode::is4xxClientError) {
+                it.bodyToMono(ZitadelError::class.java).flatMap { err ->
+                    Mono.error(InvalidInputException("Error while updating user: ${err.message}"))
+                }
+            }
+            .onStatus(HttpStatusCode::is5xxServerError) {
+                Mono.error(RuntimeException("Zitadel server error: ${it.statusCode()}"))
+            }
+            .toEntity(ZitadelUserEmailGetResponse::class.java)
+            .block()
+    }
+
+    private fun getCurrentEmail(userId: String) = webClient
+        .get()
+        .uri(createUri("/users/$userId/email"))
+        .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
+        .retrieve()
+        .toEntity(ZitadelUserEmailGetResponse::class.java)
+        .block()
+
     private fun createUserPostRequest(registrationRequest: RegistrationRequest): ZitadelUserPostRequest =
         ZitadelUserPostRequest(
             userName = registrationRequest.email,
@@ -59,9 +121,16 @@ class ZitadelUserService(
             ),
             password = registrationRequest.password,
             profile = Profile(
-                firstName = registrationRequest.displayName.substring(0,1),
+                firstName = registrationRequest.displayName.substring(0, 1),
                 lastName = registrationRequest.displayName.substring(1),
                 displayName = registrationRequest.displayName
             )
         )
+
+    private fun createUri(path: String): URI =
+        UriComponentsBuilder
+            .fromHttpUrl(zitadelConfiguration.baseUrl)
+            .path(path)
+            .build()
+        .toUri()
 }

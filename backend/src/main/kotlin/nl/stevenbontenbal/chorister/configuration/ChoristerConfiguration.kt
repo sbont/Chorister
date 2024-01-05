@@ -144,15 +144,6 @@ class ChoristerConfiguration(
         return buildOAuthClient(oauth2Client)
     }
 
-    /*@Bean
-    fun zitadelClient(
-        authorizedClientManager: OAuth2AuthorizedClientManager
-    ): WebClient {
-        val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
-        oauth2Client.setDefaultClientRegistrationId("zitadel")
-        return buildOAuthClient(oauth2Client)
-    }*/
-
     private fun buildOAuthClient(oauth2Client: ServletOAuth2AuthorizedClientExchangeFilterFunction) =
         WebClient.builder()
             .apply(oauth2Client.oauth2Configuration())
@@ -170,13 +161,6 @@ class ChoristerConfiguration(
             )
             .build()
 
-
-    @Bean
-    fun zitadelClientService(
-        zitadelConfiguration: ZitadelProperties,
-        oauthClientManager: OAuth2AuthorizedClientManager
-    ): UserAuthorizationService = ZitadelUserService(zitadelConfiguration, authorizedWebClient(oauthClientManager))
-
     @Bean
     fun registrationService(
         userRepository: UserRepository,
@@ -185,17 +169,28 @@ class ChoristerConfiguration(
         userAuthorizationService: UserAuthorizationService,
         categorisationService: CategorisationService,
         userService: UserService
-    ): RegistrationService = RegistrationService(userRepository, choirRepository, inviteRepository, userAuthorizationService, categorisationService, userService)
+    ): RegistrationService = RegistrationService(
+        userRepository,
+        choirRepository,
+        inviteRepository,
+        userAuthorizationService,
+        categorisationService,
+        userService
+    )
 
 
     @Bean
-    fun categorisationService(choristerProperties: ChoristerProperties, categoryRepository: CategoryRepository): CategorisationService = CategorisationService(choristerProperties, categoryRepository)
+    fun categorisationService(
+        choristerProperties: ChoristerProperties,
+        categoryRepository: CategoryRepository
+    ): CategorisationService = CategorisationService(choristerProperties, categoryRepository)
 
     @Bean
-    fun databaseInitializer(choirRepository: ChoirRepository,
-                            userRepository: UserRepository,
-                            songbookRepository: SongbookRepository,
-                            songRepository: SongRepository
+    fun databaseInitializer(
+        choirRepository: ChoirRepository,
+        userRepository: UserRepository,
+        songbookRepository: SongbookRepository,
+        songRepository: SongRepository
     ) = ApplicationRunner {
 
     }

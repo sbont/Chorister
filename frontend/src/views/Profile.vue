@@ -12,6 +12,13 @@
             <h1 class="title">User details</h1>
             <div class="w-40">
                 <div class="field">
+                    <label class="label">Name</label>
+                    <div class="control">
+                        <input class="input" type="text" v-model="draftValues.displayName" />
+                    </div>
+                </div>
+
+                <div class="field">
                     <label class="label">Email</label>
                     <div class="control has-icons-left">
                         <input class="input" type="email" placeholder="you@" v-model="draftValues.email" />
@@ -72,7 +79,7 @@ export default {
                 .finally(() => saving.value = false);
         }
 
-        return { 
+        return {
             auth, user, draftValues, loading, saving,
             save
         }

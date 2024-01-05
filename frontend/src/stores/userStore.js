@@ -61,7 +61,8 @@ export const useUsers = defineStore('users', {
             this.users.set(user.id, user);
             let changes = {
                 email: user.email,
-                username: user.username
+                username: user.username,
+                displayName: user.displayName
             }
             console.log(changes);
             return api.updateUserForId(user.id, changes);
