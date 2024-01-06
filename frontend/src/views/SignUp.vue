@@ -60,7 +60,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import api from "./../api.js";
 
 const Signup = {

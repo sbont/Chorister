@@ -58,7 +58,7 @@
         </div>
     </div>
 </template>
-<script>
+<script lang="ts">
 import api from "./../api.js";
 import {computed, onMounted, ref } from 'vue'
 import { useScores } from "@/stores/scoreStore";
