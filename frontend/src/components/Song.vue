@@ -358,10 +358,7 @@ export default {
         const editor = useEditor({
             content: null,
             extensions: [
-                StarterKit,
-                Document,
-                Paragraph,
-                Text,
+                StarterKit
             ],
             editorProps: {
                 attributes: {
