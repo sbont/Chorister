@@ -88,7 +88,7 @@
     </div>
 </template>
 
-<script>
+<script  lang="ts">
 import api from "./../api.js";
 import { onMounted, ref } from 'vue'
 import moment from "moment";

@@ -41,7 +41,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { useAuth } from "@/stores/authStore";
 import { useUsers } from "@/stores/userStore";
 import { storeToRefs } from "pinia";
