@@ -1,20 +1,10 @@
-import Vue, { createApp } from 'vue'
-import App from './App'
+import { createApp } from 'vue'
+import App from './App.vue'
 import VueLogger from 'vuejs3-logger';
 import router from './router'
 import { loadScript } from 'vue-plugin-load-script';
 import { createPinia } from 'pinia'
 import { useAuth } from "@/stores/authStore";
-import { configureCompat } from 'vue'
-
-// default everything to Vue 3 behavior, and only enable compat
-// for certain features
-configureCompat({
-  MODE: 3
-})
-
-Vue.config.productionTip = false
-// Vue.use(LoadScript);
 
 loadScript("https://kit.fontawesome.com/e168ca8cb0.js")
 

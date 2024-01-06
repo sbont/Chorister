@@ -9,16 +9,16 @@ const routes = [
       hideHeader: true,
       forwardWhenAuthenticated: '/repertoire'
     },
-    component: () => import(/* webpackChunkName: "landing" */ '../views/Landing.vue'),
+    component: () => import('../views/Landing.vue'),
   },
   {
     path: '/signup',
     name: 'SignUp',
-    component: () => import(/* webpackChunkName: "signup" */ '../views/SignUp.vue')
+    component: () => import('../views/SignUp.vue')
   },
   {
     path: '/repertoire',
-    component: () => import(/* webpackChunkName: "repertoire" */ '../views/Repertoire.vue'),
+    component: () => import('../views/Repertoire.vue'),
     meta: {
       requiresAuth: true
     },
@@ -26,7 +26,7 @@ const routes = [
       {
         path: '',
         name: 'Repertoire',
-        component: () => import(/* webpackChunkName: "allsongs" */ '../views/AllSongs.vue'),
+        component: () => import('../views/AllSongs.vue'),
         meta: {
           requiresAuth: true
         },
@@ -34,7 +34,7 @@ const routes = [
       {
         path: 'by-season/:id',
         name: 'CategorySeason',
-        component: () => import(/* webpackChunkName: "songsbycategory" */ '../views/SongsByCategory.vue'),
+        component: () => import('../views/SongsByCategory.vue'),
         meta: {
           requiresAuth: true
         },
@@ -42,7 +42,7 @@ const routes = [
       {
         path: 'by-liturgical-moment/:id',
         name: 'CategoryLiturgical',
-        component: () => import(/* webpackChunkName: "songsbycategory" */ '../views/SongsByCategory.vue'),
+        component: () => import('../views/SongsByCategory.vue'),
         meta: {
           requiresAuth: true
         },
@@ -50,7 +50,7 @@ const routes = [
       {
         path: 'setlist/new',
         name: 'NewSetlist',
-        component: () => import(/* webpackChunkName: "setlistdetail" */ '../components/SetlistDetail.vue'),
+        component: () => import('../components/SetlistDetail.vue'),
         meta: {
           requiresAuth: true
         },
@@ -58,7 +58,7 @@ const routes = [
       {
         path: 'setlist/:id',
         name: 'Setlist',
-        component: () => import(/* webpackChunkName: "setlist" */ '../views/Setlist.vue'),
+        component: () => import('../views/Setlist.vue'),
         meta: {
           requiresAuth: true
         },
@@ -66,7 +66,7 @@ const routes = [
         //   {
         //     path: 'texts',
         //     name: 'Export',
-        //     component: () => import(/* webpackChunkName: "setlisttextexport" */ '../views/SetlistTextExport.vue'),
+        //     component: () => import('../views/SetlistTextExport.vue'),
         //     meta: {
         //       requiresAuth: true,
         //       hideHeader: true
@@ -77,7 +77,7 @@ const routes = [
       {
         path: 'song/new',
         name: 'NewSong',
-        component: () => import(/* webpackChunkName: "song" */ '../components/Song.vue'),
+        component: () => import('../components/Song.vue'),
         meta: {
           requiresAuth: true
         },
@@ -85,7 +85,7 @@ const routes = [
       {
         path: 'song/:id',
         name: 'Song',
-        component: () => import(/* webpackChunkName: "song" */ '../components/Song.vue'),
+        component: () => import('../components/Song.vue'),
         meta: {
           requiresAuth: true
         },
@@ -95,17 +95,17 @@ const routes = [
   {
     path: '/mychoir',
     name: 'My Choir',
-    component: () => import(/* webpackChunkName: "mychoir" */ '../views/MyChoir.vue')
+    component: () => import('../views/MyChoir.vue')
   },
   {
     path: '/profile',
     name: 'Profile',
-    component: () => import(/* webpackChunkName: "profile" */ '../views/Profile.vue')
+    component: () => import('../views/Profile.vue')
   },
   {
     path: '/repertoire/setlist/:id/texts',
     name: 'Export',
-    component: () => import(/* webpackChunkName: "setlisttextexport" */ '../views/SetlistTextExport.vue'),
+    component: () => import('../views/SetlistTextExport.vue'),
     meta: {
       requiresAuth: true,
       hideHeader: true
@@ -114,7 +114,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes,
   linkExactActiveClass: "is-active",
 })

@@ -1,15 +1,13 @@
 import {defineStore} from "pinia";
-import {inject} from "vue";
 import {Log, UserManager, WebStorageStateStore} from 'oidc-client'
 
-const logger = inject('vuejs3-logger');
 const settings = {
     userStore: new WebStorageStateStore({ store: window.localStorage }),
-    authority: process.env.VUE_APP_AUTHORITY_URL,
-    client_id: process.env.VUE_APP_CHORISTER_WEB_CLIENT_ID,
+    authority: import.meta.env.VITE_APP_AUTHORITY_URL,
+    client_id: import.meta.env.VITE_APP_CHORISTER_WEB_CLIENT_ID,
     response_type: 'code',
-    redirect_uri: process.env.VUE_APP_BASE_URL + '/authorized',
-    post_logout_redirect_uri: process.env.VUE_APP_BASE_URL,
+    redirect_uri: import.meta.env.VITE_APP_BASE_URL + '/authorized',
+    post_logout_redirect_uri: import.meta.env.VITE_APP_BASE_URL,
     scope: 'openid',
     automaticSilentRenew: true
 }

@@ -3,18 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src"
   },
   "dependencies": {
-    "@tiptap/extension-document": "^2.0.0-beta.202",
-    "@tiptap/extension-heading": "^2.0.0-beta.202",
-    "@tiptap/extension-paragraph": "^2.0.0-beta.202",
-    "@tiptap/extension-text": "^2.0.0-beta.202",
+    "@tiptap/core": "^2.1.13",
+    "@tiptap/extension-document": "^2.1.13",
+    "@tiptap/extension-heading": "^2.1.13",
+    "@tiptap/extension-paragraph": "^2.1.13",
+    "@tiptap/extension-text": "^2.1.13",
     "@tiptap/pm": "^2.0.3",
-    "@tiptap/starter-kit": "^2.0.0-beta.202",
-    "@tiptap/vue-3": "^2.0.0-beta.202",
+    "@tiptap/starter-kit": "^2.1.13",
+    "@tiptap/vue-3": "^2.1.13",
+    "@vitejs/plugin-vue": "^5.0.2",
     "@vue/compat": "^3.1.0-0",
     "@vueform/multiselect": "^2.5.6",
     "@vuelidate/core": "^2.0.0",
@@ -24,6 +27,7 @@
     "moment": "^2.29.4",
     "oidc-client": "^1.11.5",
     "pinia": "^2.0.23",
+    "vite": "^5.0.11",
     "vue": "^3.1.0-0",
     "vue-multiselect": "^3.0.0-alpha.2",
     "vue-plugin-load-script": "^2.1.1",
@@ -31,28 +35,19 @@
     "vuejs3-logger": "^1.0.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^5.0.8",
-    "@vue/cli-plugin-eslint": "^5.0.8",
-    "@vue/cli-plugin-router": "^5.0.8",
-    "@vue/cli-service": "^5.0.8",
-    "@vue/compiler-sfc": "^3.1.0-0",
-    "@babel/core": "^7.11.0",
-    "@babel/eslint-parser": "^7.21.8",
     "eslint": "^8.39.0",
     "eslint-plugin-vue": "^9.11.0"
   },
   "eslintConfig": {
     "root": true,
     "env": {
-      "node": true
+      "node": true,
+      "es2022": true
     },
     "extends": [
       "plugin:vue/essential",
       "eslint:recommended"
     ],
-    "parserOptions": {
-      "parser": "@babel/eslint-parser"
-    },
     "rules": {
       "no-unused-vars": "off",
       "vue/multi-word-component-names": "off"

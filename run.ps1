@@ -24,7 +24,7 @@ pause
 # Frontend
 Push-Location -Path frontend
 Write-Host "Starting front-end..."
-yarn serve
+yarn run dev
 Pop-Location
 
 Read-Host -Prompt "Press Enter to exit"
