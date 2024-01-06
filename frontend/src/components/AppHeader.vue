@@ -47,7 +47,7 @@
   </nav>
 </template>
 
-<script>
+<script lang="ts">
 import { useAuth } from "@/stores/authStore";
 import { inject, onMounted } from "vue";
 import { storeToRefs } from "pinia";

@@ -5,7 +5,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
 import AppHeader from './components/AppHeader.vue'
 import { useRoute } from "vue-router";

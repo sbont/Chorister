@@ -315,7 +315,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import Score from "@/components/Score.vue"
 import VueMultiselect from 'vue-multiselect'
 import { useEditor, EditorContent } from '@tiptap/vue-3'

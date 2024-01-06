@@ -29,7 +29,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import ChoirMembers from "../components/ChoirMembers.vue";
 import api from "./../api.js";
 import { onMounted, ref } from 'vue'

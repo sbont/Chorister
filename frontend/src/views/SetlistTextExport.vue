@@ -8,7 +8,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import {useSongs} from "@/stores/songStore";
 import {useRoute} from "vue-router";
 import {computed, onMounted, ref} from "vue";

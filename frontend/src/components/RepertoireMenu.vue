@@ -39,7 +39,7 @@
 	</aside>
 </template>
 
-<script>
+<script lang="ts">
 import api from "./../api.js";
 import { computed, inject, onMounted } from 'vue'
 import { useSetlists } from "@/stores/setlistStore";

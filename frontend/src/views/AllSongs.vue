@@ -13,7 +13,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import Songs from '@/components/Songs.vue'
 
 const AllSongs = {

@@ -7,7 +7,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import api from "./../api.js";
 import Songs from '@/components/Songs.vue'
 

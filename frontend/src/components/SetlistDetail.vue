@@ -73,7 +73,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { useSetlists } from "@/stores/setlistStore";
 import { inject, onMounted, ref } from "vue";
 import {useRoute, useRouter} from "vue-router";
