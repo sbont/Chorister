@@ -25,7 +25,7 @@
                             <div class="field-body">
                                 <div class="field" v-bind:class="{ static: !editing }">
                                     <div class="control">
-                                        <input v-if="editing" v-model="draftValues?.title" class="input"
+                                        <input v-if="editing && draftValues" v-model="draftValues.title" class="input"
                                             :class="{ 'is-danger': v$.title.$error }" type="text"
                                             placeholder="The name of the song or hymn" @blur="v$.title.$touch" />
                                         <span v-else>
@@ -42,7 +42,7 @@
                             <div class="field-body">
                                 <div class="field" v-bind:class="{ static: !editing }">
                                     <div class="control">
-                                        <input v-if="editing" v-model="draftValues?.composer" class="input" type="text"
+                                        <input v-if="editing && draftValues" v-model="draftValues.composer" class="input" type="text"
                                             placeholder="Artist / composer / writer" />
                                         <span v-else>
                                             {{ song?.composer }}
@@ -59,8 +59,7 @@
                                 <div class="field-flex-col">
                                     <div class="field" v-bind:class="{ static: !editing }">
                                         <div class="control">
-                                            <input v-if="editing" v-model="draftValues?.songbook?.title
-                                                " class="input" type="text"
+                                            <input v-if="editing && draftValues" v-model="draftValues.songbook.title" class="input" type="text"
                                                 placeholder="Songbook, hymnal or collection title" />
                                             <span v-else>
                                                 {{ song?.songbook?.title }}
@@ -78,7 +77,7 @@
                                                 static: !editing,
                                             }">
                                                 <div class="control">
-                                                    <input v-if="editing" v-model="draftValues?.songbookNumber
+                                                    <input v-if="editing && draftValues" v-model="draftValues.songbookNumber
                                                         " class="input" type="text"
                                                         placeholder="Song number in the book" />
                                                     <span v-else>
@@ -93,14 +92,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div v-if="editing" class="field is-horizontal">
+                        <div v-if="editing && draftValues" class="field is-horizontal">
                             <div class="field-label is-normal">
                                 <label class="label">Youtube video</label>
                             </div>
                             <div class="field-body">
                                 <div class="field" v-bind:class="{ static: !editing }">
                                     <div class="control">
-                                        <input v-model="draftValues?.recordingUrl" class="input" type="url"
+                                        <input v-model="draftValues.recordingUrl" class="input" type="url"
                                             placeholder="https://www.youtube.com/watch?v=..." />
                                     </div>
                                 </div>
@@ -189,8 +188,8 @@
                     <div v-if="editing" class="field is-horizontal">
                         <div class="field-body">
                             <div class="field" v-bind:class="{ static: !editing }">
-                                <div class="control" v-if="editing">
-                                    <input v-model="draftValues?.recordingUrl" class="input" type="url"
+                                <div class="control" v-if="editing && draftValues">
+                                    <input v-model="draftValues.recordingUrl" class="input" type="url"
                                         placeholder="https://www.youtube.com/watch?v=..." />
                                 </div>
                             </div>
@@ -314,12 +313,11 @@ onMounted(() => {
         const songId = Number(route.params.id);
         const songLoaded = songStore.get(songId)
             .then((value) => {
-                if (!value.songbook) {
-                    value.songbook = {};
+                if (value) {
+                    song.value = value;
+                    const content = value.text;
+                    editor.value!.commands.setContent(content)
                 }
-                song.value = value;
-                const content = value.text;
-                editor.value!.commands.setContent(content)
             });
         scoreStore.fetchForSong(songId).then((value) => scores.value = value);
         const songCategoriesLoaded = categoryStore.getForSong(songId);

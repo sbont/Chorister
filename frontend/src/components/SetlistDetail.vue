@@ -3,26 +3,26 @@
         <div v-if="!loading">
             <div class="setlist-info m-3 is-flex is-align-content-flex-start">
                 <h1 class="title is-flex-grow-1 mr-3" v-if="!editing">{{ setlist?.name }}</h1>
-                <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="editing">
+                <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="editing && draftValues">
                     <div class="field-label is-normal">
                         <label class="label">Name</label>
                     </div>
                     <div class="field-body">
                         <div class="field" v-bind:class="{ static: !editing }" >
                             <div class="control">
-                                <input v-model="draftValues?.name" class="input" type="text" placeholder="Easter Morning Service" />
+                                <input v-model="draftValues.name" class="input" type="text" placeholder="Easter Morning Service" />
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="editing">
+                <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="editing && draftValues">
                     <div class="field-label is-normal">
                         <label class="label">Date</label>
                     </div>
                     <div class="field-body">
                         <div class="field" v-bind:class="{ static: !editing }" >
                             <div class="control">
-                                <input v-model="draftValues?.date" class="input" type="date" />
+                                <input v-model="draftValues.date" class="input" type="date" />
                             </div>
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                     </p>
                 </div>
             </div>
-            <div class="subtitle m-3" v-if="!editing">{{ setlist?.date }}</div>
+            <div class="subtitle m-3" v-if="!editing && setlist">{{ setlist.date }}</div>
         </div>
     </div>
 </template>
