@@ -47,28 +47,19 @@
   </nav>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useAuth } from "@/stores/authStore";
 import { inject, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 
+// State
+const auth = useAuth();
+const { user, isLoggedIn } = storeToRefs(auth);
 
-export default {
-    setup() {
-        const logger = inject('vuejs3-logger');
+// Computed
+onMounted(() => {});
 
-        // State
-        const auth = useAuth();
-        const { user, isLoggedIn } = storeToRefs(auth);
-
-        // Computed
-        onMounted(() => {});
-
-        // Methods
-        const onLogin = () => auth.login()
-        const onLogout = () => auth.logout()
-
-        return { auth, user, isLoggedIn, onLogin, onLogout }
-    }
-}
+// Methods
+const onLogin = () => auth.login()
+const onLogout = () => auth.logout()
 </script>

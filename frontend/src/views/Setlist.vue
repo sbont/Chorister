@@ -13,16 +13,6 @@
 import SetlistDetail from '@/components/SetlistDetail.vue';
 import Songs from '@/components/Songs.vue';
 
-// app Vue instance
-const Setlist = {
-	name: "Setlist",
-	components: {
-		SetlistDetail,
-		Songs
-	}
-};
-
-export default Setlist;
 </script>
 
 <style>

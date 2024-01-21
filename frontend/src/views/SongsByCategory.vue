@@ -1,43 +1,31 @@
 <template>
     <div>
         <div class="is-flex is-justify-content-space-between m-3">
-            <h1 class="title">{{ category.name }}</h1>
+            <h1 class="title" v-if="category">{{ category.name }}</h1>
         </div>
         <Songs />
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { Category } from "@/types";
+import { onMounted, ref } from "vue";
 import api from "./../api.js";
 import Songs from '@/components/Songs.vue'
+import { useRoute } from "vue-router";
 
-const SongsByCategory = {
-    name: "Songs by Category",
-    data: function () {
-        return {
-            category: {
-                name: "..."
-            }
-        };
-    },
-    mounted: function () {
-        console.log(this.$route.params);
-        var routeName = this.$route.name;
-        var categoryId = this.$route.params.id;
-        api.getCategoryById(categoryId)
-            .then((response) => {
-                this.$log.debug("Data loaded: ", response.data);
-                this.category = response.data;
-            })
-            .catch((error) => {
-                this.$log.debug(error);
-                this.error = "Failed to load repertoire";
-            });
-    },
-    components: {
-        Songs
-    }
-};
 
-export default SongsByCategory;
+// State
+const category = ref<Category>()
+const route = useRoute()
+
+onMounted(() => {
+    console.log(route.params);
+    var categoryId = Number(route.params.id);
+    api.getCategoryById(categoryId)
+        .then((response) => {
+            category.value = response.data;
+        })
+})
+
 </script>

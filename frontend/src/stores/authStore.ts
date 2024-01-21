@@ -1,5 +1,5 @@
-import {defineStore} from "pinia";
-import {Log, UserManager, WebStorageStateStore} from 'oidc-client'
+import { defineStore } from "pinia";
+import { User, UserManager, WebStorageStateStore } from 'oidc-client'
 
 const settings = {
     userStore: new WebStorageStateStore({ store: window.localStorage }),
@@ -19,7 +19,7 @@ userManager.events.addAccessTokenExpired(() => {
 
 export const useAuth = defineStore('auth', {
     state: () => ({
-        user: null
+        user: {} as User | null
     }),
     getters: {
         isLoggedIn: (state) => state.user !== null
@@ -79,9 +79,3 @@ export const useAuth = defineStore('auth', {
         }
     }
 })
-export default {
-    install: function (Vue) {
-        Log.logger = console;
-        Log.level = Log.INFO;
-    }
-}

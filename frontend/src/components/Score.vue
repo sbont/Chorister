@@ -58,65 +58,60 @@
         </div>
     </div>
 </template>
-<script lang="ts">
-import api from "./../api.js";
-import {computed, onMounted, ref } from 'vue'
+<script setup lang="ts">
+import { PropType, computed, onMounted, ref } from 'vue'
 import { useScores } from "@/stores/scoreStore";
 import { useRoute, useRouter } from "vue-router";
+import { Score } from "@/types";
 
-export default {
-    props: {
-        value: Object
-    },
-    emits: ["remove"],
-    setup(props, { emit }) {
-        const scoreStore = useScores();
-        const route = useRoute();
-        const router = useRouter()
+const props = defineProps({
+    value: {
+        type: Object as PropType<Score>,
+        required: true            
+    }
+})
+const emit = defineEmits(["remove"])
 
-        // state
-        const score = ref(props.value);
-        const editing = ref(false);
-        const draftValues = ref();
-        const saving = ref(false);
-        const error = ref(null);
+const scoreStore = useScores();
+const route = useRoute();
+const router = useRouter()
 
-        // Computed
-        const isNew = computed(() => !score.value.id);
-        const previewUrl = computed(() => score.value.fileUrl?.replace("/view", "/preview"));
+// state
+const score = ref(props.value);
+const editing = ref(false);
+const draftValues = ref();
+const saving = ref(false);
+const error = ref(null);
 
-        onMounted(() => {
-            if (!score.value.id) {
-                draftValues.value = score.value;
-                editing.value = true;
-            }
-        });
+// Computed
+const isNew = computed(() => !score.value.id);
+const previewUrl = computed(() => score.value.fileUrl?.replace("/view", "/preview"));
 
-        // Methods
-        const edit = () => {
-            draftValues.value = score.value;
-            editing.value = true;
-        }
+onMounted(() => {
+    if (!score.value.id) {
+        draftValues.value = score.value;
+        editing.value = true;
+    }
+});
 
-        const save = () => {
-            score.value = draftValues.value;
-            editing.value = false;
-            console.log(score.value);
-            if(score.value.id) {
-                api.updateScoreForId(score.value.id, score.value);
-            } else {
-                api.createNewScore(score.value);
-            }
-        }
+// Methods
+const edit = () => {
+    draftValues.value = score.value;
+    editing.value = true;
+}
 
-        const cancelEdit = () => {
-            editing.value = false;
-            draftValues.value = null;
-            if(!score.value.id) {
-                emit("remove");
-            }
-        }
-        return { score, editing, draftValues, saving, previewUrl, edit, save, cancelEdit }
+const save = () => {
+    score.value = draftValues.value;
+    editing.value = false;
+    console.log(score.value);
+    scoreStore.saveToServer(score.value)
+}
+
+const cancelEdit = () => {
+    editing.value = false;
+    draftValues.value = null;
+    if(!score.value.id) {
+        emit("remove");
     }
 }
 </script>

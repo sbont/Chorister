@@ -3,87 +3,75 @@
         <section class="hero is-medium is-link">
             <div class="hero-body">
                 <p class="subtitle">hello</p>
-                <p class="title">{{ user.displayName }}</p>
+                <p class="title">{{ user?.displayName }}</p>
             </div>
         </section>
 
         <div class="pt-5">
             <section class="section">
-            <h1 class="title">User details</h1>
-            <div class="w-40">
-                <div class="field">
-                    <label class="label">Name</label>
-                    <div class="control">
-                        <input class="input" type="text" v-model="draftValues.displayName" />
+                <h1 class="title">User details</h1>
+                <div class="w-40">
+                    <div class="field">
+                        <label class="label">Name</label>
+                        <div class="control">
+                            <input class="input" type="text" v-model="draftValues?.displayName" />
+                        </div>
                     </div>
-                </div>
 
-                <div class="field">
-                    <label class="label">Email</label>
-                    <div class="control has-icons-left">
-                        <input class="input" type="email" placeholder="you@" v-model="draftValues.email" />
-                        <span class="icon is-small is-left">
-                            <i class="fas fa-envelope"></i>
-                        </span>
+                    <div class="field">
+                        <label class="label">Email</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="email" placeholder="you@" v-model="draftValues?.email" />
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                        </div>
                     </div>
-                </div>
 
-                <button
-                    @click="save"
-                    class="button is-link"
-                    :class="{ 'is-loading': saving }"
-                >
-                    Save changes
-                </button>
-            </div>
+                    <button @click="save" class="button is-link" :class="{ 'is-loading': saving }">
+                        Save changes
+                    </button>
+                </div>
             </section>
         </div>
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useAuth } from "@/stores/authStore";
 import { useUsers } from "@/stores/userStore";
+import { User } from "@/types";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, ref } from "vue";
 
-export default {
-    setup() {
-        const auth = useAuth();
-        const userStore = useUsers();
-        const { user: authUser } = storeToRefs(auth);
+const auth = useAuth();
+const userStore = useUsers();
+const { user: authUser } = storeToRefs(auth);
 
-        // State
-        const user = ref()
-        const loading = ref(true)
-        const saving = ref(false)
-        const draftValues = ref({})
+// State
+const user = ref<User>()
+const loading = ref(true)
+const saving = ref(false)
+const draftValues = ref<User>()
 
-        // Computed
-        onMounted(() => {
-            console.log(auth.getUserZitadelId());
-            console.log(userStore.getCurrent());
-            userStore.getCurrent()
-                .then((value) => {
-                    user.value = value;
-                    draftValues.value = value;
-                })
-                .finally(() => loading.value = false);
-        });
+// Computed
+onMounted(() => {
+    console.log(auth.getUserZitadelId());
+    console.log(userStore.getCurrent());
+    userStore.getCurrent()
+        .then((value) => {
+            user.value = value;
+            draftValues.value = value;
+        })
+        .finally(() => loading.value = false);
+});
 
-        // Methods
-        const save = () => {
-            saving.value = true;
-            user.value = draftValues.value;
-            userStore.save(draftValues.value)
-                .finally(() => saving.value = false);
-        }
-
-        return {
-            auth, user, draftValues, loading, saving,
-            save
-        }
-    }
+// Methods
+const save = () => {
+    saving.value = true;
+    user.value = draftValues.value;
+    userStore.save(draftValues.value)
+        .finally(() => saving.value = false);
 }
 </script>
 <style>
