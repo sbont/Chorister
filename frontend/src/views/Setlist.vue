@@ -9,7 +9,7 @@
 	</div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import SetlistDetail from '@/components/SetlistDetail.vue';
 import Songs from '@/components/Songs.vue';
 
