@@ -2,21 +2,22 @@
     <div class="signup container" v-if="!loading">
         <section class="mt-6">
             <h1 class="title has-text-primary">Register as a new user</h1>
-            <h2 class="subtitle has-text-info" v-if="isInvite">joining {{ choir.name }}</h2>
+            <h2 class="subtitle has-text-info" v-if="isInvite">joining {{ choir?.name }}</h2>
         </section>
 
-        <div class="pt-5">
+        <div class="pt-5" v-if="registration">
             <div class="field">
                 <label class="label">Name</label>
                 <div class="control">
-                    <input class="input" type="text" placeholder="Elvis" v-model="registration.displayName"/>
+                    <input class="input" type="text" placeholder="Elvis" v-model="registration.displayName" />
                 </div>
             </div>
 
             <div class="field" v-if="!isInvite">
                 <label class="label">Name of your choir</label>
                 <div class="control">
-                    <input class="input" type="text" placeholder="" v-model="registration.choirName" />
+                    <input class="input" type="text" placeholder=""
+                        v-model="(registration as NewChoirRegistration).choirName" />
                 </div>
             </div>
 
@@ -33,23 +34,21 @@
             <div class="field">
                 <label class="label">Password</label>
                 <p class="control has-icons-left">
-                    <input class="input" type="password" placeholder="Super safe password" v-model="registration.password"/>
+                    <input class="input" type="password" placeholder="Super safe password"
+                        v-model="registration.password" />
                     <span class="icon is-small is-left">
-                    <i class="fas fa-lock"></i>
-                </span>
+                        <i class="fas fa-lock"></i>
+                    </span>
                 </p>
             </div>
 
             <div class="control">
-                <button 
-                    class="button is-primary" 
-                    @click="submit"
-                    :class="{ 'is-loading': saving }">
+                <button class="button is-primary" @click="submit" :class="{ 'is-loading': saving }">
                     Create account
                 </button>
             </div>
 
-            <div v-if="success" class="has-text-success">
+            <div v-if="isSuccess" class="has-text-success">
                 Account created.
             </div>
             <div v-if="errorMessage" class="has-text-danger">
@@ -60,70 +59,69 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
 import api from "./../api.js";
+import { AcceptInvite, Choir, NewChoirRegistration, Registration } from "@/types";
+import { useRoute, useRouter } from "vue-router";
 
-const Signup = {
-	name: "SignUp",
-	props: [],
-	// app initial state
-    data: function () {
-        return {
-            loading: true,
-            saving: false,
-            registration: {},
-            isInvite: null,
-            choir: {},
-			success: null,
-            errorMessage: null
-        };
-    },
+type DraftRegistration = Partial<Registration>
 
-    mounted: function () {
-        let token = this.$route.query.invite;
-        this.isInvite = !!token;
-        if (token) {
-            api.getInviteByToken(token)
-                .then((response) => {
-                    this.$log.debug("Invite loaded: ", response.data);
-                    let inviteDetail = response.data;
-                    this.registration.email = inviteDetail.email;
-                    this.registration.token = inviteDetail.token;
-                    this.choir = inviteDetail.choir;
-                    this.loading = false;
-                })
-                .catch((error) => {
-                    this.$log.debug(error);
-                    this.errorMessage = "Failed to load invite";
-                    this.loading = false;
-                });
-        } else {
-            this.loading = false;
-        }
 
-    },
+// State
+const route = useRoute();
+const loading = ref(true)
+const saving = ref(false)
+const registration = ref<DraftRegistration>()
+const isInvite = ref(false)
+const choir = ref<Choir>()
+const isSuccess = ref<boolean>()
+const errorMessage = ref<string>()
 
-	methods: {
-        submit: function () {
-            this.saving = true;
-            this.errorMessage = null;
-            if (!this.registration) {
-                return;
-            }
-            let action = this.isInvite ? api.acceptInvite : api.register;
-			action(this.registration)
-				.then((response) => {
-					console.log(response);
-					this.success = true;
-                })
-                .catch((error) => {
-                    this.errorMessage = error.response.data.message ?? "Error while sending request: " + error.response.statusText;
-                    this.$log.debug(error.response);
-                })
-                .finally(() => this.saving = false);
-        },
-	}
+onMounted(() => {
+    const token = route.query.invite as string;
+    isInvite.value = !!token;
+    if (token) {
+        api.getInviteByToken(token)
+            .then((response) => {
+                const inviteDetail = response.data;
+                registration.value = {
+                    email: inviteDetail.email,
+                    token: inviteDetail.token
+                } as AcceptInvite
+                choir.value = inviteDetail.choir;
+                loading.value = false;
+            })
+            .catch((error) => {
+                errorMessage.value = "Failed to find invitation";
+                loading.value = false;
+            });
+    } else {
+        registration.value = {} as DraftRegistration
+        loading.value = false;
+    }
+})
+
+const submit = () => {
+    saving.value = true;
+    errorMessage.value = undefined;
+    if (!registration.value) {
+        return;
+    }
+    let promise;
+    if (isInvite.value)
+        promise = api.acceptInvite(registration.value as AcceptInvite)
+    else
+        promise = api.register(registration.value as NewChoirRegistration)
+    promise
+        .then((response) => {
+            console.log(response);
+            isSuccess.value = true;
+        })
+        .catch((error) => {
+            errorMessage.value = error.response.data.message ?? "Error while sending request: " + error.response.statusText;
+        })
+        .finally(() => saving.value = false);
 }
 
-export default Signup;
 </script>

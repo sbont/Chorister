@@ -2,7 +2,7 @@
     <div class="setlist-detail">
         <div v-if="!loading">
             <div class="setlist-info m-3 is-flex is-align-content-flex-start">
-                <h1 class="title is-flex-grow-1 mr-3" v-if="!editing">{{ setlist.name }}</h1>
+                <h1 class="title is-flex-grow-1 mr-3" v-if="!editing">{{ setlist?.name }}</h1>
                 <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="editing">
                     <div class="field-label is-normal">
                         <label class="label">Name</label>
@@ -10,7 +10,7 @@
                     <div class="field-body">
                         <div class="field" v-bind:class="{ static: !editing }" >
                             <div class="control">
-                                <input v-model="draftValues.name" class="input" type="text" placeholder="Easter Morning Service" />
+                                <input v-model="draftValues?.name" class="input" type="text" placeholder="Easter Morning Service" />
                             </div>
                         </div>
                     </div>
@@ -22,7 +22,7 @@
                     <div class="field-body">
                         <div class="field" v-bind:class="{ static: !editing }" >
                             <div class="control">
-                                <input v-model="draftValues.date" class="input" type="date" />
+                                <input v-model="draftValues?.date" class="input" type="date" />
                             </div>
                         </div>
                     </div>
@@ -68,99 +68,96 @@
                     </p>
                 </div>
             </div>
-            <div class="subtitle m-3" v-if="!editing">{{ setlist.date }}</div>
+            <div class="subtitle m-3" v-if="!editing">{{ setlist?.date }}</div>
         </div>
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useSetlists } from "@/stores/setlistStore";
-import { inject, onMounted, ref } from "vue";
-import {useRoute, useRouter} from "vue-router";
+import { Setlist } from "@/types";
+import { onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-export default {
-    setup() {
-        const logger = inject('vuejs3-logger');
-        const store = useSetlists()
-        const route = useRoute()
-        const router = useRouter()
+type DraftSetlist = Partial<Setlist>
 
-        // State
-        const setlist = ref({});
-        const editing = ref(false);
-        const draftValues = ref(null);
-        const loading = ref(true);
-        const saving = ref(false);
-        const error = ref(null);
+const store = useSetlists()
+const route = useRoute()
+const router = useRouter()
 
-        // Mounted
-        onMounted(() => {
-            if (route.name === "NewSetlist") {
-                draftValues.value = {};
-                editing.value = true;
-                loading.value = false;
-            } else {
-                const setlistId = route.params.id;
-                store.get(setlistId).then(value => {
-                    console.log("Loading...", loading.value);
-                    setlist.value = value;
-                    loading.value = false;
-                    console.log("value setlist: ", value);
-                    console.log("value setlist: ", setlist.value);
-                    console.log("Loading..", loading.value);
-                });
-            }
-        })
+// State
+const setlist = ref<Setlist>();
+const editing = ref(false);
+const draftValues = ref<DraftSetlist | null>(null);
+const loading = ref(true);
+const saving = ref(false);
+const error = ref<string | null>(null);
 
-        // Methods
-        const isNew = () => !setlist.value.id;
-        const save = () => {
-            saving.value = true;
-            const newSetlist = draftValues.value;
-            if (!newSetlist) {
-                return;
-            }
-            const promise = store.saveToServer(newSetlist);
-            promise.then((response) => {
-                const isNewSetlist = isNew();
-                if(isNewSetlist) {
-                    newSetlist.id = response.data.id;
-                }
-                editing.value = false;
-                saving.value = false;
-                setlist.value = newSetlist;
-                draftValues.value = null;
-                if(isNewSetlist) {
-                    store.put(setlist.value);
-                    router.push({
-                        name: "Setlist",
-                        params: { id: newSetlist.id },
-                    });
-                }
-            })
-        }
-        const edit = () => {
-            draftValues.value = setlist.value;
-            editing.value = true;
-        }
-        const cancelEdit = () => {
-            draftValues.value = null;
-            editing.value = false;
-        }
-        const remove = () => store.remove(setlist.value.id)
-            .then(() => {
-                router.push({ name: "Repertoire" });
-            });
-
-        const exportText = () => {
-            const link = router.resolve({
-                name: "Export",
-                params: { id: setlist.value.id },
-            });
-            window.open(link.href, '_blank');
-        }
-
-        return { store, setlist, editing, draftValues, loading, saving, save, edit, cancelEdit, remove, exportText }
+// Mounted
+onMounted(() => {
+    if (route.name === "NewSetlist") {
+        draftValues.value = {};
+        editing.value = true;
+        loading.value = false;
+    } else {
+        const setlistId = Number(route.params.id);
+        store.get(setlistId).then(value => {
+            setlist.value = value;
+            loading.value = false;
+        });
     }
+})
+
+// Methods
+const isNew = () => !setlist.value?.id;
+const save = () => {
+    saving.value = true;
+    const newSetlist = draftValues.value as Setlist;
+    if (!newSetlist) {
+        return;
+    }
+
+    const promise = store.saveToServer(newSetlist);
+    promise.then((response) => {
+        const isNewSetlist = isNew()
+        if(isNewSetlist) {
+            newSetlist.id = response.data.id;
+        }
+        editing.value = false;
+        saving.value = false;
+        setlist.value = newSetlist;
+        draftValues.value = null;
+        if(isNewSetlist) {
+            store.put(setlist.value);
+            router.push({
+                name: "Setlist",
+                params: { id: newSetlist.id },
+            });
+        }
+    })
 }
+
+const edit = () => {
+    draftValues.value = setlist.value as DraftSetlist;
+    editing.value = true;
+}
+
+const cancelEdit = () => {
+    draftValues.value = null;
+    editing.value = false;
+}
+
+const remove = () => store.remove(setlist.value?.id as number)
+    .then(() => {
+        router.push({ name: "Repertoire" });
+    });
+
+const exportText = () => {
+    const link = router.resolve({
+        name: "Export",
+        params: { id: setlist.value?.id },
+    });
+    window.open(link.href, '_blank');
+}
+
 </script>

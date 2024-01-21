@@ -9,18 +9,9 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import RepertoireMenu from '@/components/RepertoireMenu.vue'
 
-// app Vue instance
-const Repertoire = {
-    name: "Repertoire",
-    components: {
-        RepertoireMenu
-    }
-};
-
-export default Repertoire;
 </script>
 
 <style>

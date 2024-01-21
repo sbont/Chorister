@@ -1,10 +1,12 @@
-import {defineStore} from "pinia";
-import api from "./../api.js";
+import { defineStore } from "pinia";
+import api from "../api";
+import { Song } from "@/types";
+import { CacheListMap, CacheMap } from "@/types/CacheMaps";
 
 export const useSongs = defineStore('songs', {
     state: () => ({
-        songs: new Map(),
-        songsBySetlistId: new Map(),
+        songs: new CacheMap<number, Song>(),
+        songsBySetlistId: new CacheListMap<number, Song>(),
         loading: false,
         error: null
     }),
@@ -13,43 +15,28 @@ export const useSongs = defineStore('songs', {
         async fetchAll() {
             this.loading = true;
             const response = await api.getAllSongs()
-                .catch(err => {
-                    console.log(err);
-                    this.error = "Failed to load songs";
-                })
-            console.log("Songs loaded:", response);
             response.data.forEach(this.put);
             this.loading = false
         },
 
-        async fetchForSetlist(setlistId) {
+        async fetchForSetlist(setlistId: number) {
             this.loading = true;
             const response = await api.getSetlistEntries(setlistId)
-                .catch(err => {
-                    console.log(err);
-                    this.error = "Failed to load setlist";
-                })
             let sorted = response.data.sort((entryA, entryB) => entryA.number - entryB.number).map(entry => entry._embedded.song);
             this.putSetlist(sorted, setlistId);
             this.loading = false;
-            console.log(sorted)
             return sorted;
         },
 
-        async fetch(songId) {
+        async fetch(songId: number) {
             this.loading = true;
             const response = await api.getSongById(songId)
-                .catch((error) => {
-                    console.log(error);
-                    this.error = "Failed to load song";
-                });
-            console.log("Song loaded: ", response.data);
             this.songs.set(response.data.id, response.data);
             this.loading = false;
             return response.data;
         },
 
-        async get(songId) {
+        async get(songId: number) {
             if (!this.songs.has(songId)) {
                 return await this.fetch(songId);
             } else {
@@ -57,30 +44,34 @@ export const useSongs = defineStore('songs', {
             }
         },
 
-        async getForSetlist(setlistId) {
+        async getForSetlist(setlistId: number) {
             if (!this.songsBySetlistId.has(setlistId)) {
                 return await this.fetchForSetlist(setlistId);
             } else {
-                return this.songsBySetlistId.get(setlistId);
+                return this.songsBySetlistId.getOrEmpty(setlistId);
             }
         },
 
-        put(song) {
+        put(song: Song) {
             this.songs.set(song.id, song);
         },
 
-        putSetlist(songs, setlistId) {
+        putSetlist(songs: Array<Song>, setlistId: number) {
             songs.forEach(this.put)
             this.songsBySetlistId.set(setlistId, songs)
         },
 
-        save(song) {
+        removeSetlist(song: Song, setlistId: number) {
+            api.deleteSetlistEntry
+        },
+
+        save(song: Song) {
             const savePromise = this.saveToServer(song);
-            savePromise.then(savedSong => this.songs.set(savedSong.id, savedSong));
+            savePromise.then(response => this.songs.set(response.data.id, response.data));
             return savePromise;
         },
 
-        saveToServer(song) {
+        saveToServer(song: Song) {
             if (song.id) {
                 return api.updateSongForId(song.id, song);
             } else {
@@ -88,7 +79,7 @@ export const useSongs = defineStore('songs', {
             }
         },
 
-        delete(songId) {
+        delete(songId: number) {
             return api.deleteSongForId(songId)
                 .then((response) => {
                     this.songs.delete(songId);

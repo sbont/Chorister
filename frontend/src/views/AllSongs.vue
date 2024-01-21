@@ -13,15 +13,7 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import Songs from '@/components/Songs.vue'
 
-const AllSongs = {
-    name: "All Songs",
-    components: {
-        Songs
-    },
-};
-
-export default AllSongs;
 </script>

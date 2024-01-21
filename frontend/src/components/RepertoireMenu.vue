@@ -3,13 +3,14 @@
 		<p class="menu-label">Repertoire</p>
 		<ul class="menu-list">
 			<li>
-				<router-link :to="{ name: 'Repertoire'}">All songs</router-link>
+				<router-link :to="{ name: 'Repertoire' }">All songs</router-link>
 			</li>
 			<li v-if="ready">
 				<div class="menu-header">By time of the year</div>
 				<ul>
 					<li v-for="(category) in categories.season" :key="category.id">
-						<router-link :to="{ name: 'CategorySeason', params: { id: category.id }}" append>{{ category.name }}</router-link>
+						<router-link :to="{ name: 'CategorySeason', params: { id: category.id } }" append>{{ category.name
+						}}</router-link>
 					</li>
 				</ul>
 			</li>
@@ -17,7 +18,8 @@
 				<div class="menu-header">By liturgical place</div>
 				<ul>
 					<li v-for="(category) in categories.liturgical" :key="category.id">
-						<router-link :to="{ name: 'CategoryLiturgical', params: { id: category.id }}" append>{{ category.name }}</router-link>
+						<router-link :to="{ name: 'CategoryLiturgical', params: { id: category.id } }" append>{{
+							category.name }}</router-link>
 					</li>
 				</ul>
 			</li>
@@ -30,47 +32,42 @@
 						<i class="fas fa-plus-square"></i>
 					</span>
 					Create setlist
-                </router-link>
+				</router-link>
 			</li>
-			<li v-for="(setlist) in allSetlists" :key="setlist.id" class="droppable" @drop="dropSong($event, setlist._links.self.href)" @dragover.prevent @dragenter.prevent>
-				<router-link :to="{ name: 'Setlist', params: { id: setlist.id }}" append>{{ setlist.name }}</router-link>
+			<li v-for="(setlist) in allSetlists" :key="setlist.id" class="droppable"
+				@drop="dropSong($event, setlist._links.self.href)" @dragover.prevent @dragenter.prevent>
+				<router-link :to="{ name: 'Setlist', params: { id: setlist.id } }" append>{{ setlist.name }}</router-link>
 			</li>
 		</ul>
 	</aside>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import api from "./../api.js";
-import { computed, inject, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useSetlists } from "@/stores/setlistStore";
 import { useCategories } from "@/stores/categoryStore";
 import { storeToRefs } from "pinia";
 
-export default {
-    setup() {
-        const logger = inject('vuejs3-logger');
-        const categoryStore = useCategories();
-        const setlistStore = useSetlists();
+const categoryStore = useCategories();
+const setlistStore = useSetlists();
 
-        // State
-        const { error, allSetlists } = storeToRefs(setlistStore);
-        const { categories } = storeToRefs(categoryStore);
+// State
+const { error, allSetlists } = storeToRefs(setlistStore);
+const { categories } = storeToRefs(categoryStore);
 
-        // Computed
-        const ready = computed(() => !!categories);
+// Computed
+const ready = computed(() => !!categories);
 
-        onMounted(() => {
-            setlistStore.fetchAll();
-            categoryStore.fetchAll();
-        });
+onMounted(() => {
+	setlistStore.fetchAll();
+	categoryStore.fetchAll();
+});
 
-        // Methods
-        const dropSong = (event, setlistUri) => {
-            let songUri = event.dataTransfer.getData("text");
-            let entry = { setlist: setlistUri, song: songUri }
-            api.postSetlistEntry(entry);
-        }
-        return { setlistStore, allSetlists, categories, ready, dropSong, error }
-    }
+// Methods
+const dropSong = (event: DragEvent, setlistUri: string) => {
+	let songUri = event.dataTransfer?.getData("text");
+	let entry = { setlist: setlistUri, song: songUri }
+	api.postSetlistEntry(entry);
 }
 </script>
