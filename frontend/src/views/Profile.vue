@@ -14,14 +14,14 @@
                     <div class="field">
                         <label class="label">Name</label>
                         <div class="control">
-                            <input class="input" type="text" v-model="draftValues?.displayName" />
+                            <input class="input" type="text" v-if="draftValues" v-model="draftValues.displayName" />
                         </div>
                     </div>
 
                     <div class="field">
                         <label class="label">Email</label>
                         <div class="control has-icons-left">
-                            <input class="input" type="email" placeholder="you@" v-model="draftValues?.email" />
+                            <input class="input" type="email" placeholder="you@" v-if="draftValues" v-model="draftValues.email" />
                             <span class="icon is-small is-left">
                                 <i class="fas fa-envelope"></i>
                             </span>
@@ -70,9 +70,11 @@ onMounted(() => {
 const save = () => {
     saving.value = true;
     user.value = draftValues.value;
-    userStore.save(draftValues.value)
-        .finally(() => saving.value = false);
+    if (draftValues.value)
+        userStore.save(draftValues.value)
+            .finally(() => saving.value = false);
 }
+
 </script>
 <style>
 .w-40 {
