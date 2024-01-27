@@ -359,6 +359,7 @@ const remove = () =>
 
 const edit = () => {
     draftValues.value = song.value as DraftSong;
+    draftValues.value.songbook ??= {}
     draftSongCategories.value = Object.assign({}, songCategories.value);
     editing.value = true;
 }
