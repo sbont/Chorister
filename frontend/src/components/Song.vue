@@ -92,19 +92,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div v-if="editing && draftValues" class="field is-horizontal">
-                            <div class="field-label is-normal">
-                                <label class="label">Youtube video</label>
-                            </div>
-                            <div class="field-body">
-                                <div class="field" v-bind:class="{ static: !editing }">
-                                    <div class="control">
-                                        <input v-model="draftValues.recordingUrl" class="input" type="url"
-                                            placeholder="https://www.youtube.com/watch?v=..." />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="field is-horizontal">
                             <div class="field-label is-normal">
                                 <label class="label">Time of the year</label>
