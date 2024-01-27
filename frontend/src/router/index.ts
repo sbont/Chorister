@@ -110,6 +110,11 @@ const routes = [
       requiresAuth: true,
       hideHeader: true
     },
+  },
+  {
+    path: '/authorized',
+    name: 'Authorized',
+    component: () => import('../views/Authorized.vue')
   }
 ]
 
@@ -153,7 +158,7 @@ router.beforeEach((to, from, next) => {
       next()
     }
   } else if(to.matched.some(record => record.meta.forwardWhenAuthenticated) && auth.isLoggedIn) {
-    next(to.meta.forwardWhenAuthenticated)
+    next(to.meta.forwardWhenAuthenticated!)
   } else {
     // Default case. The user is send to the desired route.
     next()
