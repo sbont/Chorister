@@ -12,3 +12,4 @@ zitadel/zitadel-init-local.yaml
 zitadel/zitadel.exe
 
 secrets/
+frontend/src/style/package-lock.json

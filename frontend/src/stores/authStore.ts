@@ -14,7 +14,7 @@ const settings = {
 let userManager = new UserManager(settings)
 userManager.events.addAccessTokenExpired(() => {
     console.log("Access token expired. Logging out...");
-    useAuth().logout();
+    useAuth().removeSession();
 });
 
 export const useAuth = defineStore('auth', {
@@ -72,6 +72,11 @@ export const useAuth = defineStore('auth', {
                     })
                     .catch(error => reject(error))
             })
+        },
+
+        removeSession () {
+            this.user = null
+            return userManager.signinRedirect();
         },
 
         getUserZitadelId() {

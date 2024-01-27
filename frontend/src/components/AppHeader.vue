@@ -1,11 +1,11 @@
 <template>
-  <nav class="navbar p-2" role="navigation" aria-label="main navigation">
+  <nav class="navbar px-2" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
         <router-link to="/" class="navbar-item">
             <img src="@/assets/logo.png"
                  alt="Chorister logo"/>
         </router-link>
-        <div class="has-text-primary is-size-7" style="margin-top: 5px; margin-left: -32px; z-index: 2;">beta</div>
+        <div class="has-text-primary is-size-7" style="margin-top: 0.5rem; margin-left: -32px; z-index: 2;">beta</div>
       <a
         role="button"
         class="navbar-burger"
