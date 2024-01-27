@@ -214,7 +214,7 @@ import ScoreComponent from "@/components/Score.vue"
 import VueMultiselect from 'vue-multiselect'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, toRaw } from 'vue'
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { useSongs } from "@/stores/songStore";
@@ -358,7 +358,7 @@ const remove = () =>
         });
 
 const edit = () => {
-    draftValues.value = song.value as DraftSong;
+    draftValues.value = structuredClone(toRaw(song.value as DraftSong))
     draftValues.value.songbook ??= {}
     draftSongCategories.value = Object.assign({}, songCategories.value);
     editing.value = true;
