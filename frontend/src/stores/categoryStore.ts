@@ -13,24 +13,18 @@ export type CategoriesState = {
 export const useCategories = defineStore('categories', {
     state: () => ({
         categories: {},
-        categoriesBySongId: new Map(),
+        categoriesBySongId: new CacheListMap<number, Category>(),
         loading: false
     } as CategoriesState),
     getters: {},
     actions: {
         async fetchAll() {
             this.loading = true;
-            api.getAllCategories()
-                .then(response => {
-                    this.categories = {
-                        season: response.data.filter(category => category.type === "SEASON"),
-                        liturgical: response.data.filter(category => category.type === "LITURGICAL_MOMENT")
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                    this.error = "Failed to load categories";
-                });
+            const response = await api.getAllCategories()
+            this.categories = {
+                season: response.data.filter(category => category.type === "SEASON"),
+                liturgical: response.data.filter(category => category.type === "LITURGICAL_MOMENT")
+            }
             this.loading = false;
         },
 
@@ -52,7 +46,7 @@ export const useCategories = defineStore('categories', {
             let newCategories = categories.filter(draftCategory => !previousCategories.some(previousCategory => draftCategory.id === previousCategory.id));
             let deletedCategories = previousCategories.filter(previousCategory => !categories.some(draftCategory => previousCategory.id === draftCategory.id));
             const promises = [];
-            if(newCategories.length) {
+            if (newCategories.length) {
                 const posted = api.postSongCategories(songId, newCategories.map(songCategory => songCategory._links.self.href));
                 promises.push(posted);
             }
