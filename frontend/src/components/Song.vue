@@ -59,7 +59,7 @@
                                 <div class="field-flex-col">
                                     <div class="field" v-bind:class="{ static: !editing }">
                                         <div class="control">
-                                            <input v-if="editing && draftValues" v-model="draftValues.songbook.title" class="input" type="text"
+                                            <input v-if="editing && draftValues" v-model="draftValues.songbook!.title" class="input" type="text"
                                                 placeholder="Songbook, hymnal or collection title" />
                                             <span v-else>
                                                 {{ song?.songbook?.title }}
@@ -165,7 +165,7 @@
                             </button>
                         </p>
                         <p v-if="editing" class="control">
-                            <button @click="save" class="button is-link" :class="{ 'is-loading': saving }">
+                            <button @click="save" class="button is-link" :class="{ 'is-loading': saving, 'is-static': v$.$errors.length }">
                                 Save changes
                             </button>
                         </p>
@@ -198,7 +198,7 @@
 
                     <div class="text">
                         <div class="is-size-4">Text</div>
-                        <div v-if="!editing" v-html="song?.text" />
+                        <div v-if="!editing" v-html="song?.text" ></div>
                         <div v-else>
                             <editor-content :editor="editor" />
                         </div>
@@ -240,7 +240,7 @@ import { Song, Score, Songbook, Categories } from "@/types"
 type DraftSongbook = Partial<Songbook>
 
 interface DraftSong extends Omit<Partial<Song>, "songbook"> {
-    songbook: DraftSongbook
+    songbook?: DraftSongbook
 }
 
 interface DraftScore extends Omit<Partial<Score>, "song"> {
@@ -267,7 +267,7 @@ const error = ref(null);
 const rules = {
     title: { required },
 }
-const v$ = useVuelidate<DraftSong>(rules, draftValues.value as DraftSong)
+const v$ = useVuelidate<DraftSong>(rules, draftValues as DraftSong)
 const editor = useEditor({
     content: null,
     extensions: [
