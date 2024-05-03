@@ -3,7 +3,7 @@ package nl.stevenbontenbal.chorister.model.entities
 import jakarta.persistence.*
 
 @Entity
-class Score(
+class Chords(
     override var id: Long? = null,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
@@ -13,7 +13,7 @@ class Score(
     override var song: Song,
     override var description: String?,
     override var key: Key?,
-    var fileUrl: String?,
+    var chords: String?,
 ) : Notation(id) {
     companion object
 }
