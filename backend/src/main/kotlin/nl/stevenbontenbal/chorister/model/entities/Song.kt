@@ -24,6 +24,8 @@ class Song(
     var songbookNumber: Int?,
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "song")
     var scores: MutableList<Score>? = mutableListOf(),
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "song")
+    var chords: MutableList<Chords>? = mutableListOf(),
     var slug: String = title.toSlug(),
     var addedAt: LocalDateTime = LocalDateTime.now(),
     @ManyToOne(fetch = FetchType.EAGER)

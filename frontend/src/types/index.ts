@@ -1,3 +1,5 @@
+import { Key } from "./Key"
+
 export interface Identifiable extends HalResponse {
     id: number | undefined
 }
@@ -69,7 +71,16 @@ export interface Score extends Identifiable {
     id: number,
     song: Song,
     description: string | undefined,
-    fileUrl: string
+    fileUrl: string,
+    key: Key | undefined
+}
+
+export interface Chords extends Identifiable {
+    id: number,
+    song: Song,
+    description: string | undefined,
+    chords: string,
+    key: Key | undefined
 }
 
 export interface Song extends Identifiable {

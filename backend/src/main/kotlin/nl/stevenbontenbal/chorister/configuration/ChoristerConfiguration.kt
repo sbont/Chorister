@@ -88,6 +88,8 @@ class ChoristerConfiguration(
                 corsRegistry: CorsRegistry
             ) {
                 configuration.exposeIdsFor(Song::class.java)
+                configuration.exposeIdsFor(Notation::class.java)
+                configuration.exposeIdsFor(Chords::class.java)
                 configuration.exposeIdsFor(Score::class.java)
                 configuration.exposeIdsFor(Category::class.java)
                 configuration.exposeIdsFor(Setlist::class.java)
