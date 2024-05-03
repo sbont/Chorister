@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useAuth } from "@/stores/authStore";
-import { Invite, Song, Score, Category, Setlist, SetlistEntry, Choir, User, WithEmbedded, AcceptInvite, NewChoirRegistration } from "@/types";
+import { Invite, Song, Score, Category, Setlist, SetlistEntry, Choir, User, WithEmbedded, AcceptInvite, NewChoirRegistration, Chords } from "@/types";
 
 const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + '/api';
 const auth = useAuth();
@@ -77,6 +77,18 @@ const functions = {
     updateScoreForId: (id: number, score: any) => instance.put('scores/' + id, score),
 
     deleteScoreForId: (id: number) => instance.delete('scores/' + id),
+
+    // Scores
+
+    getChordsById: (scoreId: number) => instance.get<Chords>('chords/' + scoreId),
+
+    getChordsesBySongId: (songId: number) => instance.get<Array<Chords>>('songs/' + songId + '/chords', functions.getGetConfig('chords')),
+
+    createNewChords: (score: any) => instance.post('chords', score),
+
+    updateChordsForId: (id: number, score: any) => instance.put('chords/' + id, score),
+
+    deleteChordsForId: (id: number) => instance.delete('chords/' + id),
 
     // Categories
 

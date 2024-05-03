@@ -538,4 +538,87 @@ databaseChangeLog:
         referencedColumnNames: id
         referencedTableName: setlist
         validate: true
-
+- changeSet:
+    id: 1714734695027-3
+    author: Steven.Bontenbal (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: dtype
+            type: VARCHAR(31)
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: notationPK
+            name: id
+            type: BIGINT
+        - column:
+            name: description
+            type: VARCHAR(255)
+        - column:
+            name: key
+            type: SMALLINT
+        - column:
+            name: file_url
+            type: VARCHAR(255)
+        - column:
+            name: chords
+            type: VARCHAR(255)
+        - column:
+            name: choir_id
+            type: BIGINT
+        - column:
+            name: song_id
+            type: BIGINT
+        tableName: notation
+- changeSet:
+    id: 1714734695027-5
+    author: Steven.Bontenbal (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: song_id
+        baseTableName: notation
+        constraintName: FKegee4xyjhewbqvhp0afl4noj2
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: song
+        validate: true
+- changeSet:
+    id: 1714734695027-6
+    author: Steven.Bontenbal (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: choir_id
+        baseTableName: notation
+        constraintName: FKodvho2hmoia9xtfpmmvq1a1qr
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: choir
+        validate: true
+- changeSet:
+    id: 1714734695027-7
+    author: Steven.Bontenbal (generated)
+    changes:
+    - dropForeignKeyConstraint:
+        baseTableName: score
+        constraintName: FK59e4hijvjq6p1nb5708rgiyd4
+- changeSet:
+    id: 1714734695027-8
+    author: Steven.Bontenbal (generated)
+    changes:
+    - dropForeignKeyConstraint:
+        baseTableName: score
+        constraintName: FKpqnmr7ihuxh43giujf3pnr79o
+- changeSet:
+    id: 1714734695027-9
+    author: Steven.Bontenbal (generated)
+    changes:
+    - dropTable:
+        tableName: score

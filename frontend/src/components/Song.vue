@@ -42,8 +42,8 @@
                             <div class="field-body">
                                 <div class="field" v-bind:class="{ static: !editing }">
                                     <div class="control">
-                                        <input v-if="editing && draftValues" v-model="draftValues.composer" class="input" type="text"
-                                            placeholder="Artist / composer / writer" />
+                                        <input v-if="editing && draftValues" v-model="draftValues.composer"
+                                            class="input" type="text" placeholder="Artist / composer / writer" />
                                         <span v-else>
                                             {{ song?.composer }}
                                         </span>
@@ -59,7 +59,8 @@
                                 <div class="field-flex-col">
                                     <div class="field" v-bind:class="{ static: !editing }">
                                         <div class="control">
-                                            <input v-if="editing && draftValues" v-model="draftValues.songbook!.title" class="input" type="text"
+                                            <input v-if="editing && draftValues" v-model="draftValues.songbook!.title"
+                                                class="input" type="text"
                                                 placeholder="Songbook, hymnal or collection title" />
                                             <span v-else>
                                                 {{ song?.songbook?.title }}
@@ -74,16 +75,15 @@
                                         </div>
                                         <div class="field-body">
                                             <div class="field" v-bind:class="{
-                                                static: !editing,
-                                            }">
+            static: !editing,
+        }">
                                                 <div class="control">
                                                     <input v-if="editing && draftValues" v-model="draftValues.songbookNumber
-                                                        " class="input" type="text"
-                                                        placeholder="Song number in the book" />
+            " class="input" type="text" placeholder="Song number in the book" />
                                                     <span v-else>
                                                         {{
-                                                            song?.songbookNumber
-                                                        }}
+            song?.songbookNumber
+        }}
                                                     </span>
                                                 </div>
                                             </div>
@@ -101,8 +101,8 @@
                                     <div class="control">
                                         <div class="select is-multiple">
                                             <VueMultiselect v-if="editing" v-model="draftSongCategories.season"
-                                                :multiple="true" :options="categories.season" track-by="name" label="name"
-                                                :close-on-select="false"></VueMultiselect>
+                                                :multiple="true" :options="categories.season" track-by="name"
+                                                label="name" :close-on-select="false"></VueMultiselect>
 
                                             <div v-else class="tags are-medium">
                                                 <span v-for="(category) in songCategories?.season" :key="category.id"
@@ -128,8 +128,8 @@
                                                 label="name" :close-on-select="false"></VueMultiselect>
 
                                             <div v-else class="tags are-medium">
-                                                <span v-for="(category) in songCategories?.liturgical" :key="category.id"
-                                                    class="tag">
+                                                <span v-for="(category) in songCategories?.liturgical"
+                                                    :key="category.id" class="tag">
                                                     {{ category.name }}
                                                 </span>
                                             </div>
@@ -152,7 +152,8 @@
                             </button>
                         </p>
                         <p v-if="editing" class="control">
-                            <button @click="save" class="button is-link" :class="{ 'is-loading': saving, 'is-static': v$.$errors.length }">
+                            <button @click="save" class="button is-link"
+                                :class="{ 'is-loading': saving, 'is-static': v$.$errors.length }">
                                 Save changes
                             </button>
                         </p>
@@ -168,9 +169,9 @@
                     <div class="is-size-4">Play</div>
                     <div v-if="youtubeId && !editing" class="yt-wrapper">
                         <iframe id="ytplayer" type="text/html" :src="'https://www.youtube.com/embed/' +
-                            youtubeId +
-                            '?autoplay=0'
-                            " frameborder="0"></iframe>
+            youtubeId +
+            '?autoplay=0'
+            " frameborder="0"></iframe>
                     </div>
                     <div v-if="editing" class="field is-horizontal">
                         <div class="field-body">
@@ -185,10 +186,23 @@
 
                     <div class="text">
                         <div class="is-size-4">Text</div>
-                        <div v-if="!editing" v-html="song?.text" ></div>
+                        <div v-if="!editing" v-html="song?.text"></div>
                         <div v-else>
                             <editor-content :editor="editor" />
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scores m-2 p-3">
+                <div class="is-size-4">Chords</div>
+                <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
+                    <ChordsComponent v-for="chords in chordses" :key="chords.id" :value="(chords as Chords)"
+                        @remove="removeChords(chords.id)"></ChordsComponent>
+                    <div class="">
+                        <button class="button is-primary" @click="addChords">
+                            Add
+                        </button>
                     </div>
                 </div>
             </div>
@@ -211,6 +225,7 @@
 
 <script setup lang="ts">
 import ScoreComponent from "@/components/Score.vue"
+import ChordsComponent from "@/components/Chords.vue"
 import VueMultiselect from 'vue-multiselect'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
@@ -220,9 +235,10 @@ import { required } from '@vuelidate/validators';
 import { useSongs } from "@/stores/songStore";
 import { useCategories } from "@/stores/categoryStore";
 import { useScores } from "@/stores/scoreStore";
+import { useChords } from "@/stores/chordsStore";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
-import { Song, Score, Songbook, Categories } from "@/types"
+import { Song, Score, Songbook, Categories, Chords } from "@/types"
 
 type DraftSongbook = Partial<Songbook>
 
@@ -234,8 +250,13 @@ interface DraftScore extends Omit<Partial<Score>, "song"> {
     song?: string
 }
 
+interface DraftChords extends Omit<Partial<Chords>, "song"> {
+    song?: string
+}
+
 const songStore = useSongs();
 const categoryStore = useCategories();
+const chordsStore = useChords();
 const scoreStore = useScores();
 const route = useRoute();
 const router = useRouter()
@@ -245,6 +266,7 @@ const { categories } = storeToRefs(categoryStore);
 const song = ref<Song>()
 const songCategories = ref<Categories>();
 const scores = ref<Array<Score | DraftScore>>([]);
+const chordses = ref<Array<Chords | DraftChords>>([]);
 const editing = ref(false);
 const draftValues = ref<DraftSong>();
 const draftSongCategories = ref();
@@ -307,6 +329,7 @@ onMounted(() => {
                 }
             });
         scoreStore.fetchForSong(songId).then((value) => scores.value = value);
+        chordsStore.fetchForSong(songId).then((value) => chordses.value = value);
         const songCategoriesLoaded = categoryStore.getForSong(songId);
         Promise.all([songLoaded, categoriesLoaded, songCategoriesLoaded])
             .then(([, , songCategoryResponse]) => {
@@ -384,6 +407,20 @@ const removeScore = (scoreId: number | undefined) => {
         scoreStore.delete(scoreId);
     }
     scores.value = scores.value.filter(current => current.id !== scoreId);
+}
+
+const addChords = () => {
+    let newChords: DraftChords = {
+        song: song.value?._links.self.href
+    };
+    chordses.value.push(newChords);
+}
+
+const removeChords = (chordsId: number | undefined) => {
+    if (chordsId) {
+        chordsStore.delete(chordsId);
+    }
+    chordses.value = chordses.value.filter(current => current.id !== chordsId);
 }
 
 const vSongFocus = (el: HTMLElement, binding: { value: any }) => {
