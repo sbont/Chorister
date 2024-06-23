@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import api from "././../api.js";
 import { Categories, Category } from '@/types'
-import { CacheListMap } from "../types/CacheMaps";
+import { CacheListMap } from "@/types/CacheMaps";
 
 export type CategoriesState = {
     categories: Categories
@@ -47,7 +47,7 @@ export const useCategories = defineStore('categories', {
             let deletedCategories = previousCategories.filter(previousCategory => !categories.some(draftCategory => previousCategory.id === draftCategory.id));
             const promises = [];
             if (newCategories.length) {
-                const posted = api.postSongCategories(songId, newCategories.map(songCategory => songCategory._links.self.href));
+                const posted = api.postSongCategories(songId, newCategories.map(songCategory => songCategory._links!.self.href));
                 promises.push(posted);
             }
             deletedCategories.forEach(songCategory => promises.push(api.deleteSongCategory(songId, songCategory.id)));

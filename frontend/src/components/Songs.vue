@@ -98,7 +98,7 @@ const loadSongs = function () {
     const sorter = (data: Array<Song>) => data.sort((songA, songB) => songA.title.localeCompare(songB.title));
     const setlistExtractor = (entries: Array<SetlistEntry & WithEmbedded<"song", Song>>) => {
         let sorted = entries.sort((entryA, entryB) => entryA.number - entryB.number);
-        return sorted.map(entry => Object.assign(entry._embedded.song, { setlistEntryUri: entry._links.self.href })) as Array<SetlistSong>;
+        return sorted.map(entry => Object.assign(entry._embedded.song, { setlistEntryUri: entry?._links?.self.href })) as Array<SetlistSong>;
     }
 
     const routeName = route.name;
@@ -106,7 +106,7 @@ const loadSongs = function () {
     let songsLoaded;
     switch (routeName) {
         case 'Repertoire':
-            songsLoaded = api.getAllSongs().then(response => songs.value = sorter(response.data));
+            songsLoaded = songStore.fetchAll().then(response => songs.value = sorter(response.data));
             break;
         case 'CategorySeason':
         case 'CategoryLiturgical':
@@ -134,7 +134,7 @@ const oneBased = (index: number) => index + 1;
 const startDrag = function (event: DragEvent, song: Song) {
     if (event.dataTransfer) {
         event.dataTransfer.dropEffect = "link";
-        event.dataTransfer.setData("text/plain", song._links.self.href);
+        event.dataTransfer.setData("text/plain", song._links!.self.href);
     }
 }
 
