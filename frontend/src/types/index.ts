@@ -1,11 +1,11 @@
 import { Key } from "./Key"
 
-export interface Identifiable extends HalResponse {
+export interface Identifiable extends ApiEntity {
     id: number | undefined
 }
 
-export interface HalResponse {
-    _links: { self: { href: string }}
+export interface ApiEntity {
+    _links: { self: { href: string }} | undefined
 }
 
 export interface Choir extends Identifiable {
@@ -67,22 +67,23 @@ enum CategoryType {
     Liturgical = "LITURGICAL_MOMENT"
 }
 
-export interface Score extends Identifiable {
-    id: number,
+export interface Score extends ApiEntity {
     song: Song,
     description: string | undefined,
     fileUrl: string,
     key: Key | undefined
 }
 
-export interface Chords extends Identifiable {
-    id: number,
+export interface Chords extends ApiEntity {
     song: Song,
     description: string | undefined,
     chords: string,
     key: Key | undefined
 }
 
+export interface DraftChords extends Omit<Partial<Chords>, "song"> {
+    song?: string
+}
 export interface Song extends Identifiable {
     id: number,
     choir: Choir,
@@ -93,6 +94,7 @@ export interface Song extends Identifiable {
     songbook: Songbook | undefined,
     songbookNumber: number,
     scores: Array<Score>,
+    chords: Array<Chords>,
     slug: string,
     addedAt: Date,
     addedBy: User,
@@ -115,7 +117,7 @@ export interface Setlist extends Identifiable {
     entries: Array<SetlistEntry>,
 }
 
-export interface SetlistEntry extends HalResponse {
+export interface SetlistEntry extends ApiEntity {
     id: string,
     setlist: Setlist,
     song: Song,

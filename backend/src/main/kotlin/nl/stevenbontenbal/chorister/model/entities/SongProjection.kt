@@ -14,6 +14,7 @@ interface SongProjection {
     var songbook: Songbook?
     var songbookNumber: Int?
     var scores: MutableList<Score>?
+    var chords: MutableList<Chords>?
     var addedAt: LocalDateTime
     var slug: String
     var text: String?

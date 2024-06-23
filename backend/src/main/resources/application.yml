@@ -20,6 +20,9 @@ chorister:
 server:
   port: 8090
 spring:
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
   jpa:
     database-platform: org.hibernate.dialect.CockroachDialect
     hibernate.ddl-auto: validate

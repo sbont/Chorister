@@ -49,6 +49,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.22")
 	implementation("org.modelmapper:modelmapper:3.1.1")
     implementation("junit:junit:4.13.2")
+	implementation("org.jboss.logging:jboss-logging")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	developmentOnly("org.zalando:logbook-spring-boot-starter:2.16.0")
 	runtimeOnly("com.h2database:h2")

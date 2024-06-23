@@ -8,7 +8,7 @@ export class CacheMap<K, V> extends Map<K, V> {
     getOrElse = (key: K, onElse: LazyArg<V>) => Option.getOrElse(this.getOrNone(key), onElse)
 }
 
-export class CacheListMap<K, V extends Identifiable> extends CacheMap<K, Array<V>> {
+export class CacheListMap<K, V> extends CacheMap<K, Array<V>> {
     addTo(key: K, value: V): void {
         let array = this.getOrElse(key, () => {
             let newArray = Array<V>()
@@ -19,7 +19,7 @@ export class CacheListMap<K, V extends Identifiable> extends CacheMap<K, Array<V
     }
 
     addAllTo(key: K, values: Array<V>): void {
-        var existingArray = this.getOrNone(key)
+        let existingArray = this.getOrNone(key);
         Option.match(existingArray, {
             onNone: () => this.set(key, values),
             onSome: (array) => values.map(value => array.push(value))
@@ -31,6 +31,13 @@ export class CacheListMap<K, V extends Identifiable> extends CacheMap<K, Array<V
             let remaining = array.filter(e => !values.includes(e))
             this.set(key, remaining)
         })
+    }
+    
+    remove(value: V): void {
+        for (const [key, values] of this.entries()) {
+            const i = values.findIndex(e => e === value)
+            if (i > -1) values.splice(i, 1)
+        }
     }
 
     getOrEmpty = (key: K) => this.get(key) ?? new Array<V>

@@ -1,6 +1,11 @@
 package nl.stevenbontenbal.chorister.model.entities
 
-enum class Key(val literal: String) {
+import com.fasterxml.jackson.annotation.JsonValue
+
+enum class Key(
+    @JsonValue
+    val literal: String
+) {
     C("C"),
     DB("Db"),
     D("D"),

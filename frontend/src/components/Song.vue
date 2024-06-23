@@ -11,7 +11,7 @@
                     </p>
                 </div>
                 <div v-else class="hero-body">
-                    <p class="title">{{ isNew ? "Add new" : "Edit" }}</p>
+                    <p class="title">{{ songIsNew ? "Add new" : "Edit" }}</p>
                 </div>
             </section>
 
@@ -74,17 +74,12 @@
                                             <label class="label">Number</label>
                                         </div>
                                         <div class="field-body">
-                                            <div class="field" v-bind:class="{
-            static: !editing,
-        }">
+                                            <div class="field" v-bind:class="{ static: !editing, }">
                                                 <div class="control">
-                                                    <input v-if="editing && draftValues" v-model="draftValues.songbookNumber
-            " class="input" type="text" placeholder="Song number in the book" />
-                                                    <span v-else>
-                                                        {{
-            song?.songbookNumber
-        }}
-                                                    </span>
+                                                    <input v-if="editing && draftValues"
+                                                        v-model="draftValues.songbookNumber" class="input" type="text"
+                                                        placeholder="Song number in the book" />
+                                                    <span v-else>{{ song?.songbookNumber }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -194,24 +189,13 @@
                 </div>
             </div>
 
-            <div class="scores m-2 p-3">
-                <div class="is-size-4">Chords</div>
-                <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
-                    <ChordsComponent v-for="chords in chordses" :key="chords.id" :value="(chords as Chords)"
-                        @remove="removeChords(chords.id)"></ChordsComponent>
-                    <div class="">
-                        <button class="button is-primary" @click="addChords">
-                            Add
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <ChordsArray :song-uri=song?._links?.self.href! />
 
             <div class="scores m-2 p-3">
                 <div class="is-size-4">Scores</div>
                 <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
-                    <ScoreComponent v-for="score in scores" :key="score.id" :value="(score as Score)"
-                        @remove="removeScore(score.id)"></ScoreComponent>
+                    <ScoreComponent v-for="score in scores" :key="score._links?.self.href" :value="(score as Score)"
+                        @remove="removeScore(score)"></ScoreComponent>
                     <div class="">
                         <button class="button is-primary" @click="addScore">
                             Add
@@ -225,7 +209,7 @@
 
 <script setup lang="ts">
 import ScoreComponent from "@/components/Score.vue"
-import ChordsComponent from "@/components/Chords.vue"
+import ChordsArray from "@/components/ChordsArray.vue";
 import VueMultiselect from 'vue-multiselect'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
@@ -238,7 +222,9 @@ import { useScores } from "@/stores/scoreStore";
 import { useChords } from "@/stores/chordsStore";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
-import { Song, Score, Songbook, Categories, Chords } from "@/types"
+import { Song, Score, Songbook, Categories, Chords, ApiEntity } from "@/types"
+import { isNew } from "@/utils"
+import { isApiEntity } from "@/utils"
 
 type DraftSongbook = Partial<Songbook>
 
@@ -291,7 +277,7 @@ const editor = useEditor({
 })
 
 // Computed
-const isNew = computed(() => !song.value?.id);
+const songIsNew = computed(() => song.value && isNew(song.value))
 const youtubeId = computed(() => song.value?.recordingUrl ? song.value.recordingUrl.split("?v=")[1] : null);
 const subtitle = computed(() => {
     let result = "";
@@ -328,14 +314,13 @@ onMounted(() => {
                     editor.value!.commands.setContent(content)
                 }
             });
-        scoreStore.fetchForSong(songId).then((value) => scores.value = value);
-        chordsStore.fetchForSong(songId).then((value) => chordses.value = value);
+        // scoreStore.fetchForSong(songId).then((value) => scores.value = value);
         const songCategoriesLoaded = categoryStore.getForSong(songId);
         Promise.all([songLoaded, categoriesLoaded, songCategoriesLoaded])
             .then(([, , songCategoryResponse]) => {
                 songCategories.value = {};
-                songCategories.value.season = categories.value.season!.filter(category => songCategoryResponse!.some(songCategory => category._links.self.href === songCategory._links.self.href));
-                songCategories.value.liturgical = categories.value.liturgical!.filter(category => songCategoryResponse!.some(songCategory => category._links.self.href === songCategory._links.self.href));
+                songCategories.value.season = categories.value.season!.filter(category => songCategoryResponse!.some(songCategory => category._links!.self.href === songCategory._links!.self.href));
+                songCategories.value.liturgical = categories.value.liturgical!.filter(category => songCategoryResponse!.some(songCategory => category._links!.self.href === songCategory._links!.self.href));
             })
             .finally(() => loading.value = false);
     }
@@ -353,9 +338,8 @@ const save = async () => {
         return;
     }
     const promise = songStore.save(songDraft as Song);
-    const isNewSong = isNew.value
     promise.then((response) => {
-        if (isNewSong) {
+        if (songIsNew.value) {
             songDraft.id = response.data.id;
         }
         categoryStore.putForSong(response.data.id, draftSongCategories.value.season.concat(draftSongCategories.value.liturgical));
@@ -365,7 +349,7 @@ const save = async () => {
         songCategories.value = draftSongCategories.value;
         draftValues.value = undefined;
         draftSongCategories.value = [];
-        if (isNewSong) {
+        if (songIsNew.value) {
             router.push({
                 name: "Song",
                 params: { id: songDraft.id },
@@ -397,30 +381,16 @@ const cancelEdit = () => {
 
 const addScore = () => {
     let newScore: DraftScore = {
-        song: song.value?._links.self.href
+        song: song.value?._links?.self.href
     };
     scores.value.push(newScore);
 }
 
-const removeScore = (scoreId: number | undefined) => {
-    if (scoreId) {
-        scoreStore.delete(scoreId);
+const removeScore = (score: Score | DraftScore) => {
+    if (isApiEntity(score)) {
+        scoreStore.delete(score);
     }
-    scores.value = scores.value.filter(current => current.id !== scoreId);
-}
-
-const addChords = () => {
-    let newChords: DraftChords = {
-        song: song.value?._links.self.href
-    };
-    chordses.value.push(newChords);
-}
-
-const removeChords = (chordsId: number | undefined) => {
-    if (chordsId) {
-        chordsStore.delete(chordsId);
-    }
-    chordses.value = chordses.value.filter(current => current.id !== chordsId);
+    scores.value = scores.value.filter(current => current._links?.self.href !== score._links?.self.href);
 }
 
 const vSongFocus = (el: HTMLElement, binding: { value: any }) => {
