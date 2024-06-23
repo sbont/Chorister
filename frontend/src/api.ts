@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useAuth } from "@/stores/authStore";
-import { Invite, Song, Score, Category, Setlist, SetlistEntry, Choir, User, WithEmbedded, AcceptInvite, NewChoirRegistration, Chords } from "@/types";
+import { Invite, Song, Score, Category, Setlist, SetlistEntry, Choir, User, WithEmbedded, AcceptInvite, NewChoirRegistration, Chords, ApiEntity } from "@/types";
 
 const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + '/api';
 const auth = useAuth();
@@ -29,10 +29,6 @@ const functions = {
             ]
         }
     },
-
-    // Generic
-
-    delete: (resourceUri: string) => instance.delete(resourceUri),
 
     // Register
 
@@ -147,6 +143,20 @@ const functions = {
     getUser: () => instance.get<User>('user'),
 
     updateUserForId: (id: number, user: any) => instance.patch('users/' + id, user),
+
+    // Generic methods
+
+    getAll: <Persistable extends ApiEntity>(path: string) => instance.get<Array<Persistable>>(path, functions.getGetConfig(path)),
+
+    getAllRelated: <Persistable extends ApiEntity>(uri: string, association: string) => instance.get<Array<Persistable>>(`${uri}/${association}`, functions.getGetConfig(association)),
+
+    getOne: <Persistable extends ApiEntity>(uri: string) => instance.get<Persistable>(uri),
+
+    create: <Persistable extends ApiEntity>(path: string, entity: Persistable) => instance.post<Persistable>(path, entity),
+
+    update: <Persistable extends ApiEntity>(uri: string, entity: Persistable) => instance.put<Persistable>(uri, entity),
+
+    delete: <Persistable extends ApiEntity>(uri: string) => instance.delete(uri),
 
 }
 

@@ -17,6 +17,7 @@ export const useSongs = defineStore('songs', {
             const response = await api.getAllSongs()
             response.data.forEach(this.put);
             this.loading = false
+            return response;
         },
 
         async fetchForSetlist(setlistId: number) {
@@ -37,9 +38,12 @@ export const useSongs = defineStore('songs', {
         },
 
         async get(songId: number) {
+            console.log("getting song with id: " + songId);
             if (!this.songs.has(songId)) {
+                console.log("Fetching...");
                 return await this.fetch(songId);
             } else {
+                console.log("From store");
                 return this.songs.get(songId);
             }
         },
