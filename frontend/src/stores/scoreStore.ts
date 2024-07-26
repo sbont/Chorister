@@ -1,3 +1,3 @@
 import { useEntityStore } from "./entityStore";
 
-export const useScores = useEntityStore('scores', 'scores/');
+export const useScores = useEntityStore('scores', 'scores');

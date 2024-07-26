@@ -4,7 +4,7 @@
     <div>{{ error }}</div>
     <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
       <ChordsComponent v-for="chords in chordses" :key="chords._links?.self.href" :value="(chords as Chords)"
-                       @remove="removeChords(chords)"></ChordsComponent>
+        @remove="removeChords(chords)"></ChordsComponent>
       <div v-if="!draftValues">
         <button class="button is-primary" @click="addChords">
           Add
@@ -13,17 +13,17 @@
       <div v-else>
         <ChordsComponent :value="draftValues" @cancel="cancelAdd" @added="onAdded"></ChordsComponent>
       </div>
-      
+
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import ChordsComponent from "@/components/Chords.vue"
-import {Chords, DraftChords} from "@/types";
-import {onMounted, ref} from "vue";
-import {isNew} from "@/utils";
-import {useChords} from "@/stores/chordsStore";
+import { Chords, DraftChords } from "@/types";
+import { ref } from "vue";
+import { isNew } from "@/utils";
+import { useChords } from "@/stores/chordsStore";
 
 
 const props = defineProps({
@@ -54,6 +54,4 @@ const removeChords = (chords: Chords) => {
 
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -189,26 +189,18 @@
                 </div>
             </div>
 
-            <ChordsArray :song-uri=song?._links?.self.href! />
+            <div v-if="!editing">
+                <ChordsArray :song-uri=song?._links?.self.href! />
 
-            <div class="scores m-2 p-3">
-                <div class="is-size-4">Scores</div>
-                <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
-                    <ScoreComponent v-for="score in scores" :key="score._links?.self.href" :value="(score as Score)"
-                        @remove="removeScore(score)"></ScoreComponent>
-                    <div class="">
-                        <button class="button is-primary" @click="addScore">
-                            Add
-                        </button>
-                    </div>
-                </div>
+                <ScoreArray :song-uri=song?._links?.self.href! />
             </div>
+
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import ScoreComponent from "@/components/Score.vue"
+import ScoreArray from "@/components/ScoreArray.vue"
 import ChordsArray from "@/components/ChordsArray.vue";
 import VueMultiselect from 'vue-multiselect'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
@@ -366,22 +358,8 @@ const cancelEdit = () => {
     draftValues.value = undefined;
     draftSongCategories.value = null;
     editing.value = false;
-    if (!song.value!.id)
+    if (!song.value?.id)
         router.push({ name: "Repertoire" });
-}
-
-const addScore = () => {
-    let newScore: DraftScore = {
-        song: song.value?._links?.self.href
-    };
-    scores.value.push(newScore);
-}
-
-const removeScore = (score: Score | DraftScore) => {
-    if (isApiEntity(score)) {
-        scoreStore.delete(score);
-    }
-    scores.value = scores.value.filter(current => current._links?.self.href !== score._links?.self.href);
 }
 
 const vSongFocus = (el: HTMLElement, binding: { value: any }) => {
