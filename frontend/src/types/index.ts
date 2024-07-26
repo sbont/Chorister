@@ -74,6 +74,10 @@ export interface Score extends ApiEntity {
     key: Key | undefined
 }
 
+export interface DraftScore extends Omit<Partial<Score>, "song"> {
+    song?: string
+}
+
 export interface Chords extends ApiEntity {
     song: Song,
     description: string | undefined,
