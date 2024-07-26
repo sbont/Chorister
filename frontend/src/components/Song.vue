@@ -294,9 +294,10 @@ onMounted(() => {
         const songCategoriesLoaded = categoryStore.getForSong(songId);
         Promise.all([songLoaded, categoriesLoaded, songCategoriesLoaded])
             .then(([, , songCategoryResponse]) => {
-                songCategories.value = {};
-                songCategories.value.season = categories.value.season!.filter(category => songCategoryResponse!.some(songCategory => category._links!.self.href === songCategory._links!.self.href));
-                songCategories.value.liturgical = categories.value.liturgical!.filter(category => songCategoryResponse!.some(songCategory => category._links!.self.href === songCategory._links!.self.href));
+                songCategories.value = {
+                    season: categories.value.season!.filter(category => songCategoryResponse!.some(songCategory => category._links!.self.href === songCategory._links!.self.href)),
+                    liturgical: categories.value.liturgical!.filter(category => songCategoryResponse!.some(songCategory => category._links!.self.href === songCategory._links!.self.href))
+                };
             })
             .finally(() => loading.value = false);
     }
@@ -356,11 +357,6 @@ const cancelEdit = () => {
         router.push({ name: "Repertoire" });
 }
 
-const vSongFocus = (el: HTMLElement, binding: { value: any }) => {
-    if (binding.value) {
-        el.focus();
-    }
-}
 </script>
 
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>

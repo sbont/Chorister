@@ -22,8 +22,8 @@
                     <ChoirMembers :choir="choir" />
                 </div>
 
-                <div class="categories" v-if="activeTab == 'categories'">
-                    hoi
+                <div class="categories" v-if="activeTab == 'categories' && choir">
+                    <Categories :choir="choir" />
                 </div>
 
             </div>
@@ -37,6 +37,7 @@ import api from "./../api.js";
 import { onMounted, ref } from 'vue'
 import moment from "moment";
 import { Choir } from "@/types";
+import Categories from "@/components/Categories.vue";
 
 // state
 const choir = ref<Choir>()

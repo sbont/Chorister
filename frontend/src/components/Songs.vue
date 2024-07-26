@@ -140,16 +140,17 @@ const removeSongFromSetlist = function (song: SetlistSong) {
     loading.value = true;
     deleting.value = true;
     let entryUri = song.setlistEntryUri;
-    api.delete(entryUri)
+    api.deleteByUri(entryUri)
         .then((response) => {
-            console.log("Entry removed: " + entryUri);
             removeSong(song);
         })
         .catch((error) => {
-            console.error(error);
             error.value = "Failed to remove entry";
         })
-        .finally(() => deleting.value = false);
+        .finally(() => {
+            loading.value = false;
+            deleting.value = false;
+        });
 }
 </script>
 
