@@ -154,7 +154,7 @@ const functions = {
 
     create: <Persistable extends ApiEntity>(path: string, entity: Persistable) => instance.post<Persistable>(path, entity),
 
-    update: <Persistable extends ApiEntity>(uri: string, entity: Persistable) => instance.put<Persistable>(uri, entity),
+    update: <Persistable extends ApiEntity>(uri: string, entity: Persistable) => instance.patch<Persistable>(uri, entity),
 
     delete: <Persistable extends ApiEntity>(uri: string) => instance.delete(uri),
 

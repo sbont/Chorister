@@ -13,6 +13,7 @@ class Chords(
     override var song: Song,
     override var description: String?,
     override var key: Key?,
+    @Column(length = 30000)
     var chords: String?,
 ) : Notation(id) {
     companion object
