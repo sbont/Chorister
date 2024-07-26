@@ -15,7 +15,4 @@ interface CategoryRepository: CrudRepository<Category, Long> {
 
     @PostAuthorize("hasPermission(filterObject, 'read')")
     fun findByName(name: String): Category?
-
-    @RestResource(exported = false)
-    fun deleteById(id: Long?)
 }

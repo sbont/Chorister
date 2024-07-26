@@ -51,8 +51,8 @@ export interface AcceptInvite extends Registration {
 
 
 export interface Categories {
-    season?: Array<Category> | undefined,
-    liturgical?: Array<Category> | undefined
+    season: Array<Category>,
+    liturgical: Array<Category>
 }
 
 export interface Category extends Identifiable {
@@ -62,7 +62,7 @@ export interface Category extends Identifiable {
     type: CategoryType
 }
 
-enum CategoryType {
+export enum CategoryType {
     Season = "SEASON",
     Liturgical = "LITURGICAL_MOMENT"
 }

@@ -62,35 +62,13 @@ const functions = {
 
     deleteSongForId: (id: number) => instance.delete('songs/' + id),
 
-    // Scores
-
-    getScoreById: (scoreId: number) => instance.get<Score>('scores/' + scoreId),
-
-    getScoresBySongId: (songId: number) => instance.get<Array<Score>>('songs/' + songId + '/scores', functions.getGetConfig('scores')),
-
-    createNewScore: (score: any) => instance.post('scores', score),
-
-    updateScoreForId: (id: number, score: any) => instance.put('scores/' + id, score),
-
-    deleteScoreForId: (id: number) => instance.delete('scores/' + id),
-
-    // Scores
-
-    getChordsById: (scoreId: number) => instance.get<Chords>('chords/' + scoreId),
-
-    getChordsesBySongId: (songId: number) => instance.get<Array<Chords>>('songs/' + songId + '/chords', functions.getGetConfig('chords')),
-
-    createNewChords: (score: any) => instance.post('chords', score),
-
-    updateChordsForId: (id: number, score: any) => instance.put('chords/' + id, score),
-
-    deleteChordsForId: (id: number) => instance.delete('chords/' + id),
-
     // Categories
 
     getCategoryById: (id: number) => instance.get<Category>('categories/' + id),
 
     getAllCategories: () => instance.get<Array<Category>>('categories', functions.getGetConfig('categories')),
+    
+    createNewCategory: (category: Category) => instance.post<Category>('categories', category),
 
     // Song categories
 
@@ -156,7 +134,9 @@ const functions = {
 
     update: <Persistable extends ApiEntity>(uri: string, entity: Persistable) => instance.patch<Persistable>(uri, entity),
 
-    delete: <Persistable extends ApiEntity>(uri: string) => instance.delete(uri),
+    deleteByUri: (uri: string) => instance.delete(uri),
+    
+    delete: <Persistable extends ApiEntity>(entity: Persistable) => entity._links?.self.href ? instance.delete(entity._links?.self.href) : Promise.resolve(),
 
 }
 
