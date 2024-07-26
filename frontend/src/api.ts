@@ -58,7 +58,7 @@ const functions = {
 
     createNewSong: (song: any) => instance.post<Song>('songs', song),
 
-    updateSongForId: (id: number, song: any) => instance.put<Song>('songs/' + id, song),
+    updateSongForId: (id: number, song: any) => instance.patch<Song>('songs/' + id, song),
 
     deleteSongForId: (id: number) => instance.delete('songs/' + id),
 

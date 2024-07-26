@@ -15,7 +15,6 @@
                 <th class="col3">Composer</th>
                 <th class="col4">Songbook</th>
                 <th class="col5">No.</th>
-                <th class="col6"># Scores</th>
                 <th class="col7">Last Played</th>
                 <th class="category-col">Categories</th>
                 <th v-if="!!setlistId"></th>
@@ -29,7 +28,6 @@
                     <td>{{ song.composer }}</td>
                     <td>{{ (song.songbook || {}).title }}</td>
                     <td>{{ song.songbookNumber }}</td>
-                    <td>{{ song.scores.length }}</td>
                     <td>{{ song.lastSetlist?.date }}</td>
                     <td class="category-col">
                         <div class="tags">
