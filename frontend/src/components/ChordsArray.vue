@@ -1,5 +1,5 @@
 <template>
-  <div class="scores m-2 p-3">
+  <div class="m-2 p-3">
     <div class="is-size-4">Chords</div>
     <div>{{ error }}</div>
     <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
