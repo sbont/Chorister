@@ -610,13 +610,6 @@ databaseChangeLog:
         baseTableName: score
         constraintName: FK59e4hijvjq6p1nb5708rgiyd4
 - changeSet:
-    id: 1714734695027-8
-    author: Steven.Bontenbal (generated)
-    changes:
-    - dropForeignKeyConstraint:
-        baseTableName: score
-        constraintName: FKpqnmr7ihuxh43giujf3pnr79o
-- changeSet:
     id: 1714734695027-9
     author: Steven.Bontenbal (generated)
     changes:
