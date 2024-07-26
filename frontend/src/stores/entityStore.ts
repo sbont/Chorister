@@ -72,7 +72,7 @@ export const useEntityStore = (name: string, endpoint: string) => defineStore(na
         },
         async delete(obj: ApiEntity) {
             const uri = obj._links?.self.href!
-            await api.delete(uri)
+            await api.delete(obj)
             this.objByUri.delete(uri)
             this.objByRelatedUri.remove(obj)
         }

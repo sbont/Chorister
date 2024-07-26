@@ -30,7 +30,7 @@ class Song(
     var addedAt: LocalDateTime = LocalDateTime.now(),
     @ManyToOne(fetch = FetchType.EAGER)
     var addedBy: User?,
-    @ManyToMany
+    @ManyToMany(cascade = [CascadeType.REMOVE])
     @JoinTable(
         name = "SONG_CATEGORY",
         joinColumns = [JoinColumn(name = "SONG_ID")],
