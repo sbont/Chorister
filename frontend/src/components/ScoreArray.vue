@@ -18,11 +18,11 @@
 </template>
 
 <script setup lang="ts">
-import ScoreComponent from "./../components/Score.vue"
-import { Score, DraftScore } from "./../types";
+import ScoreComponent from "@/components/Score.vue"
+import { Score, DraftScore } from "@/types";
 import { ref } from "vue";
-import { isNew } from "./../utils";
-import { useScores } from "./../stores/scoreStore";
+import { isNew } from "@/utils";
+import { useScores } from "@/stores/scoreStore";
 
 
 const props = defineProps({

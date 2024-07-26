@@ -223,13 +223,8 @@ interface DraftSong extends Omit<Partial<Song>, "songbook"> {
     songbook?: DraftSongbook
 }
 
-interface DraftScore extends Omit<Partial<Score>, "song"> {
-    song?: string
-}
-
 const songStore = useSongs();
 const categoryStore = useCategories();
-const scoreStore = useScores();
 const route = useRoute();
 const router = useRouter()
 
@@ -237,7 +232,6 @@ const router = useRouter()
 const { categories } = storeToRefs(categoryStore);
 const song = ref<Song>()
 const songCategories = ref<Categories>();
-const scores = ref<Array<Score | DraftScore>>([]);
 const editing = ref(false);
 const draftValues = ref<DraftSong>();
 const draftSongCategories = ref();
