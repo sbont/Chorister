@@ -61,20 +61,18 @@
 <script setup lang="ts">
 import { PropType, computed, onMounted, ref } from 'vue'
 import { useScores } from "@/stores/scoreStore";
-import { useRoute, useRouter } from "vue-router";
-import { Score } from "@/types";
+import { ApiEntity, Score, DraftScore } from "@/types";
+import { isNew } from "@/utils";
 
 const props = defineProps({
     value: {
-        type: Object as PropType<Score>,
+        type: Object as PropType<Score | DraftScore>,
         required: true            
     }
 })
-const emit = defineEmits(["remove"])
+const emit = defineEmits(["remove", "cancel", "added"])
 
 const scoreStore = useScores();
-const route = useRoute();
-const router = useRouter()
 
 // state
 const score = ref(props.value);
@@ -84,11 +82,10 @@ const saving = ref(false);
 const error = ref(null);
 
 // Computed
-const isNew = computed(() => !score.value.id);
 const previewUrl = computed(() => score.value.fileUrl?.replace("/view", "/preview"));
 
 onMounted(() => {
-    if (!score.value.id) {
+    if (isNew(score.value)) {
         draftValues.value = score.value;
         editing.value = true;
     }
@@ -103,16 +100,18 @@ const edit = () => {
 const save = () => {
     score.value = draftValues.value;
     editing.value = false;
-    console.log(score.value);
-    scoreStore.saveToServer(score.value)
+    saving.value = true;
+    scoreStore.saveToServer(<ApiEntity>score.value)
+    .then(newChords => {
+        emit("added", newChords)
+    })
+    .finally(() => saving.value = false)
 }
 
 const cancelEdit = () => {
     editing.value = false;
     draftValues.value = null;
-    if(!score.value.id) {
-        emit("remove");
-    }
+    emit("cancel")
 }
 </script>
 

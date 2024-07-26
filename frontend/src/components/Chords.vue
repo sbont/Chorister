@@ -64,10 +64,9 @@
     </div>
 </template>
 <script setup lang="ts">
-import { PropType, onMounted, ref } from 'vue'
+import { PropType, ref } from 'vue'
 import { Key, KeyLabelMapping } from "@/types/Key";
 import { useChords } from "@/stores/chordsStore";
-import { useRoute, useRouter } from "vue-router";
 import { ApiEntity, Chords, DraftChords } from "@/types";
 import { isNew } from "@/utils";
 import { useEditor, EditorContent } from '@tiptap/vue-3'
@@ -84,8 +83,6 @@ const props = defineProps({
 const emit = defineEmits(["remove", "cancel", "added"])
 
 const chordsStore = useChords();
-const route = useRoute();
-const router = useRouter()
 const keyLabelMapping = KeyLabelMapping
 const editor = useEditor({
     content: null,
