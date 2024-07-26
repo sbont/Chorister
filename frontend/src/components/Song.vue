@@ -219,7 +219,6 @@ import { required } from '@vuelidate/validators';
 import { useSongs } from "@/stores/songStore";
 import { useCategories } from "@/stores/categoryStore";
 import { useScores } from "@/stores/scoreStore";
-import { useChords } from "@/stores/chordsStore";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 import { Song, Score, Songbook, Categories, Chords, ApiEntity } from "@/types"
@@ -236,13 +235,8 @@ interface DraftScore extends Omit<Partial<Score>, "song"> {
     song?: string
 }
 
-interface DraftChords extends Omit<Partial<Chords>, "song"> {
-    song?: string
-}
-
 const songStore = useSongs();
 const categoryStore = useCategories();
-const chordsStore = useChords();
 const scoreStore = useScores();
 const route = useRoute();
 const router = useRouter()
@@ -252,7 +246,6 @@ const { categories } = storeToRefs(categoryStore);
 const song = ref<Song>()
 const songCategories = ref<Categories>();
 const scores = ref<Array<Score | DraftScore>>([]);
-const chordses = ref<Array<Chords | DraftChords>>([]);
 const editing = ref(false);
 const draftValues = ref<DraftSong>();
 const draftSongCategories = ref();
@@ -310,11 +303,8 @@ onMounted(() => {
             .then((value) => {
                 if (value) {
                     song.value = value;
-                    const content = value.text;
-                    editor.value!.commands.setContent(content)
                 }
             });
-        // scoreStore.fetchForSong(songId).then((value) => scores.value = value);
         const songCategoriesLoaded = categoryStore.getForSong(songId);
         Promise.all([songLoaded, categoriesLoaded, songCategoriesLoaded])
             .then(([, , songCategoryResponse]) => {
@@ -366,6 +356,7 @@ const remove = () =>
 
 const edit = () => {
     draftValues.value = structuredClone(toRaw(song.value as DraftSong))
+    editor.value!.commands.setContent(draftValues.value.text ?? "")
     draftValues.value.songbook ??= {}
     draftSongCategories.value = Object.assign({}, songCategories.value);
     editing.value = true;

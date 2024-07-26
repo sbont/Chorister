@@ -568,7 +568,7 @@ databaseChangeLog:
             type: VARCHAR(255)
         - column:
             name: chords
-            type: VARCHAR(255)
+            type: VARCHAR(30000)
         - column:
             name: choir_id
             type: BIGINT
