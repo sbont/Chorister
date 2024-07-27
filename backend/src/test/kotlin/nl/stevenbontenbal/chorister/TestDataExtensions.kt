@@ -4,6 +4,7 @@ import nl.stevenbontenbal.chorister.model.entities.*
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import java.time.LocalDate
 import java.util.*
+import kotlin.collections.List
 
 fun Song.Companion.create(choir: Choir): Song {
     return Song(
@@ -19,12 +20,17 @@ fun Song.Companion.create(choir: Choir): Song {
     )
 }
 
-fun Setlist.Companion.create(choir: Choir): Setlist {
+fun Setlist.Companion.create(choir: Choir, id: Long? = null): Setlist {
     return Setlist(
+        id = id,
         choir = choir,
         name = "Christmas Morning",
         date = LocalDate.of(2022, 12, 25),
     )
+}
+
+fun Setlist.Companion.create(choir: Choir, entityManager: TestEntityManager): Setlist {
+    return Setlist.create(choir).persist(entityManager)
 }
 
 fun Category.Companion.create(choir: Choir, categoryType: CategoryType): Category {
@@ -60,12 +66,16 @@ fun Invite.Companion.create(choir: Choir): Invite {
     )
 }
 
-fun SetlistEntry.Companion.create(setlist: Setlist, song: Song): SetlistEntry {
+fun SetlistEntry.Companion.create(setlist: Setlist, song: Song, number: Int = 1): SetlistEntry {
     return SetlistEntry(
         setlist = setlist,
         song = song,
-        number = 1
+        number = number
     )
+}
+
+fun SetlistEntry.Companion.create(setlist: Setlist, songs: List<Song>): List<SetlistEntry> {
+    return songs.mapIndexed { index, song -> SetlistEntry.create(setlist, song, index + 1) }
 }
 
 fun <T> T.persist(entityManager: TestEntityManager): T {
