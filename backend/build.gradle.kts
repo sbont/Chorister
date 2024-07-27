@@ -69,7 +69,7 @@ dependencies {
 	liquibaseRuntime("org.liquibase:liquibase-groovy-dsl:3.0.3")
 	liquibaseRuntime("org.liquibase.ext:liquibase-hibernate6:4.23.0")
 	liquibaseRuntime("info.picocli:picocli:4.7.3")
-	liquibaseRuntime("org.postgresql:postgresql:42.5.4")
+	liquibaseRuntime("org.postgresql:postgresql:42.7.2")
 	liquibaseRuntime("org.springframework.boot:spring-boot-starter-data-jpa")
 	liquibaseRuntime(sourceSets.getByName("main").output)
 	liquibaseRuntime(files("src/main"))
