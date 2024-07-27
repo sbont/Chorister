@@ -21,12 +21,12 @@ class SetlistEntryRepositoryTests @Autowired constructor(
     fun `When findBySetlistId then return all setlist's entries`() {
         // Arrange
         val choir = Choir.create().persist(entityManager)
-        val setlist = Setlist.create(choir).persist(entityManager)
+        val setlist = Setlist.create(choir, entityManager)
         val song1 = Song.create(choir).persist(entityManager)
         val song2 = Song.create(choir).persist(entityManager)
-        val song3 = Song.create(choir).persist(entityManager)
-        val entry1 = SetlistEntry.create(setlist, song1).persist(entityManager)
-        val entry2 = SetlistEntry.create(setlist, song2).persist(entityManager)
+        Song.create(choir).persist(entityManager)
+        SetlistEntry.create(setlist, song1).persist(entityManager)
+        SetlistEntry.create(setlist, song2).persist(entityManager)
         // Act
         val setlists = setlistEntryRepository.findBySetlistId(setlistId = setlist.id!!)
         // Assert
