@@ -35,7 +35,7 @@
 				</router-link>
 			</li>
 			<li v-for="(setlist) in allSetlists" :key="setlist.id" class="droppable"
-				@drop="dropSong($event, setlist._links.self.href)" @dragover.prevent @dragenter.prevent>
+				@drop="dropSong($event, setlist._links!.self.href)" @dragover.prevent @dragenter.prevent>
 				<router-link :to="{ name: 'Setlist', params: { id: setlist.id } }" append>{{ setlist.name }}</router-link>
 			</li>
 		</ul>
@@ -67,7 +67,7 @@ onMounted(() => {
 // Methods
 const dropSong = (event: DragEvent, setlistUri: string) => {
 	let songUri = event.dataTransfer?.getData("text");
-	let entry = { setlist: setlistUri, song: songUri }
-	api.postSetlistEntry(entry);
+    if (songUri)
+        setlistStore.addSetlistEntry(setlistUri, songUri)
 }
 </script>

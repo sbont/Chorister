@@ -1,15 +1,12 @@
 <template>
     <div class="p-2">
-        <!-- <div class="is-flex is-justify-content-space-between">
-            <h1 class="title">Repertoire</h1>
-            <router-link class="button is-primary" to="song/new" append tag="button">Add +</router-link>
-        </div> -->
         <progress v-if="loading" class="progress is-medium is-info" max="100"></progress>
         <div v-if="error" class="error" @click="handleErrorClick">
             ERROR: {{ error }}
         </div>
         <table class="table is-hoverable is-fullwidth song-table" v-if="!loading" v-cloak>
             <thead>
+            <tr>
                 <th class="col1" title="number"></th>
                 <th class="col2">Title</th>
                 <th class="col3">Composer</th>
@@ -17,7 +14,7 @@
                 <th class="col5">No.</th>
                 <th class="col7">Last Played</th>
                 <th class="category-col">Categories</th>
-                <th v-if="!!setlistId"></th>
+            </tr>
             </thead>
             <tbody>
                 <tr v-for="(song, index) in songs" class="song" :key="song.id" draggable="true"
@@ -36,14 +33,6 @@
                                 {{ category.name }}
                             </span>
                         </div>
-                    </td>
-                    <td v-if="!!setlistId" class="p-1b">
-                        <button class="button is-danger is-inverted is-small" :class="{ 'is-loading': deleting }"
-                            @click="removeSongFromSetlist(song as SetlistSong)">
-                            <span class="icon is-small">
-                                <i class="fas fa-times"></i>
-                            </span>
-                        </button>
                     </td>
                 </tr>
             </tbody>
@@ -66,9 +55,6 @@ import { SetlistEntry, Song, User, WithEmbedded } from "@/types";
 // Types
 
 type DraftSong = Partial<Song>
-interface SetlistSong extends Song {
-    setlistEntryUri: string
-}
 
 const emit = defineEmits(["remove"])
 
@@ -94,11 +80,6 @@ const pluralize = function (n: number) {
 
 const loadSongs = function () {
     const sorter = (data: Array<Song>) => data.sort((songA, songB) => songA.title.localeCompare(songB.title));
-    const setlistExtractor = (entries: Array<SetlistEntry & WithEmbedded<"song", Song>>) => {
-        let sorted = entries.sort((entryA, entryB) => entryA.number - entryB.number);
-        return sorted.map(entry => Object.assign(entry._embedded.song, { setlistEntryUri: entry?._links?.self.href })) as Array<SetlistSong>;
-    }
-
     const routeName = route.name;
     let id = Number(route.params.id);
     let songsLoaded;
@@ -110,17 +91,8 @@ const loadSongs = function () {
         case 'CategoryLiturgical':
             songsLoaded = api.getSongsByCategoryId(id).then(response => songs.value = sorter(response.data));
             break;
-        case 'Setlist':
-            setlistId.value = id;
-            songsLoaded = api.getSetlistEntries(id).then(response => songs.value = setlistExtractor(response.data));
-            break;
     }
     songsLoaded!.finally(() => (loading.value = false));
-}
-
-const removeSong = function (song: Song) {
-    // notice NOT using "=>" syntax
-    songs.value.splice(songs.value.indexOf(song), 1);
 }
 
 const handleErrorClick = function () {
@@ -136,22 +108,6 @@ const startDrag = function (event: DragEvent, song: Song) {
     }
 }
 
-const removeSongFromSetlist = function (song: SetlistSong) {
-    loading.value = true;
-    deleting.value = true;
-    let entryUri = song.setlistEntryUri;
-    api.deleteByUri(entryUri)
-        .then((response) => {
-            removeSong(song);
-        })
-        .catch((error) => {
-            error.value = "Failed to remove entry";
-        })
-        .finally(() => {
-            loading.value = false;
-            deleting.value = false;
-        });
-}
 </script>
 
 <style>
