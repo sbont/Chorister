@@ -122,7 +122,7 @@ const cancelEdit = () => {
 .score {
     max-width: 20rem;
 }
-.card-content-editing {
-    height: 249px;
+.textarea:not([rows]) {
+    max-height: initial;
 }
 </style>
