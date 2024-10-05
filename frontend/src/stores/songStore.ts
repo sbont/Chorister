@@ -65,10 +65,6 @@ export const useSongs = defineStore('songs', {
             this.songsBySetlistId.set(setlistId, songs)
         },
 
-        removeSetlist(song: Song, setlistId: number) {
-            api.deleteSetlistEntry
-        },
-
         save(song: Song) {
             const savePromise = this.saveToServer(song);
             savePromise.then(response => this.songs.set(response.data.id, response.data));
