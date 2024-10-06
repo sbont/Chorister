@@ -9,24 +9,23 @@
 </template>
 
 <script setup lang="ts">
-import { useSongs } from "@/stores/songStore";
 import { useRoute } from "vue-router";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { Song } from "@/types";
+import { useSetlists } from "@/stores/setlistStore";
 
-const songStore = useSongs();
+const setlistStore = useSetlists();
 const route = useRoute();
 
 // state
-const text = ref("")
 const songs = ref<Array<Song>>([])
-
-onMounted(() => {
-    const setlistId = Number(route.params.id);
-    songStore
-        .getForSetlist(setlistId)
-        .then(result => songs.value = result)
-})
+const setlistId = Number(route.params.id);
+setlistStore
+    .fetchEntries(setlistId)
+    .then(result => {
+        console.log(result)
+        songs.value = result.map(e => e._embedded.song)
+    })
 
 </script>
 

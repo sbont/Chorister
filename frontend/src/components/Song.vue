@@ -26,8 +26,8 @@
                                 <div class="field" v-bind:class="{ static: !editing }">
                                     <div class="control">
                                         <input v-if="editing && draftValues" v-model="draftValues.title" class="input"
-                                            :class="{ 'is-danger': v$.title.$error }" type="text"
-                                            placeholder="The name of the song or hymn" @blur="v$.title.$touch" />
+                                               :class="{ 'is-danger': v$.title.$error }" type="text"
+                                               placeholder="The name of the song or hymn" @blur="v$.title.$touch"/>
                                         <span v-else>
                                             {{ song?.title }}
                                         </span>
@@ -43,7 +43,7 @@
                                 <div class="field" v-bind:class="{ static: !editing }">
                                     <div class="control">
                                         <input v-if="editing && draftValues" v-model="draftValues.composer"
-                                            class="input" type="text" placeholder="Artist / composer / writer" />
+                                               class="input" type="text" placeholder="Artist / composer / writer"/>
                                         <span v-else>
                                             {{ song?.composer }}
                                         </span>
@@ -60,8 +60,8 @@
                                     <div class="field" v-bind:class="{ static: !editing }">
                                         <div class="control">
                                             <input v-if="editing && draftValues" v-model="draftValues.songbook!.title"
-                                                class="input" type="text"
-                                                placeholder="Songbook, hymnal or collection title" />
+                                                   class="input" type="text"
+                                                   placeholder="Songbook, hymnal or collection title"/>
                                             <span v-else>
                                                 {{ song?.songbook?.title }}
                                             </span>
@@ -77,8 +77,9 @@
                                             <div class="field" v-bind:class="{ static: !editing, }">
                                                 <div class="control">
                                                     <input v-if="editing && draftValues"
-                                                        v-model="draftValues.songbookNumber" class="input" type="text"
-                                                        placeholder="Song number in the book" />
+                                                           v-model="draftValues.songbookNumber" class="input"
+                                                           type="text"
+                                                           placeholder="Song number in the book"/>
                                                     <span v-else>{{ song?.songbookNumber }}</span>
                                                 </div>
                                             </div>
@@ -96,12 +97,13 @@
                                     <div class="control">
                                         <div class="select is-multiple">
                                             <VueMultiselect v-if="editing" v-model="draftSongCategories.season"
-                                                :multiple="true" :options="categories.season" track-by="name"
-                                                label="name" :close-on-select="false"></VueMultiselect>
+                                                            :multiple="true" :options="categories.season"
+                                                            track-by="name"
+                                                            label="name" :close-on-select="false"></VueMultiselect>
 
                                             <div v-else class="tags are-medium">
                                                 <span v-for="(category) in songCategories?.season" :key="category.id"
-                                                    class="tag">
+                                                      class="tag">
                                                     {{ category.name }}
                                                 </span>
                                             </div>
@@ -119,12 +121,13 @@
                                     <div class="control">
                                         <div class="select is-multiple">
                                             <VueMultiselect v-if="editing" v-model="draftSongCategories.liturgical"
-                                                :multiple="true" :options="categories.liturgical" track-by="name"
-                                                label="name" :close-on-select="false"></VueMultiselect>
+                                                            :multiple="true" :options="categories.liturgical"
+                                                            track-by="name"
+                                                            label="name" :close-on-select="false"></VueMultiselect>
 
                                             <div v-else class="tags are-medium">
                                                 <span v-for="(category) in songCategories?.liturgical"
-                                                    :key="category.id" class="tag">
+                                                      :key="category.id" class="tag">
                                                     {{ category.name }}
                                                 </span>
                                             </div>
@@ -148,7 +151,7 @@
                         </p>
                         <p v-if="editing" class="control">
                             <button @click="save" class="button is-link"
-                                :class="{ 'is-loading': saving, 'is-static': v$.$errors.length }">
+                                    :class="{ 'is-loading': saving, 'is-static': v$.$errors.length }">
                                 Save changes
                             </button>
                         </p>
@@ -173,7 +176,7 @@
                             <div class="field" v-bind:class="{ static: !editing }">
                                 <div class="control" v-if="editing && draftValues">
                                     <input v-model="draftValues.recordingUrl" class="input" type="url"
-                                        placeholder="https://www.youtube.com/watch?v=..." />
+                                           placeholder="https://www.youtube.com/watch?v=..."/>
                                 </div>
                             </div>
                         </div>
@@ -183,16 +186,16 @@
                         <div class="is-size-4">Text</div>
                         <div v-if="!editing" v-html="song?.text"></div>
                         <div v-else>
-                            <editor-content :editor="editor" />
+                            <editor-content :editor="editor"/>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div v-if="!editing">
-                <ChordsArray :song-uri=song?._links?.self.href! />
+                <ChordsArray :song-uri=song?._links?.self.href!/>
 
-                <ScoreArray :song-uri=song?._links?.self.href! />
+                <ScoreArray :song-uri=song?._links?.self.href!/>
             </div>
 
         </div>
@@ -229,7 +232,7 @@ const route = useRoute();
 const router = useRouter()
 
 // State
-const { categories } = storeToRefs(categoryStore);
+const {categories} = storeToRefs(categoryStore);
 const song = ref<Song>()
 const songCategories = ref<Categories>();
 const editing = ref(false);
@@ -239,7 +242,7 @@ const loading = ref(true);
 const saving = ref(false);
 const error = ref(null);
 const rules = {
-    title: { required },
+    title: {required},
 }
 const v$ = useVuelidate<DraftSong>(rules, draftValues as DraftSong)
 const editor = useEditor({
@@ -329,7 +332,7 @@ const save = async () => {
         if (songIsNew.value) {
             router.push({
                 name: "Song",
-                params: { id: songDraft.id },
+                params: {id: songDraft.id},
             });
         }
     })
@@ -338,7 +341,7 @@ const save = async () => {
 const remove = () =>
     songStore.delete(song.value!.id)
         .then((response) => {
-            router.push({ name: "Repertoire" });
+            router.push({name: "Repertoire"});
         });
 
 const edit = () => {
@@ -354,7 +357,7 @@ const cancelEdit = () => {
     draftSongCategories.value = null;
     editing.value = false;
     if (!song.value?.id)
-        router.push({ name: "Repertoire" });
+        router.push({name: "Repertoire"});
 }
 
 </script>

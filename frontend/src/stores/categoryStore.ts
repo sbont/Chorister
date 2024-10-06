@@ -1,7 +1,7 @@
-import {defineStore} from "pinia";
+import { defineStore } from "pinia";
 import api from "././../api.js";
-import {Categories, Category, CategoryType} from '@/types'
-import {CacheListMap} from "@/types/CacheMaps";
+import { Categories, Category, CategoryType } from '@/types'
+import { CacheListMap } from "@/types/CacheMaps";
 
 export type CategoriesState = {
     categories: Categories
@@ -55,7 +55,7 @@ export const useCategories = defineStore('categories', {
             this.categoriesBySongId.addAllTo(songId, newCategories)
             this.categoriesBySongId.removeAllFrom(songId, deletedCategories)
         },
-        
+
         async saveToServer(category: Category) {
             await api.createNewCategory(category);
             if (category.type == CategoryType.Season) {
@@ -64,7 +64,7 @@ export const useCategories = defineStore('categories', {
                 this.categories.liturgical.push(category);
             }
         },
-        
+
         async delete(category: Category) {
             await api.delete(category)
         }

@@ -5,15 +5,16 @@
             <div class="columns p-3">
                 <div class="column is-3">
                     <h4 class="title is-5">by time of the year</h4>
-                    <CategoriesByType :categories="categoryStore.categories.season" :category-type="CategoryType.Season" @save="onSave" @remove="onDelete" />
+                    <CategoriesByType :categories="categoryStore.categories.season" :category-type="CategoryType.Season"
+                                      @save="onSave" @remove="onDelete"/>
                 </div>
                 <div class="column is-3">
                     <h4 class="title is-5">by liturgical moment</h4>
-                    <CategoriesByType :categories="categoryStore.categories.liturgical" :category-type="CategoryType.Liturgical" @save="onSave" @remove="onDelete" />
+                    <CategoriesByType :categories="categoryStore.categories.liturgical"
+                                      :category-type="CategoryType.Liturgical" @save="onSave" @remove="onDelete"/>
                 </div>
             </div>
             <div class="p-3">
-                
 
 
             </div>
@@ -26,7 +27,7 @@
 import { ref } from 'vue'
 import { Choir, Category, CategoryType } from "@/types"
 import { PropType } from "vue";
-import {useCategories} from "@/stores/categoryStore";
+import { useCategories } from "@/stores/categoryStore";
 import CategoriesByType from "@/components/CategoriesByType.vue";
 
 const props = defineProps({

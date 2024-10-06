@@ -1,7 +1,7 @@
-import {defineStore} from "pinia";
+import { defineStore } from "pinia";
 import api from "../api.js";
-import {CacheListMap, CacheMap} from "@/types/CacheMaps.js";
-import {ApiEntity} from "@/types/index.js";
+import { CacheListMap, CacheMap } from "@/types/CacheMaps.js";
+import { ApiEntity } from "@/types/index.js";
 
 export const useEntityStore = (name: string, endpoint: string) => defineStore(name, {
     state: () => ({

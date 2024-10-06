@@ -28,7 +28,7 @@
                 <td v-else>
                     <div class="field">
                         <div class="control">
-                            <input class="input" type="text" v-model="draftValue" />
+                            <input class="input" type="text" v-model="draftValue"/>
                         </div>
                     </div>
                 </td>
@@ -49,8 +49,8 @@
 </template>
 
 <script setup lang="ts">
-import {PropType, ref} from "vue";
-import {Category, CategoryType} from "@/types";
+import { PropType, ref } from "vue";
+import { Category, CategoryType } from "@/types";
 
 const props = defineProps({
     categories: {

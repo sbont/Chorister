@@ -14,14 +14,15 @@
                     <div class="field">
                         <label class="label">Name</label>
                         <div class="control">
-                            <input class="input" type="text" v-if="draftValues" v-model="draftValues.displayName" />
+                            <input class="input" type="text" v-if="draftValues" v-model="draftValues.displayName"/>
                         </div>
                     </div>
 
                     <div class="field">
                         <label class="label">Email</label>
                         <div class="control has-icons-left">
-                            <input class="input" type="email" placeholder="you@" v-if="draftValues" v-model="draftValues.email" />
+                            <input class="input" type="email" placeholder="you@" v-if="draftValues"
+                                   v-model="draftValues.email"/>
                             <span class="icon is-small is-left">
                                 <i class="fas fa-envelope"></i>
                             </span>
@@ -46,7 +47,7 @@ import { computed, onMounted, ref } from "vue";
 
 const auth = useAuth();
 const userStore = useUsers();
-const { user: authUser } = storeToRefs(auth);
+const {user: authUser} = storeToRefs(auth);
 
 // State
 const user = ref<User>()

@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { User, UserManager, WebStorageStateStore } from 'oidc-client'
 
 const settings = {
-    userStore: new WebStorageStateStore({ store: window.localStorage }),
+    userStore: new WebStorageStateStore({store: window.localStorage}),
     authority: import.meta.env.VITE_APP_AUTHORITY_URL,
     client_id: import.meta.env.VITE_APP_CHORISTER_WEB_CLIENT_ID,
     response_type: 'code',
@@ -29,11 +29,11 @@ export const useAuth = defineStore('auth', {
             userManager.getUser().then(user => this.user = user);
         },
 
-        login () {
+        login() {
             return userManager.signinRedirect();
         },
 
-        logout () {
+        logout() {
             userManager.signoutRedirect()
                 .then(() => {
                     console.log('User logged out')
@@ -41,11 +41,11 @@ export const useAuth = defineStore('auth', {
                 .catch(error => console.log(error))
         },
 
-        handleLoginRedirect () {
+        handleLoginRedirect() {
             return userManager.signinRedirectCallback().then((user) => this.user = user);
         },
 
-        handleLogoutRedirect () {
+        handleLogoutRedirect() {
             return userManager.signoutRedirectCallback().then(() => this.user = null);
         },
 
@@ -59,11 +59,11 @@ export const useAuth = defineStore('auth', {
             })
         },
 
-        getAccessToken () {
+        getAccessToken() {
             return new Promise((resolve, reject) => {
                 userManager.getUser()
                     .then(user => {
-                        if(user) {
+                        if (user) {
                             console.log('Got access token from user')
                             resolve(user.access_token)
                         } else {
@@ -74,7 +74,7 @@ export const useAuth = defineStore('auth', {
             })
         },
 
-        removeSession () {
+        removeSession() {
             this.user = null
             return userManager.signinRedirect();
         },

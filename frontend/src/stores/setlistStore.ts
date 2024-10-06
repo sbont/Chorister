@@ -1,8 +1,8 @@
-import {defineStore} from "pinia";
+import { defineStore } from "pinia";
 import api from "../api";
-import {CacheListMap, CacheMap} from "@/types/CacheMaps";
-import {Setlist, SetlistEntry, Song, WithEmbedded} from "@/types";
-import {useSongs} from "@/stores/songStore";
+import { CacheListMap, CacheMap } from "@/types/CacheMaps";
+import { Setlist, SetlistEntry, Song, WithEmbedded } from "@/types";
+import { useSongs } from "@/stores/songStore";
 
 export const useSetlists = defineStore('setlists', {
     state: () => ({
@@ -46,6 +46,7 @@ export const useSetlists = defineStore('setlists', {
             });
             this.entriesBySetlistId.set(setlistId, response.data)
             this.sortEntries(setlistId)
+            this.loading = false
             return this.entriesBySetlistId.getOrEmpty(setlistId)
         },
 
@@ -61,7 +62,7 @@ export const useSetlists = defineStore('setlists', {
             let entries = this.entriesBySetlistId.get(setlistId)
             console.log(entries);
             if (!entries) return;
-            
+
             let originalIndex = entryNumber - 1
             let original = entries[originalIndex]
             let newIndex = originalIndex + direction;
@@ -75,7 +76,7 @@ export const useSetlists = defineStore('setlists', {
             original.number = newIndex + 1
             swapped.number = originalIndex + 1
             this.sortEntries(setlistId)
-            
+
             let saveFirst = this.saveEntryToServer(original);
             let saveSecond = this.saveEntryToServer(swapped);
             Promise.all([saveFirst, saveSecond]).catch(error => {
@@ -106,12 +107,12 @@ export const useSetlists = defineStore('setlists', {
                 return api.createNewSetlist(setlist);
             }
         },
-        
+
         async addSetlistEntry(setlistUri: string, songUri: string) {
-            let entry = { setlist: setlistUri, song: songUri }
+            let entry = {setlist: setlistUri, song: songUri}
             await api.postSetlistEntry(entry);
         },
-        
+
         async saveEntryToServer(entry: SetlistEntry) {
             if (entry.id) {
                 return api.update(entry._links!.self.href, entry);
@@ -119,7 +120,7 @@ export const useSetlists = defineStore('setlists', {
                 return api.postSetlistEntry(entry);
             }
         },
-        
+
         async remove(setlistId: number) {
             return api.deleteSetlistForId(setlistId)
                 .then((_) => this.setlists.delete(setlistId));
