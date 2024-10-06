@@ -27,18 +27,19 @@
                                     <i class="fas fa-caret-up"></i>
                                 </div>
 
-                                <div class="icon is-small" @click.prevent="moveDown(entry)" :class="{ 'is-disabled': isLast(entry) }">
+                                <div class="icon is-small" @click.prevent="moveDown(entry)"
+                                     :class="{ 'is-disabled': isLast(entry) }">
                                     <i class="fas fa-caret-down"></i>
                                 </div>
                             </div>
                         </td>
                         <td>{{ entry.number }}</td>
-                        <td>
+                        <th>
                             <router-link :to="{ name: 'Song', params: { id: entry.song?.id } }" append>{{
                                     entry.song.title
                                 }}
                             </router-link>
-                        </td>
+                        </th>
                         <td>{{ entry.song.composer }}</td>
                         <td>{{ entry.song.songbook?.title }}</td>
                         <td>{{ entry.song.songbookNumber }}</td>
@@ -62,11 +63,11 @@
 
 <script setup lang="ts">
 import SetlistDetail from '@/components/SetlistDetail.vue';
-import {Song} from '@/types'
+import { Song } from '@/types'
 import api from "@/api";
-import {useRoute} from "vue-router";
-import {useSetlists} from "@/stores/setlistStore";
-import {computed, ref} from "vue";
+import { useRoute } from "vue-router";
+import { useSetlists } from "@/stores/setlistStore";
+import { computed, ref } from "vue";
 
 type SetlistSong = {
     number: number
@@ -132,11 +133,13 @@ const isLast = (setlistEntry: SetlistSong) => setlistEntry.number == entries.val
 [v-cloak] {
     display: none;
 }
+
 .move-container {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 }
+
 .icon.is-disabled {
     color: rgba(0, 0, 0, 0.3);
 }
@@ -144,27 +147,35 @@ const isLast = (setlistEntry: SetlistSong) => setlistEntry.number == entries.val
 table td.col0 {
     padding: 0.25em 0.75em;
 }
+
 table td.remove {
     padding: 0.25em 0.75em;
 }
+
 .col0 {
     width: 2%;
 }
+
 .col1 {
     width: 2%;
 }
+
 .col2 {
     width: 35%;
 }
+
 .col3 {
     width: 25%;
 }
+
 .col4 {
     width: 20%;
 }
+
 .col5 {
     width: 10%;
 }
+
 .col6 {
     width: 2%;
 }

@@ -2,6 +2,7 @@ package nl.stevenbontenbal.chorister.model.entities
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.rest.core.config.Projection
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Projection(name = "defaultProjection", types = [Song::class])
@@ -21,6 +22,9 @@ interface SongProjection {
     @JsonIgnore
     fun getSetlistEntries(): MutableList<SetlistEntry>?
 
-    fun getLastSetlist(): Setlist? = getSetlistEntries()?.map { entry -> entry.setlist }?.sortedByDescending { it.date }?.firstOrNull()
+    fun getLastSetlist(): Setlist? = getSetlistEntries()
+        ?.map { entry -> entry.setlist }
+        ?.sortedByDescending { it.date }
+        ?.firstOrNull { it.date != null && it.date!! <= LocalDate.now() }
 
 }

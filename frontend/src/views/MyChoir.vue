@@ -12,18 +12,18 @@
                 <div class="tabs">
                     <ul>
                         <li :class="{ 'is-active': activeTab == 'members' }"><a
-                                v-on:click="activeTab = 'members'">Members</a></li>
+                            v-on:click="activeTab = 'members'">Members</a></li>
                         <li :class="{ 'is-active': activeTab == 'categories' }"><a
-                                v-on:click="activeTab = 'categories'">Categories</a></li>
+                            v-on:click="activeTab = 'categories'">Categories</a></li>
                     </ul>
                 </div>
 
                 <div class="new-members" v-if="activeTab == 'members' && choir">
-                    <ChoirMembers :choir="choir" />
+                    <ChoirMembers :choir="choir"/>
                 </div>
 
                 <div class="categories" v-if="activeTab == 'categories' && choir">
-                    <Categories :choir="choir" />
+                    <Categories :choir="choir"/>
                 </div>
 
             </div>

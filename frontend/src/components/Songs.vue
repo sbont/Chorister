@@ -12,29 +12,30 @@
                 <th class="col3">Composer</th>
                 <th class="col4">Songbook</th>
                 <th class="col5">No.</th>
-                <th class="col7">Last Played</th>
+                <th class="col6">Last Played</th>
                 <th class="category-col">Categories</th>
             </tr>
             </thead>
             <tbody>
-                <tr v-for="(song, index) in songs" class="song" :key="song.id" draggable="true"
-                    @dragstart="startDrag($event, song)">
-                    <td>{{ oneBased(index) }}</td>
-                    <th><router-link :to="{ name: 'Song', params: { id: song.id } }" append>{{ song.title }}</router-link>
-                    </th>
-                    <td>{{ song.composer }}</td>
-                    <td>{{ (song.songbook || {}).title }}</td>
-                    <td>{{ song.songbookNumber }}</td>
-                    <td>{{ song.lastSetlist?.date }}</td>
-                    <td class="category-col">
-                        <div class="tags">
+            <tr v-for="(song, index) in songs" class="song" :key="song.id" draggable="true"
+                @dragstart="startDrag($event, song)">
+                <td>{{ oneBased(index) }}</td>
+                <th>
+                    <router-link :to="{ name: 'Song', params: { id: song.id } }" append>{{ song.title }}</router-link>
+                </th>
+                <td>{{ song.composer }}</td>
+                <td>{{ (song.songbook || {}).title }}</td>
+                <td>{{ song.songbookNumber }}</td>
+                <td>{{ song.lastSetlist?.date }}</td>
+                <td class="category-col">
+                    <div class="tags">
                             <span v-for="(category, index) in song.categories" class="song-category tag is-normal"
-                                :key="index">
+                                  :key="index">
                                 {{ category.name }}
                             </span>
-                        </div>
-                    </td>
-                </tr>
+                    </div>
+                </td>
+            </tr>
             </tbody>
             <tfoot></tfoot>
         </table>
@@ -49,25 +50,17 @@
 import api from "./../api.js";
 import { onMounted, ref } from 'vue'
 import { useSongs } from "@/stores/songStore";
-import { useRoute, useRouter } from "vue-router";
-import { SetlistEntry, Song, User, WithEmbedded } from "@/types";
+import { useRoute } from "vue-router";
+import { Song } from "@/types";
 
 // Types
-
-type DraftSong = Partial<Song>
-
-const emit = defineEmits(["remove"])
-
 const songStore = useSongs();
 const route = useRoute();
-const router = useRouter();
 
 // state
 const songs = ref<Array<Song>>([]);
 const loading = ref(true);
-const deleting = ref(false)
 const error = ref<string | null>(null);
-const setlistId = ref<number>();
 
 onMounted(() => {
     loadSongs();
@@ -144,10 +137,6 @@ td.p-1b {
 }
 
 .col6 {
-    width: 10%;
-}
-
-.col7 {
     width: 10%;
 }
 

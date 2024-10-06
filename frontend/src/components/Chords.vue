@@ -27,7 +27,8 @@
                                         <select v-model="draftValues.key">
                                             <option>Select key...</option>
                                             <option v-for="(key, index) in keyOptions" class="song" :key="key"
-                                                draggable="true" v-bind:value="key">{{ keyLabelMapping[key] }}</option>
+                                                    draggable="true" v-bind:value="key">{{ keyLabelMapping[key] }}
+                                            </option>
                                         </select>
                                     </div>
                                 </div>
@@ -38,7 +39,7 @@
                                 <label class="label">Description</label>
                                 <div class="control">
                                     <input class="input" type="text" v-model="draftValues.description"
-                                        placeholder="Version name, instrument, ..." />
+                                           placeholder="Version name, instrument, ..."/>
                                 </div>
                             </div>
                         </div>
@@ -47,7 +48,7 @@
                     <div class="field">
                         <label class="label">Chords</label>
                         <div class="control">
-                            <editor-content :editor="editor" />
+                            <editor-content :editor="editor"/>
                         </div>
                     </div>
                 </div>

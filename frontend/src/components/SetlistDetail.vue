@@ -8,9 +8,10 @@
                         <label class="label">Name</label>
                     </div>
                     <div class="field-body">
-                        <div class="field" v-bind:class="{ static: !editing }" >
+                        <div class="field" v-bind:class="{ static: !editing }">
                             <div class="control">
-                                <input v-model="draftValues.name" class="input" type="text" placeholder="Easter Morning Service" />
+                                <input v-model="draftValues.name" class="input" type="text"
+                                       placeholder="Easter Morning Service"/>
                             </div>
                         </div>
                     </div>
@@ -20,9 +21,9 @@
                         <label class="label">Date</label>
                     </div>
                     <div class="field-body">
-                        <div class="field" v-bind:class="{ static: !editing }" >
+                        <div class="field" v-bind:class="{ static: !editing }">
                             <div class="control">
-                                <input v-model="draftValues.date" class="input" type="date" />
+                                <input v-model="draftValues.date" class="input" type="date"/>
                             </div>
                         </div>
                     </div>
@@ -30,33 +31,33 @@
                 <div class="field is-grouped">
                     <p v-if="!editing" class="control">
                         <button
-                                @click="exportText"
-                                class="button is-link"
+                            @click="exportText"
+                            class="button is-link"
                         >
                             Export texts
                         </button>
                     </p>
                     <p v-if="!editing" class="control">
                         <button
-                                @click="edit"
-                                class="button is-link"
+                            @click="edit"
+                            class="button is-link"
                         >
                             Edit
                         </button>
                     </p>
                     <p v-if="!editing" class="control">
                         <button
-                                @click="remove"
-                                class="button is-danger"
+                            @click="remove"
+                            class="button is-danger"
                         >
                             Delete
                         </button>
                     </p>
                     <p v-if="editing" class="control">
                         <button
-                                @click="save"
-                                class="button is-link"
-                                :class="{ 'is-loading': saving }"
+                            @click="save"
+                            class="button is-link"
+                            :class="{ 'is-loading': saving }"
                         >
                             Save changes
                         </button>
@@ -120,18 +121,18 @@ const save = () => {
     const promise = store.saveToServer(newSetlist);
     promise.then((response) => {
         const isNewSetlist = isNew()
-        if(isNewSetlist) {
+        if (isNewSetlist) {
             newSetlist.id = response.data.id;
         }
         editing.value = false;
         saving.value = false;
         setlist.value = newSetlist;
         draftValues.value = null;
-        if(isNewSetlist) {
+        if (isNewSetlist) {
             store.put(setlist.value);
             router.push({
                 name: "Setlist",
-                params: { id: newSetlist.id },
+                params: {id: newSetlist.id},
             });
         }
     })
@@ -149,13 +150,13 @@ const cancelEdit = () => {
 
 const remove = () => store.remove(setlist.value?.id as number)
     .then(() => {
-        router.push({ name: "Repertoire" });
+        router.push({name: "Repertoire"});
     });
 
 const exportText = () => {
     const link = router.resolve({
         name: "Export",
-        params: { id: setlist.value?.id },
+        params: {id: setlist.value?.id},
     });
     window.open(link.href, '_blank');
 }

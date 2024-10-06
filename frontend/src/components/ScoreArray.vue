@@ -3,7 +3,7 @@
         <div class="is-size-4">Scores</div>
         <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
             <ScoreComponent v-for="score in scores" :key="score._links?.self.href" :value="(score as Score)"
-                @remove="removeScore(score)"></ScoreComponent>
+                            @remove="removeScore(score)"></ScoreComponent>
 
             <div v-if="!draftValues">
                 <button class="button is-primary" @click="addScore">
@@ -36,7 +36,7 @@ const scores = ref<Array<Score>>([]);
 scoreStore.fetchRelated(props.songUri as string, "scores").then(data => scores.value = data as Score[]).catch(e => error.value = e).finally(() => loading.value = false)
 const draftValues = ref<DraftScore | undefined>(undefined)
 
-const addScore = () => draftValues.value = { song: props.songUri }
+const addScore = () => draftValues.value = {song: props.songUri}
 const cancelAdd = () => draftValues.value = undefined
 
 const onAdded = (score: Score) => {

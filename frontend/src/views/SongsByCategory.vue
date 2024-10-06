@@ -3,7 +3,7 @@
         <div class="is-flex is-justify-content-space-between m-3">
             <h1 class="title" v-if="category">{{ category.name }}</h1>
         </div>
-        <Songs />
+        <Songs/>
     </div>
 </template>
 
@@ -21,7 +21,7 @@ const route = useRoute()
 
 onMounted(() => {
     console.log(route.params);
-    var categoryId = Number(route.params.id);
+    let categoryId = Number(route.params.id);
     api.getCategoryById(categoryId)
         .then((response) => {
             category.value = response.data;
