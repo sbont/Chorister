@@ -123,8 +123,6 @@ ij_scss_use_double_quotes = true
 ij_scss_value_alignment = 0
 
 [*.vue]
-indent_size = 4
-tab_width = 4
 ij_continuation_indent_size = 4
 ij_vue_indent_children_of_top_level = template
 ij_vue_interpolation_new_line_after_start_delimiter = true
@@ -311,7 +309,7 @@ ij_typescript_spaces_within_imports = true
 ij_typescript_spaces_within_interpolation_expressions = false
 ij_typescript_spaces_within_method_call_parentheses = false
 ij_typescript_spaces_within_method_parentheses = false
-ij_typescript_spaces_within_object_literal_braces = false
+ij_typescript_spaces_within_object_literal_braces = true
 ij_typescript_spaces_within_object_type_braces = true
 ij_typescript_spaces_within_parentheses = false
 ij_typescript_spaces_within_switch_parentheses = false
