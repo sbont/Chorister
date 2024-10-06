@@ -316,7 +316,8 @@ const save = async () => {
     }
     const promise = songStore.save(songDraft as Song);
     promise.then((response) => {
-        if (songIsNew.value) {
+        const wasNew = isNew(songDraft);
+        if (wasNew) {
             songDraft.id = response.data.id;
         }
         categoryStore.putForSong(response.data.id, draftSongCategories.value.season.concat(draftSongCategories.value.liturgical));
@@ -326,7 +327,7 @@ const save = async () => {
         songCategories.value = draftSongCategories.value;
         draftValues.value = undefined;
         draftSongCategories.value = [];
-        if (songIsNew.value) {
+        if (wasNew) {
             router.push({
                 name: "Song",
                 params: {id: songDraft.id},
