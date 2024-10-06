@@ -25,8 +25,8 @@
                                 <div class="control">
                                     <div class="select">
                                         <select v-model="draftValues.key">
-                                            <option>Select key...</option>
-                                            <option v-for="(key, index) in keyOptions" class="song" :key="key"
+                                            <option v-bind:value="undefined" disabled>Select...</option>
+                                            <option v-for="(key, i) in keyOptions" class="song" :key="key"
                                                     draggable="true" v-bind:value="key">{{ keyLabelMapping[key] }}
                                             </option>
                                         </select>
