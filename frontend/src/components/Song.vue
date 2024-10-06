@@ -193,9 +193,8 @@
             </div>
 
             <div v-if="!editing">
-                <ChordsArray :song-uri=song?._links?.self.href!/>
-
-                <ScoreArray :song-uri=song?._links?.self.href!/>
+                <ChordsArray :song-uri="song?._links?.self.href!"/>
+                <ScoreArray :song-uri="song?._links?.self.href!"/>
             </div>
 
         </div>
@@ -206,19 +205,17 @@
 import ScoreArray from "@/components/ScoreArray.vue"
 import ChordsArray from "@/components/ChordsArray.vue";
 import VueMultiselect from 'vue-multiselect'
-import { useEditor, EditorContent } from '@tiptap/vue-3'
+import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import { computed, onMounted, ref, toRaw } from 'vue'
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { useSongs } from "@/stores/songStore";
 import { useCategories } from "@/stores/categoryStore";
-import { useScores } from "@/stores/scoreStore";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
-import { Song, Score, Songbook, Categories, Chords, ApiEntity } from "@/types"
+import { Categories, Song, Songbook } from "@/types"
 import { isNew } from "@/utils"
-import { isApiEntity } from "@/utils"
 
 type DraftSongbook = Partial<Songbook>
 
@@ -232,7 +229,7 @@ const route = useRoute();
 const router = useRouter()
 
 // State
-const {categories} = storeToRefs(categoryStore);
+const { categories } = storeToRefs(categoryStore);
 const song = ref<Song>()
 const songCategories = ref<Categories>();
 const editing = ref(false);
