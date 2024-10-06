@@ -20,7 +20,7 @@
                     <div>
                         <div class="field is-horizontal">
                             <div class="field-label is-normal">
-                                <label class="label">Title</label>
+                                <label class="label is-required">Title</label>
                             </div>
                             <div class="field-body">
                                 <div class="field" v-bind:class="{ static: !editing }">
@@ -392,5 +392,10 @@ const cancelEdit = () => {
 
 .text p {
     min-height: 18px;
+}
+
+.label.is-required::after {
+    content: ' *';
+    color: red;
 }
 </style>

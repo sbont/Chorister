@@ -1,7 +1,8 @@
 <template>
     <div class="setlist-detail">
         <div v-if="!loading">
-            <div class="setlist-info m-3 is-flex is-align-content-flex-start">
+            <div v-if="error">{{ error }}</div>
+            <div class="setlist-info m-3 is-flex is-align-content-flex-start">                
                 <h1 class="title is-flex-grow-1 mr-3" v-if="!editing">{{ setlist?.name }}</h1>
                 <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="editing && draftValues">
                     <div class="field-label is-normal">
@@ -69,7 +70,7 @@
                     </p>
                 </div>
             </div>
-            <div class="subtitle m-3" v-if="!editing && setlist">{{ setlist.date }}</div>
+            <div class="subtitle m-3" v-if="!editing && setlist">{{ format(setlist.date) }}</div>
         </div>
     </div>
 </template>
@@ -110,13 +111,23 @@ onMounted(() => {
 })
 
 // Methods
+const format = (date: Date) => new Date(date).toLocaleDateString();
 const isNew = () => !setlist.value?.id;
 const save = () => {
     saving.value = true;
     const newSetlist = draftValues.value as Setlist;
-    if (!newSetlist) {
+    if (!newSetlist) return;
+    
+    if (!newSetlist.name && !newSetlist.date) {
+        error.value = "Either Name or Date is required";
+        saving.value = false;
         return;
+    } else {
+        error.value = null;
     }
+    
+    if (!newSetlist.name)
+        newSetlist.name = new Date(newSetlist.date).toLocaleDateString()
 
     const promise = store.saveToServer(newSetlist);
     promise.then((response) => {
