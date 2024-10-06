@@ -67,7 +67,7 @@ import { isNew } from "@/utils";
 const props = defineProps({
     value: {
         type: Object as PropType<Score | DraftScore>,
-        required: true            
+        required: true
     }
 })
 const emit = defineEmits(["remove", "cancel", "added"])
@@ -102,10 +102,10 @@ const save = () => {
     editing.value = false;
     saving.value = true;
     scoreStore.saveToServer(<ApiEntity>score.value)
-    .then(newChords => {
-        emit("added", newChords)
-    })
-    .finally(() => saving.value = false)
+        .then(newChords => {
+            emit("added", newChords)
+        })
+        .finally(() => saving.value = false)
 }
 
 const cancelEdit = () => {
@@ -119,9 +119,11 @@ const cancelEdit = () => {
 [v-cloak] {
     display: none;
 }
+
 .score {
     max-width: 20rem;
 }
+
 .textarea:not([rows]) {
     max-height: initial;
 }

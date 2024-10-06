@@ -1,4 +1,4 @@
-import {defineStore} from "pinia";
+import { defineStore } from "pinia";
 import api from "../api";
 import { CacheMap } from "@/types/CacheMaps";
 import { User } from "@/types";

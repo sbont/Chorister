@@ -20,15 +20,6 @@ export const useSongs = defineStore('songs', {
             return response;
         },
 
-        async fetchForSetlist(setlistId: number) {
-            this.loading = true;
-            const response = await api.getSetlistEntries(setlistId)
-            let sorted = response.data.sort((entryA, entryB) => entryA.number - entryB.number).map(entry => entry._embedded.song);
-            this.putSetlist(sorted, setlistId);
-            this.loading = false;
-            return sorted;
-        },
-
         async fetch(songId: number) {
             this.loading = true;
             const response = await api.getSongById(songId)
@@ -48,21 +39,8 @@ export const useSongs = defineStore('songs', {
             }
         },
 
-        async getForSetlist(setlistId: number) {
-            if (!this.songsBySetlistId.has(setlistId)) {
-                return await this.fetchForSetlist(setlistId);
-            } else {
-                return this.songsBySetlistId.getOrEmpty(setlistId);
-            }
-        },
-
         put(song: Song) {
             this.songs.set(song.id, song);
-        },
-
-        putSetlist(songs: Array<Song>, setlistId: number) {
-            songs.forEach(this.put)
-            this.songsBySetlistId.set(setlistId, songs)
         },
 
         save(song: Song) {
