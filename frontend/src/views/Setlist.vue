@@ -177,7 +177,7 @@ table td.remove {
 }
 
 .col6 {
-    width: 2%;
+    width: 4%;
 }
 
 </style>
