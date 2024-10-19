@@ -14,6 +14,9 @@ class Score(
     override var description: String?,
     override var key: Key?,
     var fileUrl: String?,
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FILE_ID")
+    var file: File?
 ) : Notation(id) {
     companion object
 }

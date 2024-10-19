@@ -615,3 +615,62 @@ databaseChangeLog:
     changes:
     - dropTable:
         tableName: score
+databaseChangeLog:
+- changeSet:
+    id: 1729343815383-3
+    author: Steven.Bontenbal (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: filePK
+            name: id
+            type: BIGINT
+        - column:
+            name: s3key
+            type: VARCHAR(255)
+        - column:
+            name: choir_id
+            type: BIGINT
+        tableName: file
+- changeSet:
+    id: 1729343815383-4
+    author: Steven.Bontenbal (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: file_id
+            type: bigint
+        tableName: notation
+- changeSet:
+    id: 1729343815383-5
+    author: Steven.Bontenbal (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: choir_id
+        baseTableName: file
+        constraintName: FK4q7pwifi0vherpvyboto1ymn1
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: choir
+        validate: true
+- changeSet:
+    id: 1729343815383-6
+    author: Steven.Bontenbal (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: file_id
+        baseTableName: notation
+        constraintName: FKlolhxms5ebp7pv0852hv4v3gy
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: file
+        validate: true
+

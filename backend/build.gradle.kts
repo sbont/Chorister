@@ -50,6 +50,7 @@ dependencies {
 	implementation("org.modelmapper:modelmapper:3.1.1")
     implementation("junit:junit:4.13.2")
 	implementation("org.jboss.logging:jboss-logging")
+	implementation("aws.sdk.kotlin:s3:1.3.56")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	developmentOnly("org.zalando:logbook-spring-boot-starter:2.16.0")
 	runtimeOnly("com.h2database:h2")
