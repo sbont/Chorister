@@ -188,6 +188,19 @@ class ChoristerConfiguration(
     ): CategorisationService = CategorisationService(choristerProperties, categoryRepository)
 
     @Bean
+    fun fileService(
+        fileRepository: FileRepository,
+        s3Configuration: S3Configuration,
+
+        ): FileService = FileService(fileRepository, s3Configuration)
+
+    @Bean
+    fun chordsService(
+        scoreRepository: ScoreRepository,
+        fileService: FileService
+    ): ChordsService = ChordsService(scoreRepository, fileService)
+
+    @Bean
     fun databaseInitializer(
         choirRepository: ChoirRepository,
         userRepository: UserRepository,
