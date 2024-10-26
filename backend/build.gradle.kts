@@ -4,13 +4,13 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins {
 	id("org.springframework.boot") version "3.0.6"
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
-	id("org.jetbrains.kotlin.plugin.noarg") version "1.8.0"
+	id("org.jetbrains.kotlin.plugin.noarg") version "2.0.21"
 	id("org.liquibase.gradle") version "2.2.0"
-	kotlin("jvm") version "1.8.0"
-	kotlin("plugin.spring") version "1.8.0"
-	kotlin("plugin.jpa") version "1.8.0"
-	kotlin("plugin.allopen") version "1.8.0"
-	kotlin("kapt") version "1.8.0"
+	kotlin("jvm") version "2.0.21"
+	kotlin("plugin.spring") version "2.0.21"
+	kotlin("plugin.jpa") version "2.0.21"
+	kotlin("plugin.allopen") version "2.0.21"
+	kotlin("kapt") version "2.0.21"
 	application
 }
 
@@ -46,7 +46,9 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.22")
+	implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 	implementation("org.modelmapper:modelmapper:3.1.1")
     implementation("junit:junit:4.13.2")
 	implementation("org.jboss.logging:jboss-logging")
@@ -65,7 +67,7 @@ dependencies {
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	"kapt"("org.springframework.boot:spring-boot-configuration-processor")
-	liquibaseRuntime("org.jetbrains.kotlin:kotlin-stdlib:1.8.22")
+	liquibaseRuntime("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
 	liquibaseRuntime("org.liquibase:liquibase-core:4.20.0")
 	liquibaseRuntime("org.liquibase:liquibase-groovy-dsl:3.0.3")
 	liquibaseRuntime("org.liquibase.ext:liquibase-hibernate6:4.23.0")

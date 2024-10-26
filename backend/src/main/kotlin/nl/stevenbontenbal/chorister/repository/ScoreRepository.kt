@@ -5,4 +5,4 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.data.rest.core.annotation.RepositoryRestResource
 
 @RepositoryRestResource
-interface ScoreRepository : CrudRepository<Score, Long> {}
+interface ScoreRepository : CrudRepository<Score, Long>

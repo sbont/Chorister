@@ -10,6 +10,10 @@ Pop-Location
 # DB
 Write-Host "Starting Cockroach..."
 Start-Process -FilePath "$($env:APPDATA)\cockroach\cockroach.exe" -ArgumentList "start-single-node --certs-dir cockroachdb\certs --store=C:\db\ --listen-addr=localhost:26258 --http-addr=localhost:8085" -PassThru
+
+# S3 server
+Write-Host "Starting Minio..."
+Start-Process -FilePath "minio" -ArgumentList "server C:\Projects\private\Chorister\s3 --address :9011 --console-address :9012" -PassThru 
 pause
 
 # Auth server

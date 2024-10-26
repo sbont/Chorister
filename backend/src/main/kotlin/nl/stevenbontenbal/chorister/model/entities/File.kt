@@ -11,6 +11,5 @@ class File(
     var s3Key: String? = null,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
-    override var choir: Choir?
-): ChoirOwnedEntity {
-}
+    override var choir: Choir?,
+): ChoirOwnedEntity

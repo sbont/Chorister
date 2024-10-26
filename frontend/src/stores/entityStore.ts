@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import api from "../api.js";
+import api from "../api";
 import { CacheListMap, CacheMap } from "@/types/CacheMaps.js";
 import { ApiEntity } from "@/types/index.js";
 
