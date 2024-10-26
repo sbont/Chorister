@@ -63,6 +63,7 @@ import { PropType, computed, onMounted, ref } from 'vue'
 import { useScores } from "@/stores/scoreStore";
 import { ApiEntity, Score, DraftScore } from "@/types";
 import { isNew } from "@/utils";
+import { getUploadUrl } from '@/services/fileService';
 
 const props = defineProps({
     value: {
@@ -86,13 +87,14 @@ const previewUrl = computed(() => score.value.fileUrl?.replace("/view", "/previe
 
 onMounted(() => {
     if (isNew(score.value)) {
-        draftValues.value = score.value;
-        editing.value = true;
+        edit();
     }
 });
 
 // Methods
 const edit = () => {
+    if () // TODO
+    getUploadUrl(score.value)
     draftValues.value = score.value;
     editing.value = true;
 }
