@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @ConfigurationProperties("s3")
 data class S3Configuration(
-    val endpointUrl: String = "",
-    val bucketName: String = ""
+    var endpointUrl: String = "",
+    var bucketName: String = "",
+    var region: String = "",
+    var accessKey: String = "",
+    var secretKey: String = "",
 )

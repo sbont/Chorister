@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useAuth } from "@/stores/authStore";
-import { Invite, Song, Score, Category, Setlist, SetlistEntry, Choir, User, WithEmbedded, AcceptInvite, NewChoirRegistration, Chords, ApiEntity } from "@/types";
+import { Invite, Song, Score, Category, Setlist, SetlistEntry, Choir, User, WithEmbedded, AcceptInvite, NewChoirRegistration, Chords, ApiEntity, UploadReturnEnvelope } from "@/types";
 
 const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + '/api';
 const auth = useAuth();
@@ -121,6 +121,14 @@ const functions = {
     getUser: () => instance.get<User>('user'),
 
     updateUserForId: (id: number, user: any) => instance.patch('users/' + id, user),
+
+    // Files
+
+    getUploadReturnEnvelope: () => instance.get<UploadReturnEnvelope>('/files/new-upload'),
+
+    // Scores
+
+    getUploadUrlForScore: (scoreUri: string) => instance.get(scoreUri + '/file/upload-url'),
 
     // Generic methods
 

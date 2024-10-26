@@ -191,14 +191,14 @@ class ChoristerConfiguration(
     fun fileService(
         fileRepository: FileRepository,
         s3Configuration: S3Configuration,
-
-        ): FileService = FileService(fileRepository, s3Configuration)
+        userService: UserService
+        ): FileService = FileService(fileRepository, s3Configuration, userService)
 
     @Bean
     fun chordsService(
         scoreRepository: ScoreRepository,
         fileService: FileService
-    ): ChordsService = ChordsService(scoreRepository, fileService)
+    ): ScoreService = ScoreService(scoreRepository, fileService)
 
     @Bean
     fun databaseInitializer(

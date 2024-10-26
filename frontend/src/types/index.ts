@@ -144,3 +144,8 @@ type Embedded<N extends string, O> = {
 export interface WithEmbedded<N extends string, O> {
     _embedded: Embedded<N, O>
 }
+
+export interface UploadReturnEnvelope {
+    fileId: number,
+    uploadUrl: string,
+}
