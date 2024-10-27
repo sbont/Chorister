@@ -48,3 +48,9 @@ logging:
 zitadel:
   base-url: http://localhost:9000/management/v1
   admin-access-token: ${CHORISTER_ZITADEL_ACCESS_TOKEN}
+s3:
+  endpoint-url: http://localhost:9011
+  bucket-name: chorister-choir-files
+  region: eu1
+  access-key: yYl4hP4xGGA0qODY1oHS
+  secret-key: 4Jw5VEse4RZCUJ8FJS6GjLL7jln4Fk4FO44Qdyg8

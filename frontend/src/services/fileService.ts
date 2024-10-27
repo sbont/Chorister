@@ -1,16 +1,10 @@
-import { Score } from "@/types";
-import api from "../api";
+import axios from "axios";
 
-export async function getUploadUrlForScore(score: Score) {
-    const selfUri = score._links?.self.href;
-    if (!selfUri)
-        return undefined;
-
-    var response = await api.getUploadUrlForScore(selfUri);
-    return new URL(response.data);
-}
-
-export async function getUploadUrl() {
-    var envelope = api.getUploadReturnEnvelope();
-    
+export async function submitFile(objectUri: string, file: File) {
+    const buffer = await file.arrayBuffer();
+    return axios.put(objectUri, buffer, {
+        headers: {
+            'Content-Type': file.type
+        }
+    });
 }
