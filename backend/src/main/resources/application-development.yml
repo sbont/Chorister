@@ -48,3 +48,9 @@ logging:
 zitadel:
   base-url: http://localhost:9000/management/v1
   admin-access-token: ${CHORISTER_ZITADEL_ACCESS_TOKEN}
+s3:
+  endpoint-url: http://localhost:9011
+  bucket-name: ${CHORISTER_MINIO_BUCKET}
+  region: eu1
+  access-key: ${CHORISTER_MINIO_ACCESS_KEY}
+  secret-key: ${CHORISTER_MINIO_SECRET_KEY}

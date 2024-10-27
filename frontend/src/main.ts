@@ -2,6 +2,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import VueLogger from 'vuejs3-logger';
 import router from './router'
+import PrimeVue from 'primevue/config';
+import Aura from '@primevue/themes/aura';
 import { loadScript } from 'vue-plugin-load-script';
 import { createPinia } from 'pinia'
 import { useAuth } from "@/stores/authStore";
@@ -25,4 +27,7 @@ const logOptions = {
 } as ILoggerOptions;
 app.use(VueLogger, logOptions);
 app.use(router);
+app.use(PrimeVue, {theme: {
+    preset: Aura
+}});
 app.mount('#app')

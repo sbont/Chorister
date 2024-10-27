@@ -71,7 +71,8 @@ export interface Score extends ApiEntity {
     song: Song,
     description: string | undefined,
     fileUrl: string,
-    key: Key | undefined
+    key: Key | undefined,
+    file: File
 }
 
 export interface DraftScore extends Omit<Partial<Score>, "song"> {
@@ -139,6 +140,11 @@ export interface User extends Identifiable {
 
 type Embedded<N extends string, O> = { 
     [K in N]: O
+}
+
+export interface File {
+    id: number,
+    fileUrl: string
 }
 
 export interface WithEmbedded<N extends string, O> {

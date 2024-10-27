@@ -2,7 +2,9 @@ package nl.stevenbontenbal.chorister.service
 
 import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
 import aws.sdk.kotlin.services.s3.S3Client
+import aws.sdk.kotlin.services.s3.model.GetObjectRequest
 import aws.sdk.kotlin.services.s3.model.PutObjectRequest
+import aws.sdk.kotlin.services.s3.presigners.presignGetObject
 import aws.sdk.kotlin.services.s3.presigners.presignPutObject
 import aws.smithy.kotlin.runtime.net.url.Url
 import nl.stevenbontenbal.chorister.configuration.S3Configuration
@@ -41,10 +43,10 @@ class FileService(
     }
 
     fun getFile(id: Long): File? {
-        val choirId = userService.getCurrentUser().choir?.id
-            ?: throw InvalidIdentifierException("Choir ID is unknown for current user")
-        val file = fileRepository.findById(id).getOrNull()
-        return if (file?.choir?.id == choirId) file else null
+        return fileRepository
+            .findById(id)
+            .filter{ userService.hasAccess(it) }
+            .getOrNull()
     }
 
     fun s3RedirectHost(): String = URL(s3Configuration.endpointUrl).host
@@ -60,15 +62,15 @@ class FileService(
         return "/s3-download/${baseUrl.protocol}/$root/${s3Configuration.bucketName}/${file.s3Key}"
     }
 
-//    suspend fun getDownloadUrl(fileKey: String) {
-//        val client = getClient()
-//        val request = GetObjectRequest {
-//            bucket = s3Configuration.bucketName
-//            key = fileKey
-//        }
-//        val url = request.
-//        presigned.url.toString()
-//    }
+    suspend fun getDownloadUrl(fileKey: String): String {
+        val client = getClient()
+        val request = GetObjectRequest {
+            bucket = s3Configuration.bucketName
+            key = fileKey
+        }
+        val presigned = client.presignGetObject(request, 2.minutes)
+        return presigned.url.toString()
+    }
 
     private suspend fun getClient() = S3Client.fromEnvironment {
         endpointUrl = clientUrl()
@@ -77,6 +79,7 @@ class FileService(
             accessKeyId = s3Configuration.accessKey
             secretAccessKey = s3Configuration.secretKey
         }
+        forcePathStyle = true
     }
 
     private fun clientUrl() = Url.parse(s3Configuration.endpointUrl)

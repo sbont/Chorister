@@ -2,7 +2,19 @@ http://localhost:8080
 
 handle_path /api/* {
 	rewrite * /api{path}
-	reverse_proxy localhost:8090
+	reverse_proxy localhost:8090  {
+		@accel {
+			header X-Accel-Redirect-Host *
+			header X-Accel-Redirect-Path *
+		}
+		handle_response @accel {
+			reverse_proxy {rp.header.X-Accel-Redirect-Host} {
+				rewrite {rp.header.X-Accel-Redirect-Path}
+				header_up Host {rp.header.X-Accel-Redirect-Host}
+			}
+			method * GET
+		}
+	}
 }
 handle_path /auth/* {
 	reverse_proxy h2c://localhost:9000
