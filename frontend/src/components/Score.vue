@@ -3,16 +3,20 @@
         <div v-if="!editing" class="card score mr-2">
             <header class="card-header">
                 <p class="card-header-title">
-                    {{ score.description }}
+                    <a @click.prevent="download" href="#" class="icon-text">
+                        <span class="icon">
+                        <i class="fas fa-cloud-download-alt"></i>
+                    </span>
+                    <span>
+                        {{ score.description }}
+                    </span>
+                    </a>
+                    
                 </p>
             </header>
             <div class="card-content p-0">
                 <div class="content is-flex">
-                    <iframe
-                        :src="previewUrl"
-                        width="200"
-                        height="200"
-                    ></iframe>
+                    {{ error }}
                 </div>
             </div>
             <footer class="card-footer">
@@ -21,28 +25,29 @@
             </footer>
         </div>
         <div v-if="editing" class="card mr-2">
-            <div class="card-content card-content-editing">
-                <div class="content is-flex is-flex-direction-column">
-                    <div class="field">
-                        <label class="label">Description</label>
-                        <div class="control">
-                            <input
-                                class="input"
-                                type="text"
-                                v-model="draftValues.description"
-                                placeholder="Version name, instrument, tonality..."
-                            />
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label">Google Drive URL</label>
-                        <div class="control">
-                            <input
-                                class="input"
-                                type="text"
-                                v-model="draftValues.fileUrl"
-                                placeholder="https://drive.google.com/file/d/..."
-                            />
+            <div class="card-content-editing">
+                <div class="content">
+                    <FileUpload name="file[]" 
+                        :disabled="uploadDisabled()"
+                        @uploader="onUpload" 
+                        @select="selectFile"
+                        @remove="removeFile" 
+                        :multiple="false" 
+                        :file-limit="1"
+                        accept="application/pdf,image/*"
+                        :maxFileSize="1000000" invalidFileSizeMessage="File exceeds maximum size of 1GB."
+                        choose-label="Browse" customUpload >
+                        <template #empty>
+                            <span>Drag and drop files to here to upload.</span>
+                        </template>
+                    </FileUpload>
+                    <div class="is-flex is-flex-direction-column card-content pt-0">
+                        <div class="field">
+                            <label class="label">Description</label>
+                            <div class="control">
+                                <input class="input" type="text" v-model="draftValues.description"
+                                    placeholder="Version name, instrument, tonality..." />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -61,9 +66,11 @@
 <script setup lang="ts">
 import { PropType, computed, onMounted, ref } from 'vue'
 import { useScores } from "@/stores/scoreStore";
-import { ApiEntity, Score, DraftScore } from "@/types";
-import { isNew } from "@/utils";
-import { getUploadUrl } from '@/services/fileService';
+import { ApiEntity, Score, DraftScore, UploadReturnEnvelope } from "@/types";
+import FileUpload, { FileUploadRemoveEvent, FileUploadSelectEvent, FileUploadUploaderEvent } from 'primevue/fileupload';
+import { isApiEntity, isNew } from "@/utils";
+import { useFiles } from '@/stores/fileStore';
+import api from '@/api';
 
 const props = defineProps({
     value: {
@@ -74,40 +81,94 @@ const props = defineProps({
 const emit = defineEmits(["remove", "cancel", "added"])
 
 const scoreStore = useScores();
+const fileStore = useFiles();
 
 // state
 const score = ref(props.value);
 const editing = ref(false);
 const draftValues = ref();
 const saving = ref(false);
-const error = ref(null);
+const error = ref<string>();
+const selectedFile = ref<File>()
 
 // Computed
-const previewUrl = computed(() => score.value.fileUrl?.replace("/view", "/preview"));
-
 onMounted(() => {
     if (isNew(score.value)) {
         edit();
     }
 });
 
+const uploadDisabled = () => !!selectedFile.value;
+
 // Methods
-const edit = () => {
-    if () // TODO
-    getUploadUrl(score.value)
+const selectFile = (event: FileUploadSelectEvent) => {
+    selectedFile.value = (event.files as File[])[0];
+    if (draftValues.value && !draftValues.value.description) {
+        const name = selectedFile.value.name;
+        draftValues.value.description = name.substring(0, name.indexOf("."));
+    }
+}
+
+const removeFile = (_: FileUploadRemoveEvent) => {
+    selectedFile.value = undefined;
+}
+
+const edit = async () => {
     draftValues.value = score.value;
     editing.value = true;
 }
 
-const save = () => {
-    score.value = draftValues.value;
+const onUpload = async (event: FileUploadUploaderEvent) => {
+    const envelope = await fileStore.getUploadEnvelope(score.value?.file?.id);
+    if (!envelope?.uploadUrl)
+        return;
+
+    const files = event.files as File[];
+    if (files.length !== 1) {
+        error.value = "Number of selected files is not equal to 1."
+        return;
+    }
+    await upload(files[0]);
+}
+
+const upload = async (file: File) => {
+    const envelope = await fileStore.getUploadEnvelope(score.value?.file?.id);
+    if (!envelope?.uploadUrl)
+        return;
+
+    try {
+        await fileStore.upload(envelope.uploadUrl, file)
+    } catch (e) {
+        console.log(e);
+        error.value = JSON.stringify(e);
+    }
+    return envelope.fileId;
+}
+
+const save = async () => {
+    error.value = undefined;
+    const wasNew = isNew(draftValues.value);
+    if (!selectedFile.value) {
+        error.value = "No file selected."
+        return;
+    }
+
     editing.value = false;
     saving.value = true;
-    scoreStore.saveToServer(<ApiEntity>score.value)
-        .then(newChords => {
-            emit("added", newChords)
-        })
-        .finally(() => saving.value = false)
+    const fileId = await upload(selectedFile.value);
+    if (!fileId) {
+        error.value = "No file ID received."
+        return;
+    }
+
+    score.value = draftValues.value;
+    const savedScore = await scoreStore.saveToServer(<ApiEntity>score.value)
+    await api.putFileIdForScore(savedScore._links?.self.href!, fileId);
+    
+    if (wasNew)
+        emit("added", savedScore)
+        
+    saving.value = false;
 }
 
 const cancelEdit = () => {
@@ -115,6 +176,21 @@ const cancelEdit = () => {
     draftValues.value = null;
     emit("cancel")
 }
+
+const download = async () => {
+    const fileId = score.value.file?.id
+    if (!fileId)
+        return;
+
+    const response = await api.getFile(fileId);
+    const blob = new Blob([response.data], { type: 'application/pdf'});
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = "download"
+    link.click()
+    URL.revokeObjectURL(link.href)
+}
+
 </script>
 
 <style>
@@ -128,5 +204,21 @@ const cancelEdit = () => {
 
 .textarea:not([rows]) {
     max-height: initial;
+}
+
+.p-fileupload .p-fileupload-upload-button, .p-fileupload .p-fileupload-cancel-button {
+    display: none;
+}
+
+.p-fileupload .p-fileupload-file {
+    padding: 0;
+}
+
+.p-fileupload-advanced {
+    border: none !important;
+}
+
+.p-fileupload-advanced .p-fileupload-file-thumbnail, .p-fileupload-advanced .p-fileupload-file-badge {
+    display: none;
 }
 </style>

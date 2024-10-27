@@ -96,6 +96,7 @@ class ChoristerConfiguration(
                 configuration.exposeIdsFor(User::class.java)
                 configuration.exposeIdsFor(Invite::class.java)
                 configuration.exposeIdsFor(SetlistEntry::class.java)
+                configuration.exposeIdsFor(File::class.java)
                 corsRegistry.addMapping("/api/**")
                     .allowedMethods("*")
                     .allowedOrigins(properties.baseUrl)
@@ -195,10 +196,11 @@ class ChoristerConfiguration(
         ): FileService = FileService(fileRepository, s3Configuration, userService)
 
     @Bean
-    fun chordsService(
+    fun scoreService(
         scoreRepository: ScoreRepository,
-        fileService: FileService
-    ): ScoreService = ScoreService(scoreRepository, fileService)
+        fileService: FileService,
+        userService: UserService
+    ): ScoreService = ScoreService(scoreRepository, fileService, userService)
 
     @Bean
     fun databaseInitializer(

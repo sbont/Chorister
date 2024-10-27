@@ -126,9 +126,15 @@ const functions = {
 
     getUploadReturnEnvelope: () => instance.get<UploadReturnEnvelope>('/files/new-upload'),
 
+    getUploadReturnEnvelopeForId: (id: number) => instance.get<UploadReturnEnvelope>(`/files/${id}/new-upload`),
+
+    getFile: (id: number) => instance.get(`/files/${id}`, { responseType: 'blob'}),
+
     // Scores
 
     getUploadUrlForScore: (scoreUri: string) => instance.get(scoreUri + '/file/upload-url'),
+
+    putFileIdForScore: (scoreUri: string, fileId: number) => instance.put(scoreUri + '/file', fileId, { headers: { "Content-Type": "application/json" }}),
 
     // Generic methods
 

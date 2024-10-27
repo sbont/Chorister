@@ -43,13 +43,7 @@ class AccessPermissionEvaluator(@Lazy userService: UserService) : PermissionEval
     }
 
     @Suppress("UNUSED_PARAMETER")
-    private fun hasPrivilege(targetDomainObject: Any?, permission: String): Boolean {
-        val currentUser = userService.getCurrentUser()
-        return when(targetDomainObject) {
-            is ChoirOwnedEntity -> currentUser.choir != null && currentUser.choir == targetDomainObject.choir
-            is Choir -> currentUser.choir == targetDomainObject
-            is User -> currentUser == targetDomainObject || currentUser.choir == targetDomainObject.choir
-            else -> false
-        }
-    }
+    private fun hasPrivilege(targetDomainObject: Any?, permission: String): Boolean =
+        targetDomainObject?.let { userService.hasAccess(it) } ?: false
+
 }

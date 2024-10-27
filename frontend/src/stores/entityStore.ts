@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import api from "../api";
 import { CacheListMap, CacheMap } from "@/types/CacheMaps.js";
 import { ApiEntity } from "@/types/index.js";
+import { isNew } from "@/utils";
 
 export const useEntityStore = (name: string, endpoint: string) => defineStore(name, {
     state: () => ({
@@ -64,11 +65,9 @@ export const useEntityStore = (name: string, endpoint: string) => defineStore(na
             }
         },
         async saveToServer(obj: ApiEntity, relatedUri?: string) {
-            if (obj._links?.self.href) {
-                return api.update(obj._links.self.href, obj).then(newObj => this.putRelated(obj, relatedUri));
-            } else {
-                return api.create(endpoint, obj).then(newObj => this.putRelated(obj, relatedUri));
-            }
+            const response = isNew(obj) ? await api.create(endpoint, obj) : await api.update(obj._links!.self.href, obj);
+            this.putRelated(obj, relatedUri);
+            return response.data;
         },
         async delete(obj: ApiEntity) {
             const uri = obj._links?.self.href!
