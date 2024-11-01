@@ -1,13 +1,13 @@
 import { defineStore } from "pinia";
 import api from "../api";
 import { CacheListMap, CacheMap } from "@/types/CacheMaps.js";
-import { ApiEntity } from "@/types/index.js";
+import { ApiEntity, ApiEntityWith, Link, WithAssociation } from "@/types/index.js";
 import { isNew } from "@/utils";
 
 export const useEntityStore = (name: string, endpoint: string) => defineStore(name, {
     state: () => ({
         objByUri: new CacheMap<string, ApiEntity>(),
-        objByRelatedUri: new CacheListMap<string, ApiEntity>(),
+        objByRelatedUri: new CacheListMap<string, ApiEntity>(), // e.g. http://localhost:8080/api/songs/1/scores
         loading: false,
         error: null as string | null
     }),
@@ -22,8 +22,8 @@ export const useEntityStore = (name: string, endpoint: string) => defineStore(na
         put(obj: ApiEntity) {
             this.objByUri.set(obj._links?.self.href!, obj)
         },
-        putRelated(obj: ApiEntity, parentUri?: string) {
-            if (parentUri) this.objByRelatedUri.addTo(parentUri, obj)
+        putRelated(obj: ApiEntity, link?: Link) {
+            if (link?.href) this.objByRelatedUri.addTo(link.href, obj)
             this.put(obj)
         },
         async fetch(uri: string) {
@@ -40,12 +40,22 @@ export const useEntityStore = (name: string, endpoint: string) => defineStore(na
             this.loading = false
             return response.data
         },
-        async fetchRelated(uri: string, association: string) {
+        async fetchRelatedFromAssociation<T extends WithAssociation>(apiEntity: ApiEntityWith<T>, association: string) {
             this.loading = true;
-            const response = await api.getAllRelated(uri, association);
-            console.log(response)
-            console.log(response.data)
+            const key = association as keyof typeof apiEntity._links;
+            const uri = apiEntity._links?.[key];
+            if (!uri) throw Error(`Link to association ${association} not found.`);
+
+            const response = await api.getAll(uri);
             response.data.forEach(e => this.putRelated(e, uri));
+            this.loading = false
+            return response.data
+        },
+        async fetchRelatedFromLink(link: Link) {
+            this.loading = true;
+            const uri = link.href;
+            const response = await api.getAll(uri);
+            response.data.forEach(e => this.putRelated(e, link));
             this.loading = false
             return response.data
         },
@@ -56,17 +66,17 @@ export const useEntityStore = (name: string, endpoint: string) => defineStore(na
                 return this.objByUri.get(uri);
             }
         },
-        async getRelated(uri: string, association: string) {
-            if (!this.objByRelatedUri.has(uri)) {
-                return await this.fetchRelated(uri, association);
+        async getRelated(link: Link) {
+            if (!this.objByRelatedUri.has(link.href)) {
+                return await this.fetchRelatedFromLink(link);
             } else {
-                this.fetchRelated(uri, association); // load in background
-                return this.objByRelatedUri.get(uri);
+                this.fetchRelatedFromLink(link); // load in background
+                return this.objByRelatedUri.get(link.href);
             }
         },
-        async saveToServer(obj: ApiEntity, relatedUri?: string) {
+        async saveToServer(obj: ApiEntity, link?: Link) {
             const response = isNew(obj) ? await api.create(endpoint, obj) : await api.update(obj._links!.self.href, obj);
-            this.putRelated(obj, relatedUri);
+            this.putRelated(obj, link);
             return response.data;
         },
         async delete(obj: ApiEntity) {
