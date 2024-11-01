@@ -3,15 +3,15 @@
         <div v-if="!editing" class="card score mr-2">
             <header class="card-header">
                 <p class="card-header-title">
-                    <a @click.prevent="download" href="#" class="icon-text">
+                    <a @click.prevent="openFile" @auxclick.prevent="openFile" @mousedown.middle.prevent="openFile" href="#" class="icon-text">
                         <span class="icon">
-                        <i class="fas fa-cloud-download-alt"></i>
-                    </span>
-                    <span>
-                        {{ score.description }}
-                    </span>
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </span>
+                        <span>
+                            {{ score.description }}
+                        </span>
                     </a>
-                    
+
                 </p>
             </header>
             <div class="card-content p-0">
@@ -27,16 +27,10 @@
         <div v-if="editing" class="card mr-2">
             <div class="card-content-editing">
                 <div class="content">
-                    <FileUpload name="file[]" 
-                        :disabled="uploadDisabled()"
-                        @uploader="onUpload" 
-                        @select="selectFile"
-                        @remove="removeFile" 
-                        :multiple="false" 
-                        :file-limit="1"
-                        accept="application/pdf,image/*"
+                    <FileUpload name="file[]" :disabled="uploadDisabled()" @uploader="onUpload" @select="selectFile"
+                        @remove="removeFile" :multiple="false" :file-limit="1" accept="application/pdf,image/*"
                         :maxFileSize="1000000" invalidFileSizeMessage="File exceeds maximum size of 1GB."
-                        choose-label="Browse" customUpload >
+                        choose-label="Browse" customUpload>
                         <template #empty>
                             <span>Drag and drop files to here to upload.</span>
                         </template>
@@ -45,7 +39,7 @@
                         <div class="field">
                             <label class="label">Description</label>
                             <div class="control">
-                                <input class="input" type="text" v-model="draftValues.description"
+                                <input class="input" type="text" v-model="draftValues!.description"
                                     placeholder="Version name, instrument, tonality..." />
                             </div>
                         </div>
@@ -64,18 +58,23 @@
     </div>
 </template>
 <script setup lang="ts">
-import { PropType, computed, onMounted, ref } from 'vue'
-import { useScores } from "@/stores/scoreStore";
-import { ApiEntity, Score, DraftScore, UploadReturnEnvelope } from "@/types";
-import FileUpload, { FileUploadRemoveEvent, FileUploadSelectEvent, FileUploadUploaderEvent } from 'primevue/fileupload';
-import { isApiEntity, isNew } from "@/utils";
+import api from '@/services/api';
+import { downloadFile } from '@/services/fileService';
 import { useFiles } from '@/stores/fileStore';
-import api from '@/api';
+import { useScores } from "@/stores/scoreStore";
+import { ApiEntity, DraftScore, Score, Song } from "@/types";
+import { isNew } from "@/utils";
+import FileUpload, { FileUploadRemoveEvent, FileUploadSelectEvent, FileUploadUploaderEvent } from 'primevue/fileupload';
+import { PropType, onMounted, ref } from 'vue';
+import { extension, extensions } from 'mime-types';
 
 const props = defineProps({
     value: {
         type: Object as PropType<Score | DraftScore>,
         required: true
+    },
+    song: {
+        type: Object as PropType<Song>
     }
 })
 const emit = defineEmits(["remove", "cancel", "added"])
@@ -86,7 +85,7 @@ const fileStore = useFiles();
 // state
 const score = ref(props.value);
 const editing = ref(false);
-const draftValues = ref();
+const draftValues = ref<DraftScore>();
 const saving = ref(false);
 const error = ref<string>();
 const selectedFile = ref<File>()
@@ -114,7 +113,7 @@ const removeFile = (_: FileUploadRemoveEvent) => {
 }
 
 const edit = async () => {
-    draftValues.value = score.value;
+    draftValues.value = score.value as DraftScore;
     editing.value = true;
 }
 
@@ -161,19 +160,19 @@ const save = async () => {
         return;
     }
 
-    score.value = draftValues.value;
     const savedScore = await scoreStore.saveToServer(<ApiEntity>score.value)
+    score.value = savedScore;
     await api.putFileIdForScore(savedScore._links?.self.href!, fileId);
-    
+
     if (wasNew)
         emit("added", savedScore)
-        
+
     saving.value = false;
 }
 
 const cancelEdit = () => {
     editing.value = false;
-    draftValues.value = null;
+    draftValues.value = undefined;
     emit("cancel")
 }
 
@@ -183,12 +182,42 @@ const download = async () => {
         return;
 
     const response = await api.getFile(fileId);
-    const blob = new Blob([response.data], { type: 'application/pdf'});
+    const blob = new Blob([response.data], { type: 'application/pdf' });
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
     link.download = "download"
     link.click()
     URL.revokeObjectURL(link.href)
+}
+
+const openFile = async (event: MouseEvent) => {
+    const fileId = score.value.file?.id
+    if (!fileId)
+        return;
+
+    try {
+        const response = await api.getFile(fileId);
+        const location = response.headers["location"];
+        if (event.button == 1)
+            window.open(location, "_blank");
+        else {
+            const response = await downloadFile(location);
+            const contentType = response.headers['content-type']?.toString() ?? "";
+            console.log(response.headers);
+            
+            const blob = new Blob([response.data], { type: contentType });
+            const link = document.createElement('a')
+            link.href = URL.createObjectURL(blob)
+            console.log(contentType);
+            
+            const ext = extension(contentType)
+            link.download = `${props.song?.title} - ${score.value?.description}.${ext}`;
+            link.click()
+            URL.revokeObjectURL(link.href)
+        }
+    } catch (e) {
+        error.value = JSON.stringify(e);
+    }
 }
 
 </script>
@@ -206,7 +235,8 @@ const download = async () => {
     max-height: initial;
 }
 
-.p-fileupload .p-fileupload-upload-button, .p-fileupload .p-fileupload-cancel-button {
+.p-fileupload .p-fileupload-upload-button,
+.p-fileupload .p-fileupload-cancel-button {
     display: none;
 }
 
@@ -218,7 +248,8 @@ const download = async () => {
     border: none !important;
 }
 
-.p-fileupload-advanced .p-fileupload-file-thumbnail, .p-fileupload-advanced .p-fileupload-file-badge {
+.p-fileupload-advanced .p-fileupload-file-thumbnail,
+.p-fileupload-advanced .p-fileupload-file-badge {
     display: none;
 }
 </style>

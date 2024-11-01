@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import api from "../api";
+import api from "../services/api";
 import { CacheListMap, CacheMap } from "@/types/CacheMaps";
 import { Setlist, SetlistEntry, Song, WithEmbedded } from "@/types";
 import { useSongs } from "@/stores/songStore";
@@ -109,7 +109,7 @@ export const useSetlists = defineStore('setlists', {
         },
 
         async addSetlistEntry(setlistUri: string, songUri: string) {
-            let entry = {setlist: setlistUri, song: songUri}
+            let entry = { setlist: setlistUri, song: songUri }
             await api.postSetlistEntry(entry);
         },
 

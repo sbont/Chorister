@@ -6,36 +6,37 @@
         </div>
         <table class="table is-hoverable is-fullwidth song-table" v-if="!loading" v-cloak>
             <thead>
-            <tr>
-                <th class="col-no" title="number"></th>
-                <th class="col-title">Title</th>
-                <th class="col-composer">Composer</th>
-                <th class="col-songbook">Songbook</th>
-                <th class="col-songbook-no">No.</th>
-                <th class="col-last-played">Last Played</th>
-                <th class="col-category">Categories</th>
-            </tr>
+                <tr>
+                    <th class="col-no" title="number"></th>
+                    <th class="col-title">Title</th>
+                    <th class="col-composer">Composer</th>
+                    <th class="col-songbook">Songbook</th>
+                    <th class="col-songbook-no">No.</th>
+                    <th class="col-last-played">Last Played</th>
+                    <th class="col-category">Categories</th>
+                </tr>
             </thead>
             <tbody>
-            <tr v-for="(song, index) in songs" class="song" :key="song.id" draggable="true"
-                @dragstart="startDrag($event, song)">
-                <td>{{ oneBased(index) }}</td>
-                <th>
-                    <router-link :to="{ name: 'Song', params: { id: song.id } }" append>{{ song.title }}</router-link>
-                </th>
-                <td>{{ song.composer }}</td>
-                <td>{{ (song.songbook || {}).title }}</td>
-                <td>{{ song.songbookNumber }}</td>
-                <td>{{ song.lastSetlist?.date }}</td>
-                <td class="col-category">
-                    <div class="tags">
+                <tr v-for="(song, index) in songs" class="song" :key="song.id" draggable="true"
+                    @dragstart="startDrag($event, song)">
+                    <td>{{ oneBased(index) }}</td>
+                    <th>
+                        <router-link :to="{ name: 'Song', params: { id: song.id } }" append>{{ song.title
+                            }}</router-link>
+                    </th>
+                    <td>{{ song.composer }}</td>
+                    <td>{{ (song.songbook || {}).title }}</td>
+                    <td>{{ song.songbookNumber }}</td>
+                    <td>{{ song.lastSetlist?.date }}</td>
+                    <td class="col-category">
+                        <div class="tags">
                             <span v-for="(category, index) in song.categories" class="song-category tag is-normal"
-                                  :key="index">
+                                :key="index">
                                 {{ category.name }}
                             </span>
-                    </div>
-                </td>
-            </tr>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
             <tfoot></tfoot>
         </table>
@@ -47,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import api from "./../api.js";
+import api from "../services/api.js";
 import { onMounted, ref } from 'vue'
 import { useSongs } from "@/stores/songStore";
 import { useRoute } from "vue-router";
@@ -119,24 +120,31 @@ td.p-1b {
 .col-no {
     width: 3%;
 }
+
 .col-title {
     width: 25%;
 }
+
 .col-composer {
     width: 20%;
 }
+
 .col-songbook {
     width: 15%;
 }
+
 .col-songbook-no {
     width: 5%;
 }
+
 .col-last-played {
     width: 10%;
 }
+
 .col-category {
     width: 32%;
 }
+
 .col-category .tags {
     flex-wrap: initial;
 }
