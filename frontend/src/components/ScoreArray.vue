@@ -19,24 +19,29 @@
 
 <script setup lang="ts">
 import ScoreComponent from "@/components/Score.vue"
-import { Score, DraftScore } from "@/types";
+import { Score, DraftScore, Song } from "@/types";
 import { ref } from "vue";
 import { isNew } from "@/utils";
 import { useScores } from "@/stores/scoreStore";
 
 
-const props = defineProps({
-    songUri: String
-})
+const props = defineProps<{
+    song: Song
+}>();
 
 const loading = ref(true)
 const error = ref<string | undefined>(undefined)
 const scoreStore = useScores()
 const scores = ref<Array<Score>>([]);
-scoreStore.fetchRelated(props.songUri as string, "scores").then(data => scores.value = data as Score[]).catch(e => error.value = e).finally(() => loading.value = false)
+const link = props.song._links?.scores
+if (link)
+    scoreStore.fetchRelatedFromLink(link).then(data => scores.value = data as Score[]).catch(e => error.value = e).finally(() => loading.value = false)
+else {
+    error.value = "No association found";
+}
 const draftValues = ref<DraftScore | undefined>(undefined)
 
-const addScore = () => draftValues.value = {song: props.songUri}
+const addScore = () => draftValues.value = {song: props.song._links?.self.href}
 const cancelAdd = () => draftValues.value = undefined
 
 const onAdded = (score: Score) => {

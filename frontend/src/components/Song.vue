@@ -193,8 +193,8 @@
             </div>
 
             <div v-if="!editing">
-                <ChordsArray :song-uri="song?._links?.self.href!"/>
-                <ScoreArray :song-uri="song?._links?.self.href!"/>
+                <ChordsArray :song="song!"/>
+                <ScoreArray :song="song!"/>
             </div>
 
         </div>
