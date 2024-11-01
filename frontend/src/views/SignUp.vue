@@ -9,7 +9,7 @@
             <div class="field">
                 <label class="label">Name</label>
                 <div class="control">
-                    <input class="input" type="text" placeholder="Elvis" v-model="registration.displayName"/>
+                    <input class="input" type="text" placeholder="Elvis" v-model="registration.displayName" />
                 </div>
             </div>
 
@@ -17,14 +17,14 @@
                 <label class="label">Name of your choir</label>
                 <div class="control">
                     <input class="input" type="text" placeholder=""
-                           v-model="(registration as NewChoirRegistration).choirName"/>
+                        v-model="(registration as NewChoirRegistration).choirName" />
                 </div>
             </div>
 
             <div class="field">
                 <label class="label">Email</label>
                 <div class="control has-icons-left">
-                    <input class="input" type="email" placeholder="you@" v-model="registration.email"/>
+                    <input class="input" type="email" placeholder="you@" v-model="registration.email" />
                     <span class="icon is-small is-left">
                         <i class="fas fa-envelope"></i>
                     </span>
@@ -35,7 +35,7 @@
                 <label class="label">Password</label>
                 <p class="control has-icons-left">
                     <input class="input" type="password" placeholder="Super safe password"
-                           v-model="registration.password"/>
+                        v-model="registration.password" />
                     <span class="icon is-small is-left">
                         <i class="fas fa-lock"></i>
                     </span>
@@ -61,7 +61,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import api from "./../api.js";
+import api from "../services/api.js";
 import { AcceptInvite, Choir, NewChoirRegistration, Registration } from "@/types";
 import { useRoute, useRouter } from "vue-router";
 

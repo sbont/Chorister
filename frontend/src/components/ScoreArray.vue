@@ -2,7 +2,7 @@
     <div class="scores m-2 p-3">
         <div class="is-size-4">Scores</div>
         <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
-            <ScoreComponent v-for="score in scores" :key="score._links?.self.href" :value="(score as Score)"
+            <ScoreComponent v-for="score in scores" :key="score._links?.self.href" :value="(score as Score)" :song="song"
                             @remove="removeScore(score)"></ScoreComponent>
 
             <div v-if="!draftValues">

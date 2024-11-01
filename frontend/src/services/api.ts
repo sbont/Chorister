@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useAuth } from "@/stores/authStore";
 import { Invite, Song, Score, Category, Setlist, SetlistEntry, Choir, User, WithEmbedded, AcceptInvite, NewChoirRegistration, Chords, ApiEntity, UploadReturnEnvelope } from "@/types";
 
-const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + '/api';
+export const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + '/api';
 const auth = useAuth();
 const instance = axios.create({
     baseURL: SERVER_URL,
@@ -12,7 +12,7 @@ instance.interceptors.request.use(
     async config => {
         let accessToken = await auth.getAccessToken()
         if(accessToken) {
-            config.headers.common.Authorization = 'Bearer ' + accessToken
+            config.headers.Authorization = 'Bearer ' + accessToken
         }
         return config
     }
@@ -127,9 +127,9 @@ const functions = {
 
     getUploadReturnEnvelope: () => instance.get<UploadReturnEnvelope>('/files/new-upload'),
 
-    getUploadReturnEnvelopeForId: (id: number) => instance.get<UploadReturnEnvelope>(`/files/${id}/new-upload`),
+    getUploadReturnEnvelopeForId: (id: number) => instance.get<UploadReturnEnvelope>(`/files/${id}/upload`),
 
-    getFile: (id: number) => instance.get(`/files/${id}`, { responseType: 'blob'}),
+    getFile: (id: number) => instance.get(`/files/${id}`),
 
     // Scores
 

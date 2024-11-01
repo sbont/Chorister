@@ -1,57 +1,58 @@
 <template>
     <div>
         <div class="setlist-detail-container">
-            <SetlistDetail/>
+            <SetlistDetail />
         </div>
         <div class="songs-container">
             <div class="p-2">
                 <progress v-if="state == State.Loading" class="progress is-medium is-info" max="100"></progress>
                 <table class="table is-hoverable is-fullwidth song-table" v-if="state != State.Loading" v-cloak>
                     <thead>
-                    <tr>
-                        <th class="col0" title="order"></th>
-                        <th class="col1" title="number"></th>
-                        <th class="col2">Title</th>
-                        <th class="col3">Composer</th>
-                        <th class="col4">Songbook</th>
-                        <th class="col5">No.</th>
-                        <th class="col6"></th>
-                    </tr>
+                        <tr>
+                            <th class="col0" title="order"></th>
+                            <th class="col1" title="number"></th>
+                            <th class="col2">Title</th>
+                            <th class="col3">Composer</th>
+                            <th class="col4">Songbook</th>
+                            <th class="col5">No.</th>
+                            <th class="col6"></th>
+                        </tr>
                     </thead>
                     <tbody>
 
-                    <tr v-for="(entry, i) in entries" class="song" :key="entry.setlistEntryUri" draggable="true">
-                        <td class="col0">
-                            <div class="move-container">
-                                <div class="icon is-small" @click="moveUp(entry)" :class="{ 'is-disabled': i == 0 }">
-                                    <i class="fas fa-caret-up"></i>
-                                </div>
+                        <tr v-for="(entry, i) in entries" class="song" :key="entry.setlistEntryUri" draggable="true">
+                            <td class="col0">
+                                <div class="move-container">
+                                    <div class="icon is-small" @click="moveUp(entry)"
+                                        :class="{ 'is-disabled': i == 0 }">
+                                        <i class="fas fa-caret-up"></i>
+                                    </div>
 
-                                <div class="icon is-small" @click.prevent="moveDown(entry)"
-                                     :class="{ 'is-disabled': isLast(entry) }">
-                                    <i class="fas fa-caret-down"></i>
+                                    <div class="icon is-small" @click.prevent="moveDown(entry)"
+                                        :class="{ 'is-disabled': isLast(entry) }">
+                                        <i class="fas fa-caret-down"></i>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td>{{ entry.number }}</td>
-                        <th>
-                            <router-link :to="{ name: 'Song', params: { id: entry.song?.id } }" append>
-                                {{ entry.song.title }}
-                            </router-link>
-                        </th>
-                        <td>{{ entry.song.composer }}</td>
-                        <td>{{ entry.song.songbook?.title }}</td>
-                        <td>{{ entry.song.songbookNumber }}</td>
-                        <td class="p-1b remove">
-                            <button class="button is-danger is-inverted is-small"
+                            </td>
+                            <td>{{ entry.number }}</td>
+                            <th>
+                                <router-link :to="{ name: 'Song', params: { id: entry.song?.id } }" append>
+                                    {{ entry.song.title }}
+                                </router-link>
+                            </th>
+                            <td>{{ entry.song.composer }}</td>
+                            <td>{{ entry.song.songbook?.title }}</td>
+                            <td>{{ entry.song.songbookNumber }}</td>
+                            <td class="p-1b remove">
+                                <button class="button is-danger is-inverted is-small"
                                     :class="{ 'is-loading': state == State.Deleting }"
                                     @click="removeSongFromSetlist(entry as SetlistSong)">
-                                <span class="icon is-small">
-										<i class="fas fa-times"></i>
-									</span>
-                            </button>
-                        </td>
-                    </tr>
+                                    <span class="icon is-small">
+                                        <i class="fas fa-times"></i>
+                                    </span>
+                                </button>
+                            </td>
+                        </tr>
                     </tbody>
                     <tfoot></tfoot>
                 </table>
@@ -63,7 +64,7 @@
 <script setup lang="ts">
 import SetlistDetail from '@/components/SetlistDetail.vue';
 import { Song } from '@/types'
-import api from "@/api";
+import api from "@/services/api";
 import { useRoute } from "vue-router";
 import { useSetlists } from "@/stores/setlistStore";
 import { computed, ref } from "vue";
@@ -178,5 +179,4 @@ table td.remove {
 .col6 {
     width: 4%;
 }
-
 </style>

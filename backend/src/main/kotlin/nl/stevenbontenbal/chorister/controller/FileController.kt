@@ -56,7 +56,7 @@ class FileController(
         val file = id?.let { fileService.getFile(it) } ?: return ResponseEntity.notFound().build()
         val key = file.s3Key ?: return ResponseEntity.internalServerError().body("File key not found")
         val downloadUrl = fileService.getDownloadUrl(key)
-        return ResponseEntity.status(HttpStatus.FOUND)
+        return ResponseEntity.status(HttpStatus.CREATED)
             .location(URI.create(downloadUrl))
             .build()
     }
