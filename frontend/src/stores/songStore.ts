@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import api from "../api";
+import api from "../services/api";
 import { Song } from "@/types";
 import { CacheListMap, CacheMap } from "@/types/CacheMaps";
 

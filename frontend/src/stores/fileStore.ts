@@ -1,4 +1,4 @@
-import api from "@/api";
+import api from "@/services/api";
 import { CacheMap, CacheListMap } from "@/types/CacheMaps";
 import { defineStore } from "pinia";
 import moment from "moment";
@@ -24,11 +24,11 @@ export const useFiles = defineStore('files', {
     }),
     getters: {},
     actions: {
-        async getUploadEnvelope(id: number| undefined): Promise<UploadReturnEnvelope> {
+        async getUploadEnvelope(id: number | undefined): Promise<UploadReturnEnvelope> {
             if (id) {
                 const file = this.filesById.get(id)
                 if (file?.operation == "GET" && file?.expires && file.expires < new Date())
-                    return { fileId: id, uploadUrl: file.presignedUrl};
+                    return { fileId: id, uploadUrl: file.presignedUrl };
             }
 
             const response = await this.fetchUploadEnvelope(id)
@@ -45,10 +45,10 @@ export const useFiles = defineStore('files', {
                 operation: "GET"
             }
             this.filesById.set(response.data.fileId, file);
-            return { fileId: response.data.fileId, uploadUrl: file.presignedUrl};
+            return { fileId: response.data.fileId, uploadUrl: file.presignedUrl };
         },
 
-        async fetchUploadEnvelope(id: number| undefined) {
+        async fetchUploadEnvelope(id: number | undefined) {
             if (id == undefined)
                 return api.getUploadReturnEnvelope();
             else

@@ -3,14 +3,14 @@
         <div class="is-flex is-justify-content-space-between m-3">
             <h1 class="title" v-if="category">{{ category.name }}</h1>
         </div>
-        <Songs/>
+        <Songs />
     </div>
 </template>
 
 <script setup lang="ts">
 import { Category } from "@/types";
 import { onMounted, ref } from "vue";
-import api from "./../api.js";
+import api from "../services/api.js";
 import Songs from '@/components/Songs.vue'
 import { useRoute } from "vue-router";
 

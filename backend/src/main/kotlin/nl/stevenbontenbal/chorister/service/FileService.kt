@@ -67,6 +67,7 @@ class FileService(
         val request = GetObjectRequest {
             bucket = s3Configuration.bucketName
             key = fileKey
+            responseContentDisposition = "inline"
         }
         val presigned = client.presignGetObject(request, 2.minutes)
         return presigned.url.toString()

@@ -8,3 +8,7 @@ export async function submitFile(objectUri: string, file: File) {
         }
     });
 }
+
+export function downloadFile(url: string) {
+    return axios.get(url, { responseType: 'blob' });
+}
