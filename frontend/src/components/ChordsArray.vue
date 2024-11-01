@@ -20,24 +20,30 @@
 
 <script setup lang="ts">
 import ChordsComponent from "@/components/Chords.vue"
-import { Chords, DraftChords } from "@/types";
+import { Chords, DraftChords, Link, Song } from "@/types";
 import { ref } from "vue";
 import { isNew } from "@/utils";
 import { useChords } from "@/stores/chordsStore";
 
 
-const props = defineProps({
-    songUri: String
-})
+const props = defineProps<{
+    song: Song
+}>();
 
 const loading = ref(true)
 const error = ref<string | undefined>(undefined)
 const chordsStore = useChords()
 const chordses = ref<Array<Chords>>([]);
-chordsStore.fetchRelated(props.songUri as string, "chords").then(data => chordses.value = data as Chords[]).catch(e => error.value = e).finally(() => loading.value = false)
+const link = props.song._links?.chords;
+if (link) {
+    chordsStore.fetchRelatedFromLink(link).then(data => chordses.value = data as Chords[]).catch(e => error.value = e).finally(() => loading.value = false)
+} else {
+    error.value = "No association found";
+}
+
 const draftValues = ref<DraftChords | undefined>(undefined)
 
-const addChords = () => draftValues.value = {song: props.songUri}
+const addChords = () => draftValues.value = {song: props.song?._links?.self.href}
 const cancelAdd = () => draftValues.value = undefined
 
 const onAdded = (chords: Chords) => {

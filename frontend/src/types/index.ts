@@ -1,14 +1,37 @@
 import { Key } from "./Key"
 
-export interface Identifiable extends ApiEntity {
+export interface Identifiable {
     id: number | undefined
 }
 
 export interface ApiEntity {
-    _links: { self: { href: string }} | undefined
+    _links: ApiEntityLinks | undefined
 }
 
-export interface Choir extends Identifiable {
+export interface ApiEntityWith<W extends WithAssociation> {
+    _links: ApiEntityLinks & W | undefined
+}
+
+export interface ApiEntityLinks {
+    self: Link
+}
+
+export interface Link {
+    href: string
+    templated?: boolean
+}
+
+export interface WithAssociation{};
+
+export interface ChordsLink extends WithAssociation {
+    chords: Link
+}
+
+export interface ScoresLink extends WithAssociation {
+    scores: Link
+}
+
+export interface Choir extends Identifiable, ApiEntity {
     id: number
     name: string
     type: string
@@ -16,7 +39,7 @@ export interface Choir extends Identifiable {
     manager: User
 }
 
-export interface User extends Identifiable {
+export interface User extends Identifiable, ApiEntity {
     id: number,
     choir: Choir,
     email: string,
@@ -24,7 +47,7 @@ export interface User extends Identifiable {
     displayName: string
 }
 
-export interface Invite extends Identifiable {
+export interface Invite extends Identifiable, ApiEntity {
     id: number
     email: string
     invitedBy: User
@@ -55,7 +78,7 @@ export interface Categories {
     liturgical: Array<Category>
 }
 
-export interface Category extends Identifiable {
+export interface Category extends Identifiable, ApiEntity {
     id: number,
     choir: Choir,
     name: string,
@@ -89,7 +112,7 @@ export interface Chords extends ApiEntity {
 export interface DraftChords extends Omit<Partial<Chords>, "song"> {
     song?: string
 }
-export interface Song extends Identifiable {
+export interface Song extends Identifiable, ApiEntityWith<ChordsLink & ScoresLink> {
     id: number,
     choir: Choir,
     title: string,
@@ -109,12 +132,12 @@ export interface Song extends Identifiable {
     lastSetlist: Setlist | undefined
 }
 
-export interface Songbook extends Identifiable {
+export interface Songbook extends Identifiable, ApiEntity {
     id: number,
     title: string
 }
 
-export interface Setlist extends Identifiable {
+export interface Setlist extends Identifiable, ApiEntity {
     id: number | undefined,
     name: string,
     date: Date,
@@ -129,7 +152,7 @@ export interface SetlistEntry extends ApiEntity {
     number: number
 }
 
-export interface User extends Identifiable {
+export interface User extends Identifiable, ApiEntity {
     id: number,
     choir: Choir,
     email: string,

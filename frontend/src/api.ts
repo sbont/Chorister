@@ -20,7 +20,8 @@ instance.interceptors.request.use(
 
 const functions = {
 
-    getGetConfig: (embeddedAttributeName: string) => {
+    getGetConfig: (path: string) => {
+        const embeddedAttributeName = path.split("/").pop()!;
         return {
             transformResponse: [
                 function(data: string) {
