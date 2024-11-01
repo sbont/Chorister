@@ -40,6 +40,8 @@ export const useSongs = defineStore('songs', {
         },
 
         put(song: Song) {
+            if (song._links?.self.templated)
+                song._links.self.href = song._links.self.href.replace("{?projection}", "");
             this.songs.set(song.id, song);
         },
 

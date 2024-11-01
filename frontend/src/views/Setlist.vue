@@ -35,9 +35,8 @@
                         </td>
                         <td>{{ entry.number }}</td>
                         <th>
-                            <router-link :to="{ name: 'Song', params: { id: entry.song?.id } }" append>{{
-                                    entry.song.title
-                                }}
+                            <router-link :to="{ name: 'Song', params: { id: entry.song?.id } }" append>
+                                {{ entry.song.title }}
                             </router-link>
                         </th>
                         <td>{{ entry.song.composer }}</td>
