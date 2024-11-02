@@ -52,16 +52,10 @@
 import { PropType, ref } from "vue";
 import { Category, CategoryType } from "@/types";
 
-const props = defineProps({
-    categories: {
-        type: Object as PropType<Array<Category>>,
-        required: true
-    },
-    categoryType: {
-        type: Object as PropType<CategoryType>,
-        required: true
-    }
-})
+const props = defineProps<{
+    categories: Array<Category>,
+    categoryType: CategoryType
+}>();
 const emit = defineEmits(["remove", "save"])
 
 // state
