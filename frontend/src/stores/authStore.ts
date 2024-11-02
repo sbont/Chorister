@@ -64,7 +64,6 @@ export const useAuth = defineStore('auth', {
                 userManager.getUser()
                     .then(user => {
                         if (user) {
-                            console.log('Got access token from user')
                             resolve(user.access_token)
                         } else {
                             resolve(null)
