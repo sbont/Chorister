@@ -65,7 +65,9 @@ export const useCategories = defineStore('categories', {
         },
 
         async delete(category: Category) {
-            await api.delete(category)
+            await api.delete(category);
+            this.categories.liturgical = this.categories.liturgical.filter(c => c.id !== category.id);
+            this.categories.season = this.categories.season.filter(c => c.id !== category.id);
         }
     }
 });
