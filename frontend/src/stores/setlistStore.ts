@@ -14,7 +14,6 @@ export const useSetlists = defineStore('setlists', {
     }),
     getters: {
         allSetlists(state) {
-            console.log("All setlists:", [...state.setlists.values()]);
             return [...state.setlists.values()];
         },
         count(state) {

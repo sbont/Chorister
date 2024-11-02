@@ -37,7 +37,6 @@ export const useCategories = defineStore('categories', {
         },
 
         async getForSong(songId: number) {
-            console.log(this.categoriesBySongId.keys());
             return this.categoriesBySongId.has(songId) ? this.categoriesBySongId.get(songId) : await this.fetchForSong(songId)
         },
 

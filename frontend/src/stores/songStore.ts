@@ -29,12 +29,9 @@ export const useSongs = defineStore('songs', {
         },
 
         async get(songId: number) {
-            console.log("getting song with id: " + songId);
             if (!this.songs.has(songId)) {
-                console.log("Fetching...");
                 return await this.fetch(songId);
             } else {
-                console.log("From store");
                 return this.songs.get(songId);
             }
         },
@@ -61,7 +58,7 @@ export const useSongs = defineStore('songs', {
 
         delete(songId: number) {
             return api.deleteSongForId(songId)
-                .then((response) => {
+                .then((_) => {
                     this.songs.delete(songId);
                 });
         }

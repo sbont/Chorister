@@ -131,7 +131,6 @@ router.beforeEach((to, from, next) => {
   // Handling it here prevents us to have an additional callback.html file. An additional file would lead to a short hiccup after logging in.
   // So here we handle the login redirect and then send the user to the "/" route.
   if (to.path === '/authorized') {
-    console.log('Login AFTERR');
     // Inform the authentication of the login redirect. Afterwards we send the user to the main page
     auth.handleLoginRedirect()
       .then(() => next('/'))
