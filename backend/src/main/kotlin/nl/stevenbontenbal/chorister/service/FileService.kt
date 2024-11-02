@@ -12,7 +12,6 @@ import nl.stevenbontenbal.chorister.configuration.S3Configuration
 import nl.stevenbontenbal.chorister.exceptions.InvalidIdentifierException
 import nl.stevenbontenbal.chorister.model.entities.File
 import nl.stevenbontenbal.chorister.repository.FileRepository
-import org.springframework.stereotype.Component
 import java.net.URL
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
