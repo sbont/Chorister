@@ -29,6 +29,7 @@ import { Choir, Category, CategoryType } from "@/types"
 import { PropType } from "vue";
 import { useCategories } from "@/stores/categoryStore";
 import CategoriesByType from "@/components/CategoriesByType.vue";
+import { AxiosError } from 'axios';
 
 const props = defineProps({
     choir: {
@@ -56,7 +57,11 @@ const onSave = (category: Category) => {
 }
 
 const onDelete = (category: Category) => {
-    categoryStore.delete(category)
+    try {
+        categoryStore.delete(category);
+    } catch(e) {
+        error.value = (e as AxiosError).message;
+    }    
 }
 
 
