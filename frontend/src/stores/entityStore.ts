@@ -74,7 +74,7 @@ export const useEntityStore = (name: string, endpoint: string) => defineStore(na
                 return this.objByRelatedUri.get(link.href);
             }
         },
-        async saveToServer(obj: ApiEntity, link?: Link) {
+        async saveToServer<T extends ApiEntity>(obj: T, link?: Link) {
             const response = isNew(obj) ? await api.create(endpoint, obj) : await api.update(obj._links!.self.href, obj);
             this.putRelated(obj, link);
             return response.data;

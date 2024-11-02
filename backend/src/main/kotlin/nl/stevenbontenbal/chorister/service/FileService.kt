@@ -2,6 +2,7 @@ package nl.stevenbontenbal.chorister.service
 
 import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
 import aws.sdk.kotlin.services.s3.S3Client
+import aws.sdk.kotlin.services.s3.model.DeleteObjectRequest
 import aws.sdk.kotlin.services.s3.model.GetObjectRequest
 import aws.sdk.kotlin.services.s3.model.PutObjectRequest
 import aws.sdk.kotlin.services.s3.presigners.presignGetObject
@@ -11,6 +12,7 @@ import nl.stevenbontenbal.chorister.configuration.S3Configuration
 import nl.stevenbontenbal.chorister.exceptions.InvalidIdentifierException
 import nl.stevenbontenbal.chorister.model.entities.File
 import nl.stevenbontenbal.chorister.repository.FileRepository
+import org.springframework.stereotype.Component
 import java.net.URL
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
@@ -71,6 +73,15 @@ class FileService(
         }
         val presigned = client.presignGetObject(request, 2.minutes)
         return presigned.url.toString()
+    }
+
+    suspend fun delete(file: File) {
+        val client = getClient()
+        val request = DeleteObjectRequest {
+            bucket = s3Configuration.bucketName
+            key = file.s3Key
+        }
+        client.deleteObject(request)
     }
 
     private suspend fun getClient() = S3Client.fromEnvironment {

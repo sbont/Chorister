@@ -1,6 +1,7 @@
 <template>
     <div class="scores m-2 p-3">
         <div class="is-size-4">Scores</div>
+        <div v-if="error" class="is-danger">{{ error }}</div>
         <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
             <ScoreComponent v-for="score in scores" :key="score._links?.self.href" :value="(score as Score)" :song="song"
                             @remove="removeScore(score)"></ScoreComponent>
@@ -23,6 +24,7 @@ import { Score, DraftScore, Song } from "@/types";
 import { ref } from "vue";
 import { isNew } from "@/utils";
 import { useScores } from "@/stores/scoreStore";
+import { AxiosError } from "axios";
 
 
 const props = defineProps<{
@@ -30,7 +32,7 @@ const props = defineProps<{
 }>();
 
 const loading = ref(true)
-const error = ref<string | undefined>(undefined)
+const error = ref<string>()
 const scoreStore = useScores()
 const scores = ref<Array<Score>>([]);
 const link = props.song._links?.scores
@@ -49,9 +51,14 @@ const onAdded = (score: Score) => {
     draftValues.value = undefined
 }
 
-const removeScore = (score: Score) => {
+const removeScore = async (score: Score) => {
     if (!isNew(score)) {
-        scoreStore.delete(score);
+         try {
+            await scoreStore.delete(score);
+         } catch(e) {
+            error.value = (e as AxiosError).message
+            return;
+         }
     }
     scores.value = scores.value.filter(current => current._links?.self.href !== score._links?.self.href);
 }

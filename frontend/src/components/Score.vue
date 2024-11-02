@@ -62,11 +62,12 @@ import api from '@/services/api';
 import { downloadFile } from '@/services/fileService';
 import { useFiles } from '@/stores/fileStore';
 import { useScores } from "@/stores/scoreStore";
-import { ApiEntity, DraftScore, Score, Song } from "@/types";
+import { DraftScore, Score, Song } from "@/types";
 import { isNew } from "@/utils";
 import FileUpload, { FileUploadRemoveEvent, FileUploadSelectEvent, FileUploadUploaderEvent } from 'primevue/fileupload';
 import { PropType, onMounted, ref } from 'vue';
-import { extension, extensions } from 'mime-types';
+import { extension } from 'mime-types';
+import { AxiosError } from 'axios';
 
 const props = defineProps({
     value: {
@@ -139,7 +140,7 @@ const upload = async (file: File) => {
         await fileStore.upload(envelope.uploadUrl, file)
     } catch (e) {
         console.log(e);
-        error.value = JSON.stringify(e);
+        error.value = (e as AxiosError).message;
     }
     return envelope.fileId;
 }
@@ -160,7 +161,8 @@ const save = async () => {
         return;
     }
 
-    const savedScore = await scoreStore.saveToServer(<ApiEntity>score.value)
+    const savedScore = await scoreStore.saveToServer(<Score>score.value)
+    savedScore.file = { id: fileId };
     score.value = savedScore;
     await api.putFileIdForScore(savedScore._links?.self.href!, fileId);
 
