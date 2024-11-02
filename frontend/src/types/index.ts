@@ -167,7 +167,7 @@ type Embedded<N extends string, O> = {
 
 export interface File {
     id: number,
-    fileUrl: string
+    fileUrl?: string
 }
 
 export interface WithEmbedded<N extends string, O> {
