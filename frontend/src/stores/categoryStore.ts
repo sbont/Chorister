@@ -56,11 +56,11 @@ export const useCategories = defineStore('categories', {
         },
 
         async saveToServer(category: Category) {
-            await api.createNewCategory(category);
+            const response = await api.createNewCategory(category);
             if (category.type == CategoryType.Season) {
-                this.categories.season.push(category);
+                this.categories.season.push(response.data);
             } else {
-                this.categories.liturgical.push(category);
+                this.categories.liturgical.push(response.data);
             }
         },
 
