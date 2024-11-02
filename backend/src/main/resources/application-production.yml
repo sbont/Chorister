@@ -48,3 +48,9 @@ logging:
 zitadel:
   base-url: https://login.chorister.co/management/v1
   admin-access-token: ${CHORISTER_ZITADEL_ACCESS_TOKEN}
+s3:
+  endpoint-url: https://ffdaee23897ed0dfa581910404b6a41e.eu.r2.cloudflarestorage.com
+  bucket-name: ${CHORISTER_S3_BUCKET}
+  region: auto
+  access-key: ${CHORISTER_S3_ACCESS_KEY}
+  secret-key: ${CHORISTER_S3_SECRET_KEY}
