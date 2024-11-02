@@ -29,7 +29,7 @@
                 <div class="content">
                     <FileUpload name="file[]" :disabled="uploadDisabled()" @uploader="onUpload" @select="selectFile"
                         @remove="removeFile" :multiple="false" :file-limit="1" accept="application/pdf,image/*"
-                        :maxFileSize="1000000" invalidFileSizeMessage="File exceeds maximum size of 1GB."
+                        :maxFileSize="2000000" invalidFileSizeMessage="File exceeds maximum size of 2GB."
                         choose-label="Browse" customUpload>
                         <template #empty>
                             <span>Drag and drop files to here to upload.</span>
