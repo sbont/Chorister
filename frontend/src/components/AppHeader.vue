@@ -2,18 +2,12 @@
     <nav class="navbar px-2" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <router-link to="/" class="navbar-item">
-                <img src="@/assets/logo.png"
-                     alt="Chorister logo"/>
+                <img src="@/assets/logo.png" alt="Chorister logo" />
             </router-link>
             <div class="has-text-primary is-size-7" style="margin-top: 0.5rem; margin-left: -32px; z-index: 2;">beta
             </div>
-            <a
-                role="button"
-                class="navbar-burger"
-                aria-label="menu"
-                aria-expanded="false"
-                data-target="navbarBasicExample"
-            >
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
+                data-target="navbarBasicExample">
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
@@ -22,8 +16,9 @@
 
         <div id="navbarBasicExample" class="navbar-menu">
             <div v-if="isLoggedIn" class="navbar-start">
-                <router-link to="/repertoire" class="navbar-item"> Repertoire</router-link>
-                <router-link to="/mychoir" class="navbar-item"> My Choir</router-link>
+                <router-link to="/planning" class="navbar-item">Planning</router-link>
+                <router-link to="/repertoire" class="navbar-item">Repertoire</router-link>
+                <router-link to="/mychoir" class="navbar-item">My Choir</router-link>
             </div>
 
             <div class="navbar-end">
@@ -38,7 +33,7 @@
                     <a class="navbar-link"> Account </a>
                     <div class="navbar-dropdown">
                         <router-link to="/profile" class="navbar-item"> Profile</router-link>
-                        <hr class="navbar-divider"/>
+                        <hr class="navbar-divider" />
                         <a href="https://github.com/sbont/Chorister/issues" class="navbar-item" target="_blank"> Report
                             an issue </a>
                         <a @click="onLogout()" class="navbar-item"> Log out </a>
