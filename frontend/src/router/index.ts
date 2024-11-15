@@ -10,16 +10,16 @@ const routes = [
             hideHeader: true,
             forwardWhenAuthenticated: '/repertoire'
         },
-        component: () => import('../views/Landing.vue'),
+        component: () => import('../components/Landing.vue'),
     },
     {
         path: '/signup',
         name: 'SignUp',
-        component: () => import('../views/SignUp.vue')
+        component: () => import('../components/SignUp.vue')
     },
     {
         path: '/repertoire',
-        component: () => import('../views/Repertoire.vue'),
+        component: () => import('../components/Repertoire.vue'),
         meta: {
             requiresAuth: true
         },
@@ -27,7 +27,7 @@ const routes = [
             {
                 path: '',
                 name: 'Repertoire',
-                component: () => import('../views/AllSongs.vue'),
+                component: () => import('../components/AllSongs.vue'),
                 meta: {
                     requiresAuth: true
                 },
@@ -35,7 +35,7 @@ const routes = [
             {
                 path: 'by-season/:id',
                 name: 'CategorySeason',
-                component: () => import('../views/SongsByCategory.vue'),
+                component: () => import('../components/SongsByCategory.vue'),
                 meta: {
                     requiresAuth: true
                 },
@@ -43,7 +43,7 @@ const routes = [
             {
                 path: 'by-liturgical-moment/:id',
                 name: 'CategoryLiturgical',
-                component: () => import('../views/SongsByCategory.vue'),
+                component: () => import('../components/SongsByCategory.vue'),
                 meta: {
                     requiresAuth: true
                 },
@@ -69,7 +69,7 @@ const routes = [
     {
         path: '/planning',
         name: 'Planning',
-        component: () => import('../views/Planning.vue'),
+        component: () => import('../components/Planning.vue'),
         children: [
             {
                 path: 'setlist/new',
@@ -82,7 +82,7 @@ const routes = [
             {
                 path: 'setlist/:id',
                 name: 'Setlist',
-                component: () => import('../views/Setlist.vue'),
+                component: () => import('../components/Setlist.vue'),
                 meta: {
                     requiresAuth: true
                 }
@@ -95,17 +95,17 @@ const routes = [
     {
         path: '/mychoir',
         name: 'My Choir',
-        component: () => import('../views/MyChoir.vue')
+        component: () => import('../components/MyChoir.vue')
     },
     {
         path: '/profile',
         name: 'Profile',
-        component: () => import('../views/Profile.vue')
+        component: () => import('../components/Profile.vue')
     },
     {
         path: '/repertoire/setlist/:id/texts',
         name: 'Export',
-        component: () => import('../views/SetlistTextExport.vue'),
+        component: () => import('../components/SetlistTextExport.vue'),
         meta: {
             requiresAuth: true,
             hideHeader: true
@@ -114,7 +114,7 @@ const routes = [
     {
         path: '/authorized',
         name: 'Authorized',
-        component: () => import('../views/Authorized.vue')
+        component: () => import('../components/Authorized.vue')
     }
 ]
 
