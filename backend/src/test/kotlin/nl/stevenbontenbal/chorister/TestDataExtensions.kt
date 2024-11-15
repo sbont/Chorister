@@ -20,8 +20,8 @@ fun Song.Companion.create(choir: Choir): Song {
     )
 }
 
-fun Setlist.Companion.create(choir: Choir, id: Long? = null): Setlist {
-    return Setlist(
+fun Event.Companion.create(choir: Choir, id: Long? = null): Event {
+    return Event(
         id = id,
         choir = choir,
         name = "Christmas Morning",
@@ -29,8 +29,8 @@ fun Setlist.Companion.create(choir: Choir, id: Long? = null): Setlist {
     )
 }
 
-fun Setlist.Companion.create(choir: Choir, entityManager: TestEntityManager): Setlist {
-    return Setlist.create(choir).persist(entityManager)
+fun Event.Companion.create(choir: Choir, entityManager: TestEntityManager): Event {
+    return Event.create(choir).persist(entityManager)
 }
 
 fun Category.Companion.create(choir: Choir, categoryType: CategoryType): Category {
@@ -66,16 +66,16 @@ fun Invite.Companion.create(choir: Choir): Invite {
     )
 }
 
-fun SetlistEntry.Companion.create(setlist: Setlist, song: Song, number: Int = 1): SetlistEntry {
-    return SetlistEntry(
-        setlist = setlist,
+fun EventEntry.Companion.create(event: Event, song: Song, sequence: Int = 1): EventEntry {
+    return EventEntry(
+        event = event,
         song = song,
-        number = number
+        sequence = sequence
     )
 }
 
-fun SetlistEntry.Companion.create(setlist: Setlist, songs: List<Song>): List<SetlistEntry> {
-    return songs.mapIndexed { index, song -> SetlistEntry.create(setlist, song, index + 1) }
+fun EventEntry.Companion.create(event: Event, songs: List<Song>): List<EventEntry> {
+    return songs.mapIndexed { index, song -> EventEntry.create(event, song, index + 1) }
 }
 
 fun <T> T.persist(entityManager: TestEntityManager): T {

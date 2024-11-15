@@ -5,7 +5,7 @@ import java.time.LocalDate
 import jakarta.persistence.*
 
 @Entity
-class Setlist (
+class Event (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -14,8 +14,8 @@ class Setlist (
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
     override var choir: Choir?,
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "setlist", cascade=[CascadeType.ALL])
-    var entries: MutableList<SetlistEntry> = mutableListOf(),
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "event", cascade=[CascadeType.ALL])
+    var entries: MutableList<EventEntry> = mutableListOf(),
 ): ChoirOwnedEntity {
     companion object
 }

@@ -21,7 +21,7 @@ export interface Link {
     templated?: boolean
 }
 
-export interface WithAssociation{};
+export interface WithAssociation { };
 
 export interface ChordsLink extends WithAssociation {
     chords: Link
@@ -127,9 +127,9 @@ export interface Song extends Identifiable, ApiEntityWith<ChordsLink & ScoresLin
     addedAt: Date,
     addedBy: User,
     categories: Array<Category>,
-    setlistEntries: Array<SetlistEntry>,
+    eventEntries: Array<EventEntry>,
     text: string,
-    lastSetlist: Setlist | undefined
+    lastEvent: Event | undefined
 }
 
 export interface Songbook extends Identifiable, ApiEntity {
@@ -137,17 +137,17 @@ export interface Songbook extends Identifiable, ApiEntity {
     title: string
 }
 
-export interface Setlist extends Identifiable, ApiEntity {
+export interface Event extends Identifiable, ApiEntity {
     id: number | undefined,
     name: string,
     date: Date,
     choir: Choir,
-    entries: Array<SetlistEntry>,
+    entries: Array<EventEntry>,
 }
 
-export interface SetlistEntry extends ApiEntity {
+export interface EventEntry extends ApiEntity {
     id: string,
-    setlist: Setlist,
+    event: Event,
     song: Song,
     number: number
 }
@@ -161,7 +161,7 @@ export interface User extends Identifiable, ApiEntity {
     zitadelId: string
 }
 
-type Embedded<N extends string, O> = { 
+type Embedded<N extends string, O> = {
     [K in N]: O
 }
 

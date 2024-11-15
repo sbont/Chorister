@@ -615,7 +615,7 @@ databaseChangeLog:
     changes:
     - dropTable:
         tableName: score
-databaseChangeLog:
+
 - changeSet:
     id: 1729343815383-3
     author: Steven.Bontenbal (generated)
@@ -674,3 +674,128 @@ databaseChangeLog:
         referencedTableName: file
         validate: true
 
+- changeSet:
+    id: 1731670263026-3
+    author: Steven.Bontenbal (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: eventPK
+            name: id
+            type: BIGINT
+        - column:
+            name: date
+            type: date
+        - column:
+            name: name
+            type: VARCHAR(255)
+        - column:
+            name: choir_id
+            type: BIGINT
+        tableName: event
+- changeSet:
+    id: 1731670263026-4
+    author: Steven.Bontenbal (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: event_entryPK
+            name: id
+            type: BIGINT
+        - column:
+            name: label
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: sequence
+            type: INTEGER
+        - column:
+            name: event_id
+            type: BIGINT
+        - column:
+            name: song_id
+            type: BIGINT
+        tableName: event_entry
+- changeSet:
+    id: 1731670263026-5
+    author: Steven.Bontenbal (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: song_id
+        baseTableName: event_entry
+        constraintName: FKe919fp3phfkslni1htthyw3tb
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: song
+        validate: true
+- changeSet:
+    id: 1731670263026-6
+    author: Steven.Bontenbal (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: choir_id
+        baseTableName: event
+        constraintName: FKssop2edix9n99dfo0ry3ps08i
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: choir
+        validate: true
+- changeSet:
+    id: 1731670263026-7
+    author: Steven.Bontenbal (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: event_id
+        baseTableName: event_entry
+        constraintName: FKvqhkxe3llc057a3bipl5vwx9
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: event
+        validate: true
+- changeSet:
+    id: 1731670263026-8
+    author: Steven.Bontenbal (generated)
+    changes:
+    - dropForeignKeyConstraint:
+        baseTableName: setlist
+        constraintName: FK7q31nna27f76r8gd1c6m8yf83
+- changeSet:
+    id: 1731670263026-9
+    author: Steven.Bontenbal (generated)
+    changes:
+    - dropForeignKeyConstraint:
+        baseTableName: setlist_entry
+        constraintName: FKhruk0cy5p7w9gqopby40lrbnj
+- changeSet:
+    id: 1731670263026-10
+    author: Steven.Bontenbal (generated)
+    changes:
+    - dropForeignKeyConstraint:
+        baseTableName: setlist_entry
+        constraintName: FKtcv572md6w1pgevxh1w27tdn5
+- changeSet:
+    id: 1731670263026-12
+    author: Steven.Bontenbal (generated)
+    changes:
+    - dropTable:
+        tableName: setlist
+- changeSet:
+    id: 1731670263026-13
+    author: Steven.Bontenbal (generated)
+    changes:
+    - dropTable:
+        tableName: setlist_entry

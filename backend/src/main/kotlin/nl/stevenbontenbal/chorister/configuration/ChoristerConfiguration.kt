@@ -92,19 +92,14 @@ class ChoristerConfiguration(
                 configuration.exposeIdsFor(Chords::class.java)
                 configuration.exposeIdsFor(Score::class.java)
                 configuration.exposeIdsFor(Category::class.java)
-                configuration.exposeIdsFor(Setlist::class.java)
+                configuration.exposeIdsFor(Event::class.java)
                 configuration.exposeIdsFor(User::class.java)
                 configuration.exposeIdsFor(Invite::class.java)
-                configuration.exposeIdsFor(SetlistEntry::class.java)
+                configuration.exposeIdsFor(EventEntry::class.java)
                 configuration.exposeIdsFor(File::class.java)
                 corsRegistry.addMapping("/api/**")
                     .allowedMethods("*")
                     .allowedOrigins(properties.baseUrl)
-            }
-
-            override fun configureConversionService(conversionService: ConfigurableConversionService?) {
-                super.configureConversionService(conversionService)
-                conversionService?.addConverter(SetlistEntryIdConverter())
             }
         }
     }

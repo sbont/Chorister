@@ -19,6 +19,6 @@ interface SongRepository : CrudRepository<Song, Long> {
     fun findAllByCategories_id(@Param("id") categoryId: Long): Iterable<Song>
 
     @PostFilter("hasPermission(filterObject, 'read')")
-    @Query("select s from Song s join Setlist l where l.id = :id")
-    fun bysetlist(@Param("id") setlistId: Long): Iterable<Song>
+    @Query("select s from Song s join Event l where l.id = :id")
+    fun byevent(@Param("id") eventId: Long): Iterable<Song>
 }
