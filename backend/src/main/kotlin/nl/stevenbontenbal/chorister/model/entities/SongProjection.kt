@@ -20,10 +20,10 @@ interface SongProjection {
     var categories: MutableList<Category>?
 
     @JsonIgnore
-    fun getSetlistEntries(): MutableList<SetlistEntry>?
+    fun getEventEntries(): MutableList<EventEntry>?
 
-    fun getLastSetlist(): Setlist? = getSetlistEntries()
-        ?.map { entry -> entry.setlist }
+    fun getLastEvent(): Event? = getEventEntries()
+        ?.map { entry -> entry.event }
         ?.sortedByDescending { it.date }
         ?.firstOrNull { it.date != null && it.date!! <= LocalDate.now() }
 

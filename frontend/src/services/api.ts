@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useAuth } from "@/stores/authStore";
-import { Invite, Song, Score, Category, Setlist, SetlistEntry, Choir, User, WithEmbedded, AcceptInvite, NewChoirRegistration, Chords, ApiEntity, UploadReturnEnvelope } from "@/types";
+import { Invite, Song, Score, Category, Event, EventEntry, Choir, User, WithEmbedded, AcceptInvite, NewChoirRegistration, Chords, ApiEntity, UploadReturnEnvelope } from "@/types";
 
 export const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + '/api';
 const auth = useAuth();
@@ -11,7 +11,7 @@ const instance = axios.create({
 instance.interceptors.request.use(
     async config => {
         let accessToken = await auth.getAccessToken()
-        if(accessToken) {
+        if (accessToken) {
             config.headers.Authorization = 'Bearer ' + accessToken
         }
         return config
@@ -24,7 +24,7 @@ const functions = {
         const embeddedAttributeName = path.split("/").pop()!;
         return {
             transformResponse: [
-                function(data: string) {
+                function (data: string) {
                     return data ? JSON.parse(data)._embedded[embeddedAttributeName] : data;
                 }
             ]
@@ -68,7 +68,7 @@ const functions = {
     getCategoryById: (id: number) => instance.get<Category>('categories/' + id),
 
     getAllCategories: () => instance.get<Array<Category>>('categories', functions.getGetConfig('categories')),
-    
+
     createNewCategory: (category: Category) => instance.post<Category>('categories', category),
 
     // Song categories
@@ -83,30 +83,30 @@ const functions = {
 
     deleteSongCategory: (songId: number, categoryId: number) => instance.delete('songs/' + songId + '/categories/' + categoryId),
 
-    // Setlists
+    // Events
 
-    getSetlistById: (id: number) => instance.get<Setlist>('setlists/' + id),
+    getEventById: (id: number) => instance.get<Event>('events/' + id),
 
-    getAllSetlists: () => instance.get<Array<Setlist>>('setlists', functions.getGetConfig('setlists')),
+    getAllEvents: () => instance.get<Array<Event>>('events', functions.getGetConfig('events')),
 
-    createNewSetlist: (setlist: any) => instance.post('setlists', setlist),
+    createNewEvent: (event: any) => instance.post('events', event),
 
-    updateSetlistForId: (id: number, setlist: any) => instance.put('setlists/' + id, setlist),
+    updateEventForId: (id: number, event: any) => instance.put('events/' + id, event),
 
-    deleteSetlistForId: (id: number) => instance.delete('setlists/' + id),
+    deleteEventForId: (id: number) => instance.delete('events/' + id),
 
-    // Setlist songs
+    // Event songs
 
-    getSetlistEntries: (setlistId: number) => instance.get<Array<SetlistEntry & WithEmbedded<"song", Song>>>('setlists/' + setlistId + '/entries', functions.getGetConfig('setlistEntries')),
+    getEventEntries: (eventId: number) => instance.get<Array<EventEntry & WithEmbedded<"song", Song>>>('events/' + eventId + '/entries', functions.getGetConfig('eventEntries')),
 
-    postSetlistEntry: (entry: any) => instance.post("setlistEntries", entry, {
+    postEventEntry: (entry: any) => instance.post("eventEntries", entry, {
         headers: {
             'content-type': 'application/json'
         }
     }),
 
-    deleteSetlistEntry: (setlistEntryId: string) => instance.delete("setlistEntries/" + setlistEntryId),
-    
+    deleteEventEntry: (eventEntryId: string) => instance.delete("eventEntries/" + eventEntryId),
+
     // My Choir
 
     getChoirs: () => instance.get<Array<Choir>>('choirs', functions.getGetConfig('choirs')),
@@ -115,7 +115,7 @@ const functions = {
 
     // Users
 
-    getUsers: () => instance.get<Array<User>>('users',  functions.getGetConfig('users')),
+    getUsers: () => instance.get<Array<User>>('users', functions.getGetConfig('users')),
 
     getUserById: (userId: number) => instance.get<User>('users/' + userId),
 
@@ -135,7 +135,7 @@ const functions = {
 
     getUploadUrlForScore: (scoreUri: string) => instance.get(scoreUri + '/file/upload-url'),
 
-    putFileIdForScore: (scoreUri: string, fileId: number) => instance.put(scoreUri + '/file', fileId, { headers: { "Content-Type": "application/json" }}),
+    putFileIdForScore: (scoreUri: string, fileId: number) => instance.put(scoreUri + '/file', fileId, { headers: { "Content-Type": "application/json" } }),
 
     // Generic methods
 
@@ -150,7 +150,7 @@ const functions = {
     update: <Persistable extends ApiEntity>(uri: string, entity: Persistable) => instance.patch<Persistable>(uri, entity),
 
     deleteByUri: (uri: string) => instance.delete(uri),
-    
+
     delete: <Persistable extends ApiEntity>(entity: Persistable) => entity._links?.self.href ? instance.delete(entity._links?.self.href) : Promise.resolve(),
 
 }

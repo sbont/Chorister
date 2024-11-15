@@ -38,7 +38,7 @@ class Song(
     )
     var categories: MutableSet<Category>? = mutableSetOf(),
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "song", cascade=[CascadeType.ALL])
-    var setlistEntries: MutableList<SetlistEntry>? = mutableListOf(),
+    var eventEntries: MutableList<EventEntry>? = mutableListOf(),
     @Column(length = 32000)
     var text: String?,
 ) : ChoirOwnedEntity {

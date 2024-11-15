@@ -5,17 +5,17 @@
                 <p class="menu-label">Planning</p>
                 <ul class="menu-list">
                     <li>
-                        <router-link :to="{ name: 'NewSetlist' }" append>
+                        <router-link :to="{ name: 'NewEvent' }" append>
                             <span class="icon">
                                 <i class="fas fa-plus-square"></i>
                             </span>
                             Add event
                         </router-link>
                     </li>
-                    <li v-for="(setlist) in allSetlists" :key="setlist.id" class="droppable"
-                        @drop="dropSong($event, setlist)" @dragover.prevent @dragenter.prevent>
-                        <router-link :to="{ name: 'Setlist', params: { id: setlist.id } }" append>{{
-                            setlist.name
+                    <li v-for="(event) in allEvents" :key="event.id" class="droppable" @drop="dropSong($event, event)"
+                        @dragover.prevent @dragenter.prevent>
+                        <router-link :to="{ name: 'Event', params: { id: event.id } }" append>{{
+                            event.name
                             }}
                         </router-link>
                     </li>
@@ -30,28 +30,28 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { useSetlists } from "@/stores/setlistStore";
+import { useEvents } from "@/stores/eventStore";
 import { useCategories } from "@/stores/categoryStore";
 import { storeToRefs } from "pinia";
-import { Setlist } from "@/types";
+import { Event } from "@/types";
 
-const setlistStore = useSetlists();
+const eventStore = useEvents();
 
 // State
-const { allSetlists } = storeToRefs(setlistStore);
+const { allEvents } = storeToRefs(eventStore);
 
 // Computed
-const ready = computed(() => !!allSetlists);
+const ready = computed(() => !!allEvents);
 
 onMounted(() => {
-    setlistStore.fetchAll();
+    eventStore.fetchAll();
 });
 
 // Methods
-const dropSong = (event: DragEvent, setlist: Setlist) => {
-    let setlistUri = setlist._links?.self.href
-    let songUri = event.dataTransfer?.getData("text");
-    if (songUri && setlistUri)
-        setlistStore.addSetlistEntry(setlistUri, songUri)
+const dropSong = (dragEvent: DragEvent, event: Event) => {
+    let eventUri = event._links?.self.href
+    let songUri = dragEvent.dataTransfer?.getData("text");
+    if (songUri && eventUri)
+        eventStore.addEventEntry(eventUri, songUri)
 }
 </script>

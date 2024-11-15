@@ -72,17 +72,17 @@ const routes = [
         component: () => import('../components/Planning.vue'),
         children: [
             {
-                path: 'setlist/new',
-                name: 'NewSetlist',
-                component: () => import('../components/SetlistDetail.vue'),
+                path: 'event/new',
+                name: 'NewEvent',
+                component: () => import('../components/EventDetail.vue'),
                 meta: {
                     requiresAuth: true
                 },
             },
             {
-                path: 'setlist/:id',
-                name: 'Setlist',
-                component: () => import('../components/Setlist.vue'),
+                path: 'event/:id',
+                name: 'Event',
+                component: () => import('../components/Event.vue'),
                 meta: {
                     requiresAuth: true
                 }
@@ -103,9 +103,9 @@ const routes = [
         component: () => import('../components/Profile.vue')
     },
     {
-        path: '/repertoire/setlist/:id/texts',
+        path: '/repertoire/event/:id/texts',
         name: 'Export',
-        component: () => import('../components/SetlistTextExport.vue'),
+        component: () => import('../components/EventTextExport.vue'),
         meta: {
             requiresAuth: true,
             hideHeader: true
