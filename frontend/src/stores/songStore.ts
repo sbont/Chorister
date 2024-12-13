@@ -6,15 +6,20 @@ import { CacheListMap, CacheMap } from "@/types/CacheMaps";
 export const useSongs = defineStore('songs', {
     state: () => ({
         songs: new CacheMap<number, Song>(),
-        songsBySetlistId: new CacheListMap<number, Song>(),
+        songsByEventId: new CacheListMap<number, Song>(),
         loading: false,
         error: null
     }),
-    getters: {},
+    getters: {
+        allSongs(state) {
+            return [...state.songs.values()];
+        } 
+    },
     actions: {
         async fetchAll() {
             this.loading = true;
-            const response = await api.getAllSongs()
+            const response = await api.getAllSongs();
+            sort(response.data);
             response.data.forEach(this.put);
             this.loading = false
             return response;
@@ -23,7 +28,7 @@ export const useSongs = defineStore('songs', {
         async fetch(songId: number) {
             this.loading = true;
             const response = await api.getSongById(songId)
-            this.songs.set(response.data.id, response.data);
+            this.put(response.data);
             this.loading = false;
             return response.data;
         },
@@ -56,11 +61,11 @@ export const useSongs = defineStore('songs', {
             }
         },
 
-        delete(songId: number) {
-            return api.deleteSongForId(songId)
-                .then((_) => {
-                    this.songs.delete(songId);
-                });
+        async delete(songId: number) {
+            await api.deleteSongForId(songId);
+            this.songs.delete(songId);
         }
     }
 });
+
+const sort = (data: Array<Song>) => data.sort((songA, songB) => songA.title.localeCompare(songB.title));

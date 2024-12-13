@@ -23,7 +23,7 @@ interface SongProjection {
     fun getEventEntries(): MutableList<EventEntry>?
 
     fun getLastEvent(): Event? = getEventEntries()
-        ?.map { entry -> entry.event }
+        ?.map { entry -> entry.event!! }
         ?.sortedByDescending { it.date }
         ?.firstOrNull { it.date != null && it.date!! <= LocalDate.now() }
 

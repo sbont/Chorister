@@ -96,10 +96,12 @@ const functions = {
     deleteEventForId: (id: number) => instance.delete('events/' + id),
 
     // Event songs
-
+    
     getEventEntries: (eventId: number) => instance.get<Array<EventEntry & WithEmbedded<"song", Song>>>('events/' + eventId + '/entries', functions.getGetConfig('eventEntries')),
 
-    postEventEntry: (entry: any) => instance.post("eventEntries", entry, {
+    putEventEntries: (id: number, entries: Array<EventEntry>) => instance.put(`events/${id}/reorder`, { entries: entries }),
+
+    createEventEntry: (entry: any) => instance.post<EventEntry>("eventEntries", entry, {
         headers: {
             'content-type': 'application/json'
         }
@@ -146,6 +148,8 @@ const functions = {
     getOne: <Persistable extends ApiEntity>(uri: string) => instance.get<Persistable>(uri),
 
     create: <Persistable extends ApiEntity>(path: string, entity: Persistable) => instance.post<Persistable>(path, entity),
+
+    createRelated: <Persistable>(uri: string, association: string, entity: Persistable) => instance.post<Persistable>(`${uri}/${association}`, entity),
 
     update: <Persistable extends ApiEntity>(uri: string, entity: Persistable) => instance.patch<Persistable>(uri, entity),
 

@@ -15,13 +15,13 @@ class EventEntryEventHandler(
     @HandleBeforeCreate
     fun handleEventEntryCreate(eventEntry: EventEntry) {
         val event = eventEntry.event
-        val no = event.entries.size + 1
+        val no = event!!.entries.size + 1
         eventEntry.sequence = no
     }
 
     @HandleAfterDelete
     fun handleEventEntryDelete(oldEventEntry: EventEntry) {
-        oldEventEntry.event.id?.let {
+        oldEventEntry.event!!.id?.let {
             val laterEntries = eventEntryRepository.findByEventIdAndSequenceGreaterThan(it, oldEventEntry.sequence)
             laterEntries.forEach { current -> current.sequence -- }
             eventEntryRepository.saveAll(laterEntries)
