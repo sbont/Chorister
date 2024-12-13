@@ -3,6 +3,7 @@ package nl.stevenbontenbal.chorister.model.entities
 import nl.stevenbontenbal.chorister.interfaces.ChoirOwnedEntity
 import java.time.LocalDate
 import jakarta.persistence.*
+import org.springframework.data.rest.core.annotation.RestResource
 
 @Entity
 class Event (
@@ -14,7 +15,7 @@ class Event (
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
     override var choir: Choir?,
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "event", cascade=[CascadeType.ALL])
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "event", cascade=[CascadeType.ALL])
     var entries: MutableList<EventEntry> = mutableListOf(),
 ): ChoirOwnedEntity {
     companion object

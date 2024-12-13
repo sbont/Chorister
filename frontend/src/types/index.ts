@@ -72,7 +72,6 @@ export interface AcceptInvite extends Registration {
     token: string
 }
 
-
 export interface Categories {
     season: Array<Category>,
     liturgical: Array<Category>
@@ -149,7 +148,8 @@ export interface EventEntry extends ApiEntity {
     id: string,
     event: Event,
     song: Song,
-    number: number
+    label: string,
+    sequence: number
 }
 
 export interface User extends Identifiable, ApiEntity {

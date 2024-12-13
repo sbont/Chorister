@@ -27,7 +27,7 @@
                     <td>{{ song.composer }}</td>
                     <td>{{ (song.songbook || {}).title }}</td>
                     <td>{{ song.songbookNumber }}</td>
-                    <td>{{ song.lastSetlist?.date }}</td>
+                    <td>{{ song.lastEvent?.date }}</td>
                     <td class="col-category">
                         <div class="tags">
                             <span v-for="(category, index) in song.categories" class="song-category tag is-normal"

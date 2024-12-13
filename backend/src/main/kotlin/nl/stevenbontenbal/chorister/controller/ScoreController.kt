@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody
 class ScoreController(
     private val scoreService: ScoreService
 ) {
-    @PutMapping("/scores/{id}/file") //, consumes = [MediaType.TEXT_PLAIN_VALUE]
+    @PutMapping("/scores/{id}/file")
     fun putFile(@PathVariable id: Long?, @RequestBody fileId: Long?): ResponseEntity<Any> {
         if (id == null || fileId == null)
             return ResponseEntity<Any>(HttpStatus.BAD_REQUEST)

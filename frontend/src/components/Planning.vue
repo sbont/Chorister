@@ -2,7 +2,7 @@
     <div class="columns is-gapless">
         <div class="column is-one-third-tablet is-one-fifth-desktop has-background-grey-darker" id="menu">
             <aside class="menu p-2">
-                <p class="menu-label">Planning</p>
+                <p class="menu-label">Create</p>
                 <ul class="menu-list">
                     <li>
                         <router-link :to="{ name: 'NewEvent' }" append>
@@ -12,11 +12,26 @@
                             Add event
                         </router-link>
                     </li>
-                    <li v-for="(event) in allEvents" :key="event.id" class="droppable" @drop="dropSong($event, event)"
+                </ul>
+
+                <p class="menu-label">Upcoming</p>
+                <ul class="menu-list">
+                    <li v-for="(event) in futureEvents" :key="event.id" class="droppable"
+                        @drop="dropSong($event, event)" @dragover.prevent @dragenter.prevent>
+                        <router-link :to="{ name: 'Event', params: { id: event.id } }" append>{{
+                            event.name
+                        }}
+                        </router-link>
+                    </li>
+                </ul>
+
+                <p class="menu-label">Past</p>
+                <ul class="menu-list">
+                    <li v-for="(event) in pastEvents" :key="event.id" class="droppable" @drop="dropSong($event, event)"
                         @dragover.prevent @dragenter.prevent>
                         <router-link :to="{ name: 'Event', params: { id: event.id } }" append>{{
                             event.name
-                            }}
+                        }}
                         </router-link>
                     </li>
                 </ul>
@@ -31,27 +46,24 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useEvents } from "@/stores/eventStore";
-import { useCategories } from "@/stores/categoryStore";
 import { storeToRefs } from "pinia";
 import { Event } from "@/types";
 
 const eventStore = useEvents();
+eventStore.fetchAll();
 
 // State
-const { allEvents } = storeToRefs(eventStore);
+const { futureEvents, pastEvents } = storeToRefs(eventStore);
 
 // Computed
-const ready = computed(() => !!allEvents);
-
-onMounted(() => {
-    eventStore.fetchAll();
-});
+const ready = computed(() => !!futureEvents);
 
 // Methods
 const dropSong = (dragEvent: DragEvent, event: Event) => {
-    let eventUri = event._links?.self.href
+    let eventId = event.id;
     let songUri = dragEvent.dataTransfer?.getData("text");
-    if (songUri && eventUri)
-        eventStore.addEventEntry(eventUri, songUri)
+    const songId = songUri ? parseInt(songUri?.substring(songUri.lastIndexOf('/'))) : undefined;
+    if (songId && eventId)
+        eventStore.addEventEntry(eventId, { songId: songId })
 }
 </script>

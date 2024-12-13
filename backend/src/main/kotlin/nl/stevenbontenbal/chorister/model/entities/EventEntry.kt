@@ -9,12 +9,12 @@ class EventEntry(
     var id: Long? = null,
     @ManyToOne
     @MapsId("eventId")
-    var event: Event,
+    var event: Event?,
     @ManyToOne
     @MapsId("songId")
     var song: Song?,
     var label: String? = null,
-    var sequence: Int = event.entries.size + 1
+    var sequence: Int = event?.entries?.size?.plus(1) ?: 0
 ) {
     companion object
 }
