@@ -16,7 +16,7 @@
                         <template #body="slotProps">
                             <button class="button is-danger is-inverted is-small"
                                 :class="{ 'is-loading': state == State.Deleting }"
-                                @click="removeSongFromEvent(slotProps.data as EventSong)">
+                                @click="removeEntryFromEvent(slotProps.data as EventSong)">
                                 <span class="icon is-small">
                                     <i class="fas fa-times"></i>
                                 </span>
@@ -24,7 +24,7 @@
                         </template>
                     </Column>
                 </DataTable>
-                <AddEventEntry :event-id="eventId"/>
+                <AddEventEntry :event-id="eventId" @add="addEntry"/>
             </div>
         </div>
     </div>
@@ -32,15 +32,16 @@
 
 <script setup lang="ts">
 import EventDetail from '@/components/EventDetail.vue';
-import { Song } from '@/types'
+import { EventEntry, Song, WithEmbedded } from '@/types'
 import api from "@/services/api";
 import { useRoute } from "vue-router";
 import { useEvents } from "@/stores/eventStore";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import DataTable, { DataTableRowReorderEvent } from 'primevue/datatable';
 import Column from 'primevue/column';
 import { useSongs } from '@/stores/songStore';
 import AddEventEntry from './AddEventEntry.vue';
+import { storeToRefs } from 'pinia';
 
 
 type EventSong = {
@@ -58,26 +59,30 @@ enum State {
 
 const state = ref<State>(State.Loading)
 const route = useRoute();
-const eventStore = useEvents();
 const eventId = Number(route.params.id);
-const entries = computed(() => {
-    return (eventStore.entriesByEventId.get(eventId) ?? []).map(entry => <EventSong>{
-        sequence: entry.sequence,
-        song: entry._embedded?.song,
-        eventEntryUri: entry?._links?.self.href
-    }) as Array<EventSong>
+const eventStore = useEvents();
+const entries = ref<Array<EventSong>>([]);
+
+onMounted(async () => {
+    const storeEntries = await eventStore.fetchEntries(eventId);
+    entries.value = storeEntries.map(toEventSong);
+    console.log(entries.value);
+    
+    state.value = State.Ready;
 });
 
-const sections = []
+function toEventSong(entry: EventEntry){ return <EventSong>{
+    sequence: entry.sequence,
+    song: entry.song,
+    eventEntryUri: entry?._links?.self.href
+}}
 
-eventStore.fetchEntries(eventId).finally(() => state.value = State.Ready);
-
-const removeSongFromEvent = function (song: EventSong) {
+const removeEntryFromEvent = function (entry: EventSong) {
     state.value = State.Deleting
-    let entryUri = song.eventEntryUri;
+    let entryUri = entry.eventEntryUri;
     api.deleteByUri(entryUri)
         .then((response) => {
-            removeSong(song);
+            removeSong(entry);
         })
         .catch((error) => {
             error.value = "Failed to remove entry";
@@ -95,6 +100,8 @@ const removeSong = function (song: EventSong) {
 const reorder = (reorder: DataTableRowReorderEvent) => {
     eventStore.reorder(eventId, reorder.dragIndex, reorder.dropIndex);
 }
+
+const addEntry = (entry: EventEntry) => entries.value.push(toEventSong(entry));
 
 </script>
 
