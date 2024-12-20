@@ -8,7 +8,7 @@ import moment from "moment";
 export const useEvents = defineStore('events', {
     state: () => ({
         events: new CacheMap<number, Event>(),
-        entriesByEventId: new CacheListMap<number, EventEntry & WithEmbedded<"song", Song>>(),
+        entriesByEventId: new CacheListMap<number, EventEntry>(),
         loading: false,
         error: null as string | null,
         songStore: useSongs()
@@ -25,8 +25,11 @@ export const useEvents = defineStore('events', {
             const today = new Date();
             return [...state.events.values()].filter(e => new Date(e.date) < today);
         },
+        entries(state) {
+            return (eventId: number) => state.entriesByEventId.getOrEmpty(eventId);
+        },
         count(state) {
-            return state.events.size;
+            return (eventId: number) => state.entriesByEventId.getOrEmpty(eventId).length;
         }
     },
     actions: {
@@ -116,7 +119,8 @@ export const useEvents = defineStore('events', {
             }
             const sequence = this.entriesByEventId.getOrEmpty(eventId!).length;
             const newEntry = await api.createEventEntry({ event: event._links?.self.href, sequence, song: song?._links?.self.href });
-            this.entriesByEventId.addTo(event.id!, { ...newEntry.data, _embedded: { song: song }})
+            this.entriesByEventId.addTo(event.id!, newEntry.data)
+            return newEntry.data;
         },
 
         async saveEntryToServer(entry: EventEntry) {

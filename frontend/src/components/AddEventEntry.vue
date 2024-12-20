@@ -1,5 +1,5 @@
 <template>
-    <div class="add-row has-background-light" @click="addEntry"
+    <div class="add-row has-background-light"
         @mouseover="() => { if (state == State.Ready) state = State.MouseOver }"
         @mouseleave="() => { if (state == State.MouseOver) state = State.Ready }">
         <div v-if="state == State.Ready">
@@ -71,10 +71,12 @@ const addEntry = () => {
     state.value = State.AddHeader;
 }
 
-const save = () => {
+const save = async () => {
     if (state.value == State.AddSong && selectedSongId.value) {
-        eventStore.addEventEntry(props.eventId, { songId: selectedSongId.value })
-        emit("add",);
+        const entry = await eventStore.addEventEntry(props.eventId, { songId: selectedSongId.value })
+        console.log(entry);
+        
+        emit("add", entry);
     } else if (state.value == State.AddHeader) {
         emit("add", { label: headerName.value });
     }

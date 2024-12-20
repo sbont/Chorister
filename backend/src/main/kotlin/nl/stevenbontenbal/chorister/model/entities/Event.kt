@@ -15,7 +15,7 @@ class Event (
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
     override var choir: Choir?,
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "event", cascade=[CascadeType.ALL])
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "event", cascade=[CascadeType.REMOVE])
     var entries: MutableList<EventEntry> = mutableListOf(),
 ): ChoirOwnedEntity {
     companion object
