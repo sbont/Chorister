@@ -1,6 +1,5 @@
 import { Option } from "effect"
 import { LazyArg } from "effect/Function"
-import { Identifiable } from ".";
 
 export class CacheMap<K, V> extends Map<K, V> {
     getOrNone = (key: K) => Option.fromNullable(this.get(key))
@@ -32,7 +31,7 @@ export class CacheListMap<K, V> extends CacheMap<K, Array<V>> {
             this.set(key, remaining)
         })
     }
-    
+
     remove(value: V): void {
         for (const [key, values] of this.entries()) {
             const i = values.findIndex(e => e === value)

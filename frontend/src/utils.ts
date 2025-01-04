@@ -1,4 +1,4 @@
-import { ApiEntity, Identifiable } from "./types";
+import { ApiEntity, Identifiable } from "./services/apiTypes";
 
 export const isNew = (obj: any) => !(obj as ApiEntity)._links?.self.href && !(obj as Identifiable).id
 
