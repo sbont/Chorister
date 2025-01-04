@@ -1,27 +1,291 @@
-import axios from 'axios'
-import { useAuth } from "@/stores/authStore";
-import { Invite, Song, Score, Category, Event, EventEntry, Choir, User, WithEmbedded, AcceptInvite, NewChoirRegistration, Chords, ApiEntity, UploadReturnEnvelope } from "@/types";
+import { ApiEndpoint, Api as IChoristerApi } from "@/application/api";
+import { Category as DomainCategory } from "@/entities/category";
+import { Choir as DomainChoir } from "@/entities/choir";
+import { Chords as DomainChords } from "@/entities/chords";
+import { Entity, isNew } from "@/entities/entity";
+import { Event as DomainEvent, EventEntry as DomainEventEntry } from "@/entities/event";
+import { Score as DomainScore } from "@/entities/score";
+import { Song as DomainSong } from "@/entities/song";
+import { User as DomainUser } from "@/entities/user";
+import { ApiEntity as IdentifiableApiEntity } from "@/services/apiTypes";
+import { useAuth } from "@/services/authStore";
+import axios, { AxiosInstance } from "axios";
+import { Category, fromDomainCategory, toDomainCategory } from "./apiTypes/category";
+import { Choir, fromDomainChoir, toDomainChoir } from "./apiTypes/choir";
+import { Chords, fromDomainChords, toDomainChords } from "./apiTypes/chords";
+import { EventEntry, EventGet, EventPost, fromDomainEvent, fromDomainEventEntry, toDomainEvent, toDomainEventEntry } from "./apiTypes/event";
+import { UploadReturnEnvelope } from "./apiTypes/file";
+import { NewChoirRegistration } from "./apiTypes/registration";
+import { fromDomainScore, Score, toDomainScore } from "./apiTypes/score";
+import { fromDomainSong, Song, toDomainSong } from "./apiTypes/song";
+import { fromDomainUser, toDomainUser, User } from "./apiTypes/user";
+import { Uri } from "@/types";
 
-export const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + '/api';
-const auth = useAuth();
-const instance = axios.create({
-    baseURL: SERVER_URL,
-    timeout: 5000
-});
-instance.interceptors.request.use(
-    async config => {
-        let accessToken = await auth.getAccessToken()
-        if (accessToken) {
-            config.headers.Authorization = 'Bearer ' + accessToken
-        }
-        return config
+const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + "/api";
+
+export default class ChoristerApi implements IChoristerApi {
+    private readonly instance: AxiosInstance;
+    private events: EntityEndpoint<DomainEvent, EventGet, EventPost>;
+    private eventEntries: EntityEndpoint<DomainEventEntry, EventEntry, EventEntry>;
+    private choirs: ChoirsEndpoint;
+    private registration: RegistrationEndpoint;
+    private categories: EntityEndpoint<DomainCategory, Category, Category>
+    private users: EntityEndpoint<DomainUser, User, User>
+    private user: UserEndpoint;
+    private files: FilesEndpoint;
+
+    public readonly songs: SongsEndpoint;
+    public readonly chords: EntityEndpoint<DomainChords, Chords, Chords>;
+    public readonly scores: ScoresEndpoint;
+
+    constructor() {
+        this.instance = axios.create({
+            baseURL: SERVER_URL,
+            timeout: 5000,
+        });
+        const auth = useAuth();
+        this.instance.interceptors.request.use(
+            async config => {
+                let accessToken = await auth.getAccessToken()
+                if (accessToken) {
+                    config.headers.Authorization = "Bearer " + accessToken
+                }
+                return config
+            }
+        )
+
+        this.songs = new SongsEndpoint(this.instance, "songs", fromDomainSong, toDomainSong);
+        this.events = new EntityEndpoint(this.instance, "event", fromDomainEvent, toDomainEvent);
+        this.eventEntries = new EntityEndpoint(this.instance, "evententries", fromDomainEventEntry, toDomainEventEntry);
+        this.choirs = new ChoirsEndpoint(this.instance, "choirs", fromDomainChoir, toDomainChoir);
+        this.registration = new RegistrationEndpoint(this.instance);
+        this.categories = new EntityEndpoint(this.instance, "categories", fromDomainCategory, toDomainCategory);
+        this.users = new EntityEndpoint(this.instance, "users", fromDomainUser, toDomainUser);
+        this.user = new UserEndpoint(this.instance);
+        this.scores = new ScoresEndpoint(this.instance, "scores", fromDomainScore, toDomainScore);
+        this.files = new FilesEndpoint(this.instance);
+        this.chords = new EntityEndpoint(this.instance, "chords", fromDomainChords, toDomainChords);
     }
-)
 
-const functions = {
 
-    getGetConfig: (path: string) => {
-        const embeddedAttributeName = path.split("/").pop()!;
+    // Generic
+
+    update = async <DomainEntity extends Entity>(entity: DomainEntity) => {
+        if (!entity.uri)
+            throw new Error("Object URI unknown");
+
+        await this.instance.patch(entity.uri, entity);
+    }
+
+    deleteEntity = async <DomainEntity extends Entity>(entity: DomainEntity) => {
+        if (!entity.uri)
+            throw new Error("Object URI unknown");
+
+        await this.instance.delete(entity.uri!);
+    }
+
+    // Registration
+
+    register = async (choirName: string, userDisplayName: string, email: string, password: string) =>
+        await this.registration.register({ choirName, displayName: userDisplayName, email, password });
+
+    // Songs
+
+    getSongById = (id: number) => this.songs.getOne(id);
+
+    getAllSongs = () => this.songs.getAll();
+
+    createNewSong = (song: DomainSong) => this.songs.create(song);
+
+    updateSong = (song: DomainSong) => this.songs.update(song);
+
+    deleteSong = (song: DomainSong) => this.songs.delete(song);
+
+    getSongsByCategory = (categoryId: number) => this.songs.getSongsByCategory(categoryId);
+
+    // Categories
+
+    getCategoryById = (id: number) => this.categories.getOne(id);
+
+    getAllCategories = () => this.categories.getAll();
+
+    createNewCategory = (category: DomainCategory) => this.categories.create(category);
+
+    // Song categories
+
+    getSongCategories = (songId: number) => this.songs.getAllRelated(songId, "categories", toDomainCategory);
+
+    postSongCategories = (songId: number, categories: Array<DomainCategory>) => this.categories.addAllAssociations(this.songs.getUri(songId) + "/categories", categories);
+
+    deleteSongCategory = (songId: number, category: DomainCategory) => this.categories.deleteAssociation(this.songs.getUri(songId) + "/categories", category);
+
+    // Chords
+
+    getChords = (songId: number) => this.songs.getAllRelated(songId, "chords", toDomainChords);
+
+    createChords = (chords: DomainChords) => this.chords.create(chords);
+
+    deleteChords = (chords: DomainChords) => this.chords.delete(chords);
+
+    // Event
+
+    getEventById = async (id: number) => this.events.getOne(id);
+
+    getAllEvents = async () => this.events.getAll();
+
+    createNewEvent = async (event: DomainEvent) => this.events.create(event);
+
+    updateEvent = async (event: DomainEvent) => this.events.update(event);
+
+    deleteEvent = async (event: DomainEvent) => this.events.delete(event);
+
+    getEventEntries = async (event: DomainEvent) => event.id ? this.events.getAllRelated(event.id, "entries", toDomainEventEntry) : [];
+
+    putEventEntries = async (event: DomainEvent, entries: Array<DomainEventEntry>) => {
+        if (!event.id)
+            throw Error("Cannot add entries to an unsaved event")
+
+        await this.events.putAllRelated(event.id, "entries", entries, fromDomainEventEntry)
+    }
+
+    createEventEntry = async (entry: DomainEventEntry) => this.eventEntries.create(entry);
+
+    deleteEventEntry = async (entry: DomainEventEntry) => this.eventEntries.delete(entry);
+
+    // Choir
+
+    getChoir = async () => {
+        const choirs = await this.choirs.getAll();
+        if (choirs == undefined || choirs.length != 1)
+            throw Error("Choir not found for current user.")
+
+        return choirs[0];
+    }
+
+    updateChoir = async (choir: DomainChoir) => await this.choirs.update(choir);
+
+    getToken = async () => await this.choirs.getToken();
+
+    deleteToken = async () => await this.choirs.deleteToken();
+
+    // Users
+
+    getUser = () => this.user.get();
+
+    getAllUsers = () => this.users.getAll();
+
+    getUserById = (userId: number) => this.users.getOne(userId);
+
+    updateUser = (user: DomainUser) => this.users.update(user);
+
+    // Scores
+
+    getScores = (songId: number) => this.songs.getAllRelated(songId, "scores", toDomainScore);
+
+    createScore = (score: DomainScore) => this.scores.create(score);
+
+    deleteScore = (score: DomainScore) => this.scores.delete(score);
+
+    getUploadUrlForScore = (score: DomainScore) => this.scores.getUploadUrlForScore(score);
+
+    putFileIdForScore = (score: DomainScore, fileId: number) => this.scores.putFileIdForScore(score, fileId);
+
+    // Files
+
+    getUploadReturnEnvelope = () => this.files.getUploadReturnEnvelope();
+
+    getUploadReturnEnvelopeForId = (id: number) => this.files.getUploadReturnEnvelopeForId(id);
+
+    getFileLocation = (fileId: number) => this.files.getFileLocation(fileId);
+}
+
+class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends IdentifiableApiEntity, ApiPostEntity extends IdentifiableApiEntity> implements ApiEndpoint<DomainEntity> {
+    protected instance: AxiosInstance;
+    protected readonly path: string;
+    protected readonly fromDomain: (e: DomainEntity) => ApiPostEntity;
+    protected readonly toDomain: (a: ApiGetEntity) => DomainEntity;
+
+    constructor(instance: AxiosInstance, path: string, fromDomain: (e: DomainEntity) => ApiPostEntity, toDomain: (a: ApiGetEntity) => DomainEntity) {
+        this.instance = instance;
+        this.path = path;
+        this.fromDomain = fromDomain;
+        this.toDomain = toDomain;
+    }
+
+    getUri = (id: number) => `${SERVER_URL}/${this.path}/${id}`;
+
+    getOne = async (id: number) => {
+        const response = await this.instance.get<ApiGetEntity>(`${this.path}/${id}`);
+        return this.toDomain(response.data);
+    }
+
+    getByUri = async (uri: Uri) => {
+        const response = await this.instance.get<ApiGetEntity>(uri);
+        return this.toDomain(response.data);
+    }
+
+    getAll = async () => {
+        const response = await this.instance.get<Array<ApiGetEntity>>(this.path, this.getGetConfig());
+        return response.data.map(this.toDomain);
+    }
+
+    create = async (song: DomainEntity) => {
+        const data = this.fromDomain(song);
+        const response = await this.instance.post<ApiGetEntity>(this.path, data);
+        return this.toDomain(response.data);
+    }
+
+    update = async (obj: DomainEntity) => {
+        if (isNew(obj))
+            throw new Error("Object has no id");
+
+        const data = this.fromDomain(obj);
+        const response = await this.instance.patch<ApiGetEntity>(`${this.path}/` + data.id, data);
+        return this.toDomain(response.data);
+    }
+
+    delete = async (obj: DomainEntity) => {
+        if (isNew(obj))
+            throw new Error("Song has no id");
+
+        await this.instance.delete("songs/" + obj.id)
+    }
+
+    getAllRelated = async <RelatedDomainEntity extends Entity, RelatedApiEntity extends IdentifiableApiEntity>(id: number, association: string, toDomain: (e: RelatedApiEntity) => RelatedDomainEntity) => {
+        const response = await this.instance.get<Array<RelatedApiEntity>>(`${this.path}/${id}/${association}`, this.getGetConfig(association));
+        return response.data.map(toDomain);
+    }
+
+    getAllAssociated = async (uri: string) => {
+        const response = await this.instance.get<Array<ApiGetEntity>>(uri, this.getGetConfig());
+        return response.data.map(this.toDomain);
+    }
+
+    putAllRelated = async <RelatedDomainEntity extends Entity, RelatedApiEntity extends IdentifiableApiEntity>(id: number, association: string, objects: Array<RelatedDomainEntity>, fromDomain: (e: RelatedDomainEntity) => RelatedApiEntity) => {
+        const data = objects.map(fromDomain);
+        await this.instance.put<Array<RelatedApiEntity>>(`${this.path}/${id}/${association}`, data);
+    }
+
+    putAllAssociations = async (uri: string, objects: Array<DomainEntity>) => {
+        const data = objects.map(this.fromDomain);
+        await this.instance.put<Array<ApiPostEntity>>(uri, data);
+    }
+
+    addAllAssociations = async (uri: string, objects: Array<DomainEntity>) => {
+        if (!objects.every(o => o.uri != undefined))
+            throw new Error("Unknown URI for an object in " + JSON.stringify(objects));
+
+        const uris = objects.map(o => o.uri);
+        const data = uris.join("\r\n");
+        await this.instance.post(uri, data, { headers: { "content-type": "text/uri-list" } });
+    }
+
+    deleteAssociation = async(uri: string, object: DomainEntity) => {
+        await this.instance.delete(`${uri}/${object.id}`);
+    }
+
+    protected getGetConfig(embeddedAttributeName: string | undefined = undefined) {
+        embeddedAttributeName ??= this.path.split("/").pop()!;
         return {
             transformResponse: [
                 function (data: string) {
@@ -29,134 +293,100 @@ const functions = {
                 }
             ]
         }
-    },
+    }
+}
 
-    // Register
+class SongsEndpoint extends EntityEndpoint<DomainSong, Song, Song> {
+    constructor(instance: AxiosInstance, path: string, fromDomain: (e: DomainSong) => Song, toDomain: (a: Song) => DomainSong) {
+        super(instance, path, fromDomain, toDomain);
+    }
 
-    register: (request: NewChoirRegistration) => instance.post('registration', request),
+    getSongsByCategory = async (categoryId: number) => {
+        const response = await this.instance.get<Array<Song>>("songs/search/bycategory?id=" + categoryId, this.getGetConfig("songs"));
+        return response.data.map(toDomainSong);
+    }
+}
 
-    // Invites
+class ChoirsEndpoint extends EntityEndpoint<DomainChoir, Choir, Choir> {
+    constructor(instance: AxiosInstance, path: string, fromDomain: (e: DomainChoir) => Choir, toDomain: (a: Choir) => DomainChoir) {
+        super(instance, path, fromDomain, toDomain);
+    }
 
-    getInvites: () => instance.get<Array<Invite>>('invites', functions.getGetConfig('invites')),
+    getToken = async () => {
+        const response = await this.instance.get<string>("choir/invitelink");
+        return response.data;
+    }
 
-    updateInviteForId: (id: number, invite: any) => instance.put('invites/' + id, invite),
+    deleteToken = async () => {
+        await this.instance.delete("choir/invitelink");
+    }
+}
 
-    getInviteByToken: (token: string) => instance.get<Invite>('invite?token=' + token),
+class RegistrationEndpoint {
+    private instance: AxiosInstance;
+    private path = "registration";
 
-    acceptInvite: (request: AcceptInvite) => instance.post('invite/accept', request),
+    constructor(instance: AxiosInstance) {
+        this.instance = instance;
+    }
 
-    getToken: () => instance.get<string>('choir/invitelink'),
+    register = async (request: NewChoirRegistration) => {
+        await this.instance.post(this.path, request);
+    }
+}
 
-    deleteToken: () => instance.delete('choir/invitelink'),
+class UserEndpoint {
+    private instance: AxiosInstance;
+    private path = "user";
 
-    // Songs
+    constructor(instance: AxiosInstance) {
+        this.instance = instance;
+    }
 
-    getSongById: (id: number) => instance.get<Song>('songs/' + id),
+    get = async () => {
+        const response = await this.instance.get<User>(this.path);
+        return toDomainUser(response.data);
+    }
+}
 
-    getAllSongs: () => instance.get<Array<Song>>('songs', functions.getGetConfig('songs')),
+class FilesEndpoint {
+    private instance: AxiosInstance;
+    private path = "files";
 
-    getSongsByCategoryId: (categoryId: number) => instance.get<Array<Song>>('songs/search/bycategory?id=' + categoryId, functions.getGetConfig('songs')),
-
-    createNewSong: (song: any) => instance.post<Song>('songs', song),
-
-    updateSongForId: (id: number, song: any) => instance.patch<Song>('songs/' + id, song),
-
-    deleteSongForId: (id: number) => instance.delete('songs/' + id),
-
-    // Categories
-
-    getCategoryById: (id: number) => instance.get<Category>('categories/' + id),
-
-    getAllCategories: () => instance.get<Array<Category>>('categories', functions.getGetConfig('categories')),
-
-    createNewCategory: (category: Category) => instance.post<Category>('categories', category),
-
-    // Song categories
-
-    getSongCategories: (songId: number) => instance.get<Array<Category>>('songs/' + songId + '/categories', functions.getGetConfig('categories')),
-
-    postSongCategories: (songId: number, categoryUris: string[]) => instance.post('songs/' + songId + '/categories', categoryUris.join('\r\n'), {
-        headers: {
-            'content-type': 'text/uri-list'
-        }
-    }),
-
-    deleteSongCategory: (songId: number, categoryId: number) => instance.delete('songs/' + songId + '/categories/' + categoryId),
-
-    // Events
-
-    getEventById: (id: number) => instance.get<Event>('events/' + id),
-
-    getAllEvents: () => instance.get<Array<Event>>('events', functions.getGetConfig('events')),
-
-    createNewEvent: (event: any) => instance.post('events', event),
-
-    updateEventForId: (id: number, event: any) => instance.put('events/' + id, event),
-
-    deleteEventForId: (id: number) => instance.delete('events/' + id),
-
-    // Event songs
-    
-    getEventEntries: (eventId: number) => instance.get<Array<EventEntry & WithEmbedded<"song", Song>>>('events/' + eventId + '/entries', functions.getGetConfig('eventEntries')),
-
-    putEventEntries: (id: number, entries: Array<EventEntry>) => instance.put(`events/${id}/reorder`, { entries: entries }),
-
-    createEventEntry: (entry: any) => instance.post<EventEntry>("eventEntries", entry, {
-        headers: {
-            'content-type': 'application/json'
-        }
-    }),
-
-    deleteEventEntry: (eventEntryId: string) => instance.delete("eventEntries/" + eventEntryId),
-
-    // My Choir
-
-    getChoirs: () => instance.get<Array<Choir>>('choirs', functions.getGetConfig('choirs')),
-
-    updateChoirForId: (id: number, choir: any) => instance.post('choirs/' + id, choir),
-
-    // Users
-
-    getUsers: () => instance.get<Array<User>>('users', functions.getGetConfig('users')),
-
-    getUserById: (userId: number) => instance.get<User>('users/' + userId),
-
-    getUser: () => instance.get<User>('user'),
-
-    updateUserForId: (id: number, user: any) => instance.patch('users/' + id, user),
+    constructor(instance: AxiosInstance) {
+        this.instance = instance;
+    }
 
     // Files
 
-    getUploadReturnEnvelope: () => instance.get<UploadReturnEnvelope>('/files/new-upload'),
+    getUploadReturnEnvelope = async () => {
+        const response = await this.instance.get<UploadReturnEnvelope>(`${this.path}/files/new-upload`);
+        return response.data;
+    }
 
-    getUploadReturnEnvelopeForId: (id: number) => instance.get<UploadReturnEnvelope>(`/files/${id}/upload`),
+    getUploadReturnEnvelopeForId = async (id: number) => {
+        const response = await this.instance.get<UploadReturnEnvelope>(`${this.path}/${id}/upload`);
+        return response.data;
+    }
 
-    getFile: (id: number) => instance.get(`/files/${id}`),
-
-    // Scores
-
-    getUploadUrlForScore: (scoreUri: string) => instance.get(scoreUri + '/file/upload-url'),
-
-    putFileIdForScore: (scoreUri: string, fileId: number) => instance.put(scoreUri + '/file', fileId, { headers: { "Content-Type": "application/json" } }),
-
-    // Generic methods
-
-    getAll: <Persistable extends ApiEntity>(path: string) => instance.get<Array<Persistable>>(path, functions.getGetConfig(path)),
-
-    getAllRelated: <Persistable extends ApiEntity>(uri: string, association: string) => instance.get<Array<Persistable>>(`${uri}/${association}`, functions.getGetConfig(association)),
-
-    getOne: <Persistable extends ApiEntity>(uri: string) => instance.get<Persistable>(uri),
-
-    create: <Persistable extends ApiEntity>(path: string, entity: Persistable) => instance.post<Persistable>(path, entity),
-
-    createRelated: <Persistable>(uri: string, association: string, entity: Persistable) => instance.post<Persistable>(`${uri}/${association}`, entity),
-
-    update: <Persistable extends ApiEntity>(uri: string, entity: Persistable) => instance.patch<Persistable>(uri, entity),
-
-    deleteByUri: (uri: string) => instance.delete(uri),
-
-    delete: <Persistable extends ApiEntity>(entity: Persistable) => entity._links?.self.href ? instance.delete(entity._links?.self.href) : Promise.resolve(),
-
+    getFileLocation = async (fileId: number) => {
+        const response = await this.instance.get(`${this.path}/${fileId}`);
+        const location = response.headers["location"];
+        return location;
+    }
 }
 
-export default functions;
+class ScoresEndpoint extends EntityEndpoint<DomainScore, Score, Score> {
+    constructor(instance: AxiosInstance, path: string, fromDomain: (e: DomainScore) => Score, toDomain: (a: Score) => DomainScore) {
+        super(instance, path, fromDomain, toDomain);
+    }
+
+    getUploadUrlForScore = async (score: DomainScore) => {
+        const response = await this.instance.get(`${score.uri}/file/upload-url`);
+        return response.data;
+    }
+
+    putFileIdForScore = async (score: DomainScore, fileId: number) => {
+        await this.instance.put(`${score.uri}/file`, fileId, { headers: { "Content-Type": "application/json" } });
+    }
+}

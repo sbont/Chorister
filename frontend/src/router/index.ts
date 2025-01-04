@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuth } from "@/stores/authStore";
+import { useAuth } from "@/services/authStore";
 import { children } from 'effect/Fiber';
 
 const routes = [
