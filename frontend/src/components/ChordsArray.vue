@@ -3,8 +3,8 @@
         <div class="is-size-4">Chords</div>
         <div>{{ error }}</div>
         <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
-            <ChordsComponent v-for="chords in chordses" :key="chords._links?.self.href" :value="(chords as Chords)"
-                             @remove="removeChords(chords)"></ChordsComponent>
+            <ChordsComponent v-for="chords in chordses" :key="chords.id" :value="(chords as Chords)"
+                @remove="removeChords(chords)"></ChordsComponent>
             <div v-if="!draftValues">
                 <button class="button is-primary" @click="addChords">
                     Add
@@ -19,31 +19,32 @@
 </template>
 
 <script setup lang="ts">
-import ChordsComponent from "@/components/Chords.vue"
-import { Chords, DraftChords, Link, Song } from "@/types";
-import { ref } from "vue";
+import { useChords } from "@/application/chordsStore";
+import ChordsComponent from "@/components/Chords.vue";
+import { Chords } from "@/entities/chords";
+import { EntityRef, toEntityRef } from "@/entities/entity";
+import { Song } from "@/entities/song";
 import { isNew } from "@/utils";
-import { useChords } from "@/stores/chordsStore";
+import { ref } from "vue";
 
+type DraftChords = Partial<Chords> & {
+    song: EntityRef<Song>
+}
 
 const props = defineProps<{
     song: Song
 }>();
 
-const loading = ref(true)
+// const loading = ref(true)
 const error = ref<string | undefined>(undefined)
-const chordsStore = useChords()
-const chordses = ref<Array<Chords>>([]);
-const link = props.song._links?.chords;
-if (link) {
-    chordsStore.fetchRelatedFromLink(link).then(data => chordses.value = data as Chords[]).catch(e => error.value = e).finally(() => loading.value = false)
-} else {
-    error.value = "No association found";
-}
-
+const chordsStore = useChords();
+const chordses = ref<Array<Chords>>([])
 const draftValues = ref<DraftChords | undefined>(undefined)
 
-const addChords = () => draftValues.value = {song: props.song?._links?.self.href}
+if (props.song.chords) 
+    chordses.value = await chordsStore.getAllRelated(props.song.chords);
+
+const addChords = () => draftValues.value = { song: toEntityRef(props.song) }
 const cancelAdd = () => draftValues.value = undefined
 
 const onAdded = (chords: Chords) => {
@@ -55,7 +56,7 @@ const removeChords = (chords: Chords) => {
     if (!isNew(chords)) {
         chordsStore.delete(chords);
     }
-    chordses.value = chordses.value.filter(current => current._links?.self.href !== chords._links?.self.href);
+    chordses.value = chordses.value.filter(current => current.id !== chords.id);
 }
 
 </script>

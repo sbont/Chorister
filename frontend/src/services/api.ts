@@ -1,4 +1,4 @@
-import { ApiEndpoint, Api as IChoristerApi } from "@/application/api";
+import { ApiEndpoint, EndpointIdentifier, Api as IChoristerApi, ScoresApiEndpoint } from "@/application/api";
 import { Category as DomainCategory } from "@/entities/category";
 import { Choir as DomainChoir } from "@/entities/choir";
 import { Chords as DomainChords } from "@/entities/chords";
@@ -66,7 +66,6 @@ export default class ChoristerApi implements IChoristerApi {
         this.files = new FilesEndpoint(this.instance);
         this.chords = new EntityEndpoint(this.instance, "chords", fromDomainChords, toDomainChords);
     }
-
 
     // Generic
 
@@ -376,17 +375,19 @@ class FilesEndpoint {
     }
 }
 
-class ScoresEndpoint extends EntityEndpoint<DomainScore, Score, Score> {
+class ScoresEndpoint extends EntityEndpoint<DomainScore, Score, Score> implements ScoresApiEndpoint {
     constructor(instance: AxiosInstance, path: string, fromDomain: (e: DomainScore) => Score, toDomain: (a: Score) => DomainScore) {
         super(instance, path, fromDomain, toDomain);
     }
 
     getUploadUrlForScore = async (score: DomainScore) => {
-        const response = await this.instance.get(`${score.uri}/file/upload-url`);
+        const uri = score.uri ?? this.getUri(score.id!);
+        const response = await this.instance.get(`${uri}/file/upload-url`);
         return response.data;
     }
 
     putFileIdForScore = async (score: DomainScore, fileId: number) => {
-        await this.instance.put(`${score.uri}/file`, fileId, { headers: { "Content-Type": "application/json" } });
+        const uri = score.uri ?? this.getUri(score.id!);
+        await this.instance.put(`${uri}/file`, fileId, { headers: { "Content-Type": "application/json" } });
     }
 }

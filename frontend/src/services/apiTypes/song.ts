@@ -46,9 +46,9 @@ export interface Songbook extends Identifiable, ApiEntity {
 
 export function toDomainSong(apiSong: Song): SongEntity {
     return {...toDomain(apiSong),
-        scores: apiSong._links ? { uri: untemplated(apiSong._links.scores) } : [],
-        chords: apiSong._links ? { uri: untemplated(apiSong._links.chords) } : [],
-        eventEntries: apiSong._links ? { uri: untemplated(apiSong._links.eventEntries) } : [],
+        scores: apiSong._links ? { uri: untemplated(apiSong._links.scores) } : undefined,
+        chords: apiSong._links ? { uri: untemplated(apiSong._links.chords) } : undefined,
+        eventEntries: apiSong._links ? { uri: untemplated(apiSong._links.eventEntries) } : undefined,
     };
 }
 

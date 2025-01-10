@@ -1,6 +1,7 @@
 import { Chords as DomainChords } from "@/entities/chords";
+import { Uri } from "@/types";
 import { Key } from "@/types/Key";
-import { ApiEntityWith, fromDomain, Link, toDomain, untemplated, Uri, WithAssociation } from ".";
+import { ApiEntityWith, fromDomain, Link, toDomain, untemplated, WithAssociation } from ".";
 
 export interface Chords extends ApiEntityWith<SongLink> {
     id: number,
