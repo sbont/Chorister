@@ -2,146 +2,140 @@ import { Entity, EntityCollectionRef, EntityRef } from "@/entities/entity";
 import { CacheListMap, CacheMap } from "@/types/CacheMaps";
 import { isNew } from "@/utils";
 import { defineStore } from "pinia";
-import { computed, Ref, ref } from "vue";
-import { ApiEndpoint } from "./api";
+import { computed, inject, Ref, ref } from "vue";
+import { Api, ApiEndpoint, ApiKey } from "./api";
 import { Uri } from "@/types";
 
-export class EntityStore<DomainEntity extends Entity> {
-    protected api: ApiEndpoint<DomainEntity>;
-    protected name: string;
-    private objByUri = ref(new CacheMap<Uri, DomainEntity>()) as Ref<CacheMap<Uri, DomainEntity>>;
-    private objByAssociationUri = ref(new CacheListMap<string, DomainEntity>());
+export const useEntityStore = <T extends Entity>(name: string, getEndpoint: (api: Api) => ApiEndpoint<T>) => defineStore(name, () => {
+    const api = inject(ApiKey);
+    if (!api)
+        throw new Error("Api not provided");
 
-    constructor(name: string, apiEndpoint: ApiEndpoint<DomainEntity>) {
-        this.name = name;
-        this.api = apiEndpoint;
+    const endpoint = getEndpoint(api);
+    const objByUri = ref(new CacheMap<Uri, T>()) as Ref<CacheMap<Uri, T>>;
+    const objByAssociationUri = ref(new CacheListMap<string, T>());
+
+    // Getters
+    const allObjects = computed(() => {
+        return [...objByUri.value.values()];
+    });
+    const allRelated = computed(() => (associationUri: Uri) => {
+        return objByAssociationUri.value.get(associationUri);
+    });
+    const count = computed(() => objByUri.value.size);
+
+    // Actions
+
+    function put(obj: T): void {
+        const uri = obj.uri ?? endpoint.getUri(obj.id!);
+        objByUri.value.set(uri, obj)
     }
 
-    put(obj: DomainEntity): void {
-        const uri = obj.uri ?? this.api.getUri(obj.id!);
-        this.objByUri.value.set(uri, obj)
+    function addRelated(obj: T, uri: Uri): void {
+        objByAssociationUri.value.addTo(uri, obj)
+        put(obj)
     }
 
-    addRelated(obj: DomainEntity, uri: Uri): void {
-        this.objByAssociationUri.value.addTo(uri, obj)
-        this.put(obj)
+    function putAllRelated(objects: Array<T>, uri: Uri): void {
+        objByAssociationUri.value.delete(uri);
+        objByAssociationUri.value.addAllTo(uri, objects);
+        objects.forEach(put);
     }
 
-    putAllRelated(objects: Array<DomainEntity>, uri: Uri): void {
-        this.objByAssociationUri.value.delete(uri);
-        this.objByAssociationUri.value.addAllTo(uri, objects);
-        objects.forEach(this.put);
-    }
-
-    refToUri(ref: EntityRef<DomainEntity>): string {
+    function refToUri(ref: EntityRef<T>): string {
         if (ref.uri) return ref.uri;
-        if (ref.id) return this.api.getUri(ref.id);
+        if (ref.id) return endpoint.getUri(ref.id);
         throw Error("Empty entity reference");
     }
 
-    async getByRef(ref: EntityRef<DomainEntity>): Promise<DomainEntity | undefined> {
-        const uri = this.refToUri(ref);
-        return this.getByUri(uri);
-    }
- 
-
-    async get(id: number): Promise<DomainEntity | undefined> {
-        const uri = this.api.getUri(id);
-        return this.getByUri(uri);
+    async function getByRef(ref: EntityRef<T>): Promise<T | undefined> {
+        const uri = refToUri(ref);
+        return getByUri(uri);
     }
 
-    private async getByUri(uri: Uri): Promise<DomainEntity | undefined> {
-        if (this.objByUri.value.has(uri)) {
-            this.fetch(uri); // don't await, just eagerly pass the current data and let the fetch complete in the background
-            return this.objByUri.value.get(uri);
-        } 
-        
-        return await this.fetch(uri);
+
+    async function get(id: number): Promise<T | undefined> {
+        const uri = endpoint.getUri(id);
+        return getByUri(uri);
     }
 
-    async fetch(uri: Uri): Promise<DomainEntity | undefined> {
-        const data = await this.api.getByUri(uri);
-        this.put(data);
-        return data;
-    }
-
-    async getAll() {
-        if (this.objByUri.value.size > 0) {
-            this.fetchAll(); // don't await, just eagerly pass the current data and let the fetch complete in the background
-            return this.objByUri.value.values();
+    async function getByUri(uri: Uri): Promise<T | undefined> {
+        if (objByUri.value.has(uri)) {
+            fetch(uri); // don't await, just eagerly pass the current data and let the fetch complete in the background
+            return objByUri.value.get(uri);
         }
 
-        return await this.fetchAll();
+        return await fetch(uri);
     }
 
-    async fetchAll() {
-        const data = await this.api.getAll();
-        data.forEach(this.put);
+    async function fetch(uri: Uri): Promise<T | undefined> {
+        const data = await endpoint.getByUri(uri);
+        put(data);
         return data;
     }
 
-    async getRelated(ref: EntityCollectionRef<DomainEntity>): Promise<DomainEntity[]> {
-        console.log(this.api);
-        
-        const fetch = this.fetchAllRelated(ref.uri);
-        if (this.objByAssociationUri.value.has(ref.uri)) {
+    async function getAll() {
+        if (objByUri.value.size > 0) {
+            fetchAll(); // don't await, just eagerly pass the current data and let the fetch complete in the background
+            return objByUri.value.values();
+        }
+
+        return await fetchAll();
+    }
+
+    async function fetchAll() {
+        const data = await endpoint.getAll();
+        data.forEach(put);
+        return data;
+    }
+
+    async function getAllRelated(ref: EntityCollectionRef<T>): Promise<T[]> {
+        console.log(api);
+
+        const fetch = fetchAllRelated(ref.uri);
+        if (objByAssociationUri.value.has(ref.uri)) {
             // don't await the response, just eagerly pass the current data and let the fetch complete in the background
-            return this.objByAssociationUri.value.getOrEmpty(ref.uri);
+            return objByAssociationUri.value.getOrEmpty(ref.uri);
         }
 
         return await fetch;
     }
 
-    async fetchAllRelated(uri: Uri) {
-        const data = await this.api.getAllAssociated(uri);
-        this.putAllRelated(data, uri);
+    async function fetchAllRelated(uri: Uri) {
+        const data = await endpoint.getAllAssociated(uri);
+        putAllRelated(data, uri);
         return data;
     }
 
-    async save(obj: DomainEntity ) {
-        const data = isNew(obj) ? await this.api.create(obj) : await this.api.update(obj);
-        // this.putRelated(obj, link);
+    async function save(obj: T) {
+        const data = isNew(obj) ? await endpoint.create(obj) : await endpoint.update(obj);
+        // putRelated(obj, link);
         return data;
     }
 
-    async remove(obj: DomainEntity) {
+    async function remove(obj: T) {
         if (!obj.id && !obj.uri)
             return;
 
-        const uri = obj.uri ?? this.api.getUri(obj.id!);
-        await this.api.delete(obj);
-        this.objByUri.value.delete(uri);
-        this.objByAssociationUri.value.remove(obj);
+        const uri = obj.uri ?? endpoint.getUri(obj.id!);
+        await endpoint.delete(obj);
+        objByUri.value.delete(uri);
+        objByAssociationUri.value.remove(obj);
     }
 
-    setup () {
-        // Getters
-        const allObjects = computed(() => {
-            return [...this.objByUri.value.values()];
-        });
-        const allRelated = computed(() => (associationUri: Uri) => {
-            return this.objByAssociationUri.value.get(associationUri);
-        });
-        const count = computed(() => this.objByUri.value.size);
-
-        return {
-            allObjects,
-            allRelated,
-            count,
-            get: this.get,
-            getByRef: this.getByRef,
-            fetch: this.fetch,
-            getAll: this.getAll,
-            fetchAll: this.fetchAll,
-            getAllRelated: this.getRelated,
-            fetchAllRelated: this.fetchAllRelated,
-            save: this.save,
-            delete: this.remove
-        };
-    }
-
-    use = () => defineStore(this.name, () => {
-        console.log(this.api);
-        return this.setup();
-    });
-}
+    return {
+        allObjects,
+        allRelated,
+        count,
+        get,
+        getByRef,
+        fetch,
+        getAll,
+        fetchAll,
+        addRelated,
+        getAllRelated,
+        fetchAllRelated,
+        save,
+        delete: remove
+    };
+});

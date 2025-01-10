@@ -3,8 +3,8 @@
         <div class="is-size-4">Scores</div>
         <div v-if="error" class="is-danger">{{ error }}</div>
         <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
-            <ScoreComponent v-for="score in scores" :key="score._links?.self.href" :value="(score as Score)" :song="song"
-                            @remove="removeScore(score)"></ScoreComponent>
+            <ScoreComponent v-for="score in scores" :key="score.id" :value="(score as Score)"
+                :song="song" @remove="removeScore(score)"></ScoreComponent>
 
             <div v-if="!draftValues">
                 <button class="button is-primary" @click="addScore">
@@ -20,12 +20,18 @@
 
 <script setup lang="ts">
 import ScoreComponent from "@/components/Score.vue"
-import { Score, DraftScore, Song } from "@/types";
-import { ref } from "vue";
+import { inject, ref } from "vue";
 import { isNew } from "@/utils";
-import { useScores } from "@/stores/scoreStore";
+import { useScores } from "@/application/scoreStore";
 import { AxiosError } from "axios";
+import { ApiKey } from "@/application/api";
+import { Song } from "@/entities/song";
+import { Score } from "@/entities/score";
+import { EntityRef, toEntityRef } from "@/entities/entity";
 
+type DraftScore = Partial<Score> & {
+    song: EntityRef<Song>
+}
 
 const props = defineProps<{
     song: Song
@@ -33,17 +39,20 @@ const props = defineProps<{
 
 const loading = ref(true)
 const error = ref<string>()
-const scoreStore = useScores()
+const api = inject(ApiKey)!;
+console.log(api.scores);
+
+const scoreStore = useScores();
 const scores = ref<Array<Score>>([]);
-const link = props.song._links?.scores
+const link = props.song.scores
 if (link)
-    scoreStore.fetchRelatedFromLink(link).then(data => scores.value = data as Score[]).catch(e => error.value = e).finally(() => loading.value = false)
+    scoreStore.getAllRelated(link).then(data => scores.value = data).catch(e => error.value = e).finally(() => loading.value = false)
 else {
     error.value = "No association found";
 }
 const draftValues = ref<DraftScore | undefined>(undefined)
 
-const addScore = () => draftValues.value = {song: props.song._links?.self.href}
+const addScore = () => draftValues.value = { song: toEntityRef(props.song) }
 const cancelAdd = () => draftValues.value = undefined
 
 const onAdded = (score: Score) => {
@@ -53,14 +62,14 @@ const onAdded = (score: Score) => {
 
 const removeScore = async (score: Score) => {
     if (!isNew(score)) {
-         try {
+        try {
             await scoreStore.delete(score);
-         } catch(e) {
+        } catch (e) {
             error.value = (e as AxiosError).message
             return;
-         }
+        }
     }
-    scores.value = scores.value.filter(current => current._links?.self.href !== score._links?.self.href);
+    scores.value = scores.value.filter(current => current.id !== score.id);
 }
 
 </script>

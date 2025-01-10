@@ -48,14 +48,15 @@
 </template>
 
 <script setup lang="ts">
-import api from "../services/api.js";
 import { onMounted, ref } from 'vue'
-import { useSongs } from "@/stores/songStore";
+import { useSongs } from "@/application/songStore.js";
 import { useRoute } from "vue-router";
-import { Song } from "@/types";
+import { Song } from "@/entities/song";
+import { storeToRefs } from "pinia";
 
 // Types
 const songStore = useSongs();
+const { fetchAll, fetchAllForCategory } = songStore;
 const route = useRoute();
 
 // state
@@ -73,20 +74,21 @@ const pluralize = function (n: number) {
 }
 
 const loadSongs = function () {
-    const sorter = (data: Array<Song>) => data.sort((songA, songB) => songA.title.localeCompare(songB.title));
     const routeName = route.name;
     let id = Number(route.params.id);
     let songsLoaded;
     switch (routeName) {
         case 'Repertoire':
-            songsLoaded = songStore.fetchAll().then(response => songs.value = sorter(response.data));
+            songsLoaded = fetchAll();
             break;
         case 'CategorySeason':
         case 'CategoryLiturgical':
-            songsLoaded = api.getSongsByCategoryId(id).then(response => songs.value = sorter(response.data));
+            songsLoaded = fetchAllForCategory(id);
             break;
     }
-    songsLoaded!.finally(() => (loading.value = false));
+    songsLoaded!
+        .then(data => songs.value = data)
+        .finally(() => (loading.value = false));
 }
 
 const handleErrorClick = function () {
@@ -98,7 +100,7 @@ const oneBased = (index: number) => index + 1;
 const startDrag = function (event: DragEvent, song: Song) {
     if (event.dataTransfer) {
         event.dataTransfer.dropEffect = "link";
-        event.dataTransfer.setData("text/plain", song._links!.self.href);
+        event.dataTransfer.setData("text/plain", song.uri!);
     }
 }
 

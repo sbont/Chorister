@@ -10,6 +10,8 @@ import { User } from "@/entities/user"
 import { Uri } from "@/types"
 import { InjectionKey } from "vue"
 
+export type EndpointIdentifier = "songs" | "chords" | "scores";
+
 export interface Api {
     // Generic
     update: (entity: Entity) => Promise<void>
@@ -17,7 +19,7 @@ export interface Api {
 
     songs: ApiEndpoint<Song>
     chords: ApiEndpoint<Chords>
-    scores: ApiEndpoint<Score>
+    scores: ScoresApiEndpoint
 
     // Registration
     register: (choirName: string, userDisplayName: string, email: string, password: string) => Promise<void>
@@ -115,6 +117,11 @@ export interface ApiEndpoint<TEntity extends Entity> {
     putAllAssociations: (uri: Uri, objects: Array<TEntity>) => Promise<void>
     addAllAssociations: (uri: Uri, objects: Array<TEntity>) => Promise<void>
     deleteAssociation: (uri: Uri, object: TEntity) => Promise<void>
+}
+
+export interface ScoresApiEndpoint extends ApiEndpoint<Score> {
+    getUploadUrlForScore: (score: Score) => Promise<string>
+    putFileIdForScore: (score: Score, fileId: number) => Promise<void>
 }
 
 export const ApiKey: InjectionKey<Api> = Symbol("api");
