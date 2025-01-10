@@ -27,7 +27,7 @@
                                         <select v-model="draftValues.key">
                                             <option v-bind:value="undefined" disabled>Select...</option>
                                             <option v-for="(key, i) in keyOptions" class="song" :key="key"
-                                                    draggable="true" v-bind:value="key">{{ keyLabelMapping[key] }}
+                                                draggable="true" v-bind:value="key">{{ keyLabelMapping[key] }}
                                             </option>
                                         </select>
                                     </div>
@@ -39,7 +39,7 @@
                                 <label class="label">Description</label>
                                 <div class="control">
                                     <input class="input" type="text" v-model="draftValues.description"
-                                           placeholder="Version name, instrument, ..."/>
+                                        placeholder="Version name, instrument, ..." />
                                 </div>
                             </div>
                         </div>
@@ -48,7 +48,7 @@
                     <div class="field">
                         <label class="label">Chords</label>
                         <div class="control">
-                            <editor-content :editor="editor"/>
+                            <editor-content :editor="editor" />
                         </div>
                     </div>
                 </div>
@@ -65,15 +65,21 @@
     </div>
 </template>
 <script setup lang="ts">
-import { PropType, ref } from 'vue'
+import { useChords } from "@/application/chordsStore";
+import { Chords } from '@/entities/chords';
+import { EntityRef } from '@/entities/entity';
+import { Song } from '@/entities/song';
 import { Key, KeyLabelMapping } from "@/types/Key";
-import { useChords } from "@/stores/chordsStore";
-import { ApiEntity, Chords, DraftChords } from "@/types";
 import { isNew } from "@/utils";
-import { useEditor, EditorContent } from '@tiptap/vue-3'
-import StarterKit from '@tiptap/starter-kit'
-import TextStyle from '@tiptap/extension-text-style'
-import FontFamily from '@tiptap/extension-font-family'
+import FontFamily from '@tiptap/extension-font-family';
+import TextStyle from '@tiptap/extension-text-style';
+import StarterKit from '@tiptap/starter-kit';
+import { EditorContent, useEditor } from '@tiptap/vue-3';
+import { PropType, ref } from 'vue';
+
+type DraftChords = Partial<Chords> & {
+    song: EntityRef<Song>
+}
 
 const props = defineProps({
     value: {
@@ -132,7 +138,7 @@ const save = () => {
     saving.value = true;
     const html = editor.value?.getHTML();
     chords.value.chords = html;
-    chordsStore.saveToServer(<ApiEntity>chords.value)
+    chordsStore.save(chords.value as Chords)
         .then(newChords => {
             emit("added", newChords)
         })

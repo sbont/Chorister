@@ -3,7 +3,8 @@
         <div v-if="!editing" class="card score mr-2">
             <header class="card-header">
                 <p class="card-header-title">
-                    <a @click.prevent="openFile" @auxclick.prevent="openFile" @mousedown.middle.prevent="openFile" href="#" class="icon-text">
+                    <a @click.prevent="openFile" @auxclick.prevent="openFile" @mousedown.middle.prevent="openFile"
+                        href="#" class="icon-text">
                         <span class="icon">
                             <i class="fas fa-cloud-download-alt"></i>
                         </span>
@@ -58,16 +59,22 @@
     </div>
 </template>
 <script setup lang="ts">
-import api from '@/services/api';
+import { useFiles } from '@/application/fileStore';
+import { useScores } from "@/application/scoreStore";
+import { EntityRef } from '@/entities/entity';
+import { Score } from '@/entities/score';
+import { Song } from '@/entities/song';
 import { downloadFile } from '@/services/fileService';
-import { useFiles } from '@/stores/fileStore';
-import { useScores } from "@/stores/scoreStore";
-import { DraftScore, Score, Song } from "@/types";
+import api from '@/services/legacyApi';
 import { isNew } from "@/utils";
+import { AxiosError } from 'axios';
+import { extension } from 'mime-types';
 import FileUpload, { FileUploadRemoveEvent, FileUploadSelectEvent, FileUploadUploaderEvent } from 'primevue/fileupload';
 import { PropType, onMounted, ref } from 'vue';
-import { extension } from 'mime-types';
-import { AxiosError } from 'axios';
+
+type DraftScore = Partial<Score> & {
+    song: EntityRef<Song>
+}
 
 const props = defineProps({
     value: {
@@ -119,7 +126,7 @@ const edit = async () => {
 }
 
 const onUpload = async (event: FileUploadUploaderEvent) => {
-    const envelope = await fileStore.getUploadEnvelope(score.value?.file?.id);
+    const envelope = await fileStore.getUploadEnvelope(score.value?.file?.id!);
     if (!envelope?.uploadUrl)
         return;
 
@@ -161,10 +168,10 @@ const save = async () => {
         return;
     }
 
-    const savedScore = await scoreStore.saveToServer(<Score>score.value)
+    const savedScore = await scoreStore.save(score.value as Score)
     savedScore.file = { id: fileId };
     score.value = savedScore;
-    await api.putFileIdForScore(savedScore._links?.self.href!, fileId);
+    await scoreStore.linkFile(savedScore, fileId);
 
     if (wasNew)
         emit("added", savedScore)
@@ -206,12 +213,12 @@ const openFile = async (event: MouseEvent) => {
             const response = await downloadFile(location);
             const contentType = response.headers['content-type']?.toString() ?? "";
             console.log(response.headers);
-            
+
             const blob = new Blob([response.data], { type: contentType });
             const link = document.createElement('a')
             link.href = URL.createObjectURL(blob)
             console.log(contentType);
-            
+
             const ext = extension(contentType)
             link.download = `${props.song?.title} - ${score.value?.description}.${ext}`;
             link.click()
