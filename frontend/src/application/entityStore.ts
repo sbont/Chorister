@@ -91,6 +91,8 @@ export const useEntityStore = <T extends Entity>(name: string, getEndpoint: (api
 
     async function getAllRelated(ref: EntityCollectionRef<T>): Promise<T[]> {
         console.log(api);
+        console.log(ref);
+        
 
         const fetch = fetchAllRelated(ref.uri);
         if (objByAssociationUri.value.has(ref.uri)) {

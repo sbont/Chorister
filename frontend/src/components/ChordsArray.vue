@@ -35,14 +35,18 @@ const props = defineProps<{
     song: Song
 }>();
 
-// const loading = ref(true)
+const loading = ref(true)
 const error = ref<string | undefined>(undefined)
 const chordsStore = useChords();
 const chordses = ref<Array<Chords>>([])
 const draftValues = ref<DraftChords | undefined>(undefined)
 
-if (props.song.chords) 
-    chordses.value = await chordsStore.getAllRelated(props.song.chords);
+if (props.song.chords)
+    chordsStore.getAllRelated(props.song.chords)
+        .then(data => chordses.value = data)
+        .catch(e => error.value = e)
+        .finally(() => loading.value = false);;
+
 
 const addChords = () => draftValues.value = { song: toEntityRef(props.song) }
 const cancelAdd = () => draftValues.value = undefined

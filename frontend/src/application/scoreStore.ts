@@ -7,8 +7,8 @@ import { Api, ApiKey } from "./api";
 import { useEntityStore } from "./entityStore";
 
 const getEndpoint = (api: Api) => api.scores;
-export const useScores = defineStore("chords", () => {
-    const core = useEntityStore("scores", getEndpoint)();
+export const useScores = defineStore("scores", () => {
+    const core = useEntityStore("scores-core", getEndpoint)();
     const api = inject(ApiKey);
     if (!api)
         throw new Error("Api not provided");

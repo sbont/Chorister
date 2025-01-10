@@ -39,14 +39,14 @@ const props = defineProps<{
 
 const loading = ref(true)
 const error = ref<string>()
-const api = inject(ApiKey)!;
-console.log(api.scores);
-
 const scoreStore = useScores();
 const scores = ref<Array<Score>>([]);
 const link = props.song.scores
 if (link)
-    scoreStore.getAllRelated(link).then(data => scores.value = data).catch(e => error.value = e).finally(() => loading.value = false)
+    scoreStore.getAllRelated(link)
+        .then(data => scores.value = data)
+        .catch(e => error.value = e)
+        .finally(() => loading.value = false);
 else {
     error.value = "No association found";
 }
