@@ -1,4 +1,4 @@
-import { Entity, EntityRef } from "@/entities/entity";
+import { Entity, EntityCollectionRef, EntityRef } from "@/entities/entity";
 import { CacheListMap, CacheMap } from "@/types/CacheMaps";
 import { isNew } from "@/utils";
 import { defineStore } from "pinia";
@@ -8,7 +8,7 @@ import { Uri } from "@/types";
 
 export class EntityStore<DomainEntity extends Entity> {
     protected api: ApiEndpoint<DomainEntity>;
-    private name: string;
+    protected name: string;
     private objByUri = ref(new CacheMap<Uri, DomainEntity>()) as Ref<CacheMap<Uri, DomainEntity>>;
     private objByAssociationUri = ref(new CacheListMap<string, DomainEntity>());
 
@@ -80,13 +80,16 @@ export class EntityStore<DomainEntity extends Entity> {
         return data;
     }
 
-    async getRelated(uri: Uri) {
-        if (this.objByAssociationUri.value.has(uri)) {
-            this.fetchAllRelated(uri); // don't await, just eagerly pass the current data and let the fetch complete in the background
-            return this.objByAssociationUri.value.get(uri);
+    async getRelated(ref: EntityCollectionRef<DomainEntity>): Promise<DomainEntity[]> {
+        console.log(this.api);
+        
+        const fetch = this.fetchAllRelated(ref.uri);
+        if (this.objByAssociationUri.value.has(ref.uri)) {
+            // don't await the response, just eagerly pass the current data and let the fetch complete in the background
+            return this.objByAssociationUri.value.getOrEmpty(ref.uri);
         }
-            
-        return await this.fetchAllRelated(uri);
+
+        return await fetch;
     }
 
     async fetchAllRelated(uri: Uri) {
@@ -111,10 +114,9 @@ export class EntityStore<DomainEntity extends Entity> {
         this.objByAssociationUri.value.remove(obj);
     }
 
-    use = () => defineStore(this.name, () => {
+    setup () {
         // Getters
         const allObjects = computed(() => {
-            console.log(`All ${this.name}:`, [...this.objByUri.value.values()]);
             return [...this.objByUri.value.values()];
         });
         const allRelated = computed(() => (associationUri: Uri) => {
@@ -122,20 +124,24 @@ export class EntityStore<DomainEntity extends Entity> {
         });
         const count = computed(() => this.objByUri.value.size);
 
-        return { 
-            allObjects, 
+        return {
+            allObjects,
             allRelated,
-            count, 
+            count,
             get: this.get,
             getByRef: this.getByRef,
-            fetch: this.fetch, 
-            getAll: this.getAll, 
+            fetch: this.fetch,
+            getAll: this.getAll,
             fetchAll: this.fetchAll,
             getAllRelated: this.getRelated,
-            fetchAllRelated: this.fetchAllRelated, 
-            save: this.save, 
-            delete: this.remove 
+            fetchAllRelated: this.fetchAllRelated,
+            save: this.save,
+            delete: this.remove
         };
+    }
+
+    use = () => defineStore(this.name, () => {
+        console.log(this.api);
+        return this.setup();
     });
 }
-
