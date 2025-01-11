@@ -1,6 +1,6 @@
 import { Key } from "@/types/Key";
 import { Song } from "./song";
-import { ApiEntity, ApiEntityWith, fromDomain, Link, toDomain, untemplated, WithAssociation } from ".";
+import { ApiEntityIn, ApiEntityWith, fromDomain, Link, toDomain, untemplated, WithAssociation } from ".";
 import { Score as DomainScore } from "@/entities/score";
 import { Uri } from "@/types";
 

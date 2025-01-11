@@ -1,4 +1,4 @@
-import { ApiEndpoint, EndpointIdentifier, Api as IChoristerApi, ScoresApiEndpoint } from "@/application/api";
+import { Api as IChoristerApi, ApiEndpoint, ScoresApiEndpoint } from "@/application/api";
 import { Category as DomainCategory } from "@/entities/category";
 import { Choir as DomainChoir } from "@/entities/choir";
 import { Chords as DomainChords } from "@/entities/chords";
@@ -7,13 +7,22 @@ import { Event as DomainEvent, EventEntry as DomainEventEntry } from "@/entities
 import { Score as DomainScore } from "@/entities/score";
 import { Song as DomainSong } from "@/entities/song";
 import { User as DomainUser } from "@/entities/user";
-import { ApiEntity as IdentifiableApiEntity } from "@/services/apiTypes";
+import { ApiEntityIn, ApiEntityOut } from "@/services/apiTypes";
 import { useAuth } from "@/services/authStore";
 import axios, { AxiosInstance } from "axios";
 import { Category, fromDomainCategory, toDomainCategory } from "./apiTypes/category";
 import { Choir, fromDomainChoir, toDomainChoir } from "./apiTypes/choir";
 import { Chords, fromDomainChords, toDomainChords } from "./apiTypes/chords";
-import { EventEntry, EventGet, EventPost, fromDomainEvent, fromDomainEventEntry, toDomainEvent, toDomainEventEntry } from "./apiTypes/event";
+import {
+    EventEntryGet,
+    EventEntryPost,
+    EventGet,
+    EventPost,
+    fromDomainEvent,
+    fromDomainEventEntry,
+    toDomainEvent,
+    toDomainEventEntry,
+} from "./apiTypes/event";
 import { UploadReturnEnvelope } from "./apiTypes/file";
 import { NewChoirRegistration } from "./apiTypes/registration";
 import { fromDomainScore, Score, toDomainScore } from "./apiTypes/score";
@@ -25,8 +34,6 @@ const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + "/api";
 
 export default class ChoristerApi implements IChoristerApi {
     private readonly instance: AxiosInstance;
-    private events: EntityEndpoint<DomainEvent, EventGet, EventPost>;
-    private eventEntries: EntityEndpoint<DomainEventEntry, EventEntry, EventEntry>;
     private choirs: ChoirsEndpoint;
     private registration: RegistrationEndpoint;
     private categories: EntityEndpoint<DomainCategory, Category, Category>
@@ -37,6 +44,8 @@ export default class ChoristerApi implements IChoristerApi {
     public readonly songs: SongsEndpoint;
     public readonly chords: EntityEndpoint<DomainChords, Chords, Chords>;
     public readonly scores: ScoresEndpoint;
+    public readonly events: EntityEndpoint<DomainEvent, EventGet, EventPost>;
+    public readonly eventEntries: EntityEndpoint<DomainEventEntry, EventEntryGet, EventEntryPost>;
 
     constructor() {
         this.instance = axios.create({
@@ -55,8 +64,8 @@ export default class ChoristerApi implements IChoristerApi {
         )
 
         this.songs = new SongsEndpoint(this.instance, "songs", fromDomainSong, toDomainSong);
-        this.events = new EntityEndpoint(this.instance, "event", fromDomainEvent, toDomainEvent);
-        this.eventEntries = new EntityEndpoint(this.instance, "evententries", fromDomainEventEntry, toDomainEventEntry);
+        this.events = new EntityEndpoint(this.instance, "events", fromDomainEvent, toDomainEvent);
+        this.eventEntries = new EntityEndpoint(this.instance, "eventEntries", fromDomainEventEntry, toDomainEventEntry);
         this.choirs = new ChoirsEndpoint(this.instance, "choirs", fromDomainChoir, toDomainChoir);
         this.registration = new RegistrationEndpoint(this.instance);
         this.categories = new EntityEndpoint(this.instance, "categories", fromDomainCategory, toDomainCategory);
@@ -198,7 +207,7 @@ export default class ChoristerApi implements IChoristerApi {
     getFileLocation = (fileId: number) => this.files.getFileLocation(fileId);
 }
 
-class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends IdentifiableApiEntity, ApiPostEntity extends IdentifiableApiEntity> implements ApiEndpoint<DomainEntity> {
+class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends ApiEntityIn, ApiPostEntity extends ApiEntityOut> implements ApiEndpoint<DomainEntity> {
     protected instance: AxiosInstance;
     protected readonly path: string;
     protected readonly fromDomain: (e: DomainEntity) => ApiPostEntity;
@@ -250,7 +259,7 @@ class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends Identifia
         await this.instance.delete("songs/" + obj.id)
     }
 
-    getAllRelated = async <RelatedDomainEntity extends Entity, RelatedApiEntity extends IdentifiableApiEntity>(id: number, association: string, toDomain: (e: RelatedApiEntity) => RelatedDomainEntity) => {
+    getAllRelated = async <RelatedDomainEntity extends Entity, RelatedApiEntity extends ApiEntityIn>(id: number, association: string, toDomain: (e: RelatedApiEntity) => RelatedDomainEntity) => {
         const response = await this.instance.get<Array<RelatedApiEntity>>(`${this.path}/${id}/${association}`, this.getGetConfig(association));
         return response.data.map(toDomain);
     }
@@ -260,7 +269,7 @@ class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends Identifia
         return response.data.map(this.toDomain);
     }
 
-    putAllRelated = async <RelatedDomainEntity extends Entity, RelatedApiEntity extends IdentifiableApiEntity>(id: number, association: string, objects: Array<RelatedDomainEntity>, fromDomain: (e: RelatedDomainEntity) => RelatedApiEntity) => {
+    putAllRelated = async <RelatedDomainEntity extends Entity, RelatedApiEntity extends ApiEntityOut>(id: number, association: string, objects: Array<RelatedDomainEntity>, fromDomain: (e: RelatedDomainEntity) => RelatedApiEntity) => {
         const data = objects.map(fromDomain);
         await this.instance.put<Array<RelatedApiEntity>>(`${this.path}/${id}/${association}`, data);
     }
@@ -284,11 +293,11 @@ class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends Identifia
     }
 
     protected getGetConfig(embeddedAttributeName: string | undefined = undefined) {
-        embeddedAttributeName ??= this.path.split("/").pop()!;
+        const prop = embeddedAttributeName ?? this.path.split("/").pop()!;
         return {
             transformResponse: [
                 function (data: string) {
-                    return data ? JSON.parse(data)._embedded[embeddedAttributeName] : data;
+                    return data ? JSON.parse(data)._embedded[prop] : data;
                 }
             ]
         }

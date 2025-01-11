@@ -5,7 +5,9 @@ export interface Identifiable {
     id: number | undefined
 }
 
-export interface ApiEntity extends Identifiable {
+export type ApiEntityOut = Identifiable
+
+export interface ApiEntityIn extends Identifiable {
     _links: ApiEntityLinks | undefined
 }
 
@@ -32,7 +34,7 @@ export interface WithEmbedded<N extends string, O> {
     _embedded: Embedded<N, O>
 }
 
-export function getSelfUri(apiEntity: ApiEntity): Uri | undefined {
+export function getSelfUri(apiEntity: ApiEntityIn): Uri | undefined {
     const link = apiEntity._links?.self;
     if (!link)
         return undefined;
@@ -50,16 +52,15 @@ export function untemplated(link: Link): Uri {
     return link.href;
 }
 
-export function toDomain<Source extends ApiEntity, Target extends Entity>(apiEntity: Source) {
+export function toDomain<Source extends ApiEntityIn, Target extends Entity>(apiEntity: Source) {
     return Object.assign({
         id: apiEntity.id,
-        uri: untemplated(apiEntity._links?.self!)
+        uri: apiEntity._links?.self ? untemplated(apiEntity._links?.self!) : undefined
     }, apiEntity) as Entity as Target;
 }
 
-export function fromDomain<Source extends Entity, Target extends ApiEntity>(entity: Source) {
+export function fromDomain<Source extends Entity, Target extends Identifiable>(entity: Source) {
     return Object.assign({
         id: entity.id,
-        _links: { self: { href: entity.uri }}
     }, entity) as Entity as Target;
 }

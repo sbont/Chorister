@@ -16,22 +16,32 @@
 
                 <p class="menu-label">Upcoming</p>
                 <ul class="menu-list">
-                    <li v-for="(event) in futureEvents" :key="event.id" class="droppable"
-                        @drop="dropSong($event, event)" @dragover.prevent @dragenter.prevent>
-                        <router-link :to="{ name: 'Event', params: { id: event.id } }" append>{{
-                            event.name
-                        }}
+                    <li
+                        v-for="event in futureEvents"
+                        :key="event.id"
+                        class="droppable"
+                        @drop="dropSong($event, event)"
+                        @dragover.prevent
+                        @dragenter.prevent
+                    >
+                        <router-link :to="{ name: 'Event', params: { id: event.id } }" append
+                            >{{ event.name }}
                         </router-link>
                     </li>
                 </ul>
 
                 <p class="menu-label">Past</p>
                 <ul class="menu-list">
-                    <li v-for="(event) in pastEvents" :key="event.id" class="droppable" @drop="dropSong($event, event)"
-                        @dragover.prevent @dragenter.prevent>
-                        <router-link :to="{ name: 'Event', params: { id: event.id } }" append>{{
-                            event.name
-                        }}
+                    <li
+                        v-for="event in pastEvents"
+                        :key="event.id"
+                        class="droppable"
+                        @drop="dropSong($event, event)"
+                        @dragover.prevent
+                        @dragenter.prevent
+                    >
+                        <router-link :to="{ name: 'Event', params: { id: event.id } }" append
+                            >{{ event.name }}
                         </router-link>
                     </li>
                 </ul>
@@ -44,10 +54,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { useEvents } from "@/stores/eventStore";
+import { computed } from "vue";
+import { useEvents } from "@/application/eventStore";
 import { storeToRefs } from "pinia";
-import { Event } from "@/types";
+import { Event } from "@/entities/event";
 
 const eventStore = useEvents();
 eventStore.fetchAll();
@@ -62,8 +72,7 @@ const ready = computed(() => !!futureEvents);
 const dropSong = (dragEvent: DragEvent, event: Event) => {
     let eventId = event.id;
     let songUri = dragEvent.dataTransfer?.getData("text");
-    const songId = songUri ? parseInt(songUri?.substring(songUri.lastIndexOf('/'))) : undefined;
-    if (songId && eventId)
-        eventStore.addEventEntry(eventId, { songId: songId })
-}
+    const songId = songUri ? parseInt(songUri?.substring(songUri.lastIndexOf("/"))) : undefined;
+    if (songId && eventId) eventStore.addEventEntry(eventId, { songId: songId });
+};
 </script>

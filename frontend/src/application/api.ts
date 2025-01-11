@@ -20,6 +20,8 @@ export interface Api {
     songs: ApiEndpoint<Song>
     chords: ApiEndpoint<Chords>
     scores: ScoresApiEndpoint
+    events: ApiEndpoint<Event>
+    eventEntries: ApiEndpoint<EventEntry>
 
     // Registration
     register: (choirName: string, userDisplayName: string, email: string, password: string) => Promise<void>

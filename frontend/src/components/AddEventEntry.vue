@@ -1,6 +1,5 @@
 <template>
-    <div class="add-row has-background-light"
-        @mouseover="() => { if (state == State.Ready) state = State.MouseOver }"
+    <div class="add-row has-background-light" @mouseover="() => { if (state == State.Ready) state = State.MouseOver }"
         @mouseleave="() => { if (state == State.MouseOver) state = State.Ready }">
         <div v-if="state == State.Ready">
             <span class="icon">
@@ -26,7 +25,7 @@
 
         <div v-if="state == State.AddSong" class="form">
             <div class="spacer"></div>
-            <Select v-model="selectedSongId" filter :options="songStore.allSongs" option-label="title" option-value="id"
+            <Select v-model="selectedSongId" filter :options="allSongs" option-label="title" option-value="id"
                 placeholder="Select song..." class="selector mr-2" />
             <button class="button is-primary" @click="save">Add</button>
 
@@ -35,11 +34,11 @@
 </template>
 
 <script setup lang="ts">
-import { useEvents } from '@/stores/eventStore';
-import { useSongs } from '@/stores/songStore';
-import { PropType, ref } from 'vue';
+import { useEvents } from '@/application/eventStore';
+import { useSongs } from '@/application/songStore';
+import { ref } from 'vue';
 import Select from 'primevue/select';
-import { EventEntry } from '@/types';
+import { storeToRefs } from 'pinia';
 
 const props = defineProps<{ eventId: number }>();
 const emit = defineEmits(["add"]);
@@ -58,6 +57,7 @@ const headerName = ref<string>();
 const eventStore = useEvents();
 const songStore = useSongs();
 songStore.fetchAll();
+const { allSongs } = storeToRefs(songStore);
 
 // Methods
 const addHeader = () => {
@@ -75,7 +75,7 @@ const save = async () => {
     if (state.value == State.AddSong && selectedSongId.value) {
         const entry = await eventStore.addEventEntry(props.eventId, { songId: selectedSongId.value })
         console.log(entry);
-        
+
         emit("add", entry);
     } else if (state.value == State.AddHeader) {
         emit("add", { label: headerName.value });

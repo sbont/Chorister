@@ -1,8 +1,8 @@
-import { ApiEntity, ApiEntityWith, fromDomain, Identifiable, Link, toDomain, untemplated, WithAssociation } from ".";
+import { ApiEntityIn, ApiEntityWith, fromDomain, Identifiable, Link, toDomain, untemplated, WithAssociation } from ".";
 import { Category } from "./category";
 import { Choir } from "./choir";
 import { Chords } from "./chords";
-import { EventEntry } from "./event";
+import { EventEntryGet } from "./event";
 import { Score } from "./score";
 import { User } from "./user";
 import { Song as SongEntity } from "@/entities/song";
@@ -22,7 +22,7 @@ export interface Song extends ApiEntityWith<ChordsLink & ScoresLink & EventEntri
     addedAt: Date,
     addedBy: User,
     categories: Array<Category>,
-    eventEntries: Array<EventEntry>,
+    eventEntries: Array<EventEntryGet>,
     text: string,
     lastEvent: Event | undefined
 }
@@ -39,16 +39,16 @@ export interface EventEntriesLink extends WithAssociation {
     eventEntries: Link
 }
 
-export interface Songbook extends Identifiable, ApiEntity {
+export interface Songbook extends Identifiable, ApiEntityIn {
     id: number,
     title: string
 }
 
 export function toDomainSong(apiSong: Song): SongEntity {
     return {...toDomain(apiSong),
-        scores: apiSong._links ? { uri: untemplated(apiSong._links.scores) } : undefined,
-        chords: apiSong._links ? { uri: untemplated(apiSong._links.chords) } : undefined,
-        eventEntries: apiSong._links ? { uri: untemplated(apiSong._links.eventEntries) } : undefined,
+        scores: apiSong._links?.scores ? { uri: untemplated(apiSong._links.scores) } : undefined,
+        chords: apiSong._links?.chords ? { uri: untemplated(apiSong._links.chords) } : undefined,
+        eventEntries: apiSong._links?.eventEntries ? { uri: untemplated(apiSong._links.eventEntries) } : undefined,
     };
 }
 

@@ -18,7 +18,7 @@ export const useSongs = defineStore("songs", () => {
     const allSongs = computed(() => [...songs.value.values()]);
 
     // actions
-    async function put(song: Song, chords?: Array<Chords>, scores?: Array<Score>) {
+    function put(song: Song, chords?: Array<Chords>, scores?: Array<Score>) {
         songs.value.set(song.id, song);
         if (chords)
             chordsBySong.value.addAllTo(song.id, chords);
@@ -75,7 +75,7 @@ export const useSongs = defineStore("songs", () => {
         songs.value.delete(song.id);
     }
 
-    return { allSongs, fetchAll, get, save, deleteSong, fetchAllForCategory }
+    return { allSongs, fetchAll, get, save, deleteSong, fetchAllForCategory, put }
 });
 
 const sort = (data: Array<Song>) => data.sort((songA, songB) => songA.title.localeCompare(songB.title));
