@@ -11,8 +11,12 @@
                     <div class="field-body">
                         <div class="field" v-bind:class="{ static: !editing }">
                             <div class="control">
-                                <input v-model="draftValues.name" class="input" type="text"
-                                    placeholder="Easter Morning Service" />
+                                <input
+                                    v-model="draftValues.name"
+                                    class="input"
+                                    type="text"
+                                    placeholder="Easter Morning Service"
+                                />
                             </div>
                         </div>
                     </div>
@@ -31,19 +35,13 @@
                 </div>
                 <div class="field is-grouped">
                     <p v-if="!editing" class="control">
-                        <button @click="exportText" class="button is-link">
-                            Export texts
-                        </button>
+                        <button @click="exportText" class="button is-link">Export texts</button>
                     </p>
                     <p v-if="!editing" class="control">
-                        <button @click="edit" class="button is-link">
-                            Edit
-                        </button>
+                        <button @click="edit" class="button is-link">Edit</button>
                     </p>
                     <p v-if="!editing" class="control">
-                        <button @click="remove" class="button is-danger">
-                            Delete
-                        </button>
+                        <button @click="remove" class="button is-danger">Delete</button>
                     </p>
                     <p v-if="editing" class="control">
                         <button @click="save" class="button is-link" :class="{ 'is-loading': saving }">
@@ -51,9 +49,7 @@
                         </button>
                     </p>
                     <p v-if="editing" class="control">
-                        <button @click="cancelEdit" class="button">
-                            Cancel
-                        </button>
+                        <button @click="cancelEdit" class="button">Cancel</button>
                     </p>
                 </div>
             </div>
@@ -63,16 +59,17 @@
 </template>
 
 <script setup lang="ts">
-import { useEvents } from "@/stores/eventStore";
-import { Event } from "@/types";
-import { onMounted, ref } from "vue";
+import { useEvents } from "@/application/eventStore";
+import { Event } from "@/entities/event";
+import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { isNew } from "@/entities/entity";
 
-type DraftEvent = Partial<Event>
+type DraftEvent = Partial<Event>;
 
-const store = useEvents()
-const route = useRoute()
-const router = useRouter()
+const store = useEvents();
+const route = useRoute();
+const router = useRouter();
 
 // State
 const event = ref<Event>();
@@ -81,30 +78,28 @@ const draftValues = ref<DraftEvent | null>(null);
 const loading = ref(true);
 const saving = ref(false);
 const error = ref<string | null>(null);
-
-// Mounted
-onMounted(() => {
-    if (route.name === "NewEvent") {
-        draftValues.value = {};
-        editing.value = true;
+if (route.name === "NewEvent") {
+    draftValues.value = {};
+    editing.value = true;
+    loading.value = false;
+} else {
+    const eventId = Number(route.params.id);
+    store.get(eventId).then((value) => {
+        event.value = value;
         loading.value = false;
-    } else {
-        const eventId = Number(route.params.id);
-        store.get(eventId).then(value => {
-            event.value = value;
-            loading.value = false;
-        });
-    }
-})
+    });
+}
 
 // Methods
 const format = (date: Date) => new Date(date).toLocaleDateString();
-const isNew = () => !event.value?.id;
-const save = () => {
-    saving.value = true;
-    const newEvent = draftValues.value as Event;
-    if (!newEvent) return;
 
+const save = async () => {
+    saving.value = true;
+    let newEvent = draftValues.value as Event;
+    if (!newEvent) 
+        return;
+    
+    const isNewEvent = isNew(newEvent);
     if (!newEvent.name && !newEvent.date) {
         error.value = "Either Name or Date is required";
         saving.value = false;
@@ -113,50 +108,44 @@ const save = () => {
         error.value = null;
     }
 
-    if (!newEvent.name)
-        newEvent.name = new Date(newEvent.date).toLocaleDateString()
+    if (!newEvent.name) 
+        newEvent.name = new Date(newEvent.date).toLocaleDateString();
 
-    const promise = store.saveToServer(newEvent);
-    promise.then((response) => {
-        const isNewEvent = isNew()
-        if (isNewEvent) {
-            newEvent.id = response.data.id;
-        }
-        editing.value = false;
-        saving.value = false;
-        event.value = newEvent;
-        draftValues.value = null;
-        if (isNewEvent) {
-            store.put(event.value);
-            router.push({
-                name: "Event",
-                params: { id: newEvent.id },
-            });
-        }
-    })
-}
+    newEvent = await store.save(newEvent);
+    editing.value = false;
+    saving.value = false;
+    event.value = newEvent;
+    draftValues.value = null;
+    if (isNewEvent) {
+        await router.push({
+            name: "Event",
+            params: { id: newEvent.id },
+        });
+    }
+};
 
 const edit = () => {
     draftValues.value = event.value as DraftEvent;
     editing.value = true;
-}
+};
 
 const cancelEdit = () => {
     draftValues.value = null;
     editing.value = false;
-}
+};
 
-const remove = () => store.remove(event.value?.id as number)
-    .then(() => {
-        router.push({ name: "Repertoire" });
-    });
+const remove = () => {
+    if (event.value)
+        store.delete(event.value).then(() =>
+            router.push({name: "Repertoire"}));
+}
 
 const exportText = () => {
     const link = router.resolve({
         name: "Export",
         params: { id: event.value?.id },
     });
-    window.open(link.href, '_blank');
-}
+    window.open(link.href, "_blank");
+};
 
 </script>

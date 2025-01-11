@@ -25,7 +25,6 @@ export const useEntityStore = <T extends Entity>(name: string, getEndpoint: (api
     const count = computed(() => objByUri.value.size);
 
     // Actions
-
     function put(obj: T): void {
         const uri = obj.uri ?? endpoint.getUri(obj.id!);
         objByUri.value.set(uri, obj)

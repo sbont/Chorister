@@ -39,5 +39,13 @@ export class CacheListMap<K, V> extends CacheMap<K, Array<V>> {
         }
     }
 
+    removeFrom(key: K, value: V): void {
+        const values = this.get(key);
+        if (!values) return;
+        
+        const i = values.findIndex(e => e === value);
+        values.splice(i, 1);
+    }
+
     getOrEmpty = (key: K) => this.get(key) ?? new Array<V>
 }
