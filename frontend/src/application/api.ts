@@ -127,7 +127,7 @@ export interface ScoresApiEndpoint extends ApiEndpoint<Score> {
 }
 
 export interface EventsApiEndpoint extends ApiEndpoint<Event> {
-    putEntries: (uri: Uri, entries: Array<EventEntry>) => Promise<Array<EventEntry>>
+    putEntries: (eventEntriesUri: Uri, entries: Array<EventEntry>) => Promise<Array<EventEntry>>
 }
 
 export const ApiKey: InjectionKey<Api> = Symbol("api");

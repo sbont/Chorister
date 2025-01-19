@@ -78,7 +78,8 @@ export const useEvents = defineStore('events', () => {
             entries[i].sequence -= direction;
         }
         sortEntries(uri);
-        return eventEndpoint.putEntries(event.entries.uri, entries);
+        const resequenced = resequence(uri);
+        return eventEndpoint.putEntries(event.entries.uri, resequenced);
     }
 
     async function get(eventId: number) {
@@ -121,13 +122,14 @@ export const useEvents = defineStore('events', () => {
             console.log("Song not found");
             return;
         }
-        const sequence = entriesByEventUri.value.getOrEmpty(uri).length;
+        const sequence = entriesByEventUri.value.getOrEmpty(uri).length + 1;
         let newEntry: EventEntry = { 
             event: new EntityRef(event), 
             sequence, 
             song: new EntityRef(song) 
         }
-        newEntry = await entriesEndpoint.create(newEntry);
+        const response = await entriesEndpoint.create(newEntry);
+        newEntry.uri = response.uri;
         entriesByEventUri.value.addTo(uri, newEntry);
         return newEntry;
     }
@@ -146,9 +148,17 @@ export const useEvents = defineStore('events', () => {
     }
     
     async function deleteEntry(eventEntry: EventEntry) {
-        await entriesEndpoint.delete(eventEntry);
         const eventUri =  eventEntry.event.uri ?? eventEndpoint.getUri(eventEntry.event.id!);
+        const event = events.value.get(eventUri)!;
         entriesByEventUri.value.removeFrom(eventUri, eventEntry);
+        const entries = resequence(eventUri);
+        eventEndpoint.putEntries(event.entries.uri, entries);
+    }
+    
+    function resequence(eventUri: Uri) {
+        const entries = entriesByEventUri.value.get(eventUri)!;
+        entries.forEach((entry, i) => entry.sequence = i + 1);
+        return entries;
     }
 
     return {

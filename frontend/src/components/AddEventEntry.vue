@@ -67,10 +67,6 @@ const addSong = () => {
     state.value = State.AddSong;
 }
 
-const addEntry = () => {
-    state.value = State.AddHeader;
-}
-
 const save = async () => {
     if (state.value == State.AddSong && selectedSongId.value) {
         const entry = await eventStore.addEventEntry(props.eventId, { songId: selectedSongId.value })
@@ -80,7 +76,7 @@ const save = async () => {
     } else if (state.value == State.AddHeader) {
         emit("add", { label: headerName.value });
     }
-
+    state.value = State.Ready;
 }
 
 </script>

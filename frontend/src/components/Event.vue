@@ -42,11 +42,6 @@ import Column from "primevue/column";
 import AddEventEntry from "./AddEventEntry.vue";
 import { Event, EventEntry } from "@/entities/event";
 
-/*type EventSong = {
-    sequence: number;
-    song: Song;
-    eventEntryUri: string;
-};*/
 
 enum State {
     Ready,
@@ -65,10 +60,7 @@ const entries = ref<EventEntry[]>([]);
 eventStore.get(eventId).then((result) => {
     event.value = result;
     if (result?.entries.resolved)
-    {
         entries.value = result?.entries?.resolved;
-    }
-    console.log(result)
 
     state.value = State.Ready;
 });
@@ -76,13 +68,8 @@ eventStore.get(eventId).then((result) => {
 const removeEntryFromEvent = async function (entry: EventEntry) {
     state.value = State.Deleting;
     await eventStore.deleteEntry(entry);
-    entries.value = entries.value.filter(e => e.uri === entry.uri);
+    entries.value = entries.value.filter(e => e.uri !== entry.uri);
     state.value = State.Ready;
-};
-
-const removeSong = function (entry: EventEntry) {
-    // notice NOT using "=>" syntax
-    entries.value.splice(entries.value.indexOf(entry), 1);
 };
 
 const reorder = (reorder: DataTableRowReorderEvent) => {
