@@ -237,8 +237,8 @@ class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends ApiEntity
         return response.data.map(this.toDomain);
     }
 
-    create = async (song: DomainEntity) => {
-        const data = this.fromDomain(song);
+    create = async (obj: DomainEntity) => {
+        const data = this.fromDomain(obj);
         const response = await this.instance.post<ApiGetEntity>(this.path, data);
         return this.toDomain(response.data);
     }
@@ -254,9 +254,9 @@ class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends ApiEntity
 
     delete = async (obj: DomainEntity) => {
         if (isNew(obj))
-            throw new Error("Song has no id");
+            throw new Error("Object has no id");
 
-        await this.instance.delete("songs/" + obj.id)
+        await this.instance.delete(`${this.path}/` + obj.id)
     }
 
     getAllRelated = async <RelatedDomainEntity extends Entity, RelatedApiEntity extends ApiEntityIn>(id: number, association: string, toDomain: (e: RelatedApiEntity) => RelatedDomainEntity) => {
