@@ -20,7 +20,7 @@ export interface Api {
     songs: ApiEndpoint<Song>
     chords: ApiEndpoint<Chords>
     scores: ScoresApiEndpoint
-    events: ApiEndpoint<Event>
+    events: EventsApiEndpoint
     eventEntries: ApiEndpoint<EventEntry>
 
     // Registration
@@ -124,6 +124,10 @@ export interface ApiEndpoint<TEntity extends Entity> {
 export interface ScoresApiEndpoint extends ApiEndpoint<Score> {
     getUploadUrlForScore: (score: Score) => Promise<string>
     putFileIdForScore: (score: Score, fileId: number) => Promise<void>
+}
+
+export interface EventsApiEndpoint extends ApiEndpoint<Event> {
+    putEntries: (uri: Uri, entries: Array<EventEntry>) => Promise<Array<EventEntry>>
 }
 
 export const ApiKey: InjectionKey<Api> = Symbol("api");

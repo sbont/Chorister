@@ -5,12 +5,6 @@ export interface Entity {
     uri?: Uri;
 }
 
-export interface EntityRef<T extends Entity> {
-    id?: number;
-    uri?: Uri;
-    resolved?: T
-}
-
 export interface EntityCollectionRef<T extends Entity> {
     uri: Uri;
     resolved?: T[]
@@ -20,6 +14,30 @@ export function isNew(entity: Entity) {
     return entity.id != undefined;
 }
 
-export function toEntityRef<T extends Entity>(entity: T): EntityRef<T> {
-    return { id: entity.id, uri: entity.uri, resolved: entity };
+export class EntityRef<T extends Entity> {
+    private _uri?: Uri;
+    id?: number;
+    resolved?: T;
+
+    constructor(uri: Uri)
+    constructor(entity: T);
+    constructor(entity?: T, uri?: Uri) {
+        this.resolved = entity;
+        this.id = entity?.id;
+        this._uri = uri ?? entity?.uri;
+    }
+    
+    get uri() {
+        if (!this._uri)
+            throw new Error(`Missing uri for object ${this.resolved ?? ""}`);
+        
+        return this._uri;        
+    }
+    
+    set uri(uri: Uri) {
+        this._uri = uri;
+        if (this.resolved?.uri != uri)
+            this.resolved = undefined;
+    }
+    
 }

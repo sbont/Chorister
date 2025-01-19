@@ -5,7 +5,7 @@ import { computed, inject, ref } from "vue";
 import { ApiKey } from "./api";
 import { Event, EventEntry } from "@/entities/event";
 import { Uri } from "@/types";
-import { isNew } from "@/entities/entity";
+import { EntityRef, isNew } from "@/entities/entity";
 
 export const useEvents = defineStore('events', () => {
     const api = inject(ApiKey);
@@ -78,7 +78,7 @@ export const useEvents = defineStore('events', () => {
             entries[i].sequence -= direction;
         }
         sortEntries(uri);
-        return entriesEndpoint.putAllAssociations(event.entries.uri, entries);
+        return eventEndpoint.putEntries(event.entries.uri, entries);
     }
 
     async function get(eventId: number) {
@@ -123,9 +123,9 @@ export const useEvents = defineStore('events', () => {
         }
         const sequence = entriesByEventUri.value.getOrEmpty(uri).length;
         let newEntry: EventEntry = { 
-            event: { resolved: event }, 
+            event: new EntityRef(event), 
             sequence, 
-            song: { resolved: song } 
+            song: new EntityRef(song) 
         }
         newEntry = await entriesEndpoint.create(newEntry);
         entriesByEventUri.value.addTo(uri, newEntry);

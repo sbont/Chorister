@@ -20,14 +20,13 @@
 
 <script setup lang="ts">
 import ScoreComponent from "@/components/Score.vue"
-import { inject, ref } from "vue";
+import { ref } from "vue";
 import { isNew } from "@/utils";
 import { useScores } from "@/application/scoreStore";
 import { AxiosError } from "axios";
-import { ApiKey } from "@/application/api";
 import { Song } from "@/entities/song";
 import { Score } from "@/entities/score";
-import { EntityRef, toEntityRef } from "@/entities/entity";
+import { EntityRef } from "@/entities/entity";
 
 type DraftScore = Partial<Score> & {
     song: EntityRef<Song>
@@ -52,7 +51,7 @@ else {
 }
 const draftValues = ref<DraftScore | undefined>(undefined)
 
-const addScore = () => draftValues.value = { song: toEntityRef(props.song) }
+const addScore = () => draftValues.value = { song: new EntityRef(props.song) }
 const cancelAdd = () => draftValues.value = undefined
 
 const onAdded = (score: Score) => {

@@ -22,7 +22,7 @@
 import { useChords } from "@/application/chordsStore";
 import ChordsComponent from "@/components/Chords.vue";
 import { Chords } from "@/entities/chords";
-import { EntityRef, toEntityRef } from "@/entities/entity";
+import { EntityRef } from "@/entities/entity";
 import { Song } from "@/entities/song";
 import { isNew } from "@/utils";
 import { ref } from "vue";
@@ -45,10 +45,10 @@ if (props.song.chords)
     chordsStore.getAllRelated(props.song.chords)
         .then(data => chordses.value = data)
         .catch(e => error.value = e)
-        .finally(() => loading.value = false);;
+        .finally(() => loading.value = false);
 
 
-const addChords = () => draftValues.value = { song: toEntityRef(props.song) }
+const addChords = () => draftValues.value = { song: new EntityRef(props.song) }
 const cancelAdd = () => draftValues.value = undefined
 
 const onAdded = (chords: Chords) => {
