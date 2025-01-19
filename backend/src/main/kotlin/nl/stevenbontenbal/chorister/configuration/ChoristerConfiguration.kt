@@ -18,6 +18,7 @@ import org.springframework.core.Ordered
 import org.springframework.core.convert.support.ConfigurableConversionService
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer
+import org.springframework.data.rest.webmvc.mapping.LinkCollector
 import org.springframework.http.HttpMethod
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -100,6 +101,10 @@ class ChoristerConfiguration(
                 corsRegistry.addMapping("/api/**")
                     .allowedMethods("*")
                     .allowedOrigins(properties.baseUrl)
+            }
+
+            override fun customizeLinkCollector(collector: LinkCollector): LinkCollector {
+                return CanonicalLinkCollector(collector)
             }
         }
     }
