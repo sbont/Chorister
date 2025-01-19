@@ -1,12 +1,11 @@
 package nl.stevenbontenbal.chorister.util
 
+import org.springframework.hateoas.Link
+import org.springframework.hateoas.Links
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.util.*
-
-class Extensions {
-}
 
 fun LocalDateTime.format() = this.format(englishDateFormatter)
 
@@ -34,3 +33,9 @@ fun String.toSlug() = lowercase(Locale.getDefault())
     .split(" ")
     .joinToString("-")
     .replace("-+".toRegex(), "-")
+
+fun Links.replace(link: Link): Links {
+    val linkMap = this.associateBy { it.rel }.toMutableMap()
+    linkMap[link.rel] = link
+    return Links.of(linkMap.values)
+}

@@ -35,4 +35,13 @@ class ExceptionControllerAdvice {
         )
         return message.toResponseEntity()
     }
+
+    @ExceptionHandler
+    fun handleCanonicalLinkCollectionException(ex: CanonicalLinkCollectionException): ResponseEntity<ErrorMessage> {
+        val message = ErrorMessage(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "An error occurred when collecting association links: " + ex.message
+        )
+        return message.toResponseEntity()
+    }
 }
