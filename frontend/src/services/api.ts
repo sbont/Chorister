@@ -1,4 +1,4 @@
-import { Api as IChoristerApi, ApiEndpoint, ScoresApiEndpoint } from "@/application/api";
+import { Api as IChoristerApi, ApiEndpoint, EventsApiEndpoint, ScoresApiEndpoint } from "@/application/api";
 import { Category as DomainCategory } from "@/entities/category";
 import { Choir as DomainChoir } from "@/entities/choir";
 import { Chords as DomainChords } from "@/entities/chords";
@@ -44,7 +44,7 @@ export default class ChoristerApi implements IChoristerApi {
     public readonly songs: SongsEndpoint;
     public readonly chords: EntityEndpoint<DomainChords, Chords, Chords>;
     public readonly scores: ScoresEndpoint;
-    public readonly events: EntityEndpoint<DomainEvent, EventGet, EventPost>;
+    public readonly events: EventsEndpoint;
     public readonly eventEntries: EntityEndpoint<DomainEventEntry, EventEntryGet, EventEntryPost>;
 
     constructor() {
@@ -64,7 +64,7 @@ export default class ChoristerApi implements IChoristerApi {
         )
 
         this.songs = new SongsEndpoint(this.instance, "songs", fromDomainSong, toDomainSong);
-        this.events = new EntityEndpoint(this.instance, "events", fromDomainEvent, toDomainEvent);
+        this.events = new EventsEndpoint(this.instance);
         this.eventEntries = new EntityEndpoint(this.instance, "eventEntries", fromDomainEventEntry, toDomainEventEntry);
         this.choirs = new ChoirsEndpoint(this.instance, "choirs", fromDomainChoir, toDomainChoir);
         this.registration = new RegistrationEndpoint(this.instance);
@@ -275,15 +275,13 @@ class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends ApiEntity
     }
 
     putAllAssociations = async (uri: string, objects: Array<DomainEntity>) => {
-        const data = objects.map(this.fromDomain);
-        await this.instance.put<Array<ApiPostEntity>>(uri, data);
+        const uris = this.uriList(objects);
+        const data = uris.join("\r\n");
+        await this.instance.put<Array<ApiPostEntity>>(uri, data, { headers: { "content-type": "text/uri-list" } });
     }
 
     addAllAssociations = async (uri: string, objects: Array<DomainEntity>) => {
-        if (!objects.every(o => o.uri != undefined))
-            throw new Error("Unknown URI for an object in " + JSON.stringify(objects));
-
-        const uris = objects.map(o => o.uri);
+        const uris = this.uriList(objects);
         const data = uris.join("\r\n");
         await this.instance.post(uri, data, { headers: { "content-type": "text/uri-list" } });
     }
@@ -291,8 +289,17 @@ class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends ApiEntity
     deleteAssociation = async(uri: string, object: DomainEntity) => {
         await this.instance.delete(`${uri}/${object.id}`);
     }
+    
+    protected uriList = (objects: Array<DomainEntity>) => objects.reduce<Uri[]>((acc, obj) => {
+        if (!obj.uri) {
+            throw new Error(`Object ${obj} has no uri`);
+        } else {
+            acc.push(obj.uri);
+        }
+        return acc;
+    }, []);
 
-    protected getGetConfig(embeddedAttributeName: string | undefined = undefined) {
+    protected getGetConfig(embeddedAttributeName?: string) {
         const prop = embeddedAttributeName ?? this.path.split("/").pop()!;
         return {
             transformResponse: [
@@ -398,5 +405,17 @@ class ScoresEndpoint extends EntityEndpoint<DomainScore, Score, Score> implement
     putFileIdForScore = async (score: DomainScore, fileId: number) => {
         const uri = score.uri ?? this.getUri(score.id!);
         await this.instance.put(`${uri}/file`, fileId, { headers: { "Content-Type": "application/json" } });
+    }
+}
+
+class EventsEndpoint extends EntityEndpoint<DomainEvent, EventGet, EventPost> implements EventsApiEndpoint {
+    constructor(instance: AxiosInstance) {
+        super(instance, "events", fromDomainEvent, toDomainEvent);
+    }
+
+    async putEntries(uri: Uri, domainEntries: Array<DomainEventEntry>): Promise<Array<DomainEventEntry>> {
+        const entries = domainEntries.map(fromDomainEventEntry)
+        const response = await this.instance.put(uri, { entries }, { headers: { "Content-Type": "application/json" } });
+        return response.data;
     }
 }

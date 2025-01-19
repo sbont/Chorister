@@ -76,7 +76,7 @@ export function toDomainEventEntry(apiEntry: EventEntryGet): DomainEventEntry {
 export function fromDomainEventEntry(entry: DomainEventEntry): EventEntryPost {
     return {
         ...fromDomain(entry),
-        event: entry.event.uri!,
-        song: entry.song.uri!
+        event: entry.event.uri,
+        song: entry.song.uri
     };
 }
