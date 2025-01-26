@@ -1,8 +1,8 @@
-import { ApiEntityIn, Identifiable } from "."
 import { Choir } from "./choir"
+import { Entity } from "./entity"
 import { User } from "./user"
 
-export interface Invite extends Identifiable, ApiEntityIn {
+export interface Invite extends Entity {
     id: number
     email: string
     invitedBy: User
