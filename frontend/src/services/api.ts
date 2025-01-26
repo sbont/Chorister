@@ -14,10 +14,10 @@ import { Category, fromDomainCategory, toDomainCategory } from "./apiTypes/categ
 import { Choir, fromDomainChoir, toDomainChoir } from "./apiTypes/choir";
 import { Chords, fromDomainChords, toDomainChords } from "./apiTypes/chords";
 import {
-    EventEntryGet,
-    EventEntryPost,
-    EventGet,
-    EventPost,
+    EventEntryIn,
+    EventEntryOut,
+    EventIn,
+    EventOut,
     fromDomainEvent,
     fromDomainEventEntry,
     toDomainEvent,
@@ -26,7 +26,7 @@ import {
 import { UploadReturnEnvelope } from "./apiTypes/file";
 import { NewChoirRegistration } from "./apiTypes/registration";
 import { fromDomainScore, Score, toDomainScore } from "./apiTypes/score";
-import { fromDomainSong, Song, toDomainSong } from "./apiTypes/song";
+import { fromDomainSong, SongIn, SongOut, toDomainSong } from "./apiTypes/song";
 import { fromDomainUser, toDomainUser, User } from "./apiTypes/user";
 import { Uri } from "@/types";
 
@@ -45,7 +45,7 @@ export default class ChoristerApi implements IChoristerApi {
     public readonly chords: EntityEndpoint<DomainChords, Chords, Chords>;
     public readonly scores: ScoresEndpoint;
     public readonly events: EventsEndpoint;
-    public readonly eventEntries: EntityEndpoint<DomainEventEntry, EventEntryGet, EventEntryPost>;
+    public readonly eventEntries: EntityEndpoint<DomainEventEntry, EventEntryIn, EventEntryOut>;
 
     constructor() {
         this.instance = axios.create({
@@ -164,7 +164,7 @@ export default class ChoristerApi implements IChoristerApi {
 
     getChoir = async () => {
         const choirs = await this.choirs.getAll();
-        if (choirs == undefined || choirs.length != 1)
+        if (choirs.length != 1)
             throw Error("Choir not found for current user.")
 
         return choirs[0];
@@ -207,13 +207,13 @@ export default class ChoristerApi implements IChoristerApi {
     getFileLocation = (fileId: number) => this.files.getFileLocation(fileId);
 }
 
-class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends ApiEntityIn, ApiPostEntity extends ApiEntityOut> implements ApiEndpoint<DomainEntity> {
+class EntityEndpoint<DomainEntity extends Entity, TIn extends ApiEntityIn, TOut extends ApiEntityOut> implements ApiEndpoint<DomainEntity> {
     protected instance: AxiosInstance;
     protected readonly path: string;
-    protected readonly fromDomain: (e: DomainEntity) => ApiPostEntity;
-    protected readonly toDomain: (a: ApiGetEntity) => DomainEntity;
+    protected readonly fromDomain: (e: DomainEntity) => TOut;
+    protected readonly toDomain: (a: TIn) => DomainEntity;
 
-    constructor(instance: AxiosInstance, path: string, fromDomain: (e: DomainEntity) => ApiPostEntity, toDomain: (a: ApiGetEntity) => DomainEntity) {
+    constructor(instance: AxiosInstance, path: string, fromDomain: (e: DomainEntity) => TOut, toDomain: (a: TIn) => DomainEntity) {
         this.instance = instance;
         this.path = path;
         this.fromDomain = fromDomain;
@@ -223,23 +223,23 @@ class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends ApiEntity
     getUri = (id: number) => `${SERVER_URL}/${this.path}/${id}`;
 
     getOne = async (id: number) => {
-        const response = await this.instance.get<ApiGetEntity>(`${this.path}/${id}`);
+        const response = await this.instance.get<TIn>(`${this.path}/${id}`);
         return this.toDomain(response.data);
     }
 
     getByUri = async (uri: Uri) => {
-        const response = await this.instance.get<ApiGetEntity>(uri);
+        const response = await this.instance.get<TIn>(uri);
         return this.toDomain(response.data);
     }
 
     getAll = async () => {
-        const response = await this.instance.get<Array<ApiGetEntity>>(this.path, this.getGetConfig());
+        const response = await this.instance.get<Array<TIn>>(this.path, this.getGetConfig());
         return response.data.map(this.toDomain);
     }
 
     create = async (obj: DomainEntity) => {
         const data = this.fromDomain(obj);
-        const response = await this.instance.post<ApiGetEntity>(this.path, data);
+        const response = await this.instance.post<TIn>(this.path, data);
         return this.toDomain(response.data);
     }
 
@@ -248,7 +248,7 @@ class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends ApiEntity
             throw new Error("Object has no id");
 
         const data = this.fromDomain(obj);
-        const response = await this.instance.patch<ApiGetEntity>(`${this.path}/` + data.id, data);
+        const response = await this.instance.patch<TIn>(`${this.path}/` + data.id, data);
         return this.toDomain(response.data);
     }
 
@@ -265,7 +265,7 @@ class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends ApiEntity
     }
 
     getAllAssociated = async (uri: string) => {
-        const response = await this.instance.get<Array<ApiGetEntity>>(uri, this.getGetConfig());
+        const response = await this.instance.get<Array<TIn>>(uri, this.getGetConfig());
         return response.data.map(this.toDomain);
     }
 
@@ -277,7 +277,7 @@ class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends ApiEntity
     putAllAssociations = async (uri: string, objects: Array<DomainEntity>) => {
         const uris = this.uriList(objects);
         const data = uris.join("\r\n");
-        await this.instance.put<Array<ApiPostEntity>>(uri, data, { headers: { "content-type": "text/uri-list" } });
+        await this.instance.put<Array<TOut>>(uri, data, { headers: { "content-type": "text/uri-list" } });
     }
 
     addAllAssociations = async (uri: string, objects: Array<DomainEntity>) => {
@@ -311,13 +311,13 @@ class EntityEndpoint<DomainEntity extends Entity, ApiGetEntity extends ApiEntity
     }
 }
 
-class SongsEndpoint extends EntityEndpoint<DomainSong, Song, Song> {
-    constructor(instance: AxiosInstance, path: string, fromDomain: (e: DomainSong) => Song, toDomain: (a: Song) => DomainSong) {
+class SongsEndpoint extends EntityEndpoint<DomainSong, SongIn, SongOut> {
+    constructor(instance: AxiosInstance, path: string, fromDomain: (e: DomainSong) => SongOut, toDomain: (a: SongIn) => DomainSong) {
         super(instance, path, fromDomain, toDomain);
     }
 
     getSongsByCategory = async (categoryId: number) => {
-        const response = await this.instance.get<Array<Song>>("songs/search/bycategory?id=" + categoryId, this.getGetConfig("songs"));
+        const response = await this.instance.get<Array<SongIn>>("songs/search/bycategory?id=" + categoryId, this.getGetConfig("songs"));
         return response.data.map(toDomainSong);
     }
 }
@@ -386,8 +386,7 @@ class FilesEndpoint {
 
     getFileLocation = async (fileId: number) => {
         const response = await this.instance.get(`${this.path}/${fileId}`);
-        const location = response.headers["location"];
-        return location;
+        return response.headers["location"];
     }
 }
 
@@ -408,7 +407,7 @@ class ScoresEndpoint extends EntityEndpoint<DomainScore, Score, Score> implement
     }
 }
 
-class EventsEndpoint extends EntityEndpoint<DomainEvent, EventGet, EventPost> implements EventsApiEndpoint {
+class EventsEndpoint extends EntityEndpoint<DomainEvent, EventIn, EventOut> implements EventsApiEndpoint {
     constructor(instance: AxiosInstance) {
         super(instance, "events", fromDomainEvent, toDomainEvent);
     }
