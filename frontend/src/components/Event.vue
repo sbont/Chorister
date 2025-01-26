@@ -41,7 +41,7 @@ import DataTable, { DataTableRowReorderEvent } from "primevue/datatable";
 import Column from "primevue/column";
 import AddEventEntry from "./AddEventEntry.vue";
 import { Event, EventEntry } from "@/entities/event";
-
+import { storeToRefs } from "pinia";
 
 enum State {
     Ready,
@@ -54,27 +54,28 @@ const state = ref<State>(State.Loading);
 const route = useRoute();
 const eventId = Number(route.params.id);
 const eventStore = useEvents();
+const { entries: getEntries } = storeToRefs(eventStore);
 const event = ref<Event>();
 const entries = ref<EventEntry[]>([]);
 
-eventStore.get(eventId).then((result) => {
+eventStore.fetch(eventId).then((result) => {
     event.value = result;
-    if (result?.entries.resolved)
-        entries.value = result?.entries?.resolved;
-
     state.value = State.Ready;
+    entries.value = getEntries.value(event.value.uri!);
 });
 
 const removeEntryFromEvent = async function (entry: EventEntry) {
     state.value = State.Deleting;
     await eventStore.deleteEntry(entry);
-    entries.value = entries.value.filter(e => e.uri !== entry.uri);
+    entries.value = entries.value.filter((e) => e.uri !== entry.uri);
     state.value = State.Ready;
 };
 
 const reorder = (reorder: DataTableRowReorderEvent) => {
     if (event.value)
-        eventStore.reorder(event.value, reorder.dragIndex, reorder.dropIndex);
+        eventStore
+            .reorder(event.value, reorder.dragIndex, reorder.dropIndex)
+            .then((reordered) => (entries.value = reordered));
 };
 
 const addEntry = (entry: EventEntry) => entries.value.push(entry);
