@@ -1,27 +1,29 @@
 <template>
     <section class="hero is-info is-fullheight">
-
         <div class="hero-head"></div>
 
         <div class="hero-body">
             <div class="container has-text-centered">
                 <div class="columns is-mobile is-centered">
                     <div class="column is-half">
-                        <img src="@/assets/logo-w-t.png" alt="Chorister logo"/>
+                        <img src="@/assets/logo-w-t.png" alt="Chorister logo" />
                     </div>
                 </div>
 
                 <div class="columns is-centered my-5">
                     <div class="column is-half">
-                        <p class="is-size-5">Chorister is an <i>open-source</i> web application that helps choirs,
-                            church bands, and worship planners to organise their repertoire.</p>
+                        <p class="is-size-5">
+                            Chorister is an <i>open-source</i> web application that helps choirs, church bands, and
+                            worship planners to organise their repertoire.
+                        </p>
                     </div>
                 </div>
 
                 <div class="subtitle columns is-mobile is-centered">
                     <div class="field has-addons">
                         <p class="control">
-                            <router-link to="/signup" class="button is-info is-inverted is-outlined"> Sign up
+                            <router-link to="/signup" class="button is-info is-inverted is-outlined">
+                                Sign up
                             </router-link>
                         </p>
                         <p class="control">
@@ -34,9 +36,15 @@
 
                 <div class="columns is-centered mt-6">
                     <div class="column is-half">
-                        <p class="is-size-7"><i>Chorister is currently in beta and your <a
-                            href="https://github.com/sbont/Chorister/issues" class="has-text-link-light">feedback</a> is
-                            most welcome.</i></p>
+                        <p class="is-size-7">
+                            <i
+                                >Chorister is currently in beta and your
+                                <a href="https://github.com/sbont/Chorister/issues" class="has-text-link-light"
+                                    >feedback</a
+                                >
+                                is most welcome.</i
+                            >
+                        </p>
                     </div>
                 </div>
             </div>
@@ -63,19 +71,11 @@
 </template>
 
 <script setup lang="ts">
-import { useAuth } from "@/stores/authStore";
-import { onMounted } from "vue";
-import { storeToRefs } from "pinia";
+import { useAuth } from "@/services/authStore";
 
 // State
 const auth = useAuth();
-const {user, isLoggedIn} = storeToRefs(auth);
-
-// Computed
-onMounted(() => {
-});
 
 // Methods
-const onLogin = () => auth.login()
-
+const onLogin = () => auth.login();
 </script>

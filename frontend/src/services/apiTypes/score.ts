@@ -1,16 +1,15 @@
 import { Key } from "@/types/Key";
-import { Song } from "./song";
-import { ApiEntityIn, ApiEntityWith, fromDomain, Link, toDomain, untemplated, WithAssociation } from ".";
+import { ApiEntityWith, fromDomain, Link, toDomain, untemplated, WithAssociation } from ".";
 import { Score as DomainScore } from "@/entities/score";
 import { Uri } from "@/types";
 
 export interface Score extends ApiEntityWith<SongLink> {
-    id: number,
-    song: Uri,
-    description: string | undefined,
-    fileUrl: string,
-    key: Key | undefined,
-    file: File
+    id: number;
+    song: Uri;
+    description: string | undefined;
+    fileUrl: string;
+    key: Key | undefined;
+    file: File;
 }
 
 export interface SongLink extends WithAssociation {
