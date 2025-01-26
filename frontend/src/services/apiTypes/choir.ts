@@ -1,6 +1,6 @@
-import { Identifiable, ApiEntity, toDomain, fromDomain, WithAssociation, Link, ApiEntityWith, Uri } from "."
-import { User } from "./user"
 import { Choir as DomainChoir } from "@/entities/choir";
+import { Uri } from "@/types";
+import { ApiEntityWith, fromDomain, Identifiable, Link, toDomain, WithAssociation } from ".";
 
 export interface Choir extends Identifiable, ApiEntityWith<ManagerLink> {
     id: number
