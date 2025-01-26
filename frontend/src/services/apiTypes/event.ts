@@ -1,38 +1,38 @@
 import { ApiEntityWith, fromDomain, Identifiable, Link, toDomain, untemplated, WithAssociation, WithEmbedded } from ".";
-import { Song, toDomainSong } from "./song";
+import { SongIn, toDomainSong } from "./song";
 import { Event as DomainEvent, EventEntry as DomainEventEntry } from "@/entities/event";
 import { Uri } from "@/types";
 
-export type EventGet = Event & WithEmbedded<"entries", Array<EventEntryGet>> & ApiEntityWith<EventEntriesLink>;
-
-export interface EventPost extends Event {
-    entries?: Array<Uri>
-}
-
-export interface Event extends Identifiable {
+interface Event extends Identifiable {
     name: string,
     date: Date,
     choir?: Uri,
+}
+
+export type EventIn = Event & WithEmbedded<"entries", Array<EventEntryIn>> & ApiEntityWith<EventEntriesLink>;
+
+export interface EventOut extends Event {
+    entries?: Array<Uri>
 }
 
 export interface EventEntriesLink extends WithAssociation {
     entries: Link
 }
 
-export interface EventEntryGet extends EventEntry, ApiEntityWith<SongLink & EventLink> {
-    event: Event,
-    song?: Song,
-}
-
-export interface EventEntryPost extends EventEntry {
-    event: Uri,
-    song: Uri,
-}
-
 export interface EventEntry extends Identifiable {
     id: number,
     label: string,
     sequence: number
+}
+
+export interface EventEntryIn extends EventEntry, ApiEntityWith<SongLink & EventLink> {
+    event: Event,
+    song?: SongIn,
+}
+
+export interface EventEntryOut extends EventEntry {
+    event: Uri,
+    song: Uri,
 }
 
 export interface SongLink extends WithAssociation {
@@ -43,7 +43,7 @@ export interface EventLink extends WithAssociation {
     event: Link
 }
 
-export function toDomainEvent(apiEvent: EventGet): DomainEvent {
+export function toDomainEvent(apiEvent: EventIn): DomainEvent {
     return {
         ...toDomain(apiEvent),
         entries: {
@@ -53,14 +53,14 @@ export function toDomainEvent(apiEvent: EventGet): DomainEvent {
     };
 }
 
-export function fromDomainEvent(event: DomainEvent): EventPost {
+export function fromDomainEvent(event: DomainEvent): EventOut {
     return {
         ...fromDomain(event),
         entries: event.entries.resolved?.map(e => e.uri!)
     };
 }
 
-export function toDomainEventEntry(apiEntry: EventEntryGet): DomainEventEntry {
+export function toDomainEventEntry(apiEntry: EventEntryIn): DomainEventEntry {
     return {
         ...toDomain(apiEntry),
         event: { 
@@ -73,7 +73,7 @@ export function toDomainEventEntry(apiEntry: EventEntryGet): DomainEventEntry {
     };
 }
 
-export function fromDomainEventEntry(entry: DomainEventEntry): EventEntryPost {
+export function fromDomainEventEntry(entry: DomainEventEntry): EventEntryOut {
     return {
         ...fromDomain(entry),
         event: entry.event.uri,
