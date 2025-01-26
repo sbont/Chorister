@@ -24,7 +24,7 @@ export interface Link {
     templated?: boolean
 }
 
-export interface WithAssociation { };
+export interface WithAssociation { }
 
 type Embedded<N extends string, O> = {
     [K in N]: O
