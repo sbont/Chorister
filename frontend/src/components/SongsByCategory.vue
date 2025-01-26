@@ -8,24 +8,18 @@
 </template>
 
 <script setup lang="ts">
-import { Category } from "@/types";
-import { onMounted, ref } from "vue";
-import api from "../services/api.js";
-import Songs from '@/components/Songs.vue'
+import { Category } from "@/entities/category";
+import { ref } from "vue";
+import Songs from "@/components/Songs.vue";
 import { useRoute } from "vue-router";
-
+import { useCategories } from "@/application/categoryStore";
 
 // State
-const category = ref<Category>()
-const route = useRoute()
-
-onMounted(() => {
-    console.log(route.params);
-    let categoryId = Number(route.params.id);
-    api.getCategoryById(categoryId)
-        .then((response) => {
-            category.value = response.data;
-        })
-})
-
+const category = ref<Category>();
+const route = useRoute();
+const categoryStore = useCategories();
+const categoryId = Number(route.params.id);
+categoryStore.get(categoryId).then((data) => {
+    category.value = data;
+});
 </script>

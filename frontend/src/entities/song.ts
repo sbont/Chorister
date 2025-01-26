@@ -20,7 +20,7 @@ export interface Song extends Entity {
     slug: string
     addedAt: Date
     addedBy: EntityRef<User>
-    categories: Array<Category>
+    categories: EntityCollectionRef<Category>
     eventEntries?: EntityCollectionRef<EventEntry>
     text: string
     lastEvent: Event | undefined

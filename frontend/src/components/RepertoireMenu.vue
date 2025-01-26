@@ -8,10 +8,10 @@
             <li v-if="ready">
                 <div class="menu-header">By time of the year</div>
                 <ul>
-                    <li v-for="(category) in categories.season" :key="category.id">
+                    <li v-for="(category) in categories?.season" :key="category.id">
                         <router-link :to="{ name: 'CategorySeason', params: { id: category.id } }" append>{{
-                                category.name
-                            }}
+                            category.name
+                        }}
                         </router-link>
                     </li>
                 </ul>
@@ -19,10 +19,10 @@
             <li v-if="ready">
                 <div class="menu-header">By liturgical place</div>
                 <ul>
-                    <li v-for="(category) in categories.liturgical" :key="category.id">
+                    <li v-for="(category) in categories?.liturgical" :key="category.id">
                         <router-link :to="{ name: 'CategoryLiturgical', params: { id: category.id } }" append>{{
-                                category.name
-                            }}
+                            category.name
+                        }}
                         </router-link>
                     </li>
                 </ul>
@@ -32,14 +32,14 @@
 </template>
 
 <script setup lang="ts">
-import { useCategories } from "@/stores/categoryStore";
+import { useCategories } from "@/application/categoryStore";
 import { storeToRefs } from "pinia";
 import { computed, onMounted } from 'vue';
 
 const categoryStore = useCategories();
 
 // State
-const {categories} = storeToRefs(categoryStore);
+const { categories } = storeToRefs(categoryStore);
 
 // Computed
 const ready = computed(() => !!categories);

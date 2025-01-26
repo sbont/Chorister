@@ -1,6 +1,7 @@
-import { ApiEntity, ApiEntityWith, fromDomain, Identifiable, Link, toDomain, Uri, WithAssociation } from "."
-import { Choir } from "./choir"
 import { Category as DomainCategory } from "@/entities/category";
+import { Uri } from "@/types";
+import { ApiEntityWith, fromDomain, Identifiable, Link, toDomain, WithAssociation } from ".";
+import { EntityRef } from "@/entities/entity";
 
 export interface Category extends Identifiable, ApiEntityWith<ChoirLink> {
     id: number,
@@ -20,7 +21,7 @@ export interface ChoirLink extends WithAssociation {
 
 export function toDomainCategory(category: Category): DomainCategory {
     return { ... toDomain(category),
-        choir: { uri: category._links!.choir.href }
+        choir: category._links?.choir ? new EntityRef(category._links.choir.href) : undefined
     };
 }
 
