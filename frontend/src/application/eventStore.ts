@@ -53,34 +53,6 @@ export const useEvents = defineStore('events', () => {
         loading.value = false;
         return data;
     }
-    
-    function sort(entries: EventEntry[]): EventEntry[] {
-        return entries.sort((entryA, entryB) => entryA.sequence - entryB.sequence);
-    } 
-
-    function sortEntries(eventUri: Uri) {
-        let entries = entriesByEventUri.value.get(eventUri)
-        if (entries) {
-            entriesByEventUri.value.set(eventUri, sort(entries));
-        }
-    }
-
-    async function reorder(event: Event, oldIndex: number, newIndex: number) {
-        const uri =  event.uri ?? eventEndpoint.getUri(event.id!)
-        let entries = entriesByEventUri.value.get(uri)
-        if (!entries) return;
-
-        const moved = entries[oldIndex];
-        moved.sequence = newIndex + 1;
-
-        const direction = newIndex > oldIndex ? 1 : -1;
-        for (let i = newIndex; i != oldIndex; i -= direction) {
-            entries[i].sequence -= direction;
-        }
-        sortEntries(uri);
-        const resequenced = resequence(uri);
-        return eventEndpoint.putEntries(event.entries.uri, resequenced);
-    }
 
     async function get(eventId: number) {
         const uri =  eventEndpoint.getUri(eventId);
@@ -89,6 +61,35 @@ export const useEvents = defineStore('events', () => {
         } else {
             return events.value.get(uri);
         }
+    }
+    
+    function sort(entries: EventEntry[]): EventEntry[] {
+        return entries.sort((entryA, entryB) => entryA.sequence - entryB.sequence);
+    } 
+
+    function sortEntries(eventUri: Uri) {
+        let entries = entriesByEventUri.value.get(eventUri);
+        if (entries) {
+            entriesByEventUri.value.set(eventUri, sort(entries));
+        }
+    }
+
+    async function reorder(event: Event, oldIndex: number, newIndex: number): Promise<EventEntry[]> {
+        const uri =  event.uri ?? eventEndpoint.getUri(event.id!)
+        let entries = entriesByEventUri.value.get(uri)
+        if (!entries) return [];
+
+        const moved = entries[oldIndex];
+        moved.sequence = newIndex + 1;
+        
+        const direction = newIndex > oldIndex ? 1 : -1;
+        for (let i = newIndex; i != oldIndex; i -= direction) {
+            entries[i].sequence -= direction;
+        }
+        entries = sort(entries);
+        entriesByEventUri.value.set(uri, entries);
+        await eventEndpoint.putEntries(event.entries.uri, entries);
+        return entries;        
     }
 
     function put(event: Event) {
@@ -100,6 +101,7 @@ export const useEvents = defineStore('events', () => {
                 if (entry.song.resolved)
                     songStore.put(entry.song.resolved);
             })
+            sortEntries(uri);
         }
     }
 
@@ -167,6 +169,7 @@ export const useEvents = defineStore('events', () => {
         entries,
         count,
         get,
+        fetch,
         fetchAll,
         save,
         saveEntry,
