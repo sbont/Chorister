@@ -65,7 +65,6 @@ import { EntityRef } from '@/entities/entity';
 import { Score } from '@/entities/score';
 import { Song } from '@/entities/song';
 import { downloadFile } from '@/services/fileService';
-import api from '@/services/legacyApi';
 import { isNew } from "@/utils";
 import { AxiosError } from 'axios';
 import { extension } from 'mime-types';
@@ -185,28 +184,13 @@ const cancelEdit = () => {
     emit("cancel")
 }
 
-const download = async () => {
-    const fileId = score.value.file?.id
-    if (!fileId)
-        return;
-
-    const response = await api.getFile(fileId);
-    const blob = new Blob([response.data], { type: 'application/pdf' });
-    const link = document.createElement('a')
-    link.href = URL.createObjectURL(blob)
-    link.download = "download"
-    link.click()
-    URL.revokeObjectURL(link.href)
-}
-
 const openFile = async (event: MouseEvent) => {
     const fileId = score.value.file?.id
     if (!fileId)
         return;
 
     try {
-        const response = await api.getFile(fileId);
-        const location = response.headers["location"];
+        const location = await fileStore.getFileLocation(fileId);
         if (event.button == 1)
             window.open(location, "_blank");
         else {

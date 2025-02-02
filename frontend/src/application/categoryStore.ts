@@ -3,7 +3,6 @@ import { CacheListMap } from "@/types/CacheMaps";
 import { computed, inject, ref } from "vue";
 import { ApiKey } from "./api";
 import { Category, CategoryType } from "@/entities/category";
-import api from "@/services/legacyApi";
 
 export const useCategories = defineStore("categories", () => {
     const api = inject(ApiKey)!;
