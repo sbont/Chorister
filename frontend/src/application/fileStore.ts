@@ -60,7 +60,11 @@ export const useFiles = defineStore("files", () => {
         return await submitFile(url, file);
     }
     
+    async function getFileLocation(id: number) {
+        return await api.getFileLocation(id);
+    }
+    
     return {
-        getUploadEnvelope, fetchUploadEnvelope, upload,
+        getUploadEnvelope, fetchUploadEnvelope, upload, getFileLocation
     }
 });
