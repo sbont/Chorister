@@ -24,11 +24,12 @@ import {
     toDomainEventEntry,
 } from "./apiTypes/event";
 import { UploadReturnEnvelope } from "./apiTypes/file";
-import { NewChoirRegistration } from "./apiTypes/registration";
+import { AcceptInvite, NewChoirRegistration } from "./apiTypes/registration";
 import { fromDomainScore, Score, toDomainScore } from "./apiTypes/score";
 import { fromDomainSong, SongIn, SongOut, toDomainSong } from "./apiTypes/song";
 import { fromDomainUser, toDomainUser, User } from "./apiTypes/user";
 import { Uri } from "@/types";
+import { Invite, toDomainInvite } from "@/services/apiTypes/invite";
 
 const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + "/api";
 
@@ -36,9 +37,10 @@ export default class ChoristerApi implements IChoristerApi {
     private readonly instance: AxiosInstance;
     private choirs: ChoirsEndpoint;
     private registration: RegistrationEndpoint;
-    private categories: EntityEndpoint<DomainCategory, Category, Category>
-    private users: EntityEndpoint<DomainUser, User, User>
-    private user: UserEndpoint;
+    private invite: InviteEndpoint;
+    private categories: EntityEndpoint<DomainCategory, Category, Category>;
+    private users: EntityEndpoint<DomainUser, User, User>;
+    private user: UserEndpoint
     private files: FilesEndpoint;
 
     public readonly songs: SongsEndpoint;
@@ -53,21 +55,20 @@ export default class ChoristerApi implements IChoristerApi {
             timeout: 5000,
         });
         const auth = useAuth();
-        this.instance.interceptors.request.use(
-            async config => {
-                let accessToken = await auth.getAccessToken()
-                if (accessToken) {
-                    config.headers.Authorization = "Bearer " + accessToken
-                }
-                return config
+        this.instance.interceptors.request.use(async (config) => {
+            let accessToken = await auth.getAccessToken();
+            if (accessToken) {
+                config.headers.Authorization = "Bearer " + accessToken;
             }
-        )
+            return config;
+        });
 
         this.songs = new SongsEndpoint(this.instance, "songs", fromDomainSong, toDomainSong);
         this.events = new EventsEndpoint(this.instance);
         this.eventEntries = new EntityEndpoint(this.instance, "eventEntries", fromDomainEventEntry, toDomainEventEntry);
         this.choirs = new ChoirsEndpoint(this.instance, "choirs", fromDomainChoir, toDomainChoir);
         this.registration = new RegistrationEndpoint(this.instance);
+        this.invite = new InviteEndpoint(this.instance);
         this.categories = new EntityEndpoint(this.instance, "categories", fromDomainCategory, toDomainCategory);
         this.users = new EntityEndpoint(this.instance, "users", fromDomainUser, toDomainUser);
         this.user = new UserEndpoint(this.instance);
@@ -79,23 +80,31 @@ export default class ChoristerApi implements IChoristerApi {
     // Generic
 
     update = async <DomainEntity extends Entity>(entity: DomainEntity) => {
-        if (!entity.uri)
-            throw new Error("Object URI unknown");
+        if (!entity.uri) throw new Error("Object URI unknown");
 
         await this.instance.patch(entity.uri, entity);
-    }
+    };
 
     deleteEntity = async <DomainEntity extends Entity>(entity: DomainEntity) => {
-        if (!entity.uri)
-            throw new Error("Object URI unknown");
+        if (!entity.uri) throw new Error("Object URI unknown");
 
         await this.instance.delete(entity.uri!);
-    }
+    };
 
     // Registration
 
-    register = async (choirName: string, userDisplayName: string, email: string, password: string) =>
-        await this.registration.register({ choirName, displayName: userDisplayName, email, password });
+    register = (choirName: string, userDisplayName: string, email: string, password: string) =>
+        this.registration.register({ choirName, displayName: userDisplayName, email, password });
+
+    getInviteByToken = (token: string) => this.invite.get(token);
+
+    acceptInvite = (token: string, displayName: string, email: string, password: string) =>
+        this.invite.accept({
+            token,
+            displayName,
+            email,
+            password,
+        });
 
     // Songs
 
@@ -123,9 +132,11 @@ export default class ChoristerApi implements IChoristerApi {
 
     getSongCategories = (songId: number) => this.songs.getAllRelated(songId, "categories", toDomainCategory);
 
-    postSongCategories = (songId: number, categories: Array<DomainCategory>) => this.categories.addAllAssociations(this.songs.getUri(songId) + "/categories", categories);
+    postSongCategories = (songId: number, categories: Array<DomainCategory>) =>
+        this.categories.addAllAssociations(this.songs.getUri(songId) + "/categories", categories);
 
-    deleteSongCategory = (songId: number, category: DomainCategory) => this.categories.deleteAssociation(this.songs.getUri(songId) + "/categories", category);
+    deleteSongCategory = (songId: number, category: DomainCategory) =>
+        this.categories.deleteAssociation(this.songs.getUri(songId) + "/categories", category);
 
     // Chords
 
@@ -147,14 +158,14 @@ export default class ChoristerApi implements IChoristerApi {
 
     deleteEvent = async (event: DomainEvent) => this.events.delete(event);
 
-    getEventEntries = async (event: DomainEvent) => event.id ? this.events.getAllRelated(event.id, "entries", toDomainEventEntry) : [];
+    getEventEntries = async (event: DomainEvent) =>
+        event.id ? this.events.getAllRelated(event.id, "entries", toDomainEventEntry) : [];
 
     putEventEntries = async (event: DomainEvent, entries: Array<DomainEventEntry>) => {
-        if (!event.id)
-            throw Error("Cannot add entries to an unsaved event")
+        if (!event.id) throw Error("Cannot add entries to an unsaved event");
 
-        await this.events.putAllRelated(event.id, "entries", entries, fromDomainEventEntry)
-    }
+        await this.events.putAllRelated(event.id, "entries", entries, fromDomainEventEntry);
+    };
 
     createEventEntry = async (entry: DomainEventEntry) => this.eventEntries.create(entry);
 
@@ -164,11 +175,10 @@ export default class ChoristerApi implements IChoristerApi {
 
     getChoir = async () => {
         const choirs = await this.choirs.getAll();
-        if (choirs.length != 1)
-            throw Error("Choir not found for current user.")
+        if (choirs.length != 1) throw Error("Choir not found for current user.");
 
         return choirs[0];
-    }
+    };
 
     updateChoir = async (choir: DomainChoir) => await this.choirs.update(choir);
 
@@ -346,7 +356,8 @@ class RegistrationEndpoint {
     }
 
     register = async (request: NewChoirRegistration) => {
-        await this.instance.post(this.path, request);
+        const response = await this.instance.post<User>(this.path, request);
+        return toDomainUser(response.data);
     }
 }
 
@@ -360,6 +371,25 @@ class UserEndpoint {
 
     get = async () => {
         const response = await this.instance.get<User>(this.path);
+        return toDomainUser(response.data);
+    }
+}
+
+class InviteEndpoint {
+    private instance: AxiosInstance;
+    private path = "invite";
+
+    constructor(instance: AxiosInstance) {
+        this.instance = instance;
+    }
+
+    get = async (token: string) => {
+        const response = await this.instance.get<Invite>(`${this.path}?token=${token}`);
+        return toDomainInvite(response.data);
+    }
+    
+    accept = async (inviteRequest: AcceptInvite) => {
+        const response = await this.instance.post<User>(`${this.path}/accept`, inviteRequest);
         return toDomainUser(response.data);
     }
 }
