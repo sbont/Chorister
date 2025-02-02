@@ -24,7 +24,8 @@ export interface Api {
     eventEntries: ApiEndpoint<EventEntry>
 
     // Registration
-    register: (choirName: string, userDisplayName: string, email: string, password: string) => Promise<void>
+    register: (choirName: string, userDisplayName: string, email: string, password: string) => Promise<User>
+    acceptInvite: (token: string, displayName: string, email: string, password: string) => Promise<User>
 
     // Songs
     getSongById: (id: number) => Promise<Song>
@@ -67,6 +68,7 @@ export interface Api {
     updateChoir: (choir: Choir) => Promise<Choir>
     getToken: () => Promise<string>
     deleteToken: () => Promise<void>
+    getInviteByToken: (token: string) => Promise<Invite>
 
     // Users
     getAllUsers: () => Promise<Array<User>>
@@ -97,14 +99,7 @@ export interface Api {
     //     create: <Persistable extends ApiEntity>(path: string, entity: Persistable) => Promise<Entity>
 
     //     createRelated: <Persistable>(uri: string, association: string, entity: Persistable) => Promise<Entity>
-
-
-
-    // Invites (deprecated)
-    // getAllInvites: () => Promise<Invite>
-    // updateInvite: (invite: Invite) => Promise<Invite>
-    // getInviteByToken: (token: string) => Promise<Invite>
-    // acceptInvite: (invite: Invite) => Promise<User>
+    
 }
 
 export interface ApiEndpoint<TEntity extends Entity> {
