@@ -41,7 +41,6 @@ import Select from 'primevue/select';
 import { storeToRefs } from 'pinia';
 
 const props = defineProps<{ eventId: number }>();
-const emit = defineEmits(["add"]);
 
 enum State {
     Ready,
@@ -70,11 +69,8 @@ const addSong = () => {
 const save = async () => {
     if (state.value == State.AddSong && selectedSongId.value) {
         const entry = await eventStore.addEventEntry(props.eventId, { songId: selectedSongId.value })
-        console.log(entry);
-
-        emit("add", entry);
     } else if (state.value == State.AddHeader) {
-        emit("add", { label: headerName.value });
+        
     }
     state.value = State.Ready;
 }

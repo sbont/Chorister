@@ -26,7 +26,7 @@
                         </template>
                     </Column>
                 </DataTable>
-                <AddEventEntry :event-id="eventId" @add="addEntry" />
+                <AddEventEntry :event-id="eventId" />
             </div>
         </div>
     </div>
@@ -36,7 +36,7 @@
 import EventDetail from "@/components/EventDetail.vue";
 import { useRoute } from "vue-router";
 import { useEvents } from "@/application/eventStore";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import DataTable, { DataTableRowReorderEvent } from "primevue/datatable";
 import Column from "primevue/column";
 import AddEventEntry from "./AddEventEntry.vue";
@@ -56,44 +56,29 @@ const eventId = Number(route.params.id);
 const eventStore = useEvents();
 const { entries: getEntries } = storeToRefs(eventStore);
 const event = ref<Event>();
-const entries = ref<EventEntry[]>([]);
+const entries = computed(() => event.value ? getEntries.value(event.value.uri!) : []);
 
 eventStore.fetch(eventId).then((result) => {
     event.value = result;
     state.value = State.Ready;
-    entries.value = getEntries.value(event.value.uri!);
 });
 
 const removeEntryFromEvent = async function (entry: EventEntry) {
     state.value = State.Deleting;
     await eventStore.deleteEntry(entry);
-    entries.value = entries.value.filter((e) => e.uri !== entry.uri);
     state.value = State.Ready;
 };
 
 const reorder = (reorder: DataTableRowReorderEvent) => {
     if (event.value)
-        eventStore
-            .reorder(event.value, reorder.dragIndex, reorder.dropIndex)
-            .then((reordered) => (entries.value = reordered));
+        eventStore.reorder(event.value, reorder.dragIndex, reorder.dropIndex)
 };
 
-const addEntry = (entry: EventEntry) => entries.value.push(entry);
 </script>
 
 <style>
 [v-cloak] {
     display: none;
-}
-
-.move-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-.icon.is-disabled {
-    color: rgba(0, 0, 0, 0.3);
 }
 
 table td.col0 {
