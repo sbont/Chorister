@@ -9,12 +9,11 @@ export class CacheMap<K, V> extends Map<K, V> {
 
 export class CacheListMap<K, V> extends CacheMap<K, Array<V>> {
     addTo(key: K, value: V): void {
-        let array = this.getOrElse(key, () => {
-            let newArray = Array<V>()
-            this.set(key, newArray)
-            return newArray
-        });
-        array.push(value)
+        if (!this.has(key))
+            this.set(key, Array<V>())
+        
+        this.get(key)!.push(value)
+        console.log(JSON.stringify(this.get(key)?.values()))
     }
 
     addAllTo(key: K, values: Array<V>): void {
