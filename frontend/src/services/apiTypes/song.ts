@@ -67,7 +67,7 @@ export function toDomainSong(apiSong: SongIn): SongEntity {
         scores: apiSong._links?.scores ? { uri: untemplated(apiSong._links.scores) } : undefined,
         chords: apiSong._links?.chords ? { uri: untemplated(apiSong._links.chords) } : undefined,
         eventEntries: apiSong._links?.eventEntries ? { uri: untemplated(apiSong._links.eventEntries) } : undefined,
-        categories: { uri: apiSong._links!.categories!.href, resolved: apiSong.categories.map(toDomainCategory) }
+        categories: apiSong._links?.categories ? { uri: apiSong._links!.categories!.href, resolved: apiSong.categories?.map(toDomainCategory) } : undefined
     };
 }
 
