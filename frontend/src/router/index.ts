@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuth } from "@/services/authStore";
-import { children } from 'effect/Fiber';
 
 const routes = [
     {
@@ -125,7 +124,6 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    console.log(to)
     const auth = useAuth();
     // This isn't an actual route leading to a component. It is called by the OAuth server once the user logged in.
     // Handling it here prevents us to have an additional callback.html file. An additional file would lead to a short hiccup after logging in.

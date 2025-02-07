@@ -75,7 +75,6 @@ const loading = ref(true);
 userStore
     .fetchAll()
     .then((data) => {
-        console.log("Members loaded: ", data);
         members.value = data;
     })
     .catch((error) => {
