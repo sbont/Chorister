@@ -63,13 +63,7 @@ class ChoristerConfiguration(
                 .and().oauth2ResourceServer().jwt()
         }.headers { headers: HeadersConfigurer<HttpSecurity?> ->
             headers.frameOptions().disable()
-        }.csrf().disable()
-//            .csrf { csrf: CsrfConfigurer<HttpSecurity?> ->
-//                csrf
-//                    .ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**"))
-//            }
-            .build()
-
+        }.build()
 
     @Bean
     fun corsConfigurer(): WebMvcConfigurer? {
@@ -180,7 +174,6 @@ class ChoristerConfiguration(
         categorisationService,
         userService
     )
-
 
     @Bean
     fun categorisationService(
