@@ -35,11 +35,15 @@ class CanonicalLinkCollector(val defaultCollector: LinkCollector) : LinkCollecto
                 }
 
                 val ownerMetadata = associationLinks.getMetadataFor(assoc.inverse.owner.type)
+                if (ownerMetadata == null) {
+                    return@doWithAssociations
+                }
+
                 val propertyMapping = ownerMetadata.getMappingFor(assoc.inverse)
                 val rel = propertyMapping.rel
 
                 // if it is a collection, we can't get the value
-                if (assoc.inverse.isCollectionLike) {
+                if (assoc.inverse.isCollectionLike ) {
                     return@doWithAssociations
                 }
 

@@ -1,21 +1,26 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    id("org.springframework.boot") version "3.0.6"
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("org.jetbrains.kotlin.plugin.noarg") version "2.0.21"
+    val kotlinVersion = "2.0.21"
+
+    id("org.springframework.boot") version "3.4.4"
+    id("io.spring.dependency-management") version "1.1.7"
+    id("org.jetbrains.kotlin.plugin.noarg") version kotlinVersion
     id("org.liquibase.gradle") version "2.2.0"
-    kotlin("jvm") version "2.0.21"
-    kotlin("plugin.spring") version "2.0.21"
-    kotlin("plugin.jpa") version "2.0.21"
-    kotlin("plugin.allopen") version "2.0.21"
-    kotlin("kapt") version "2.0.21"
+
+    kotlin("jvm") version kotlinVersion
+    kotlin("plugin.spring") version kotlinVersion
+    kotlin("plugin.jpa") version kotlinVersion
+    kotlin("plugin.allopen") version kotlinVersion
+    kotlin("kapt") version kotlinVersion
     application
 }
 
 apply(plugin = "kotlin-jpa")
 apply(plugin = "java")
+apply(plugin = "io.spring.dependency-management")
 
 application {
     mainClass.set("nl.stevenbontenbal.chorister.ChoristerApplicationKt")
@@ -23,7 +28,7 @@ application {
 
 group = "nl.stevenbontenbal"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 repositories {
     mavenCentral()
@@ -44,8 +49,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.1")
     implementation("org.modelmapper:modelmapper:3.1.1")
     implementation("org.postgresql:postgresql")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -65,7 +70,7 @@ dependencies {
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("io.mockk:mockk:1.13.4")
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "junit")
@@ -86,10 +91,10 @@ dependencies {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=all")
-        jvmTarget = "17"
-        javaParameters = true
+    compilerOptions {
+        freeCompilerArgs.set(listOf("-Xjsr305=strict", "-Xjvm-default=all"))
+        jvmTarget.set(JvmTarget.JVM_21)
+        javaParameters.set(true)
     }
 }
 
