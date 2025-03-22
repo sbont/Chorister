@@ -1,9 +1,9 @@
 package nl.stevenbontenbal.chorister.repository
 
+import io.kotest.matchers.collections.shouldHaveSize
 import nl.stevenbontenbal.chorister.create
 import nl.stevenbontenbal.chorister.model.entities.Choir
 import nl.stevenbontenbal.chorister.model.entities.Song
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -26,7 +26,7 @@ class SongRepositoryTests @Autowired constructor(
         // Act
         val songs = songRepository.findAll()
         // Assert
-        Assertions.assertThat(songs.count()).isEqualTo(2)
+        songs shouldHaveSize 2
     }
 
 }

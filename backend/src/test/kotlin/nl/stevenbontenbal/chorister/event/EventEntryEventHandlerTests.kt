@@ -1,5 +1,6 @@
 package nl.stevenbontenbal.chorister.event
 
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -10,7 +11,6 @@ import nl.stevenbontenbal.chorister.model.entities.Event
 import nl.stevenbontenbal.chorister.model.entities.EventEntry
 import nl.stevenbontenbal.chorister.model.entities.Song
 import nl.stevenbontenbal.chorister.repository.EventEntryRepository
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.runner.RunWith
 import org.springframework.test.context.ContextConfiguration
@@ -33,7 +33,7 @@ class EventEntryEventHandlerTests {
         target.handleEventEntryCreate(entry)
 
         // Assert
-        Assertions.assertThat(entry.sequence).isEqualTo(1)
+        entry.sequence shouldBe 1
     }
 
     @Test
@@ -53,7 +53,7 @@ class EventEntryEventHandlerTests {
         target.handleEventEntryDelete(entries[2])
 
         // Assert
-        Assertions.assertThat(entries[2].sequence).isEqualTo(3)
+        entries[2].sequence shouldBe 3
     }
 
     @Test
@@ -74,6 +74,6 @@ class EventEntryEventHandlerTests {
 
         // Assert
         verify(exactly = 1) { repository.saveAll(listOf(entries[1], entries[2])) }
-        Assertions.assertThat(entries[1].sequence).isEqualTo(1)
+        entries[1].sequence shouldBe 1
     }
 }

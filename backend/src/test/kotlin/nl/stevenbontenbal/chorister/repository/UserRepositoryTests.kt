@@ -1,7 +1,7 @@
 package nl.stevenbontenbal.chorister.repository
 
+import io.kotest.matchers.equals.shouldBeEqual
 import nl.stevenbontenbal.chorister.model.entities.User
-import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -21,7 +21,7 @@ class UserRepositoryTests @Autowired constructor(
         // Act
         val user = userRepository.findByUsername(myUser.username)
         // Assert
-        assertThat(user).isEqualTo(myUser)
+        user?.shouldBeEqual(myUser)
     }
 
     @Test
@@ -33,7 +33,7 @@ class UserRepositoryTests @Autowired constructor(
         // Act
         val user = myUser.email?.let { userRepository.findByEmail(it) }
         // Assert
-        assertThat(user).isEqualTo(myUser)
+        user?.shouldBeEqual(myUser)
     }
 
 }

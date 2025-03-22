@@ -1,10 +1,10 @@
 package nl.stevenbontenbal.chorister.repository
 
+import io.kotest.matchers.shouldBe
 import nl.stevenbontenbal.chorister.create
 import nl.stevenbontenbal.chorister.model.entities.Category
 import nl.stevenbontenbal.chorister.model.entities.CategoryType
 import nl.stevenbontenbal.chorister.model.entities.Choir
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -27,7 +27,7 @@ class CategoryRepositoryTests @Autowired constructor(
         // Act
         val categories = categoryRepository.findAll()
         // Assert
-        Assertions.assertThat(categories.count()).isEqualTo(2)
+        categories.count() shouldBe 2
     }
 
     @Test
@@ -42,7 +42,7 @@ class CategoryRepositoryTests @Autowired constructor(
         // Act
         val actual = categoryRepository.findByName("Advent")
         // Assert
-        Assertions.assertThat(actual!!.id).isEqualTo(category1.id)
+        actual!!.id shouldBe category1.id
     }
 
     @Test
@@ -55,6 +55,6 @@ class CategoryRepositoryTests @Autowired constructor(
         // Act
         val actual = categoryRepository.findByName("Advent")
         // Assert
-        Assertions.assertThat(actual).isNull()
+        actual shouldBe null
     }
 }

@@ -1,5 +1,7 @@
 package nl.stevenbontenbal.chorister.controller
 
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -12,8 +14,6 @@ import nl.stevenbontenbal.chorister.model.entities.EventEntry
 import nl.stevenbontenbal.chorister.model.entities.Song
 import nl.stevenbontenbal.chorister.repository.EventEntryRepository
 import nl.stevenbontenbal.chorister.repository.EventRepository
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.springframework.hateoas.EntityModel
 import org.springframework.http.HttpStatus
@@ -43,7 +43,7 @@ class EventControllerTests {
 
         val response: ResponseEntity<Any> = target.putEntryCollection(eventId, entityModel)
 
-        assertEquals(HttpStatus.OK, response.statusCode)
+        response.statusCode shouldBe HttpStatus.OK
         verify { eventEntryRepository.saveAll(newEntries) }
         verify { eventEntryRepository.deleteAll(match { it.single().id == 1L }) }
     }
@@ -57,11 +57,11 @@ class EventControllerTests {
 
         every { eventRepository.findById(nonExistingId) } returns Optional.empty()
 
-        val exception = assertThrows(InvalidIdentifierException::class.java) {
+        val exception = shouldThrow<InvalidIdentifierException> {
             target.putEntryCollection(nonExistingId, entityModel)
         }
 
-        assertEquals("Event not found", exception.message)
+        exception.message shouldBe "Event not found"
     }
 
     @Test
@@ -72,6 +72,6 @@ class EventControllerTests {
 
         val response: ResponseEntity<Any> = target.putEntryCollection(null, entityModel)
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
+        response.statusCode shouldBe HttpStatus.BAD_REQUEST
     }
 }

@@ -1,6 +1,5 @@
 package nl.stevenbontenbal.chorister.controller
 
-import nl.stevenbontenbal.chorister.model.dto.FileResponse
 import nl.stevenbontenbal.chorister.model.dto.FileReturnEnvelope
 import nl.stevenbontenbal.chorister.model.entities.File
 import nl.stevenbontenbal.chorister.service.FileService
@@ -10,8 +9,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
 import java.net.URI
 
 @BasePathAwareController
@@ -22,21 +19,13 @@ class FileController(
     @GetMapping("/files/new-upload")
     suspend fun getUploadUrl(): ResponseEntity<FileReturnEnvelope> {
         val file = fileService.createFile()
-        val uploadUrl = fileService.getUploadUrl(file)
-        val response = FileReturnEnvelope(file.id!!, uploadUrl)
-        return ResponseEntity
-            .ok()
-            .body(response)
+        return getUploadUrl(file)
     }
 
     @GetMapping("/files/{id}/upload")
     suspend fun getUploadUrl(@PathVariable id: Long?): ResponseEntity<FileReturnEnvelope> {
         val file = id?.let { fileService.getFile(it) } ?: return ResponseEntity.notFound().build()
-        val uploadUrl = fileService.getUploadUrl(file)
-        val response = FileReturnEnvelope(file.id!!, uploadUrl)
-        return ResponseEntity
-            .ok()
-            .body(response)
+        return getUploadUrl(file)
     }
 
     @GetMapping("/files/old/{id}")
@@ -59,6 +48,14 @@ class FileController(
         return ResponseEntity.status(HttpStatus.CREATED)
             .location(URI.create(downloadUrl))
             .build()
+    }
+
+    private suspend fun getUploadUrl(file: File): ResponseEntity<FileReturnEnvelope> {
+        val uploadUrl = fileService.getUploadUrl(file)
+        val response = FileReturnEnvelope(file.id!!, uploadUrl)
+        return ResponseEntity
+            .ok()
+            .body(response)
     }
 
     companion object {

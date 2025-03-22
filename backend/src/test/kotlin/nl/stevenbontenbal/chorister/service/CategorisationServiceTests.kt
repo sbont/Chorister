@@ -1,5 +1,6 @@
 package nl.stevenbontenbal.chorister.service
 
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -9,7 +10,6 @@ import nl.stevenbontenbal.chorister.create
 import nl.stevenbontenbal.chorister.model.entities.Category
 import nl.stevenbontenbal.chorister.model.entities.Choir
 import nl.stevenbontenbal.chorister.repository.CategoryRepository
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.runner.RunWith
 import org.springframework.test.context.ContextConfiguration
@@ -36,7 +36,7 @@ class CategorisationServiceTests {
         // Act
         target.createDefaultCategories(choir)
         // Assert
-        assertThat(slot.captured.iterator().hasNext()).isTrue
+        slot.captured.iterator().hasNext() shouldBe true
     }
 
 }

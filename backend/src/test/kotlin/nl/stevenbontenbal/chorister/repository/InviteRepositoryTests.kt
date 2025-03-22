@@ -1,9 +1,12 @@
 package nl.stevenbontenbal.chorister.repository
 
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.beNull
+import io.kotest.matchers.should
+import io.kotest.matchers.shouldNot
 import nl.stevenbontenbal.chorister.create
 import nl.stevenbontenbal.chorister.model.entities.Choir
 import nl.stevenbontenbal.chorister.model.entities.Invite
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -31,7 +34,7 @@ class InviteRepositoryTests @Autowired constructor(
         val actual = inviteRepository.findAll()
 
         // Assert
-        assertThat(actual.count()).isEqualTo(2)
+        actual shouldHaveSize 2
     }
 
     @Test
@@ -49,7 +52,7 @@ class InviteRepositoryTests @Autowired constructor(
         val actual = inviteRepository.findByToken("1234")
 
         // Assert
-        assertThat(actual).isNotNull
+        actual shouldNot beNull()
     }
 
     @Test
@@ -67,6 +70,6 @@ class InviteRepositoryTests @Autowired constructor(
         val actual = inviteRepository.findByToken("456")
 
         // Assert
-        assertThat(actual).isNull()
+        actual should beNull()
     }
 }

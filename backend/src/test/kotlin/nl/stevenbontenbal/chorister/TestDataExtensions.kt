@@ -1,5 +1,6 @@
 package nl.stevenbontenbal.chorister
 
+import nl.stevenbontenbal.chorister.configuration.ChoristerProperties
 import nl.stevenbontenbal.chorister.model.entities.*
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import java.time.LocalDate
@@ -76,6 +77,10 @@ fun EventEntry.Companion.create(event: Event, song: Song, sequence: Int = 1): Ev
 
 fun EventEntry.Companion.create(event: Event, songs: List<Song>): List<EventEntry> {
     return songs.mapIndexed { index, song -> EventEntry.create(event, song, index + 1) }
+}
+
+fun ChoristerProperties.Companion.create(): ChoristerProperties {
+    return ChoristerProperties("Chorister", "v1", "https://chorister.co", ChoristerProperties.DefaultCategories(listOf(), listOf()))
 }
 
 fun <T> T.persist(entityManager: TestEntityManager): T {

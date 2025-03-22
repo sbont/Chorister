@@ -1,15 +1,17 @@
 package nl.stevenbontenbal.chorister.repository
 
+import io.kotest.matchers.shouldBe
 import nl.stevenbontenbal.chorister.create
 import nl.stevenbontenbal.chorister.model.entities.Choir
 import nl.stevenbontenbal.chorister.model.entities.User
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.test.context.TestPropertySource
 
 @DataJpaTest
+@TestPropertySource(properties = ["spring.jpa.hibernate.ddl-auto=create-drop"])
 class ChoirRepositoryTests @Autowired constructor(
     val entityManager: TestEntityManager,
     val choirRepository: ChoirRepository,
@@ -32,7 +34,7 @@ class ChoirRepositoryTests @Autowired constructor(
         // Act
         val actual = choirRepository.findByName(myChoir.name)
         // Assert
-        Assertions.assertThat(actual!!.id).isEqualTo(myChoir.id)
+        actual!!.id shouldBe myChoir.id
     }
 
     @Test
@@ -43,7 +45,7 @@ class ChoirRepositoryTests @Autowired constructor(
         // Act
         val actual = choirRepository.findByName("Non-Existent Choir")
         // Assert
-        Assertions.assertThat(actual).isNull()
+        actual shouldBe null
     }
     @Test
     fun `When findByInviteToken and exists then return Choir`() {
@@ -65,7 +67,7 @@ class ChoirRepositoryTests @Autowired constructor(
         // Act
         val actual = choirRepository.findByInviteToken("1234")
         // Assert
-        Assertions.assertThat(actual!!.id).isEqualTo(myChoir.id)
+        actual!!.id shouldBe myChoir.id
     }
 
     @Test
@@ -76,6 +78,6 @@ class ChoirRepositoryTests @Autowired constructor(
         // Act
         val actual = choirRepository.findByInviteToken("no-real-token")
         // Assert
-        Assertions.assertThat(actual).isNull()
+        actual shouldBe null
     }
 }

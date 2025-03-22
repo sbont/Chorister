@@ -13,4 +13,6 @@ data class ChoristerProperties(
         val liturgicalMoment: List<String>,
         val season: List<String>
     )
+
+    companion object
 }

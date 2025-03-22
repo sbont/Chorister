@@ -1,5 +1,7 @@
 package nl.stevenbontenbal.chorister.service
 
+import io.kotest.matchers.shouldBe
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -21,9 +23,11 @@ import reactor.core.publisher.Mono
 class ZitadelUserServiceTests {
     val zitadelProperties: ZitadelProperties = mockk()
     val exchangeFunction: ExchangeFunction = mockk()
+    val webclient = WebClient.builder().exchangeFunction(exchangeFunction).build()
 
     @BeforeEach
     fun init() {
+        clearAllMocks()
         every { zitadelProperties.baseUrl } returns "https://myurl/"
         every { zitadelProperties.adminAccessToken } returns "123abc"
     }
@@ -37,7 +41,6 @@ class ZitadelUserServiceTests {
             password = "123456",
             token = "qwerty"
         )
-        val webclient = WebClient.builder().exchangeFunction(exchangeFunction).build()
         every { exchangeFunction.exchange(any()) } returns Mono.just(
             ClientResponse.create(HttpStatus.OK)
                 .header("content-type", "application/json")
@@ -51,14 +54,13 @@ class ZitadelUserServiceTests {
 
         // Assert
         verify(exactly = 1) { exchangeFunction.exchange(any()) }
-        assertThat(actual.isSuccess)
-        assertThat(actual.getOrNull()).isEqualTo("789")
+        actual.isSuccess shouldBe true
+        actual.getOrNull() shouldBe "789"
     }
 
     @Test
     fun `when setEmailAddress with different email then webclient puts email`() {
         // Arrange
-        val webclient = WebClient.builder().exchangeFunction(exchangeFunction).build()
         val firstResponse = Mono.just(
             ClientResponse.create(HttpStatus.OK)
                 .header("content-type", "application/json")
@@ -79,14 +81,13 @@ class ZitadelUserServiceTests {
 
         // Assert
         verify(exactly = 3) { exchangeFunction.exchange(any()) }
-        assertThat(actual.isSuccess)
-        assertThat(actual.getOrNull()).isEqualTo("newEmail@example.com")
+        actual.isSuccess shouldBe
+        actual.getOrNull() shouldBe "newEmail@example.com"
     }
 
     @Test
     fun `when setEmailAddress with same email then no subsequent calls`() {
         // Arrange
-        val webclient = WebClient.builder().exchangeFunction(exchangeFunction).build()
         val firstResponse = Mono.just(
             ClientResponse.create(HttpStatus.OK)
                 .header("content-type", "application/json")
@@ -101,8 +102,8 @@ class ZitadelUserServiceTests {
 
         // Assert
         verify(exactly = 1) { exchangeFunction.exchange(any()) }
-        assertThat(actual.isSuccess)
-        assertThat(actual.getOrNull()).isEqualTo("oldEmail@example.com")
+        actual.isSuccess shouldBe
+        actual.getOrNull() shouldBe "oldEmail@example.com"
     }
 
 }

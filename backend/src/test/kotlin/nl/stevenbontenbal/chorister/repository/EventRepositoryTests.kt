@@ -1,9 +1,9 @@
 package nl.stevenbontenbal.chorister.repository
 
+import io.kotest.matchers.collections.shouldHaveSize
 import nl.stevenbontenbal.chorister.create
 import nl.stevenbontenbal.chorister.model.entities.Choir
 import nl.stevenbontenbal.chorister.model.entities.Event
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -26,6 +26,6 @@ class EventRepositoryTests @Autowired constructor(
         // Act
         val events = eventRepository.findAll()
         // Assert
-        Assertions.assertThat(events.count()).isEqualTo(2)
+        events shouldHaveSize 2
     }
 }
