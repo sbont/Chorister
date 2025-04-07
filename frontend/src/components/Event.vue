@@ -8,7 +8,17 @@
                 <progress v-if="state == State.Loading" class="progress is-medium is-info" max="100"></progress>
                 <DataTable :value="entries" @row-reorder="reorder">
                     <Column row-reorder class="first-col"></Column>
-                    <Column field="song.resolved.title" header="Title"></Column>
+                    <Column body-class="header" header="Title">
+                        <template #body="slotProps">
+                            <b v-if="(slotProps.data as EventEntry).label">
+                                {{ (slotProps.data as EventEntry).label }}
+                            </b>
+                            <span v-else>
+                                {{ (slotProps.data as EventEntry).song?.resolved?.title }}
+                            </span>
+                        </template>
+                    </Column>
+                    
                     <Column field="song.resolved.composer" header="Composer"></Column>
                     <Column field="song.resolved.songbook.title" header="Songbook"></Column>
                     <Column field="song.resolved.songbookNumber" header="no."></Column>
@@ -47,7 +57,6 @@ enum State {
     Ready,
     Loading,
     Deleting,
-    Dragging,
 }
 
 const state = ref<State>(State.Loading);
@@ -93,9 +102,4 @@ table td.col0 {
     width: 6%;
 }
 
-.add-row {
-    text-align: center;
-    width: 100%;
-    padding: 0.75rem 1rem;
-}
 </style>

@@ -11,20 +11,20 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import { ref } from "vue";
-import { Song } from "@/types";
-import { useEvents } from "@/stores/eventStore";
+import { Song } from "@/entities/song";
+import { useEvents } from "@/application/eventStore";
+import { storeToRefs } from "pinia";
 
 const eventStore = useEvents();
 const route = useRoute();
 
 // state
+const { entries } = storeToRefs(eventStore);
 const songs = ref<Array<Song>>([])
 const eventId = Number(route.params.id);
-eventStore
-    .fetchEntries(eventId)
+eventStore.fetch(eventId)
     .then(result => {
-        console.log(result)
-        songs.value = result.map(e => e._embedded.song)
+        songs.value = entries.value(result.uri)
     })
 
 </script>

@@ -11,7 +11,7 @@ export interface Event extends Entity {
 export interface EventEntry extends Entity {
     id?: number,
     event: EntityRef<Event>,
-    song: EntityRef<Song>,
+    song?: EntityRef<Song>,
     label?: string,
     sequence: number
 }

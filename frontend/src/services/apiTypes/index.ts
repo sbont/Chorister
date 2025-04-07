@@ -60,7 +60,8 @@ export function toDomain<Source extends ApiEntityIn, Target extends Entity>(apiE
 }
 
 export function fromDomain<Source extends Entity, Target extends Identifiable>(entity: Source) {
-    return Object.assign({
-        id: entity.id,
-    }, entity) as Entity as Target;
+    return {
+        ...entity,
+        _links: undefined
+    } as Entity as Target;
 }

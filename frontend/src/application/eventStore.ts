@@ -115,7 +115,7 @@ export const useEvents = defineStore('events', () => {
             entriesByEventUri.value.set(uri, event.entries.resolved);
             entriesByEventUri.value.set(uri, event.entries.resolved);
             event.entries.resolved?.forEach(entry => {
-                if (entry.song.resolved)
+                if (entry.song?.resolved)
                     songStore.put(entry.song.resolved);
             })
             sortEntries(uri);
@@ -129,23 +129,27 @@ export const useEvents = defineStore('events', () => {
             return eventEndpoint.update(event);
     }
 
-    async function addEventEntry(eventId: number, entry: { label?: string, songId: number }) {
+    async function addEventEntry(eventId: number, entry: { label?: string, songId?: number }) {
         const uri =  eventEndpoint.getUri(eventId);
         const event = await get(eventId);
         if (!event) {
             console.log("Event not found");
             return;
         }
-        const song = await songStore.get(entry.songId);
-        if (!song) {
-            console.log("Song not found");
-            return;
+        let song;
+        if (entry.songId) {
+            song = await songStore.get(entry.songId);
+            if (!song) {
+                console.log("Song not found");
+                return;
+            }
         }
         const sequence = (entriesByEventUri.value.get(uri) ?? []).length + 1;
-        let newEntry: EventEntry = { 
-            event: new EntityRef(event), 
-            sequence, 
-            song: new EntityRef(song) 
+        let newEntry: EventEntry = {
+            event: new EntityRef(event),
+            sequence,
+            label: entry.label,
+            song: song ? new EntityRef(song) : undefined
         }
         const response = await entriesEndpoint.create(newEntry);
         newEntry.uri = response.uri;

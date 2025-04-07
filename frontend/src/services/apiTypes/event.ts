@@ -32,7 +32,8 @@ export interface EventEntryIn extends EventEntry, ApiEntityWith<SongLink & Event
 
 export interface EventEntryOut extends EventEntry {
     event: Uri,
-    song: Uri,
+    song?: Uri,
+    label: string
 }
 
 export interface SongLink extends WithAssociation {
@@ -77,6 +78,6 @@ export function fromDomainEventEntry(entry: DomainEventEntry): EventEntryOut {
     return {
         ...fromDomain(entry),
         event: entry.event.uri,
-        song: entry.song.uri
+        song: entry.song?.uri
     };
 }
