@@ -104,7 +104,7 @@ export const useEvents = defineStore('events', () => {
         entries = sort(entries);
         entriesByEventUri.value.set(uri, entries);
         entriesByEventUri.value.set(uri, entries);
-        await eventEndpoint.putEntries(event.entries.uri, entries);
+        await eventEndpoint.putEntries(uri, entries);
         return entries;        
     }
 

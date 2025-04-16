@@ -6,7 +6,7 @@ export interface Entity {
 }
 
 export interface EntityCollectionRef<T extends Entity> {
-    uri: Uri;
+    uri?: Uri;
     resolved?: T[]
 }
 

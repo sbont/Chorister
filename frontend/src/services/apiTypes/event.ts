@@ -48,7 +48,6 @@ export function toDomainEvent(apiEvent: EventIn): DomainEvent {
     return {
         ...toDomain(apiEvent),
         entries: {
-            uri: untemplated(apiEvent._links?.entries!),
             resolved: apiEvent._embedded.entries.map(toDomainEventEntry)
         }
     };
@@ -64,9 +63,6 @@ export function fromDomainEvent(event: DomainEvent): EventOut {
 export function toDomainEventEntry(apiEntry: EventEntryIn): DomainEventEntry {
     return {
         ...toDomain(apiEntry),
-        event: { 
-            uri: untemplated(apiEntry._links!.event)
-        },
         song: { 
             uri: untemplated(apiEntry._links!.song),
             resolved: apiEntry.song ? toDomainSong(apiEntry.song) : undefined

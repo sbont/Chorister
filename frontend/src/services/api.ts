@@ -444,6 +444,6 @@ class EventsEndpoint extends EntityEndpoint<DomainEvent, EventIn, EventOut> impl
 
     async putEntries(uri: Uri, domainEntries: Array<DomainEventEntry>): Promise<void> {
         const entries = domainEntries.map(fromDomainEventEntry)
-        await this.instance.put(uri, { entries }, { headers: { "Content-Type": "application/json" } });
+        await this.instance.put(`${uri}/list`, { entries }, { headers: { "Content-Type": "application/json" } });
     }
 }

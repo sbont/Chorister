@@ -23,7 +23,7 @@ class EventController(
     private val eventEntryRepository: EventEntryRepository,
     private val eventRepository: EventRepository
 ) {
-    @PutMapping("/events/{id}/entries")
+    @PutMapping("/events/{id}/list")
     fun putEntryCollection(@PathVariable id: Long?, @RequestBody eventEntries: EntityModel<EventEntriesPutRequest>): ResponseEntity<Any> {
         if (id == null)
             return ResponseEntity<Any>(HttpStatus.BAD_REQUEST)

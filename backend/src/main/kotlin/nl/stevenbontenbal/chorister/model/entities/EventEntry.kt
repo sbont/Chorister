@@ -1,6 +1,7 @@
 package nl.stevenbontenbal.chorister.model.entities
 
 import jakarta.persistence.*
+import org.springframework.data.rest.core.annotation.RestResource
 
 @Entity
 class EventEntry(
@@ -9,6 +10,7 @@ class EventEntry(
     var id: Long? = null,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "EVENT_ID")
+    @RestResource(exported = false)
     var event: Event?,
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "SONG_ID")
