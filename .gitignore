@@ -1,7 +1,5 @@
 backend/data
 cockroachdb/
-dev-proxy/node_modules/
-keycloak/
 zitadel/
 
 frontend/yarn.lock
