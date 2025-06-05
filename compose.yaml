@@ -1,0 +1,11 @@
+services:
+  database:
+    image: "cockroachdb/cockroach:latest-v24.3"
+    ports:
+      - "26258:26258"
+      - "8085:8085"
+    command: start-single-node --insecure --listen-addr=localhost:26258 --http-addr=localhost:8085
+    volumes:
+      - "./data:/cockroach/data"
+
+    
