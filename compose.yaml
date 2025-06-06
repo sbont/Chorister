@@ -2,10 +2,17 @@ services:
   database:
     image: "cockroachdb/cockroach:latest-v24.3"
     ports:
-      - "26258:26258"
-      - "8085:8085"
-    command: start-single-node --insecure --listen-addr=localhost:26258 --http-addr=localhost:8085
+      - "26257:26257"
+      - "8080:8080"
+    command: start-single-node --insecure
     volumes:
-      - "./data:/cockroach/data"
-
-    
+      - "./data/crdb:/cockroach/cockroach-data"
+  s3:
+    image: "minio/minio"
+    ports: 
+      - "9011:9000"
+      - "9012:9001"
+    command: server /data --console-address :9001
+    volumes:
+      - "./data/s3:/data"
+  
