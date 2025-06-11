@@ -1,10 +1,16 @@
 services:
-  database:
+  crdb:
     image: "cockroachdb/cockroach:latest-v24.3"
     ports:
       - "26257:26257"
       - "8080:8080"
     command: start-single-node --insecure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: '10s'
+      timeout: '30s'
+      retries: 5
+      start_period: '20s'
     volumes:
       - "./data/crdb:/cockroach/cockroach-data"
   s3:
@@ -15,4 +21,26 @@ services:
     command: server /data --console-address :9001
     volumes:
       - "./data/s3:/data"
+  zitadel:
+    restart: 'always'
+    image: 'ghcr.io/zitadel/zitadel:latest'
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
+    environment:
+      ZITADEL_DATABASE: cockroach
+      ZITADEL_DATABASE_COCKROACH_HOST: crdb
+      ZITADEL_EXTERNALSECURE: false
+      ZITADEL_DATABASE_COCKROACH_USER_USERNAME: zitadel
+      ZITADEL_DATABASE_COCKROACH_USER_PASSWORD: ""
+      ZITADEL_DATABASE_COCKROACH_USER_SSL_MODE: disable
+      ZITADEL_DATABASE_COCKROACH_ADMIN_USERNAME: root
+      ZITADEL_DATABASE_COCKROACH_ADMIN_PASSWORD: ""
+      ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_MODE: disable
+      ZITADEL_FIRSTINSTANCE_ORG_NAME: chorister
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME: admin
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: pwd1234
+    depends_on:
+      crdb:
+        condition: 'service_healthy'
+    ports:
+      - '9000:8080'
   
