@@ -1,9 +1,26 @@
 services:
+  caddy:
+    container_name: caddy
+    image: caddy:latest
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - zitadel
+    volumes:
+      - ./data/caddy/config:/config
+      - ./data/caddy/data:/data
+      - ./reverse-proxy/Caddyfile-dev:/etc/caddy/Caddyfile
+
   crdb:
     image: "cockroachdb/cockroach:latest-v24.3"
     ports:
       - "26257:26257"
-      - "8080:8080"
+      - "9080:8080"
     command: start-single-node --insecure
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
@@ -23,31 +40,6 @@ services:
     volumes:
       - "./data/s3:/data"
 
-  zitadel:
-    restart: "always"
-    networks:
-      - "zitadel"
-    image: "ghcr.io/zitadel/zitadel:latest"
-    command: "start-from-init --masterkey 'MasterkeyNeedsToHave32Characters' --tlsMode disabled"
-    environment:
-      ZITADEL_DATABASE_POSTGRES_HOST: pgdb
-      ZITADEL_DATABASE_POSTGRES_PORT: 5432
-      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
-      ZITADEL_EXTERNALSECURE: false
-    depends_on:
-      pgdb:
-        condition: "service_healthy"
-    ports:
-      - "9000:8080"
-    volumes:
-      - "./data/pgdb:/var/lib/postgresql/data:rw"
-
   pgdb:
     restart: "always"
     image: postgres:17-alpine
@@ -62,5 +54,34 @@ services:
       timeout: "30s"
       retries: 5
       start_period: "20s"
+    volumes:
+      - "./data/pgdb:/var/lib/postgresql/data:rw"
+
+  zitadel:
+    restart: "always"
+    networks:
+      - "zitadel"
+    image: "ghcr.io/zitadel/zitadel:latest"
+    command: "start-from-init --masterkey 'MasterkeyNeedsToHave32Characters' --tlsMode disabled"
+    environment:
+      ZITADEL_LOG_LEVEL: debug
+      ZITADEL_EXTERNALHOST: 9000
+      ZITADEL_DATABASE_POSTGRES_HOST: pgdb
+      ZITADEL_DATABASE_POSTGRES_PORT: 5432
+      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
+      ZITADEL_EXTERNALSECURE: false
+      ZITADEL_FIRSTINSTANCE_ORG_NAME: Chorister
+    depends_on:
+      pgdb:
+        condition: "service_healthy"
+    ports:
+      - "9000:8080"
+
 networks:
   zitadel:
