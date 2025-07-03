@@ -4,10 +4,10 @@ server:
   port: 8090
 spring:
   datasource:
-    url: "jdbc:postgresql://localhost:26258/chorister?sslmode=verify-full&sslrootcert=C:%5CProjects%5Cprivate%5CChorister%5Csecrets%5Ccerts%5Cca.crt"
+    url: "jdbc:postgresql://127.0.0.1:26257/chorister?sslmode=disable&user=root"
     driver-class-name: org.postgresql.Driver
-    username: ${CHORISTER_DATABASE_USER}
-    password: ${CHORISTER_DATABASE_PASSWORD}
+    username: root
+    password:
     hikari:
       connection-test-query: SELECT 1
       maximum-pool-size: 50
@@ -47,10 +47,10 @@ logging:
           client: DEBUG
 zitadel:
   base-url: http://localhost:9000/management/v1
-  admin-access-token: ${CHORISTER_ZITADEL_ACCESS_TOKEN}
+  admin-access-token: "LWO5U1MJIArunLdc7MWovKaDGMOWBRURn-U4YO5xevtIA6egHlWYeEFu0aDv-_Z8VUAvABo"
 s3:
   endpoint-url: http://localhost:9011
-  bucket-name: ${CHORISTER_MINIO_BUCKET}
+  bucket-name: "chorister-files"
   region: eu1
-  access-key: ${CHORISTER_MINIO_ACCESS_KEY}
-  secret-key: ${CHORISTER_MINIO_SECRET_KEY}
+  access-key: minioadmin
+  secret-key: minioadmin

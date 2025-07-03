@@ -22,6 +22,8 @@ services:
       - "26257:26257"
       - "9080:8080"
     command: start-single-node --insecure
+    environment:
+      - COCKROACH_DATABASE=chorister
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
       interval: '10s'
