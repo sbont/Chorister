@@ -5,7 +5,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins {
     val kotlinVersion = "2.0.21"
 
-    id("org.springframework.boot") version "3.4.4"
+    id("org.springframework.boot") version "3.5.3"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.jetbrains.kotlin.plugin.noarg") version kotlinVersion
     id("org.liquibase.gradle") version "2.2.0"
