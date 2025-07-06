@@ -1,3 +1,4 @@
+import { EntityRef } from "@/entities/entity";
 import { ApiEntityIn, ApiEntityWith, Identifiable, Link, toDomain, untemplated, WithAssociation } from ".";
 import { Choir } from "./choir";
 import { User as DomainUser } from "@/entities/user";
@@ -15,11 +16,12 @@ export interface ChoirLink extends WithAssociation {
 }
 
 export function toDomainUser(user: User): DomainUser {
+    const choir = user._links?.choir ? {
+        uri: untemplated(user._links?.choir)
+    } : new EntityRef<Choir>(user.choir!)
     return {
         ...toDomain(user),
-        choir: {
-            uri: untemplated(user._links?.choir!)
-        }
+        choir: choir
     };
 }
 

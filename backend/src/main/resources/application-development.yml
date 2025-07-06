@@ -22,16 +22,6 @@ spring:
           introspection-uri: http://localhost:9000/oauth/v2/introspect
           client-id: ${CHORISTER_API_CLIENT_ID}
           client-secret: ${CHORISTER_API_SECRET}
-      client:
-        provider:
-          zitadel:
-            issuerUri: http://localhost:9000
-            user-name-attribute: api@chorister.localhost
-        registration:
-          zitadel:
-            authorization-grant-type: authorization_code
-            client_id: ${CHORISTER_ADMIN_CLIENT_ID}
-            client_secret: ${CHORISTER_ADMIN_SECRET}
 debug: true
 logging:
   level:
@@ -47,7 +37,7 @@ logging:
           client: DEBUG
 zitadel:
   base-url: http://localhost:9000/management/v1
-  admin-access-token: "LWO5U1MJIArunLdc7MWovKaDGMOWBRURn-U4YO5xevtIA6egHlWYeEFu0aDv-_Z8VUAvABo"
+  admin-access-token: ${CHORISTER_ADMIN_ACCESS_TOKEN}
 s3:
   endpoint-url: http://localhost:9011
   bucket-name: "chorister-files"

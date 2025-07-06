@@ -19,14 +19,17 @@ userManager.events.addAccessTokenExpired(() => {
 
 export const useAuth = defineStore('auth', {
     state: () => ({
-        user: {} as User | null
+        user: null as User | null
     }),
     getters: {
         isLoggedIn: (state) => state.user !== null
     },
     actions: {
         init() {
+            console.log("Init auth store...");
+            
             userManager.getUser().then(user => this.user = user);
+            console.log("User:" + JSON.stringify(this.user));
         },
 
         login() {

@@ -11,20 +11,19 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
-import java.net.URI
 
 @Component
 class ZitadelUserService(
     private val zitadelConfiguration: ZitadelProperties,
-    private val webClient: WebClient
 ) : UserAuthorizationService {
+    private val webClient: WebClient = WebClient.create(zitadelConfiguration.baseUrl)
+
     override fun postUser(registrationRequest: RegistrationRequest): Result<String?> {
         val request = createUserPostRequest(registrationRequest)
         val response = webClient
             .post()
-            .uri(createUri("/users/human/_import"))
+            .uri("/users/human/_import")
             .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
             .contentType(MediaType.APPLICATION_JSON)
             .body(BodyInserters.fromValue(request))
@@ -63,9 +62,9 @@ class ZitadelUserService(
         userId: String,
         request: ZitadelUsernamePutRequest
     ) {
-        webClient
+        WebClient.create()
             .put()
-            .uri(createUri("/users/$userId/username"))
+            .uri("/users/$userId/username")
             .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
             .contentType(MediaType.APPLICATION_JSON)
             .body(BodyInserters.fromValue(request))
@@ -86,9 +85,9 @@ class ZitadelUserService(
         userId: String,
         request: ZitadelUserEmailPutRequest
     ) {
-        webClient
+        WebClient.create()
             .put()
-            .uri(createUri("/users/$userId/email"))
+            .uri("/users/$userId/email")
             .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
             .contentType(MediaType.APPLICATION_JSON)
             .body(BodyInserters.fromValue(request))
@@ -107,7 +106,7 @@ class ZitadelUserService(
 
     private fun getCurrentEmail(userId: String) = webClient
         .get()
-        .uri(createUri("/users/$userId/email"))
+        .uri("/users/$userId/email")
         .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
         .retrieve()
         .toEntity(ZitadelUserEmailGetResponse::class.java)
@@ -117,20 +116,15 @@ class ZitadelUserService(
         ZitadelUserPostRequest(
             userName = registrationRequest.email,
             email = Email(
-                email = registrationRequest.email
+                email = registrationRequest.email,
+                isEmailVerified = true,
             ),
             password = registrationRequest.password,
+            passwordChangeRequired = false,
             profile = Profile(
                 firstName = registrationRequest.displayName.substring(0, 1),
                 lastName = registrationRequest.displayName.substring(1),
                 displayName = registrationRequest.displayName
             )
         )
-
-    private fun createUri(path: String): URI =
-        UriComponentsBuilder
-            .fromHttpUrl(zitadelConfiguration.baseUrl)
-            .path(path)
-            .build()
-        .toUri()
 }

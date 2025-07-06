@@ -22,16 +22,6 @@ spring:
           introspection-uri: https://login.chorister.co/oauth/v2/introspect
           client-id: ${CHORISTER_API_CLIENT_ID}
           client-secret: ${CHORISTER_API_SECRET}
-      client:
-        provider:
-          zitadel:
-            issuerUri: https://login.chorister.co
-            user-name-attribute: api@chorister.localhost
-        registration:
-          zitadel:
-            authorization-grant-type: authorization_code
-            client_id: ${CHORISTER_ADMIN_CLIENT_ID}
-            client_secret: ${CHORISTER_ADMIN_SECRET}
 debug: false
 logging:
   level:
