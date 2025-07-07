@@ -5,26 +5,26 @@ This front-end Vue app uses Vite as its build tool.
 
 Run
 ```
-yarn install
+pnpm i
 ```
 to install all dependencies.
 
 ### Compiles and hot-reloads for development
 You can use 
 ```
-yarn run dev
+pnpm dev
 ```
 to let Vite compile the client and run a dev server with hot-reload enabled.
 
 ### Compiles and minifies for production
 ```
-yarn build
+pnpm build
 ```
 
 ### Lints and fixes files
 ```
-yarn lint
+pnpm lint
 ```
 
 ### CSS & styling
-This project uses Bulma as its CSS framework. Custom styles are defined in `src/style/sass/mystyles.scss`; you can use Sass in that folder to regenerate the stylesheet.
+This project uses Bulma as its CSS framework. Custom styles are defined in `style/sass/mystyles.scss`; you can use Sass in that folder to regenerate the stylesheet.
