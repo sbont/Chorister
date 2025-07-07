@@ -27,7 +27,7 @@ export interface EventEntry extends Identifiable {
 
 export interface EventEntryIn extends EventEntry, ApiEntityWith<SongLink & EventLink> {
     event: Event,
-    song?: SongIn,
+    song?: SongIn | null,
 }
 
 export interface EventEntryOut extends EventEntry {
@@ -48,7 +48,7 @@ export function toDomainEvent(apiEvent: EventIn): DomainEvent {
     return {
         ...toDomain(apiEvent),
         entries: {
-            resolved: apiEvent._embedded.entries.map(toDomainEventEntry)
+            resolved: apiEvent._embedded?.entries.map(toDomainEventEntry)
         }
     };
 }
@@ -56,17 +56,18 @@ export function toDomainEvent(apiEvent: EventIn): DomainEvent {
 export function fromDomainEvent(event: DomainEvent): EventOut {
     return {
         ...fromDomain(event),
-        entries: event.entries.resolved?.map(e => e.uri!)
+        entries: event.entries?.resolved?.map(e => e.uri!)
     };
 }
 
 export function toDomainEventEntry(apiEntry: EventEntryIn): DomainEventEntry {
+    const song = apiEntry.song == null ? undefined : {
+        uri: untemplated(apiEntry._links!.song),
+        resolved: apiEntry.song ? toDomainSong(apiEntry.song) : undefined
+    };
     return {
         ...toDomain(apiEntry),
-        song: { 
-            uri: untemplated(apiEntry._links!.song),
-            resolved: apiEntry.song ? toDomainSong(apiEntry.song) : undefined
-        },
+        song
     };
 }
 

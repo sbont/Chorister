@@ -6,7 +6,7 @@ import org.springframework.data.rest.core.config.Projection
 interface EventEntryProjection {
     var id: Long?
     var event: Event?
-    var song: Song?
+    var song: SongProjection?
     var label: String?
     var sequence: Int
 }

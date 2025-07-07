@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { CacheListMap, CacheMap } from "@/types/CacheMaps";
+import { CacheMap } from "@/types/CacheMaps";
 import { useSongs } from "@/application/songStore";
 import { computed, inject, ref } from "vue";
 import { ApiKey } from "./api";
@@ -175,7 +175,7 @@ export const useEvents = defineStore('events', () => {
         const event = events.value.get(eventUri)!;
         removeFrom(eventUri, eventEntry);
         const entries = resequence(eventUri);
-        eventEndpoint.putEntries(event.entries.uri, entries);
+        eventEndpoint.putEntries(eventUri, entries);
     }
     
     function resequence(eventUri: Uri) {

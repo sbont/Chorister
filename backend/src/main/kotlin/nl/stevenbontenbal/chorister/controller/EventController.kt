@@ -24,13 +24,13 @@ class EventController(
     private val eventRepository: EventRepository
 ) {
     @PutMapping("/events/{id}/list")
-    fun putEntryCollection(@PathVariable id: Long?, @RequestBody eventEntries: EntityModel<EventEntriesPutRequest>): ResponseEntity<Any> {
+    fun putEntryCollection(@PathVariable id: Long?, @RequestBody eventEntries: CollectionModel<EventEntry>): ResponseEntity<Any> {
         if (id == null)
             return ResponseEntity<Any>(HttpStatus.BAD_REQUEST)
 
         val event = eventRepository.findById(id).orElseThrow { InvalidIdentifierException("Event not found") }
         val oldEntries = event.entries
-        val newEntries =  eventEntries.content?.entries ?: ArrayList()
+        val newEntries = eventEntries.content.toList().map { it.event = event; it }
         val toRemove = oldEntries.filterNot { newEntries.map { it.id }.contains(it.id) }
         eventEntryRepository.saveAll(newEntries.toList())
         eventEntryRepository.deleteAll(toRemove)

@@ -10,7 +10,6 @@ class EventEntry(
     var id: Long? = null,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "EVENT_ID")
-    @RestResource(exported = false)
     var event: Event?,
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "SONG_ID")

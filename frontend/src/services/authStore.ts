@@ -26,10 +26,7 @@ export const useAuth = defineStore('auth', {
     },
     actions: {
         init() {
-            console.log("Init auth store...");
-            
             userManager.getUser().then(user => this.user = user);
-            console.log("User:" + JSON.stringify(this.user));
         },
 
         login() {
