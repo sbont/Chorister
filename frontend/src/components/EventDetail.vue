@@ -1,32 +1,37 @@
 <template>
     <div class="event-detail">
+        <DetailHeader 
+            :mode="pageState" 
+            :title="event?.name" 
+            :subtitle="event ? format(event?.date) : ''" 
+            :onEdit="edit" 
+            :onDelete="remove"
+            @cancel-edit="cancelEdit"
+            :custom-buttons="[{ 'label': 'Export texts', action: exportText }]"
+        />
+
         <div v-if="!loading">
             <div v-if="error">{{ error }}</div>
-            <div class="event-info m-3 is-flex is-align-content-flex-start">
-                <h1 class="title is-flex-grow-1 mr-3" v-if="!editing">{{ event?.name }}</h1>
-                <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="editing && draftValues">
+            <div class="event-info m-3 is-flex is-justify-content-flex-end">
+                <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="pageState != 'view' && draftValues">
                     <div class="field-label is-normal">
                         <label class="label">Name</label>
                     </div>
                     <div class="field-body">
-                        <div class="field" v-bind:class="{ static: !editing }">
+                        <div class="field" v-bind:class="{ static: false }">
                             <div class="control">
-                                <input
-                                    v-model="draftValues.name"
-                                    class="input"
-                                    type="text"
-                                    placeholder="Easter Morning Service"
-                                />
+                                <input v-model="draftValues.name" class="input" type="text"
+                                    placeholder="Easter Morning Service" />
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="editing && draftValues">
+                <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="pageState != 'view' && draftValues">
                     <div class="field-label is-normal">
                         <label class="label">Date</label>
                     </div>
                     <div class="field-body">
-                        <div class="field" v-bind:class="{ static: !editing }">
+                        <div class="field" v-bind:class="{ static: false }">
                             <div class="control">
                                 <input v-model="draftValues.date" class="input" type="date" />
                             </div>
@@ -34,26 +39,13 @@
                     </div>
                 </div>
                 <div class="field is-grouped">
-                    <p v-if="!editing" class="control">
-                        <button @click="exportText" class="button is-link">Export texts</button>
-                    </p>
-                    <p v-if="!editing" class="control">
-                        <button @click="edit" class="button is-link">Edit</button>
-                    </p>
-                    <p v-if="!editing" class="control">
-                        <button @click="remove" class="button is-danger">Delete</button>
-                    </p>
-                    <p v-if="editing" class="control">
+                    <p v-if="pageState != 'view'" class="control">
                         <button @click="save" class="button is-link" :class="{ 'is-loading': saving }">
                             Save changes
                         </button>
                     </p>
-                    <p v-if="editing" class="control">
-                        <button @click="cancelEdit" class="button">Cancel</button>
-                    </p>
                 </div>
             </div>
-            <div class="subtitle m-3" v-if="!editing && event">{{ format(event.date) }}</div>
         </div>
     </div>
 </template>
@@ -64,6 +56,8 @@ import { Event } from "@/entities/event";
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { isNew } from "@/entities/entity";
+import DetailHeader from "./ui/DetailHeader.vue";
+import { PageState } from "@/types";
 
 type DraftEvent = Partial<Event>;
 
@@ -73,16 +67,17 @@ const router = useRouter();
 
 // State
 const event = ref<Event>();
-const editing = ref(false);
 const draftValues = ref<DraftEvent | null>(null);
 const loading = ref(true);
 const saving = ref(false);
 const error = ref<string | null>(null);
+const pageState = ref<PageState>()
 if (route.name === "NewEvent") {
     draftValues.value = {};
-    editing.value = true;
+    pageState.value = "create"
     loading.value = false;
 } else {
+    pageState.value = "view";
     const eventId = Number(route.params.id);
     store.get(eventId).then((value) => {
         event.value = value;
@@ -112,7 +107,7 @@ const save = async () => {
         newEvent.name = new Date(newEvent.date).toLocaleDateString();
 
     newEvent = await store.save(newEvent);
-    editing.value = false;
+    pageState.value = "view";
     saving.value = false;
     event.value = newEvent;
     draftValues.value = null;
@@ -126,18 +121,18 @@ const save = async () => {
 
 const edit = () => {
     draftValues.value = event.value as DraftEvent;
-    editing.value = true;
+    pageState.value = "edit"
 };
 
 const cancelEdit = () => {
     draftValues.value = null;
-    editing.value = false;
+    pageState.value = "view"
 };
 
 const remove = () => {
     if (event.value)
         store.delete(event.value).then(() =>
-            router.push({name: "Repertoire"}));
+            router.push({name: "Planning"}));
 }
 
 const exportText = () => {

@@ -1,12 +1,8 @@
 <template>
     <div class="mychoir">
         <div>
-            <section class="hero is-medium is-info">
-                <div class="hero-body">
-                    <p class="subtitle">My choir</p>
-                    <p class="title">{{ choir?.name }}</p>
-                </div>
-            </section>
+            <DetailHeader :title="choir.name" subtitle="My choir" subtitle-on-top v-if="choir" />
+
             <div class="p-3" v-if="!loading">
                 <div class="tabs">
                     <ul>
@@ -37,12 +33,16 @@ import ChoirMembers from "../components/ChoirMembers.vue";
 import { ref } from "vue";
 import Categories from "@/components/Categories.vue";
 import { useChoir } from "@/application/choirStore";
+import DetailHeader from "./ui/DetailHeader.vue";
 
 // state
 const choirStore = useChoir();
 const loading = ref(true);
 const activeTab = ref("members");
 const choir = ref<Choir>();
-choirStore.getChoir().then(_ => loading.value = false);
+choirStore.getChoir().then(value => {
+    choir.value = value;
+    loading.value = false;
+});
 
 </script>

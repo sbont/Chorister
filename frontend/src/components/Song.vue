@@ -1,20 +1,11 @@
 <template>
     <div class="song">
+        <DetailHeader :title="song?.title" :subtitle="subtitle"
+            :mode="(!editing ? 'view' : songIsNew ? 'create' : 'edit')" :onEdit="edit" :onDelete="remove"/>
+
         <progress v-if="loading" class="progress is-medium is-info" max="100"></progress>
 
         <div v-if="!loading">
-            <section class="hero is-info">
-                <div v-if="!editing" class="hero-body">
-                    <p class="title">{{ song?.title }}</p>
-                    <p class="subtitle" v-if="subtitle">
-                        {{ subtitle }}
-                    </p>
-                </div>
-                <div v-else class="hero-body">
-                    <p class="title">{{ songIsNew ? "Add new" : "Edit" }}</p>
-                </div>
-            </section>
-
             <div class="song-info m-2 columns">
                 <div class="column">
                     <div>
@@ -136,16 +127,6 @@
                     </div>
 
                     <div class="field is-grouped mt-5">
-                        <p v-if="!editing" class="control">
-                            <button @click="edit" class="button is-link">
-                                Edit
-                            </button>
-                        </p>
-                        <p v-if="!editing" class="control">
-                            <button @click="remove" class="button is-danger">
-                                Delete
-                            </button>
-                        </p>
                         <p v-if="editing" class="control">
                             <button @click="save" class="button is-link"
                                 :class="{ 'is-loading': saving, 'is-static': v$.$errors.length }">
@@ -214,6 +195,7 @@ import { useRoute, useRouter } from "vue-router";
 import { Song, Songbook } from "@/entities/song"
 import { isNew } from "@/utils"
 import { Category } from "@/entities/category";
+import DetailHeader from "./ui/DetailHeader.vue";
 
 type DraftSongbook = Partial<Songbook>
 
@@ -235,7 +217,6 @@ const draftValues = ref<DraftSong>();
 const draftSongCategories = ref();
 const loading = ref(true);
 const saving = ref(false);
-const error = ref(null);
 const rules = {
     title: { required },
 }
@@ -254,7 +235,7 @@ const editor = useEditor({
 })
 
 // Computed
-const songIsNew = computed(() => song.value && isNew(song.value))
+const songIsNew = computed(() => !song.value || isNew(song.value))
 const youtubeId = computed(() => song.value?.recordingUrl ? song.value.recordingUrl.split("?v=")[1] : null);
 const subtitle = computed(() => {
     let result = "";
@@ -335,9 +316,9 @@ const save = async () => {
 const remove = () => {
     if (song.value) {
         songStore.deleteSong(song.value)
-        .then((_) => {
-            router.push({ name: "Repertoire" });
-        });
+            .then((_) => {
+                router.push({ name: "Repertoire" });
+            });
     }
 }
 

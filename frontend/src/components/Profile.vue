@@ -1,11 +1,6 @@
 <template>
-    <div class="profile" v-if="!loading">
-        <section class="hero is-medium is-link">
-            <div class="hero-body">
-                <p class="subtitle">hello</p>
-                <p class="title">{{ user?.displayName }}</p>
-            </div>
-        </section>
+    <div class="profile" v-if="!loading && user">
+        <DetailHeader :title="user?.displayName" subtitle="hello" subtitle-on-top />
 
         <div class="pt-5">
             <section class="section">
@@ -21,13 +16,8 @@
                     <div class="field">
                         <label class="label">Email</label>
                         <div class="control has-icons-left">
-                            <input
-                                class="input"
-                                type="email"
-                                placeholder="you@"
-                                v-if="draftValues"
-                                v-model="draftValues.email"
-                            />
+                            <input class="input" type="email" placeholder="you@" v-if="draftValues"
+                                v-model="draftValues.email" />
                             <span class="icon is-small is-left">
                                 <i class="fas fa-envelope"></i>
                             </span>
@@ -45,6 +35,7 @@
 import { useUsers } from "@/application/userStore";
 import { onMounted, ref } from "vue";
 import { User } from "@/entities/user";
+import DetailHeader from "./ui/DetailHeader.vue";
 
 const userStore = useUsers();
 

@@ -30,7 +30,7 @@
                     <td>{{ song.lastEvent?.date }}</td>
                     <td class="col-category">
                         <div class="tags">
-                            <span v-for="(category, index) in song.categories.resolved" class="song-category tag is-normal"
+                            <span v-for="(category, index) in song.categories?.resolved" class="song-category tag is-normal"
                                 :key="index">
                                 {{ category.name }}
                             </span>
