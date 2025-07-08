@@ -11,7 +11,7 @@ class Song(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CHOIR_ID")
     override var choir: Choir?,
     var title: String,
@@ -37,7 +37,7 @@ class Song(
         inverseJoinColumns = [JoinColumn(name = "CATEGORY_ID")]
     )
     var categories: MutableSet<Category>? = mutableSetOf(),
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "song", cascade=[CascadeType.DETACH])
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "song", cascade=[CascadeType.DETACH])
     var eventEntries: MutableList<EventEntry>? = mutableListOf(),
     @Column(length = 32000)
     var text: String?,
