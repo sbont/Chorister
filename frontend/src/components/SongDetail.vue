@@ -170,9 +170,9 @@
                 </div>
             </div>
 
-            <div v-if="!editing">
-                <ChordsArray :song="song!" />
-                <ScoreArray :song="song!" />
+            <div v-if="!editing && song">
+                <ChordsArray :song="song" />
+                <ScoreArray :song="song" />
             </div>
 
         </div>
@@ -331,11 +331,12 @@ const edit = () => {
 }
 
 const cancelEdit = () => {
+    if (songIsNew.value)
+        router.push({ name: "Repertoire" });
+
     draftValues.value = undefined;
     draftSongCategories.value = null;
     editing.value = false;
-    if (!song.value?.id)
-        router.push({ name: "Repertoire" });
 }
 
 </script>

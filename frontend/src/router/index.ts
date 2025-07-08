@@ -50,7 +50,7 @@ const routes = [
             {
                 path: 'song/new',
                 name: 'NewSong',
-                component: () => import('../components/Song.vue'),
+                component: () => import('../components/SongDetail.vue'),
                 meta: {
                     requiresAuth: true
                 },
@@ -58,7 +58,7 @@ const routes = [
             {
                 path: 'song/:id',
                 name: 'Song',
-                component: () => import('../components/Song.vue'),
+                component: () => import('../components/SongDetail.vue'),
                 meta: {
                     requiresAuth: true
                 },
