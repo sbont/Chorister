@@ -22,17 +22,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-    - name: Run install
-      uses: borales/actions-yarn@v4.2.0
+    - uses: actions/setup-node@v4
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
       with:
-        dir: 'frontend'
-        cmd: install
+        version: 10
+    - name: Install dependencies
+      working-directory: frontend
+      run: pnpm install
     - name: Run build
-      uses: borales/actions-yarn@v4.2.0
-      with:
-        dir: 'frontend'
-        cmd: build
+      working-directory: frontend
+      run: pnpm build
     - name: Deploy files
       uses: appleboy/scp-action@v0.1.4
       with:
