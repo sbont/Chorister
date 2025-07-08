@@ -22,6 +22,7 @@ This starts containers runnning our database (CockroachDB), our S3 file storage 
 1. On tab Projects, add a new project with name "Chorister".
 1. Create two Apps, with the following details:
     a. `chorister-web` with Type: Web; Authentication Method: PKCE; Redirect URIs: `http://localhost:8080/authorized` (enable Development Mode); Post Logout URIs: `http://localhost:8080/`. After creatiopn, change the Auth Token Type to JWT and enable the 3 checkboxes to include user roles to the access token and to include user roles and info in the ID token.
+    Then copy the client for this app to a new `.env.development` file (use the sample file) and set the client ID as value for `VITE_APP_CHORISTER_WEB_CLIENT_ID`.
     b. `chorister-api` with Type: API; Authentication Method: Basic. Important!: Make sure to copy the client secret when displayed in the pop-up that follows creating this app.
     Save this secret as an environment variable with key `CHORISTER_API_SECRET`. Add also a variable `CHORISTER_API_CLIENT_ID` with the Client Id as its value.
 1. Create a system user called `API-admin` and make this user an org-wide user manager.
