@@ -179,7 +179,11 @@ export const useEvents = defineStore('events', () => {
     }
     
     function resequence(eventUri: Uri) {
+        console.log(eventUri);
+        console.log(entriesByEventUri.value);
+    
         const entries = entriesByEventUri.value.get(eventUri)!;
+        console.log(entries);
         entries.forEach((entry, i) => entry.sequence = i + 1);
         return entries;
     }

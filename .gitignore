@@ -7,3 +7,5 @@ frontend/yarn.lock
 
 secrets/
 frontend/src/style/package-lock.json
+
+.DS_Store
