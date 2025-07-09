@@ -1,10 +1,9 @@
 <template>
     <div class="p-2">
-        <progress v-if="loading" class="progress is-medium is-info" max="100"></progress>
         <div v-if="error" class="error" @click="handleErrorClick">
             ERROR: {{ error }}
         </div>
-        <table class="table is-hoverable is-fullwidth song-table" v-if="!loading" v-cloak>
+        <table class="table is-hoverable is-fullwidth song-table" v-cloak>
             <thead>
                 <tr>
                     <th class="col-no" title="number"></th>
@@ -30,8 +29,8 @@
                     <td>{{ song.lastEvent?.date }}</td>
                     <td class="col-category">
                         <div class="tags">
-                            <span v-for="(category, index) in song.categories?.resolved" class="song-category tag is-normal"
-                                :key="index">
+                            <span v-for="(category, index) in song.categories?.resolved"
+                                class="song-category tag is-normal" :key="index">
                                 {{ category.name }}
                             </span>
                         </div>
@@ -40,6 +39,7 @@
             </tbody>
             <tfoot></tfoot>
         </table>
+        <progress v-if="loading" class="progress is-medium is-info" max="100"></progress>
         <footer class="footer" v-cloak>
             <strong>{{ songs.length }}</strong>
             {{ pluralize(songs.length) }}
@@ -52,7 +52,6 @@ import { onMounted, ref } from 'vue'
 import { useSongs } from "@/application/songStore.js";
 import { useRoute } from "vue-router";
 import { Song } from "@/entities/song";
-import { storeToRefs } from "pinia";
 
 // Types
 const songStore = useSongs();

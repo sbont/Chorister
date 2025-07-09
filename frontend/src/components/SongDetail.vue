@@ -1,181 +1,177 @@
 <template>
     <div class="song">
         <DetailHeader :title="song?.title" :subtitle="subtitle"
-            :mode="(!editing ? 'view' : songIsNew ? 'create' : 'edit')" :onEdit="edit" :onDelete="remove"/>
+            :mode="(!editing ? 'view' : songIsNew ? 'create' : 'edit')" :onEdit="edit" :onDelete="remove" />
 
-        <progress v-if="loading" class="progress is-medium is-info" max="100"></progress>
-
-        <div v-if="!loading">
-            <div class="song-info m-2 columns">
-                <div class="column">
-                    <div>
-                        <div class="field is-horizontal">
-                            <div class="field-label is-normal">
-                                <label class="label is-required">Title</label>
+        <div class="song-info m-2 columns">
+            <div class="column">
+                <div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label is-required">Title</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field" v-bind:class="{ static: !editing }">
+                                <div class="control">
+                                    <input v-if="editing && draftValues" v-model="draftValues.title" class="input"
+                                        :class="{ 'is-danger': v$.title.$error }" type="text"
+                                        placeholder="The name of the song or hymn" @blur="v$.title.$touch" />
+                                    <span v-else>
+                                        {{ song?.title }}
+                                    </span>
+                                </div>
                             </div>
-                            <div class="field-body">
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Composer</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field" v-bind:class="{ static: !editing }">
+                                <div class="control">
+                                    <input v-if="editing && draftValues" v-model="draftValues.composer" class="input"
+                                        type="text" placeholder="Artist / composer / writer" />
+                                    <span v-else>
+                                        {{ song?.composer }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal mb-3">
+                        <div class="field-label is-normal">
+                            <label class="label">Songbook</label>
+                        </div>
+                        <div class="field-body field-flex">
+                            <div class="field-flex-col">
                                 <div class="field" v-bind:class="{ static: !editing }">
                                     <div class="control">
-                                        <input v-if="editing && draftValues" v-model="draftValues.title" class="input"
-                                            :class="{ 'is-danger': v$.title.$error }" type="text"
-                                            placeholder="The name of the song or hymn" @blur="v$.title.$touch" />
+                                        <input v-if="editing && draftValues" v-model="draftValues.songbook!.title"
+                                            class="input" type="text"
+                                            placeholder="Songbook, hymnal or collection title" />
                                         <span v-else>
-                                            {{ song?.title }}
+                                            {{ song?.songbook?.title }}
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="field is-horizontal">
-                            <div class="field-label is-normal">
-                                <label class="label">Composer</label>
-                            </div>
-                            <div class="field-body">
-                                <div class="field" v-bind:class="{ static: !editing }">
-                                    <div class="control">
-                                        <input v-if="editing && draftValues" v-model="draftValues.composer"
-                                            class="input" type="text" placeholder="Artist / composer / writer" />
-                                        <span v-else>
-                                            {{ song?.composer }}
-                                        </span>
+                            <div class="field-flex-col is-one-third ml-5">
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">Number</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field" v-bind:class="{ static: !editing, }">
+                                            <div class="control">
+                                                <input v-if="editing && draftValues"
+                                                    v-model="draftValues.songbookNumber" class="input" type="text"
+                                                    placeholder="Song number in the book" />
+                                                <span v-else>{{ song?.songbookNumber }}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="field is-horizontal mb-3">
-                            <div class="field-label is-normal">
-                                <label class="label">Songbook</label>
-                            </div>
-                            <div class="field-body field-flex">
-                                <div class="field-flex-col">
-                                    <div class="field" v-bind:class="{ static: !editing }">
-                                        <div class="control">
-                                            <input v-if="editing && draftValues" v-model="draftValues.songbook!.title"
-                                                class="input" type="text"
-                                                placeholder="Songbook, hymnal or collection title" />
-                                            <span v-else>
-                                                {{ song?.songbook?.title }}
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Time of the year</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field" v-bind:class="{ static: !editing }">
+                                <div class="control">
+                                    <div class="select is-multiple">
+                                        <VueMultiselect v-if="editing" v-model="draftSongCategories.season"
+                                            :multiple="true" :options="categories.season" track-by="name" label="name"
+                                            :close-on-select="false"></VueMultiselect>
+
+                                        <div v-else class="tags are-medium">
+                                            <span v-for="(category) in songCategories?.season" :key="category.id"
+                                                class="tag">
+                                                {{ category.name }}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="field-flex-col is-one-third ml-5">
-                                    <div class="field is-horizontal">
-                                        <div class="field-label is-normal">
-                                            <label class="label">Number</label>
-                                        </div>
-                                        <div class="field-body">
-                                            <div class="field" v-bind:class="{ static: !editing, }">
-                                                <div class="control">
-                                                    <input v-if="editing && draftValues"
-                                                        v-model="draftValues.songbookNumber" class="input" type="text"
-                                                        placeholder="Song number in the book" />
-                                                    <span v-else>{{ song?.songbookNumber }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field is-horizontal">
-                            <div class="field-label is-normal">
-                                <label class="label">Time of the year</label>
-                            </div>
-                            <div class="field-body">
-                                <div class="field" v-bind:class="{ static: !editing }">
-                                    <div class="control">
-                                        <div class="select is-multiple">
-                                            <VueMultiselect v-if="editing" v-model="draftSongCategories.season"
-                                                :multiple="true" :options="categories.season" track-by="name"
-                                                label="name" :close-on-select="false"></VueMultiselect>
-
-                                            <div v-else class="tags are-medium">
-                                                <span v-for="(category) in songCategories?.season" :key="category.id"
-                                                    class="tag">
-                                                    {{ category.name }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field is-horizontal">
-                            <div class="field-label is-normal">
-                                <label class="label">Liturgical place</label>
-                            </div>
-                            <div class="field-body">
-                                <div class="field" v-bind:class="{ static: !editing }">
-                                    <div class="control">
-                                        <div class="select is-multiple">
-                                            <VueMultiselect v-if="editing" v-model="draftSongCategories.liturgical"
-                                                :multiple="true" :options="categories.liturgical" track-by="name"
-                                                label="name" :close-on-select="false"></VueMultiselect>
-
-                                            <div v-else class="tags are-medium">
-                                                <span v-for="(category) in songCategories?.liturgical"
-                                                    :key="category.id" class="tag">
-                                                    {{ category.name }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="field is-grouped mt-5">
-                        <p v-if="editing" class="control">
-                            <button @click="save" class="button is-link"
-                                :class="{ 'is-loading': saving, 'is-static': v$.$errors.length }">
-                                Save changes
-                            </button>
-                        </p>
-                        <p v-if="editing" class="control">
-                            <button @click="cancelEdit" class="button">
-                                Cancel
-                            </button>
-                        </p>
-                    </div>
-                </div>
-
-                <div class="column">
-                    <div class="is-size-4">Play</div>
-                    <div v-if="youtubeId && !editing" class="yt-wrapper">
-                        <iframe id="ytplayer" type="text/html" :src="'https://www.youtube.com/embed/' +
-                            youtubeId +
-                            '?autoplay=0'
-                            " frameborder="0"></iframe>
-                    </div>
-                    <div v-if="editing" class="field is-horizontal">
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Liturgical place</label>
+                        </div>
                         <div class="field-body">
                             <div class="field" v-bind:class="{ static: !editing }">
-                                <div class="control" v-if="editing && draftValues">
-                                    <input v-model="draftValues.recordingUrl" class="input" type="url"
-                                        placeholder="https://www.youtube.com/watch?v=..." />
+                                <div class="control">
+                                    <div class="select is-multiple">
+                                        <VueMultiselect v-if="editing" v-model="draftSongCategories.liturgical"
+                                            :multiple="true" :options="categories.liturgical" track-by="name"
+                                            label="name" :close-on-select="false"></VueMultiselect>
+
+                                        <div v-else class="tags are-medium">
+                                            <span v-for="(category) in songCategories?.liturgical" :key="category.id"
+                                                class="tag">
+                                                {{ category.name }}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="text">
-                        <div class="is-size-4">Text</div>
-                        <div v-if="!editing" v-html="song?.text"></div>
-                        <div v-else>
-                            <editor-content :editor="editor" />
-                        </div>
-                    </div>
+                <div class="field is-grouped mt-5">
+                    <p v-if="editing" class="control">
+                        <button @click="save" class="button is-link"
+                            :class="{ 'is-loading': saving, 'is-static': v$.$errors.length }">
+                            Save changes
+                        </button>
+                    </p>
+                    <p v-if="editing" class="control">
+                        <button @click="cancelEdit" class="button">
+                            Cancel
+                        </button>
+                    </p>
                 </div>
             </div>
 
-            <div v-if="!editing && song">
-                <ChordsArray :song="song" />
-                <ScoreArray :song="song" />
-            </div>
+            <div class="column">
+                <div class="is-size-4">Play</div>
+                <div v-if="youtubeId && !editing" class="yt-wrapper">
+                    <iframe id="ytplayer" type="text/html" :src="'https://www.youtube.com/embed/' +
+                        youtubeId +
+                        '?autoplay=0'
+                        " frameborder="0"></iframe>
+                </div>
+                <div v-if="editing" class="field is-horizontal">
+                    <div class="field-body">
+                        <div class="field" v-bind:class="{ static: !editing }">
+                            <div class="control" v-if="editing && draftValues">
+                                <input v-model="draftValues.recordingUrl" class="input" type="url"
+                                    placeholder="https://www.youtube.com/watch?v=..." />
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="text">
+                    <div class="is-size-4">Text</div>
+                    <div v-if="!editing" v-html="song?.text"></div>
+                    <div v-else>
+                        <editor-content :editor="editor" />
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <div v-if="!editing && song">
+            <ChordsArray :song="song" />
+            <ScoreArray :song="song" />
+        </div>
+
     </div>
 </template>
 

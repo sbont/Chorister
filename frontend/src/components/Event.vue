@@ -5,30 +5,29 @@
         </div>
         <div class="songs-container">
             <div class="p-2">
-                <progress v-if="state == State.Loading" class="progress is-medium is-info" max="100"></progress>
                 <DataTable :value="entries" @row-reorder="reorder">
                     <Column row-reorder class="first-col"></Column>
                     <Column body-class="header" header="Title">
                         <template #body="slotProps">
-                            <b v-if="(slotProps.data as EventEntry).label">
+                            <span v-if="(slotProps.data as EventEntry).label" class="has-text-weight-semibold">
                                 {{ (slotProps.data as EventEntry).label }}
-                            </b>
-                            <span v-else>
-                                {{ (slotProps.data as EventEntry).song?.resolved?.title }}
                             </span>
+                            <router-link v-else
+                                :to="{ name: 'Song', params: { id: (slotProps.data as EventEntry).song?.resolved?.id } }"
+                                append class="has-text-weight-semibold">
+                                {{ (slotProps.data as EventEntry).song?.resolved?.title }}
+                            </router-link>
                         </template>
                     </Column>
-                    
+
                     <Column field="song.resolved.composer" header="Composer"></Column>
                     <Column field="song.resolved.songbook.title" header="Songbook"></Column>
                     <Column field="song.resolved.songbookNumber" header="no."></Column>
                     <Column body-class="delete-btn-cell">
                         <template #body="slotProps">
-                            <button
-                                class="button is-danger is-inverted is-small"
+                            <button class="button is-danger is-inverted is-small"
                                 :class="{ 'is-loading': state == State.Deleting }"
-                                @click="removeEntryFromEvent(slotProps.data as EventEntry)"
-                            >
+                                @click="removeEntryFromEvent(slotProps.data as EventEntry)">
                                 <span class="icon is-small">
                                     <i class="fas fa-times"></i>
                                 </span>
@@ -36,6 +35,9 @@
                         </template>
                     </Column>
                 </DataTable>
+
+                <progress v-if="state == State.Loading" class="progress is-medium is-info" max="100"></progress>
+
                 <AddEventEntry :event-id="eventId" />
             </div>
         </div>
@@ -59,7 +61,7 @@ enum State {
     Deleting,
 }
 
-const state = ref<State>(State.Loading);
+const state = ref<State>(State.Ready);
 const route = useRoute();
 const eventId = Number(route.params.id);
 const eventStore = useEvents();
@@ -69,7 +71,6 @@ const entries = computed(() => event.value ? getEntries.value(event.value.uri!) 
 
 eventStore.fetch(eventId).then((result) => {
     event.value = result;
-    state.value = State.Ready;
 });
 
 const removeEntryFromEvent = async function (entry: EventEntry) {
@@ -94,12 +95,11 @@ table td.col0 {
     padding: 0.25em 0.75em;
 }
 
-.p-datatable-tbody > tr > td.delete-btn-cell {
+.p-datatable-tbody>tr>td.delete-btn-cell {
     padding: 0.5em 0.75em;
 }
 
 .first-col {
     width: 6%;
 }
-
 </style>
