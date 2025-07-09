@@ -18,13 +18,13 @@
                         <button @click="button.action" class="button is-link is-inverted">{{ button.label }}</button>
                     </p>
                     <p v-if="onEdit && mode == 'view'" class="control">
-                        <button @click="$emit('edit')" class="button is-link is-inverted">Edit</button>
+                        <button @click="$emit('edit')" class="button is-link is-inverted" :disabled="editDisabled">Edit</button>
                     </p>
                     <p v-if="onCancelEdit && mode == 'edit'" class="control">
                         <button @click="$emit('cancelEdit')" class="button">Cancel</button>
                     </p>
                     <p v-if="onDelete && mode == 'view'" class="control">
-                        <button @click="$emit('delete')" class="button is-danger is-inverted">Delete</button>
+                        <button @click="$emit('delete')" class="button is-danger is-inverted" :disabled="deleteDisabled">Delete</button>
                     </p>
                 </div>
             </div>
@@ -40,17 +40,21 @@ defineEmits(["edit", "delete", "cancelEdit"]);
 interface Props {
     title?: string
     subtitle?: string
-    subtitleOnTop?: Boolean
+    subtitleOnTop?: boolean
     mode?: PageState
     onEdit?: (_: MouseEvent) => void 
+    editDisabled?: boolean
     onDelete?: (_: MouseEvent) => void
+    deleteDisabled?: boolean
     onCancelEdit?: (_: MouseEvent) => void
-    customButtons?: Array<{action: () => void, label: string}>
+    customButtons?: Array<{action: () => void, label: string, disabled: boolean}>
 }
 
 const props = withDefaults(defineProps<Props>(), {
     subtitleOnTop: () => false,
-    mode: "view"
+    mode: "view",
+    editDisabled: false,
+    deleteDisabled: false
 })
 
 </script>

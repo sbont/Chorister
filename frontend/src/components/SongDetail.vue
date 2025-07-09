@@ -1,7 +1,12 @@
 <template>
     <div class="song">
-        <DetailHeader :title="song?.title" :subtitle="subtitle"
-            :mode="(!editing ? 'view' : songIsNew ? 'create' : 'edit')" :onEdit="edit" :onDelete="remove" />
+        <DetailHeader 
+            :title="song?.title" 
+            :subtitle="subtitle"
+            :mode="!editing ? 'view' : songIsNew ? 'create' : 'edit'" 
+            :onEdit="edit" 
+            :edit-disabled="loading"
+            :onDelete="remove" />
 
         <div class="song-info m-2 columns">
             <div class="column">
