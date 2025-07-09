@@ -11,7 +11,7 @@ export interface EntityCollectionRef<T extends Entity> {
 }
 
 export function isNew(entity: Entity) {
-    return entity.id == undefined;
+    return entity.id == undefined && entity.uri == undefined;
 }
 
 export class EntityRef<T extends Entity> {

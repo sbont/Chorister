@@ -15,11 +15,6 @@
 
                 </p>
             </header>
-            <div class="card-content p-0">
-                <div class="content is-flex">
-                    {{ error }}
-                </div>
-            </div>
             <footer class="card-footer">
                 <a @click.prevent="edit" href="#" class="card-footer-item">Edit</a>
                 <a @click.prevent="$emit('remove')" href="#" class="card-footer-item has-text-danger">Delete</a>
@@ -42,6 +37,11 @@
                             <div class="control">
                                 <input class="input" type="text" v-model="draftValues!.description"
                                     placeholder="Version name, instrument, tonality..." />
+                            </div>
+                        </div>
+                        <div v-if="error" class="card-content p-0">
+                            <div class="content is-flex has-text-danger">
+                                {{ error }}
                             </div>
                         </div>
                     </div>
@@ -154,23 +154,29 @@ const upload = async (file: File) => {
 const save = async () => {
     error.value = undefined;
     const wasNew = isNew(draftValues.value);
-    if (!selectedFile.value) {
+    if (!selectedFile.value && wasNew) {
         error.value = "No file selected."
         return;
     }
 
     editing.value = false;
     saving.value = true;
-    const fileId = await upload(selectedFile.value);
-    if (!fileId) {
-        error.value = "No file ID received."
-        return;
+
+    let fileId;
+    if (selectedFile.value) {
+        fileId = await upload(selectedFile.value);
+        if (!fileId) {
+            error.value = "No file ID received."
+            return;
+        }
     }
 
-    const savedScore = await scoreStore.save(score.value as Score)
-    savedScore.file = { id: fileId };
+    const savedScore = await scoreStore.save(draftValues.value as Score)
+    if (fileId) {
+        savedScore.file = { id: fileId };
+        await scoreStore.linkFile(savedScore, fileId);
+    }
     score.value = savedScore;
-    await scoreStore.linkFile(savedScore, fileId);
 
     if (wasNew)
         emit("added", savedScore)

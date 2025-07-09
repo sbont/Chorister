@@ -258,7 +258,8 @@ class EntityEndpoint<DomainEntity extends Entity, TIn extends ApiEntityIn, TOut 
             throw new Error("Object has no id");
 
         const data = this.fromDomain(obj);
-        const response = await this.instance.patch<TIn>(`${this.path}/` + data.id, data);
+        const uri = obj.uri ?? `${this.path}/` + data.id;
+        const response = await this.instance.patch<TIn>(uri, data);
         return this.toDomain(response.data);
     }
 
@@ -405,7 +406,7 @@ class FilesEndpoint {
     // Files
 
     getUploadReturnEnvelope = async () => {
-        const response = await this.instance.get<UploadReturnEnvelope>(`${this.path}/files/new-upload`);
+        const response = await this.instance.get<UploadReturnEnvelope>(`${this.path}/new-upload`);
         return response.data;
     }
 
