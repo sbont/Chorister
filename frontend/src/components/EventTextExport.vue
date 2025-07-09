@@ -1,8 +1,9 @@
 <template>
     <div class="text">
-        <div v-for="song in songs" :key="song.id">
-            <div><b>{{ song.title }}</b></div>
-            <div v-html="song.text"></div>
+        <div v-for="entry in entries" :key="entry.id">
+            <div v-if="entry.label"><b>{{ entry.label }}</b></div>
+            <div v-if="entry.song"><b>{{ entry.song.resolved?.title }}</b></div>
+            <div v-if="entry.song" v-html="entry.song.resolved?.text"></div>
             <p></p>
         </div>
     </div>
@@ -10,8 +11,8 @@
 
 <script setup lang="ts">
 import { useRoute } from "vue-router";
-import { ref } from "vue";
-import { Song } from "@/entities/song";
+import { computed, ref } from "vue";
+import { Event } from "@/entities/event";
 import { useEvents } from "@/application/eventStore";
 import { storeToRefs } from "pinia";
 
@@ -19,13 +20,13 @@ const eventStore = useEvents();
 const route = useRoute();
 
 // state
-const { entries } = storeToRefs(eventStore);
-const songs = ref<Array<Song>>([])
 const eventId = Number(route.params.id);
-eventStore.fetch(eventId)
-    .then(result => {
-        songs.value = entries.value(result.uri)
-    })
+const { entries: getEntries } = storeToRefs(eventStore);
+const event = ref<Event>();
+const entries = computed(() => event.value ? getEntries.value(event.value.uri!) : []);
+eventStore.fetch(eventId).then((result) => {
+    event.value = result;
+});
 
 </script>
 
