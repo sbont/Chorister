@@ -19,6 +19,7 @@ chorister:
       - Pentecost
 server:
   port: 8090
+  forward-headers-strategy: framework
 spring:
   jackson:
     mapper:
