@@ -47,7 +47,7 @@ interface Props {
     onDelete?: (_: MouseEvent) => void
     deleteDisabled?: boolean
     onCancelEdit?: (_: MouseEvent) => void
-    customButtons?: Array<{action: () => void, label: string, disabled: boolean}>
+    customButtons?: Array<{action: () => void, label: string, disabled?: boolean}>
 }
 
 const props = withDefaults(defineProps<Props>(), {
