@@ -102,7 +102,7 @@ const routes = [
         component: () => import('../components/Profile.vue')
     },
     {
-        path: '/repertoire/event/:id/texts',
+        path: '/planning/event/:id/texts',
         name: 'Export',
         component: () => import('../components/EventTextExport.vue'),
         meta: {
