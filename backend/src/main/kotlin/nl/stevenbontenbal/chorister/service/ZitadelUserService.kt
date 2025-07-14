@@ -128,3 +128,5 @@ class ZitadelUserService(
             )
         )
 }
+
+typealias ZitadelUserId = String

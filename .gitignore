@@ -1,6 +1,7 @@
 backend/data
 cockroachdb/
-data/
+data/*
+!data/init-db.sql
 zitadel/
 
 frontend/yarn.lock

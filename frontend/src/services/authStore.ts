@@ -8,7 +8,7 @@ const settings = {
     response_type: 'code',
     redirect_uri: import.meta.env.VITE_APP_BASE_URL + '/authorized',
     post_logout_redirect_uri: import.meta.env.VITE_APP_BASE_URL,
-    scope: 'openid',
+    scope: 'openid profile urn:zitadel:iam:user:metadata',
     automaticSilentRenew: true
 }
 let userManager = new UserManager(settings)

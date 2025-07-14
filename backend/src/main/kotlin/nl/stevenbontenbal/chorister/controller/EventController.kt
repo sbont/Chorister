@@ -1,15 +1,12 @@
 package nl.stevenbontenbal.chorister.controller
 
 import nl.stevenbontenbal.chorister.exceptions.InvalidIdentifierException
-import nl.stevenbontenbal.chorister.model.dto.EventEntriesPutRequest
 import nl.stevenbontenbal.chorister.model.entities.Event
 import nl.stevenbontenbal.chorister.model.entities.EventEntry
 import nl.stevenbontenbal.chorister.repository.EventEntryRepository
 import nl.stevenbontenbal.chorister.repository.EventRepository
-import org.springframework.data.rest.webmvc.BasePathAwareController
 import org.springframework.data.rest.webmvc.RepositoryRestController
 import org.springframework.hateoas.CollectionModel
-import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.server.ExposesResourceFor
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

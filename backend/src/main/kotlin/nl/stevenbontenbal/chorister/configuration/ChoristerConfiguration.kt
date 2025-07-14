@@ -1,14 +1,19 @@
 package nl.stevenbontenbal.chorister.configuration
 
+import com.zaxxer.hikari.HikariDataSource
 import nl.stevenbontenbal.chorister.interfaces.UserAuthorizationService
 import nl.stevenbontenbal.chorister.model.entities.*
 import nl.stevenbontenbal.chorister.repository.*
 import nl.stevenbontenbal.chorister.service.*
 import org.modelmapper.ModelMapper
 import org.springframework.boot.ApplicationRunner
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import org.springframework.core.Ordered
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer
@@ -21,11 +26,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import javax.sql.DataSource
 
 
 @EnableWebSecurity(debug = true)
@@ -37,13 +44,14 @@ class ChoristerConfiguration(
 
     @Bean
     @Throws(Exception::class)
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    fun securityFilterChain(http: HttpSecurity, userService: UserService): SecurityFilterChain {
         http {
             authorizeHttpRequests {
                 authorize(HttpMethod.POST, "/api/registration", permitAll)
                 authorize("/api/invite/**", permitAll)
                 authorize("/api/**",authenticated)
             }
+            addFilterAfter<SecurityContextHolderAwareRequestFilter>(ChoirContextFilter(userService))
             headers {
                 frameOptions { disable() }
             }
@@ -55,6 +63,43 @@ class ChoristerConfiguration(
         }
         http.oauth2ResourceServer { it.jwt(Customizer.withDefaults()) }
         return http.build()
+    }
+
+    @Bean
+    @ConfigurationProperties("chorister.datasource.system")
+    fun systemDataSourceProperties(): DataSourceProperties {
+        return DataSourceProperties()
+    }
+
+    @Bean
+    @LiquibaseDataSource
+    @ConfigurationProperties("chorister.datasource.system.hikari")
+    fun systemDataSource(): DataSource {
+        val dataSource = systemDataSourceProperties()
+            .initializeDataSourceBuilder()
+            .type(HikariDataSource::class.java)
+            .build()
+        dataSource?.poolName = "systemDataSource"
+        return dataSource
+    }
+
+    @Bean
+    @Primary
+    @ConfigurationProperties("chorister.datasource.user")
+    fun userDataSourceProperties(): DataSourceProperties {
+        return DataSourceProperties()
+    }
+
+    @Bean
+    @Primary
+    @ConfigurationProperties("chorister.datasource.user.hikari")
+    fun userDataSource(): DataSource? {
+        val dataSource = userDataSourceProperties()
+            .initializeDataSourceBuilder()
+            .type(HikariDataSource::class.java)
+            .build()
+        dataSource?.poolName = "userDataSource"
+        return ChoirAwareDataSource(dataSource)
     }
 
     @Bean
@@ -152,9 +197,7 @@ class ChoristerConfiguration(
         userRepository: UserRepository,
         songbookRepository: SongbookRepository,
         songRepository: SongRepository
-    ) = ApplicationRunner {
-
-    }
+    ) = ApplicationRunner {}
 
     @Bean
     fun modelMapper(): ModelMapper = ModelMapper()

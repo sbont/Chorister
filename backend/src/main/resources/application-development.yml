@@ -1,17 +1,27 @@
 chorister:
   base-url: "http://localhost:8080/"
+  datasource:
+    system:
+      url: "jdbc:postgresql://127.0.0.1:26257/chorister?sslmode=disable"
+      driver-class-name: org.postgresql.Driver
+      username: root
+      password:
+      hikari:
+        connection-test-query: SELECT 1
+        maximum-pool-size: 50
+        minimum-idle: 20
+    user:
+      url: ${chorister.datasource.system.url}
+      username: app_user
+      password: user1234!
 server:
   port: 8090
 spring:
-  datasource:
-    url: "jdbc:postgresql://127.0.0.1:26257/chorister?sslmode=disable&user=root"
-    driver-class-name: org.postgresql.Driver
-    username: root
-    password:
-    hikari:
-      connection-test-query: SELECT 1
-      maximum-pool-size: 50
-      minimum-idle: 20
+  liquibase:
+    parameters:
+      username: app_user
+      password: user1234!
+      database: chorister
   security:
     oauth2:
       resourceserver:
