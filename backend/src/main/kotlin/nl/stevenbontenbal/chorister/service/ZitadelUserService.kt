@@ -8,10 +8,13 @@ import nl.stevenbontenbal.chorister.model.dto.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
+import java.nio.charset.Charset
+import java.util.*
 
 @Component
 class ZitadelUserService(
@@ -44,7 +47,7 @@ class ZitadelUserService(
         return Result.success(response?.body?.userId)
     }
 
-    fun setEmailAddress(userId: String, email: String): Result<String> {
+    fun setEmailAddress(userId: ZitadelUserId, email: String): Result<String> {
         val response = getCurrentEmail(userId)
         if (response?.body?.email?.email == email)
             return Result.success(email)
@@ -56,6 +59,45 @@ class ZitadelUserService(
         changeUserName(userId, userNameRequest)
 
         return Result.success(email)
+    }
+
+    fun getChoir(token: Jwt): Long? {
+        val choirId = getMetadata(token, CHOIR_METADATA_KEY)
+        return choirId?.toLong()
+    }
+
+    private fun getMetadata(token: Jwt, key: String): String? {
+        val metadataClaim = token.getClaim<Map<String, String>>("urn:zitadel:iam:user:metadata")
+        return metadataClaim?.get(key)?.let {
+            Base64.getDecoder().decode(it).toString(Charset.defaultCharset())
+        }
+    }
+
+    fun setChoir(userId: ZitadelUserId, choirId: Long) {
+        val body = metadataRequest(choirId.toString())
+        webClient
+            .post()
+            .uri("/users/$userId/metadata/$CHOIR_METADATA_KEY")
+            .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(body))
+            .retrieve()
+            .onStatus(HttpStatusCode::is4xxClientError) {
+                it.bodyToMono(ZitadelError::class.java).flatMap { err ->
+                    Mono.error(InvalidInputException("Error while updating user: ${err.message}"))
+                }
+            }
+            .onStatus(HttpStatusCode::is5xxServerError) {
+                Mono.error(RuntimeException("Zitadel server error: ${it.statusCode()}"))
+            }
+            .toEntity(ZitadelResourceDetails::class.java)
+            .block()
+    }
+
+    private fun metadataRequest(value: String): ZitadelMetadataPostRequest {
+        return ZitadelMetadataPostRequest(
+            value = Base64.getEncoder().encodeToString(value.toByteArray())
+        )
     }
 
     private fun changeUserName(
@@ -127,6 +169,10 @@ class ZitadelUserService(
                 displayName = registrationRequest.displayName
             )
         )
+
+    companion object {
+        const val CHOIR_METADATA_KEY = "tenant_id"
+    }
 }
 
 typealias ZitadelUserId = String

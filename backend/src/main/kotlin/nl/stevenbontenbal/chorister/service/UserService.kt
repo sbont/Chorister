@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
-import java.nio.charset.Charset
-import java.util.*
 
 @Component
 @Lazy
@@ -23,22 +21,25 @@ class UserService(private val userRepository: UserRepository, private val zitade
     }
 
     fun getCurrentChoirId(): Long? {
-        val value = getMetadata("org_id")
-        return value?.toLong()
+        val token = getAuthToken()
+        return token?.let { zitadelUserService.getChoir(token) }
     }
 
     private fun getZitadelUserId(): ZitadelUserId {
-        val jwt = SecurityContextHolder.getContext().authentication.principal as Jwt
-        val userId = jwt.subject
+        val jwt = getAuthToken()
+        val userId = jwt?.subject
         return userId ?: throw AuthException("Zitadel user ID unknown.")
     }
 
-    private fun getMetadata(key: String): String? {
-        val jwt = SecurityContextHolder.getContext().authentication.principal as Jwt
-        val metadataClaim = jwt.getClaim<Map<String, String>>("urn:zitadel:iam:user:metadata")
-        return metadataClaim?.get(key)?.let {
-            Base64.getDecoder().decode(it).toString(Charset.defaultCharset())
-        }
+    private fun getAuthToken(): Jwt? {
+        return SecurityContextHolder.getContext().authentication?.principal as Jwt?
+    }
+
+    fun addUserToChoir(user: User, choir: Choir) {
+        user.choir = choir
+        userRepository.save(user)
+        val zitadelId = user.zitadelId ?: throw AuthException("Zitadel user ID unknown.")
+        zitadelUserService.setChoir(zitadelId, choir.id!!)
     }
 
     fun setUserEmail(user: User) {

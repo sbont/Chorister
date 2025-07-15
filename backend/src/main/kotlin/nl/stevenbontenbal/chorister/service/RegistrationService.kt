@@ -3,10 +3,13 @@ package nl.stevenbontenbal.chorister.service
 import nl.stevenbontenbal.chorister.exceptions.InvalidInputException
 import nl.stevenbontenbal.chorister.exceptions.UsernameAlreadyExistingException
 import nl.stevenbontenbal.chorister.interfaces.UserAuthorizationService
+import nl.stevenbontenbal.chorister.model.dto.AcceptInviteRequest
+import nl.stevenbontenbal.chorister.model.dto.InviteDetail
+import nl.stevenbontenbal.chorister.model.dto.NewChoirRegistrationRequest
+import nl.stevenbontenbal.chorister.model.dto.RegistrationRequest
 import nl.stevenbontenbal.chorister.model.entities.Choir
 import nl.stevenbontenbal.chorister.model.entities.Invite
 import nl.stevenbontenbal.chorister.model.entities.User
-import nl.stevenbontenbal.chorister.model.dto.*
 import nl.stevenbontenbal.chorister.repository.ChoirRepository
 import nl.stevenbontenbal.chorister.repository.InviteRepository
 import nl.stevenbontenbal.chorister.repository.UserRepository
@@ -20,9 +23,9 @@ open class RegistrationService(
     private val inviteRepository: InviteRepository,
     private val authorizationService: UserAuthorizationService,
     private val categorisationService: CategorisationService,
+    private val choirService: ChoirService,
     private val userService: UserService
 ) {
-
     @Transactional
     open fun register(registrationRequest: RegistrationRequest): User {
         validate(registrationRequest)
@@ -74,7 +77,7 @@ open class RegistrationService(
         else {
             val choir = choirRepository.findByInviteToken(acceptInviteRequest.token)
             if (choir != null)
-                addUserToChoir(user, choir)
+                userService.addUserToChoir(user, choir)
             else
                 throw InvalidInputException("Invalid invite")
         }
@@ -109,13 +112,14 @@ open class RegistrationService(
 
     private fun registerNewChoir(user: User, registrationRequest: NewChoirRegistrationRequest) {
         val choir = registerChoir(registrationRequest, user)
+        userService.addUserToChoir(user, choir)
         initializeChoirData(choir)
-        addUserToChoir(user, choir)
     }
 
     private fun addInviteeToChoir(user: User, invite: Invite) {
         val choir = invite.choir!!
-        addUserToChoir(user, choir)
+        userService.addUserToChoir(user, choir)
+        choirService.setCurrentChoir(choir)
         invite.user = user
         invite.acceptedDate = LocalDateTime.now()
         inviteRepository.save(invite)
@@ -130,13 +134,8 @@ open class RegistrationService(
 
     private fun registerChoir(registrationRequest: NewChoirRegistrationRequest, user: User): Choir {
         val choir = createChoir(registrationRequest, user)
-        choirRepository.save(choir)
+        choirService.insertWithTransaction(choir)
         return choir
-    }
-
-    private fun addUserToChoir(user: User, choir: Choir) {
-        user.choir = choir
-        userRepository.save(user)
     }
 
     private fun initializeChoirData(choir: Choir) {
@@ -149,7 +148,7 @@ open class RegistrationService(
             email = registrationRequest.email,
             displayName = registrationRequest.displayName,
             zitadelId = userId.getOrNull()
-    )
+        )
 
     private fun createChoir(registrationRequest: NewChoirRegistrationRequest, user: User): Choir =
         Choir(

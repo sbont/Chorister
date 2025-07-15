@@ -161,6 +161,7 @@ class ChoristerConfiguration(
         inviteRepository: InviteRepository,
         userAuthorizationService: UserAuthorizationService,
         categorisationService: CategorisationService,
+        choirService: ChoirService,
         userService: UserService
     ): RegistrationService = RegistrationService(
         userRepository,
@@ -168,6 +169,7 @@ class ChoristerConfiguration(
         inviteRepository,
         userAuthorizationService,
         categorisationService,
+        choirService,
         userService
     )
 

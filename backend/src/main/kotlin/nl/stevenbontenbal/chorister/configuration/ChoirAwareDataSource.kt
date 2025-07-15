@@ -23,11 +23,13 @@ class ChoirAwareDataSource(targetDataSource: DataSource) : DelegatingDataSource(
     }
 
     @Throws(SQLException::class)
-    private fun setChoirId(connection: Connection) {
+    fun setChoirId(connection: Connection) {
         connection.createStatement().use { sql ->
             val choirId = ChoirContext.getCurrentChoirId()
             if (choirId != null)
                 sql.execute("SET app.current_choir_id TO '$choirId'")
+            else
+                sql.execute("RESET app.current_choir_id")
         }
     }
 }

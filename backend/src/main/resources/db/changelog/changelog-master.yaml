@@ -808,39 +808,39 @@ databaseChangeLog:
           ALTER TABLE choir ENABLE ROW LEVEL SECURITY;
           DROP POLICY IF EXISTS choir_security ON choir;
           CREATE POLICY choir_security ON choir
-          USING (id = current_setting('app.current_choir_id')::INTEGER);
+          USING (current_setting('app.current_choir_id') = '' OR id::VARCHAR = current_setting('app.current_choir_id'));
 
           ALTER TABLE category ENABLE ROW LEVEL SECURITY;
           DROP POLICY IF EXISTS category_choir_security ON category;
           CREATE POLICY category_choir_security ON category
-          USING (choir_id = current_setting('app.current_choir_id')::INTEGER);
+          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
           
           ALTER TABLE event ENABLE ROW LEVEL SECURITY;
           DROP POLICY IF EXISTS event_choir_security ON event;
           CREATE POLICY event_choir_security ON event
-          USING (choir_id = current_setting('app.current_choir_id')::INTEGER);
+          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
           
           ALTER TABLE file ENABLE ROW LEVEL SECURITY;
           DROP POLICY IF EXISTS file_choir_security ON file;
           CREATE POLICY file_choir_security ON file
-          USING (choir_id = current_setting('app.current_choir_id')::INTEGER);
+          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
           
           ALTER TABLE invite ENABLE ROW LEVEL SECURITY;
           DROP POLICY IF EXISTS invite_choir_security ON invite;
           CREATE POLICY invite_choir_security ON invite
-          USING (choir_id = current_setting('app.current_choir_id')::INTEGER);
+          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
           
           ALTER TABLE notation ENABLE ROW LEVEL SECURITY;
           DROP POLICY IF EXISTS notation_choir_security ON notation;
           CREATE POLICY notation_choir_security ON notation
-          USING (choir_id = current_setting('app.current_choir_id')::INTEGER);
+          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
           
           ALTER TABLE registration ENABLE ROW LEVEL SECURITY;
           DROP POLICY IF EXISTS registration_choir_security ON registration;
           CREATE POLICY registration_choir_security ON registration
-          USING (choir_id = current_setting('app.current_choir_id')::INTEGER);
+          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
           
           ALTER TABLE song ENABLE ROW LEVEL SECURITY;
           DROP POLICY IF EXISTS song_choir_security ON song;
           CREATE POLICY song_choir_security ON song
-          USING (choir_id = current_setting('app.current_choir_id')::INTEGER);
+          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));

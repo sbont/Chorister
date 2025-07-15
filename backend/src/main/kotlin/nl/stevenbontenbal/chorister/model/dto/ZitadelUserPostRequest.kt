@@ -13,7 +13,8 @@ data class ZitadelUserPostRequest (
     var passwordChangeRequired          : Boolean?        = null,
     var requestPasswordlessRegistration : Boolean?        = null,
     var otpCode                         : String?         = null,
-    var idps                            : ArrayList<Idps> = arrayListOf()
+    var idps                            : ArrayList<Idps> = arrayListOf(),
+    var metadata                        : ArrayList<Metadata> = arrayListOf(),
 )
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -39,6 +40,12 @@ data class Phone (
 )
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+data class Password (
+    var password     : String? = null,
+    var changeRequired : Boolean = false
+)
+
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 data class HashedPassword (
     var value     : String? = null,
     var algorithm : String? = null
@@ -49,4 +56,10 @@ data class Idps (
     var configId       : String? = null,
     var externalUserId : String? = null,
     var displayName    : String? = null
+)
+
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+data class Metadata (
+    var key  : String,
+    var value: String
 )
