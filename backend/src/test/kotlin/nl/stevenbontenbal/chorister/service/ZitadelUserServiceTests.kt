@@ -7,7 +7,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import nl.stevenbontenbal.chorister.configuration.ZitadelProperties
 import nl.stevenbontenbal.chorister.model.dto.AcceptInviteRequest
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.runner.RunWith
@@ -47,7 +46,7 @@ class ZitadelUserServiceTests {
                 .body("{ \"userId\" : \"789\"}")
                 .build()
         )
-        val target = ZitadelUserService(zitadelProperties, webclient)
+        val target = ZitadelService(zitadelProperties)
 
         // Act
         val actual = target.postUser(request)
@@ -74,7 +73,7 @@ class ZitadelUserServiceTests {
                 .build()
         )
         every { exchangeFunction.exchange(any()) } returnsMany listOf(firstResponse, secondResponse, secondResponse)
-        val target = ZitadelUserService(zitadelProperties, webclient)
+        val target = ZitadelService(zitadelProperties)
 
         // Act
         val actual = target.setEmailAddress("789", "newEmail@example.com")
@@ -95,7 +94,7 @@ class ZitadelUserServiceTests {
                 .build()
         )
         every { exchangeFunction.exchange(any()) } returns firstResponse
-        val target = ZitadelUserService(zitadelProperties, webclient)
+        val target = ZitadelService(zitadelProperties)
 
         // Act
         val actual = target.setEmailAddress("789", "oldEmail@example.com")

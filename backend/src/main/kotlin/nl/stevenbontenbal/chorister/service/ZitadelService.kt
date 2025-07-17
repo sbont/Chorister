@@ -1,6 +1,7 @@
 package nl.stevenbontenbal.chorister.service
 
 import nl.stevenbontenbal.chorister.configuration.ZitadelProperties
+import nl.stevenbontenbal.chorister.exceptions.AuthException
 import nl.stevenbontenbal.chorister.exceptions.InvalidInputException
 import nl.stevenbontenbal.chorister.exceptions.UsernameAlreadyExistingException
 import nl.stevenbontenbal.chorister.interfaces.UserAuthorizationService
@@ -8,16 +9,15 @@ import nl.stevenbontenbal.chorister.model.dto.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import java.nio.charset.Charset
-import java.util.*
 
 @Component
-class ZitadelUserService(
+class ZitadelService(
     private val zitadelConfiguration: ZitadelProperties,
 ) : UserAuthorizationService {
     private val webClient: WebClient = WebClient.create(zitadelConfiguration.baseUrl)
@@ -61,30 +61,67 @@ class ZitadelUserService(
         return Result.success(email)
     }
 
-    fun getChoir(token: Jwt): Long? {
-        val choirId = getMetadata(token, CHOIR_METADATA_KEY)
-        return choirId?.toLong()
+    fun getExternalUserId(): ZitadelUserId {
+        val jwt = getAuthToken()
+        val userId = jwt?.subject
+        return userId ?: throw AuthException("Zitadel user ID unknown.")
     }
 
-    private fun getMetadata(token: Jwt, key: String): String? {
-        val metadataClaim = token.getClaim<Map<String, String>>("urn:zitadel:iam:user:metadata")
-        return metadataClaim?.get(key)?.let {
-            Base64.getDecoder().decode(it).toString(Charset.defaultCharset())
-        }
+    fun getTenant(): Long? {
+        val roles = getRoles()
+        return roles.filterIsInstance<TenantUser>().firstOrNull()?.tenantId
     }
 
-    fun setChoir(userId: ZitadelUserId, choirId: Long) {
-        val body = metadataRequest(choirId.toString())
+    private fun getAuthToken(): Jwt? = SecurityContextHolder.getContext().authentication?.principal as Jwt?
+
+    private fun getRoles(): Set<UserRole> {
+        val jwt = getAuthToken()
+        val rolesClaim = jwt?.getClaim<Map<String, String>>("urn:zitadel:iam:org:project:roles")
+        val roles = rolesClaim?.keys?.map { UserRole.parse(it) }
+        return roles?.toSet() ?: setOf()
+    }
+
+    fun createRolesForTenant(tenantId: Long) {
+        val body = createRolesRequest(tenantId, AccessLevel.MANAGER)
         webClient
             .post()
-            .uri("/users/$userId/metadata/$CHOIR_METADATA_KEY")
+            .uri("/projects/${zitadelConfiguration.projectId}/roles")
             .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
             .contentType(MediaType.APPLICATION_JSON)
             .body(BodyInserters.fromValue(body))
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError) {
                 it.bodyToMono(ZitadelError::class.java).flatMap { err ->
-                    Mono.error(InvalidInputException("Error while updating user: ${err.message}"))
+                    Mono.error(InvalidInputException("Error while creating roles: ${err.message}"))
+                }
+            }
+            .toEntity(ZitadelResourceDetails::class.java)
+            .block()
+    }
+
+    private fun createRolesRequest(tenantId: Long, accessLevel: AccessLevel): ZitadelProjectRolesPostRequest =
+        ZitadelProjectRolesPostRequest(
+            roleKey = roleKey(tenantId, accessLevel),
+            displayName = "Tenant $tenantId ${accessLevel.name.lowercase().replaceFirstChar { it.uppercase() }}",
+            group = "tenant.$tenantId"
+        )
+
+    private fun roleKey(tenantId: Long, accessLevel: AccessLevel): String {
+        return "tenant.$tenantId.${accessLevel.name.lowercase()}"
+    }
+
+    fun addRoleToUser(userId: ZitadelUserId, tenantId: Long) {
+        val body = createAddRolesRequest(tenantId)
+        webClient
+            .post()
+            .uri("/users/$userId/grants")
+            .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(body))
+            .retrieve()
+            .onStatus(HttpStatusCode::is4xxClientError) {
+                it.bodyToMono(ZitadelError::class.java).flatMap { err ->
+                    Mono.error(InvalidInputException("Error while adding grants to user: ${err.message}"))
                 }
             }
             .onStatus(HttpStatusCode::is5xxServerError) {
@@ -94,11 +131,11 @@ class ZitadelUserService(
             .block()
     }
 
-    private fun metadataRequest(value: String): ZitadelMetadataPostRequest {
-        return ZitadelMetadataPostRequest(
-            value = Base64.getEncoder().encodeToString(value.toByteArray())
+    private fun createAddRolesRequest(tenantId: Long): ZitadelUserGrantsRequest =
+        ZitadelUserGrantsRequest(
+            projectId = zitadelConfiguration.projectId,
+            roleKeys = listOf(roleKey(tenantId, AccessLevel.MANAGER))
         )
-    }
 
     private fun changeUserName(
         userId: String,
@@ -169,10 +206,6 @@ class ZitadelUserService(
                 displayName = registrationRequest.displayName
             )
         )
-
-    companion object {
-        const val CHOIR_METADATA_KEY = "tenant_id"
-    }
 }
 
 typealias ZitadelUserId = String

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Component
-class ChoirService {
+class ChoirService(private val zitadelService: ZitadelService) {
     @PersistenceContext
     private val entityManager: EntityManager? = null
 
@@ -23,6 +23,7 @@ class ChoirService {
     private fun persistAndSetCurrentChoir(choir: Choir): Choir {
         entityManager!!.persist(choir)
         setCurrentChoir(choir)
+        zitadelService.createRolesForTenant(choir.id!!)
         return choir
     }
 
