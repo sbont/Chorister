@@ -11,10 +11,10 @@ import aws.smithy.kotlin.runtime.net.url.Url
 import nl.stevenbontenbal.chorister.application.config.S3Configuration
 import nl.stevenbontenbal.chorister.domain.InvalidIdentifierException
 import nl.stevenbontenbal.chorister.domain.songs.File
+import nl.stevenbontenbal.chorister.domain.songs.IFileRepository
 import nl.stevenbontenbal.chorister.domain.songs.IFileService
 import nl.stevenbontenbal.chorister.domain.users.UserService
-import nl.stevenbontenbal.chorister.domain.songs.IFileRepository
-import java.net.URL
+import java.net.URI
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 import kotlin.time.Duration.Companion.minutes
@@ -52,12 +52,12 @@ class FileService(
             .getOrNull()
     }
 
-    override fun s3RedirectHost(): String = URL(s3Configuration.endpointUrl).host
+    override fun s3RedirectHost(): String = URI(s3Configuration.endpointUrl).toURL().host
 
     override fun s3RedirectPath(file: File): String = "${s3Configuration.bucketName}/${file.s3Key}"
 
     override fun s3RedirectUrlPathSafe(file: File): String {
-        val baseUrl = URL(s3Configuration.endpointUrl)
+        val baseUrl = URI(s3Configuration.endpointUrl).toURL()
         val root = baseUrl.host +
                 (if (baseUrl.port > -1) ":${baseUrl.port}" else "") +
                 (if (baseUrl.path.isNotEmpty()) "/${baseUrl.path}" else "")
