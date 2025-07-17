@@ -1,7 +1,14 @@
 package nl.stevenbontenbal.chorister
 
-import nl.stevenbontenbal.chorister.configuration.ChoristerProperties
-import nl.stevenbontenbal.chorister.model.entities.*
+import nl.stevenbontenbal.chorister.application.config.ChoristerProperties
+import nl.stevenbontenbal.chorister.domain.events.Event
+import nl.stevenbontenbal.chorister.domain.events.EventEntry
+import nl.stevenbontenbal.chorister.domain.songs.Category
+import nl.stevenbontenbal.chorister.domain.songs.CategoryType
+import nl.stevenbontenbal.chorister.domain.songs.Song
+import nl.stevenbontenbal.chorister.domain.users.Choir
+import nl.stevenbontenbal.chorister.domain.users.Invite
+import nl.stevenbontenbal.chorister.domain.users.User
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import java.time.LocalDate
 import java.util.*
