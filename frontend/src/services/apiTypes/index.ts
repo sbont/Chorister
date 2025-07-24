@@ -31,7 +31,7 @@ type Embedded<N extends string, O> = {
 }
 
 export interface WithEmbedded<N extends string, O> {
-    _embedded: Embedded<N, O>
+    _embedded?: Embedded<N, O>
 }
 
 export function getSelfUri(apiEntity: ApiEntityIn): Uri | undefined {

@@ -5,7 +5,7 @@ import { computed, inject, ref } from "vue";
 import { ApiKey } from "./api";
 import { Event, EventEntry } from "@/entities/event";
 import { Uri } from "@/types";
-import { EntityRef, isNew } from "@/entities/entity";
+import { EntityCollectionRef, EntityRef, isNew } from "@/entities/entity";
 
 export const useEvents = defineStore('events', () => {
     const api = inject(ApiKey);
@@ -34,7 +34,7 @@ export const useEvents = defineStore('events', () => {
         return [...events.value.values()].filter(e => new Date(e.date) < today);
     });
 
-    const entries = computed(() => (eventUri: Uri) => entriesByEventUri.value.get(eventUri) ?? []);
+    const getEntries = computed(() => (eventUri: Uri) => entriesByEventUri.value.get(eventUri) ?? []);
 
     // Actions
     function addTo(key: Uri, value: EventEntry): void {
@@ -65,8 +65,20 @@ export const useEvents = defineStore('events', () => {
         loading.value = true;
         const data = await eventEndpoint.getOne(eventId);
         put(data);
+        if (!data.entries.resolved) {
+            fetchEntries(data);
+        }
+
         loading.value = false;
         return data;
+    }
+
+    async function fetchEntries(event: Event) {
+        if (!event.entries.uri)
+             return;
+
+        const entries = await entriesEndpoint.getAllAssociated(event.entries.uri);
+        putEntries(event.uri!, entries);
     }
 
     async function get(eventId: number) {
@@ -112,14 +124,17 @@ export const useEvents = defineStore('events', () => {
         const uri =  event.uri ?? eventEndpoint.getUri(event.id!)
         events.value.set(uri, event);
         if (event.entries.resolved) {
-            entriesByEventUri.value.set(uri, event.entries.resolved);
-            entriesByEventUri.value.set(uri, event.entries.resolved);
-            event.entries.resolved?.forEach(entry => {
-                if (entry.song?.resolved)
-                    songStore.put(entry.song.resolved);
-            })
-            sortEntries(uri);
+            putEntries(uri, event.entries.resolved)
         }
+    }
+
+    function putEntries(eventUri: string, entries: EventEntry[]) {
+        entriesByEventUri.value.set(eventUri, entries);
+        entries.forEach(entry => {
+            if (entry.song?.resolved)
+                songStore.put(entry.song.resolved);
+        })
+        sortEntries(eventUri);
     }
 
     async function save(event: Event) {
@@ -188,7 +203,7 @@ export const useEvents = defineStore('events', () => {
         entriesByEventUri2: entriesByEventUri,
         futureEvents,
         pastEvents,
-        entries,
+        entries: getEntries,
         get,
         fetch,
         fetchAll,

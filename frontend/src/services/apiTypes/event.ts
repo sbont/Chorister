@@ -1,3 +1,4 @@
+import { EntityRef } from "@/entities/entity";
 import { ApiEntityWith, fromDomain, Identifiable, Link, toDomain, untemplated, WithAssociation, WithEmbedded } from ".";
 import { SongIn, toDomainSong } from "./song";
 import { Event as DomainEvent, EventEntry as DomainEventEntry } from "@/entities/event";
@@ -25,9 +26,8 @@ export interface EventEntry extends Identifiable {
     sequence: number
 }
 
-export interface EventEntryIn extends EventEntry, ApiEntityWith<SongLink & EventLink> {
+export interface EventEntryIn extends EventEntry, ApiEntityWith<SongLink & EventLink>, WithEmbedded<"song", SongIn> {
     event: Event,
-    song?: SongIn | null,
 }
 
 export interface EventEntryOut extends EventEntry {
@@ -47,9 +47,10 @@ export interface EventLink extends WithAssociation {
 export function toDomainEvent(apiEvent: EventIn): DomainEvent {
     return {
         ...toDomain(apiEvent),
-        entries: {
+        entries: { 
+            uri: untemplated(apiEvent._links!.entries),
             resolved: apiEvent._embedded?.entries.map(toDomainEventEntry)
-        }
+         } 
     };
 }
 
@@ -61,13 +62,14 @@ export function fromDomainEvent(event: DomainEvent): EventOut {
 }
 
 export function toDomainEventEntry(apiEntry: EventEntryIn): DomainEventEntry {
-    const song = apiEntry.song == null ? undefined : {
+    const song = apiEntry._embedded?.song == null ? undefined : {
         uri: untemplated(apiEntry._links!.song),
-        resolved: apiEntry.song ? toDomainSong(apiEntry.song) : undefined
+        resolved: apiEntry._embedded.song ? toDomainSong(apiEntry._embedded.song) : undefined
     };
     return {
         ...toDomain(apiEntry),
-        song
+        song,
+        event: { uri: apiEntry._links?.event!.href! }
     };
 }
 
