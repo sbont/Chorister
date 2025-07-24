@@ -23,7 +23,7 @@ import {
     toDomainEvent,
     toDomainEventEntry,
 } from "./apiTypes/event";
-import { UploadReturnEnvelope } from "./apiTypes/file";
+import { UploadReturnEnvelope } from "./apiTypes/fileInfo";
 import { AcceptInvite, NewChoirRegistration } from "./apiTypes/registration";
 import { fromDomainScore, Score, toDomainScore } from "./apiTypes/score";
 import { fromDomainSong, SongIn, SongOut, toDomainSong } from "./apiTypes/song";
@@ -41,8 +41,8 @@ export default class ChoristerApi implements IChoristerApi {
     private categories: EntityEndpoint<DomainCategory, Category, Category>;
     private users: EntityEndpoint<DomainUser, User, User>;
     private user: UserEndpoint
-    private files: FilesEndpoint;
 
+    public readonly files: FilesEndpoint;
     public readonly songs: SongsEndpoint;
     public readonly chords: EntityEndpoint<DomainChords, Chords, Chords>;
     public readonly scores: ScoresEndpoint;
@@ -72,9 +72,9 @@ export default class ChoristerApi implements IChoristerApi {
         this.categories = new EntityEndpoint(this.instance, "categories", fromDomainCategory, toDomainCategory);
         this.users = new EntityEndpoint(this.instance, "users", fromDomainUser, toDomainUser);
         this.user = new UserEndpoint(this.instance);
-        this.scores = new ScoresEndpoint(this.instance, "scores", fromDomainScore, toDomainScore);
         this.files = new FilesEndpoint(this.instance);
         this.chords = new EntityEndpoint(this.instance, "chords", fromDomainChords, toDomainChords);
+        this.scores = new ScoresEndpoint(this.instance, "scores", fromDomainScore, toDomainScore(this.files.getUri));
     }
 
     // Generic
@@ -198,7 +198,7 @@ export default class ChoristerApi implements IChoristerApi {
 
     // Scores
 
-    getScores = (songId: number) => this.songs.getAllRelated(songId, "scores", toDomainScore);
+    getScores = (songId: number) => this.songs.getAllRelated(songId, "scores", toDomainScore(this.files.getUri));
 
     createScore = (score: DomainScore) => this.scores.create(score);
 
@@ -214,7 +214,7 @@ export default class ChoristerApi implements IChoristerApi {
 
     getUploadReturnEnvelopeForId = (id: number) => this.files.getUploadReturnEnvelopeForId(id);
 
-    getFileLocation = (fileId: number) => this.files.getFileLocation(fileId);
+    getFileLocation = (fileUri: string) => this.files.getFileLocation(fileUri);
 }
 
 class EntityEndpoint<DomainEntity extends Entity, TIn extends ApiEntityIn, TOut extends ApiEntityOut> implements ApiEndpoint<DomainEntity> {
@@ -267,7 +267,7 @@ class EntityEndpoint<DomainEntity extends Entity, TIn extends ApiEntityIn, TOut 
         if (isNew(obj))
             throw new Error("Object has no id");
 
-        await this.instance.delete(`${this.path}/` + obj.id)
+        await this.instance.delete(obj.uri ?? `${this.path}/` + obj.id)
     }
 
     getAllRelated = async <RelatedDomainEntity extends Entity, RelatedApiEntity extends ApiEntityIn>(id: number, association: string, toDomain: (e: RelatedApiEntity) => RelatedDomainEntity) => {
@@ -297,10 +297,10 @@ class EntityEndpoint<DomainEntity extends Entity, TIn extends ApiEntityIn, TOut 
         await this.instance.post(uri, data, { headers: { "content-type": "text/uri-list" } });
     }
 
-    deleteAssociation = async(uri: string, object: DomainEntity) => {
+    deleteAssociation = async (uri: string, object: DomainEntity) => {
         await this.instance.delete(`${uri}/${object.id}`);
     }
-    
+
     protected uriList = (objects: Array<DomainEntity>) => objects.reduce<Uri[]>((acc, obj) => {
         if (!obj.uri) {
             throw new Error(`Object ${obj} has no uri`);
@@ -388,7 +388,7 @@ class InviteEndpoint {
         const response = await this.instance.get<Invite>(`${this.path}?token=${token}`);
         return toDomainInvite(response.data);
     }
-    
+
     accept = async (inviteRequest: AcceptInvite) => {
         const response = await this.instance.post<User>(`${this.path}/accept`, inviteRequest);
         return toDomainUser(response.data);
@@ -403,7 +403,7 @@ class FilesEndpoint {
         this.instance = instance;
     }
 
-    // Files
+    getUri = (id: number) => `${SERVER_URL}/${this.path}/${id}`;
 
     getUploadReturnEnvelope = async () => {
         const response = await this.instance.get<UploadReturnEnvelope>(`${this.path}/new-upload`);
@@ -415,8 +415,8 @@ class FilesEndpoint {
         return response.data;
     }
 
-    getFileLocation = async (fileId: number) => {
-        const response = await this.instance.get(`${this.path}/${fileId}`);
+    getFileLocation = async (fileUri: string) => {
+        const response = await this.instance.get(fileUri);
         return response.headers["location"];
     }
 }
@@ -445,6 +445,6 @@ class EventsEndpoint extends EntityEndpoint<DomainEvent, EventIn, EventOut> impl
 
     async putEntries(uri: Uri, domainEntries: Array<DomainEventEntry>): Promise<void> {
         const entries = domainEntries.map(fromDomainEventEntry)
-        await this.instance.put(`${uri}/list`, { "_embedded": { "eventEntries" : entries }}, { headers: { "Content-Type": "application/json" } });
+        await this.instance.put(`${uri}/list`, { "_embedded": { "eventEntries": entries } }, { headers: { "Content-Type": "application/json" } });
     }
 }

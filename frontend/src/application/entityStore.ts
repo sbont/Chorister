@@ -89,6 +89,9 @@ export const useEntityStore = <T extends Entity>(name: string, getEndpoint: (api
     }
 
     async function getAllRelated(ref: EntityCollectionRef<T>): Promise<T[]> {
+        if (!ref.uri)
+            throw new Error("URI unknown for related entity");
+
         const fetch = fetchAllRelated(ref.uri);
         if (objByAssociationUri.value.has(ref.uri)) {
             // don't await the response, just eagerly pass the current data and let the fetch complete in the background
@@ -106,7 +109,6 @@ export const useEntityStore = <T extends Entity>(name: string, getEndpoint: (api
 
     async function save(obj: T) {
         const data = isNew(obj) ? await endpoint.create(obj) : await endpoint.update(obj);
-        // putRelated(obj, link);
         return data;
     }
 

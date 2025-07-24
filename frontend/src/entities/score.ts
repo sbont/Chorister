@@ -1,12 +1,12 @@
 import { Key } from "@/types/Key";
 import { Entity, EntityRef } from "./entity";
 import { Song } from "./song";
-import { File } from "./file";
+import { FileInfo } from "./fileInfo";
 
 export interface Score extends Entity {
-    song: EntityRef<Song>;
+    song: EntityRef<Song>,
     description: string | undefined,
     fileUrl: string,
     key: Key | undefined,
-    file: File
+    file?: FileInfo
 }

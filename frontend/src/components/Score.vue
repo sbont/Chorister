@@ -3,7 +3,7 @@
         <div v-if="!editing" class="card score mr-2">
             <header class="card-header">
                 <p class="card-header-title">
-                    <a @click.prevent="openFile" @auxclick.prevent="openFile" @mousedown.middle.prevent="openFile"
+                    <a v-if="score.file?.fileInfoUri" @click.prevent="openFile" @auxclick.prevent="openFile" @mousedown.middle.prevent="openFile"
                         href="#" class="icon-text">
                         <span class="icon">
                             <i class="fas fa-cloud-download-alt"></i>
@@ -12,7 +12,9 @@
                             {{ score.description }}
                         </span>
                     </a>
-
+                    <span v-else>
+                        {{ score.description }}
+                    </span>
                 </p>
             </header>
             <footer class="card-footer">
@@ -125,10 +127,6 @@ const edit = async () => {
 }
 
 const onUpload = async (event: FileUploadUploaderEvent) => {
-    const envelope = await fileStore.getUploadEnvelope(score.value?.file?.id!);
-    if (!envelope?.uploadUrl)
-        return;
-
     const files = event.files as File[];
     if (files.length !== 1) {
         error.value = "Number of selected files is not equal to 1."
@@ -148,7 +146,7 @@ const upload = async (file: File) => {
         console.log(e);
         error.value = (e as AxiosError).message;
     }
-    return envelope.fileId;
+    return envelope.file;
 }
 
 const save = async () => {
@@ -162,19 +160,19 @@ const save = async () => {
     editing.value = false;
     saving.value = true;
 
-    let fileId;
+    let fileInfo;
     if (selectedFile.value) {
-        fileId = await upload(selectedFile.value);
-        if (!fileId) {
+        fileInfo = await upload(selectedFile.value);
+        if (!fileInfo) {
             error.value = "No file ID received."
             return;
         }
     }
 
     const savedScore = await scoreStore.save(draftValues.value as Score)
-    if (fileId) {
-        savedScore.file = { id: fileId };
-        await scoreStore.linkFile(savedScore, fileId);
+    if (fileInfo && wasNew) {
+        savedScore.file = fileInfo;
+        await scoreStore.linkFile(savedScore, fileInfo.id!!);
     }
     score.value = savedScore;
 
@@ -191,17 +189,18 @@ const cancelEdit = () => {
 }
 
 const openFile = async (event: MouseEvent) => {
-    const fileId = score.value.file?.id
-    if (!fileId)
+    const fileUri = score.value.file?.fileInfoUri;
+    if (!fileUri){
         return;
+    }   
 
     try {
-        const location = await fileStore.getFileLocation(fileId);
+        const location = await fileStore.getDownloadUrl(fileUri);
         if (event.button == 1)
             window.open(location, "_blank");
         else {
             const response = await downloadFile(location);
-            const contentType = response.headers['content-type']?.toString() ?? "";
+            const contentType = response.headers["content-type"]?.toString() ?? "";
             console.log(response.headers);
 
             const blob = new Blob([response.data], { type: contentType });

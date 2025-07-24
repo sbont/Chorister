@@ -68,7 +68,7 @@ const removeScore = async (score: Score) => {
             return;
         }
     }
-    scores.value = scores.value.filter(current => current.id !== score.id);
+    scores.value = scores.value.filter(current => current.uri !== score.uri);
 }
 
 </script>

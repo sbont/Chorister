@@ -1,9 +1,10 @@
-import { CacheMap, CacheListMap } from "@/types/CacheMaps";
-import { defineStore } from "pinia";
-import moment from "moment";
-import { submitFile } from "@/services/fileService";
-import { inject, ref } from "vue";
 import { ApiKey } from "@/application/api";
+import { FileInfo } from "@/entities/fileInfo";
+import { submitFile } from "@/services/fileService";
+import { CacheMap } from "@/types/CacheMaps";
+import moment from "moment";
+import { defineStore } from "pinia";
+import { inject, ref } from "vue";
 
 type FileOperation = {
     presignedUrl: string;
@@ -14,7 +15,7 @@ type FileOperation = {
 type Operation = "GET" | "PUT"
 
 export interface UploadReturnEnvelope {
-    fileId: number,
+    file: FileInfo,
     uploadUrl: string,
 }
 
@@ -28,8 +29,10 @@ export const useFiles = defineStore("files", () => {
     async function getUploadEnvelope(id: number | undefined): Promise<UploadReturnEnvelope> {
         if (id) {
             const file = filesById.value.get(id)
-            if (file?.operation == "GET" && file?.expires && file.expires < new Date())
-                return { fileId: id, uploadUrl: file.presignedUrl };
+            if (file?.operation == "GET" && file?.expires && file.expires < new Date()) {
+                const fileUri = api.files.getUri(id);
+                return { file: { id, fileInfoUri: fileUri }, uploadUrl: file.presignedUrl };
+            }
         }
 
         const response = await fetchUploadEnvelope(id)
@@ -46,25 +49,26 @@ export const useFiles = defineStore("files", () => {
             operation: "GET"
         }
         filesById.value.set(response.fileId, file);
-        return { fileId: response.fileId, uploadUrl: file.presignedUrl };
+        const fileUri = api.files.getUri(response.fileId);
+        return { file: { id: response.fileId, fileInfoUri: fileUri }, uploadUrl: file.presignedUrl };
     }
 
-    async function fetchUploadEnvelope(id: number | undefined) {
-        if (id == undefined)
+    async function fetchUploadEnvelope(fileId: number | undefined) {
+        if (fileId == undefined)
             return api.getUploadReturnEnvelope();
         else
-            return api.getUploadReturnEnvelopeForId(id);
+            return api.getUploadReturnEnvelopeForId(fileId);
     }
 
     async function upload(url: string, file: File) {
         return await submitFile(url, file);
     }
-    
-    async function getFileLocation(id: number) {
-        return await api.getFileLocation(id);
+
+    async function getDownloadUrl(fileUri: string) {
+        return await api.getFileLocation(fileUri);
     }
-    
+
     return {
-        getUploadEnvelope, fetchUploadEnvelope, upload, getFileLocation
+        getUploadEnvelope, fetchUploadEnvelope, upload, getDownloadUrl
     }
 });

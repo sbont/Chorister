@@ -22,6 +22,7 @@ export interface Api {
     scores: ScoresApiEndpoint
     events: EventsApiEndpoint
     eventEntries: ApiEndpoint<EventEntry>
+    files: FilesApiEndpoint
 
     // Registration
     register: (choirName: string, userDisplayName: string, email: string, password: string) => Promise<User>
@@ -85,7 +86,7 @@ export interface Api {
     // Files
     getUploadReturnEnvelope: () => Promise<{ fileId: number, uploadUrl: string }>
     getUploadReturnEnvelopeForId: (id: number) => Promise<{ fileId: number, uploadUrl: string }>
-    getFileLocation: (id: number) => Promise<string>
+    getFileLocation: (uri: string) => Promise<string>
 
 
     //     // Generic methods
@@ -99,7 +100,7 @@ export interface Api {
     //     create: <Persistable extends ApiEntity>(path: string, entity: Persistable) => Promise<Entity>
 
     //     createRelated: <Persistable>(uri: string, association: string, entity: Persistable) => Promise<Entity>
-    
+
 }
 
 export interface ApiEndpoint<TEntity extends Entity> {
@@ -123,6 +124,10 @@ export interface ScoresApiEndpoint extends ApiEndpoint<Score> {
 
 export interface EventsApiEndpoint extends ApiEndpoint<Event> {
     putEntries: (eventUri: Uri, entries: Array<EventEntry>) => Promise<void>
+}
+
+export interface FilesApiEndpoint {
+    getUri: (id: number) => Uri
 }
 
 export const ApiKey: InjectionKey<Api> = Symbol("api");
