@@ -3,7 +3,7 @@ import { Entity, EntityRef } from "./entity";
 
 export interface User extends Entity {
     id: number,
-    choir: EntityRef<Choir>,
+    choir?: EntityRef<Choir>,
     email: string,
     username: string,
     displayName: string,

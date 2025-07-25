@@ -6,5 +6,5 @@ export interface Choir extends Entity {
     name: string
     type: string
     inviteToken?: string
-    manager: User | EntityRef
+    manager?: EntityRef<User>
 }

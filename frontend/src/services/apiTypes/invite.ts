@@ -3,7 +3,13 @@ import { Choir, toDomainChoir } from "./choir"
 import { User } from "./user"
 import { Invite as DomainInvite } from "@/entities/invite"
 
-export interface Invite extends Identifiable, ApiEntityIn {
+export interface Invite {
+    email?: string
+    token: string
+    choir: Choir
+}
+
+export interface SingleInvite extends Invite, Identifiable, ApiEntityIn {
     id: number
     email: string
     invitedBy: User

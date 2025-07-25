@@ -29,7 +29,7 @@ import { fromDomainScore, Score, toDomainScore } from "./apiTypes/score";
 import { fromDomainSong, SongIn, SongOut, toDomainSong } from "./apiTypes/song";
 import { fromDomainUser, toDomainUser, User } from "./apiTypes/user";
 import { Uri } from "@/types";
-import { Invite, toDomainInvite } from "@/services/apiTypes/invite";
+import { SingleInvite, toDomainInvite } from "@/services/apiTypes/invite";
 
 const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + "/api";
 
@@ -385,7 +385,7 @@ class InviteEndpoint {
     }
 
     get = async (token: string) => {
-        const response = await this.instance.get<Invite>(`${this.path}?token=${token}`);
+        const response = await this.instance.get<SingleInvite>(`${this.path}?token=${token}`);
         return toDomainInvite(response.data);
     }
 

@@ -1,50 +1,59 @@
 <template>
-    <div class="signup container" v-if="!loading">
-        <section class="mt-6">
-            <h1 class="title has-text-primary">Register as a new user</h1>
-            <h2 class="subtitle has-text-info" v-if="isInvite">joining {{ choir?.name }}</h2>
+    <div class="signup container" v-if="state != State.Loading">
+        <section class="my-6">
+            <h1 class="title has-text-primary" v-if="!isInvite">Sign up to create your choir space</h1>
+            <h1 class="title has-text-primary" v-if="isInvite">Sign up to join {{ choir?.name }}'s space</h1>
+
+            <p v-if="state == State.InviteNotFound">Invite not found. Make sure you entered the correct URL, and check
+                if the invite is still active.</p>
         </section>
 
-        <div class="field">
-            <label class="label">Name</label>
+        <div v-if="state == State.NewRegistration || state == State.InviteLoaded || state == State.Saving">
+            <div class="field">
+                <label class="label">Name</label>
+                <div class="control">
+                    <input class="input" type="text" placeholder="Elvis" v-model="displayName" />
+                </div>
+            </div>
+
+            <div class="field" v-if="!isInvite">
+                <label class="label">Name of your choir</label>
+                <div class="control">
+                    <input class="input" type="text" placeholder="" v-model="choirName" />
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Email</label>
+                <div class="control has-icons-left">
+                    <input class="input" type="email" placeholder="you@" v-model="email" />
+                    <span class="icon is-small is-left">
+                        <i class="fas fa-envelope"></i>
+                    </span>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Password</label>
+                <p class="control has-icons-left">
+                    <input class="input" type="password" placeholder="Super safe password" v-model="password" />
+                    <span class="icon is-small is-left">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                </p>
+            </div>
+
             <div class="control">
-                <input class="input" type="text" placeholder="Elvis" v-model="displayName" />
+                <button class="button is-primary" @click="submit" :class="{ 'is-loading': state == State.Saving }">
+                    Create account
+                </button>
             </div>
         </div>
 
-        <div class="field" v-if="!isInvite">
-            <label class="label">Name of your choir</label>
-            <div class="control">
-                <input class="input" type="text" placeholder="" v-model="choirName" />
-            </div>
-        </div>
+        <div v-if="state == State.Finished" class="has-text-success">Account successfully created. You can now login your username <b>{{ email }}</b> and your password.</div>
 
-        <div class="field">
-            <label class="label">Email</label>
-            <div class="control has-icons-left">
-                <input class="input" type="email" placeholder="you@" v-model="email" />
-                <span class="icon is-small is-left">
-                    <i class="fas fa-envelope"></i>
-                </span>
-            </div>
-        </div>
-
-        <div class="field">
-            <label class="label">Password</label>
-            <p class="control has-icons-left">
-                <input class="input" type="password" placeholder="Super safe password" v-model="password" />
-                <span class="icon is-small is-left">
-                    <i class="fas fa-lock"></i>
-                </span>
-            </p>
-        </div>
-
-        <div class="control">
-            <button class="button is-primary" @click="submit" :class="{ 'is-loading': saving }">Create account</button>
-        </div>
-
-        <div v-if="isSuccess" class="has-text-success">Account created.</div>
-        <div v-if="errorMessage" class="has-text-danger">
+        <div v-if="state == State.Failed" class="has-text-danger">
+            Failed to save user:<br>
             {{ errorMessage }}
         </div>
     </div>
@@ -56,12 +65,21 @@ import { useRoute } from "vue-router";
 import { Choir } from "@/entities/choir";
 import { ApiKey } from "@/application/api";
 
+enum State {
+    Loading,
+    InviteNotFound,
+    InviteLoaded,
+    NewRegistration,
+    Saving,
+    Finished,
+    Failed
+}
+
 // State
 const route = useRoute();
 const api = inject(ApiKey)!;
 
-const loading = ref(true);
-const saving = ref(false);
+const state = ref<State>(State.Loading);
 const token = route.query.invite as string;
 const isInvite = !!token;
 const displayName = ref<string>();
@@ -70,7 +88,6 @@ const password = ref<string>();
 const choirName = ref<string>();
 
 const choir = ref<Choir>();
-const isSuccess = ref<boolean>();
 const errorMessage = ref<string>();
 
 onMounted(() => {
@@ -79,14 +96,16 @@ onMounted(() => {
             .then((invite) => {
                 email.value = invite.email;
                 choir.value = invite.choir;
-                loading.value = false;
+                state.value = State.InviteLoaded;
             })
             .catch((error) => {
+                console.log(error);
+                
                 errorMessage.value = "Failed to find invitation";
-                loading.value = false;
+                state.value = State.InviteNotFound;
             });
     } else {
-        loading.value = false;
+        state.value = State.NewRegistration;
     }
 });
 
@@ -108,7 +127,7 @@ const submit = () => {
         return;
     }
 
-    saving.value = true;
+    state.value = State.Saving;
     errorMessage.value = undefined;
     let promise;
     if (isInvite) promise = api.acceptInvite(token, displayName.value, email.value, password.value);
@@ -116,12 +135,12 @@ const submit = () => {
     promise
         .then((response) => {
             console.log(response);
-            isSuccess.value = true;
+            state.value = State.Finished;
         })
         .catch((error) => {
             errorMessage.value =
                 error.response.data.message ?? "Error while sending request: " + error.response.statusText;
-        })
-        .finally(() => (saving.value = false));
+                State.Failed;
+        });
 };
 </script>

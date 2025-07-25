@@ -12,7 +12,6 @@ import nl.stevenbontenbal.chorister.domain.events.EventEntry
 import nl.stevenbontenbal.chorister.domain.songs.*
 import nl.stevenbontenbal.chorister.domain.users.*
 import nl.stevenbontenbal.chorister.persistence.ChoirAwareDataSource
-import nl.stevenbontenbal.chorister.persistence.CurrentChoirRepository
 import org.modelmapper.ModelMapper
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource
@@ -133,7 +132,6 @@ class ChoristerConfiguration(
         inviteRepository: IInviteRepository,
         userAuthorizationService: IUserAuthorizationService,
         categorisationService: CategorisationService,
-        currentChoirRepository: CurrentChoirRepository,
         userService: UserService
     ): RegistrationService = RegistrationService(
         userRepository,
@@ -141,7 +139,6 @@ class ChoristerConfiguration(
         inviteRepository,
         userAuthorizationService,
         categorisationService,
-        currentChoirRepository,
         userService
     )
 

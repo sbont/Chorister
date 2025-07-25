@@ -14,7 +14,6 @@ open class RegistrationService(
     private val inviteRepository: IInviteRepository,
     private val authorizationService: IUserAuthorizationService,
     private val categorisationService: CategorisationService,
-    private val currentChoirRepository: ICurrentChoirRepository,
     private val userService: UserService
 ) {
     @Transactional
@@ -110,7 +109,6 @@ open class RegistrationService(
     private fun addInviteeToChoir(user: User, invite: Invite) {
         val choir = invite.choir!!
         userService.addUserToChoir(user, choir)
-        currentChoirRepository.setCurrentChoir(choir)
         invite.user = user
         invite.acceptedDate = LocalDateTime.now()
         inviteRepository.save(invite)
@@ -125,7 +123,8 @@ open class RegistrationService(
 
     private fun registerChoir(registrationRequest: NewChoirRegistrationRequest, user: User): Choir {
         val choir = createChoir(registrationRequest, user)
-        currentChoirRepository.insertAsCurrentChoir(choir)
+        choirRepository.save(choir)
+        authorizationService.createRolesForTenant(choir.id!!)
         return choir
     }
 
