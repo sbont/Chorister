@@ -1,846 +1,846 @@
 databaseChangeLog:
-- changeSet:
-    id: 1689428242005-1
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: categoryPK
-            name: id
-            type: BIGINT
-        - column:
-            name: name
-            type: VARCHAR(255)
-        - column:
-            name: type
-            type: CHAR(1)
-        - column:
-            name: choir_id
-            type: BIGINT
-        tableName: category
-- changeSet:
-    id: 1689428242005-2
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: choirPK
-            name: id
-            type: BIGINT
-        - column:
-            name: invite_token
-            type: VARCHAR(255)
-        - column:
-            name: name
-            type: VARCHAR(255)
-        - column:
-            name: type
-            type: VARCHAR(255)
-        - column:
-            name: manager_id
-            type: BIGINT
-        tableName: choir
-- changeSet:
-    id: 1689428242005-3
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: chorister_userPK
-            name: id
-            type: BIGINT
-        - column:
-            name: display_name
-            type: VARCHAR(255)
-        - column:
-            name: email
-            type: VARCHAR(255)
-        - column:
-            name: username
-            type: VARCHAR(255)
-        - column:
-            name: zitadel_id
-            type: VARCHAR(255)
-        - column:
-            name: choir_id
-            type: BIGINT
-        tableName: chorister_user
-- changeSet:
-    id: 1689428242005-4
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: invitePK
-            name: id
-            type: BIGINT
-        - column:
-            name: accepted_date
-            type: TIMESTAMP(6) WITHOUT TIME ZONE
-        - column:
-            name: created_date
-            type: TIMESTAMP(6) WITHOUT TIME ZONE
-        - column:
-            name: email
-            type: VARCHAR(255)
-        - column:
-            constraints:
-              nullable: false
-            name: expired
-            type: BOOLEAN
-        - column:
-            name: token
-            type: VARCHAR(255)
-        - column:
-            name: choir_id
-            type: BIGINT
-        - column:
-            name: invited_by_id
-            type: BIGINT
-        - column:
-            name: user_id
-            type: BIGINT
-        tableName: invite
-- changeSet:
-    id: 1689428242005-5
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: registrationPK
-            name: id
-            type: BIGINT
-        - column:
-            name: choir_name
-            type: VARCHAR(255)
-        - column:
-            name: choir_type
-            type: VARCHAR(255)
-        - column:
-            name: display_name
-            type: VARCHAR(255)
-        - column:
-            name: email
-            type: VARCHAR(255)
-        - column:
-            name: registration_uuid
-            type: UUID
-        - column:
-            name: username
-            type: VARCHAR(255)
-        - column:
-            name: choir_id
-            type: BIGINT
-        - column:
-            name: user_id
-            type: BIGINT
-        tableName: registration
-- changeSet:
-    id: 1689428242005-6
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: scorePK
-            name: id
-            type: BIGINT
-        - column:
-            name: description
-            type: VARCHAR(255)
-        - column:
-            name: file_url
-            type: VARCHAR(255)
-        - column:
-            name: song_id
-            type: BIGINT
-        tableName: score
-- changeSet:
-    id: 1689428242005-7
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: setlistPK
-            name: id
-            type: BIGINT
-        - column:
-            name: date
-            type: date
-        - column:
-            name: name
-            type: VARCHAR(255)
-        - column:
-            name: choir_id
-            type: BIGINT
-        tableName: setlist
-- changeSet:
-    id: 1689428242005-8
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            constraints:
-              nullable: false
-            name: number
-            type: INTEGER
-        - column:
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: setlist_entryPK
-            name: setlist_id
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: setlist_entryPK
-            name: song_id
-            type: BIGINT
-        tableName: setlist_entry
-- changeSet:
-    id: 1689428242005-9
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: songPK
-            name: id
-            type: BIGINT
-        - column:
-            name: added_at
-            type: TIMESTAMP(6) WITHOUT TIME ZONE
-        - column:
-            name: composer
-            type: VARCHAR(255)
-        - column:
-            name: recording_url
-            type: VARCHAR(255)
-        - column:
-            name: score_url
-            type: VARCHAR(255)
-        - column:
-            name: slug
-            type: VARCHAR(255)
-        - column:
-            name: songbook_number
-            type: INTEGER
-        - column:
-            name: text
-            type: VARCHAR(32000)
-        - column:
-            name: title
-            type: VARCHAR(255)
-        - column:
-            name: added_by_id
-            type: BIGINT
-        - column:
-            name: choir_id
-            type: BIGINT
-        - column:
-            name: songbook_id
-            type: BIGINT
-        tableName: song
-- changeSet:
-    id: 1689428242005-10
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            constraints:
-              nullable: false
-            name: song_id
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: category_id
-            type: BIGINT
-        tableName: song_category
-- changeSet:
-    id: 1689428242005-11
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: songbookPK
-            name: id
-            type: BIGINT
-        - column:
-            name: title
-            type: VARCHAR(255)
-        tableName: songbook
-- changeSet:
-    id: 1689428242005-12
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: user_id
-        baseTableName: invite
-        constraintName: FK1qd94red8k5pjti2o787votx5
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: chorister_user
-        validate: true
-- changeSet:
-    id: 1689428242005-13
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: manager_id
-        baseTableName: choir
-        constraintName: FK4codi2nt3ogslescnhoc9chw4
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: chorister_user
-        validate: true
-- changeSet:
-    id: 1689428242005-14
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: invited_by_id
-        baseTableName: invite
-        constraintName: FK4s6cjqvvr5nl74670iy06xrb8
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: chorister_user
-        validate: true
-- changeSet:
-    id: 1689428242005-15
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: user_id
-        baseTableName: registration
-        constraintName: FK55vnfdl5t5fbv55kabqrjyxa0
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: chorister_user
-        validate: true
-- changeSet:
-    id: 1689428242005-16
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: song_id
-        baseTableName: score
-        constraintName: FK59e4hijvjq6p1nb5708rgiyd4
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: song
-        validate: true
-- changeSet:
-    id: 1689428242005-17
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: song_id
-        baseTableName: song_category
-        constraintName: FK5nbpf87jlbfsw5jft5ltkkob4
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: song
-        validate: true
-- changeSet:
-    id: 1689428242005-18
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: choir_id
-        baseTableName: song
-        constraintName: FK6ncctoirxhvq2f6yb9g69acae
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: choir
-        validate: true
-- changeSet:
-    id: 1689428242005-19
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: choir_id
-        baseTableName: setlist
-        constraintName: FK7q31nna27f76r8gd1c6m8yf83
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: choir
-        validate: true
-- changeSet:
-    id: 1689428242005-20
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: songbook_id
-        baseTableName: song
-        constraintName: FKbe6q3aeqocwlulft6id5ijbdi
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: songbook
-        validate: true
-- changeSet:
-    id: 1689428242005-21
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: category_id
-        baseTableName: song_category
-        constraintName: FKhekaoilgunoajdf3310ai5yk3
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: category
-        validate: true
-- changeSet:
-    id: 1689428242005-22
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: song_id
-        baseTableName: setlist_entry
-        constraintName: FKhruk0cy5p7w9gqopby40lrbnj
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: song
-        validate: true
-- changeSet:
-    id: 1689428242005-23
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: choir_id
-        baseTableName: category
-        constraintName: FKivi48kr6t52rcc3aefusfgeh4
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: choir
-        validate: true
-- changeSet:
-    id: 1689428242005-24
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: choir_id
-        baseTableName: invite
-        constraintName: FKmgy52xeqnduacucrdarsu02qe
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: choir
-        validate: true
-- changeSet:
-    id: 1689428242005-25
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: choir_id
-        baseTableName: chorister_user
-        constraintName: FKn0yblvs09x0mpchilgytsorg5
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: choir
-        validate: true
-- changeSet:
-    id: 1689428242005-26
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: choir_id
-        baseTableName: registration
-        constraintName: FKogmtigo559vwvrc2tme7ydctf
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: choir
-        validate: true
-- changeSet:
-    id: 1689428242005-27
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: added_by_id
-        baseTableName: song
-        constraintName: FKt28ovxcyr2ve3wm7lgodh276h
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: chorister_user
-        validate: true
-- changeSet:
-    id: 1689428242005-28
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: setlist_id
-        baseTableName: setlist_entry
-        constraintName: FKtcv572md6w1pgevxh1w27tdn5
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: setlist
-        validate: true
-- changeSet:
-    id: 1714734695027-3
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            constraints:
-              nullable: false
-            name: dtype
-            type: VARCHAR(31)
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: notationPK
-            name: id
-            type: BIGINT
-        - column:
-            name: description
-            type: VARCHAR(255)
-        - column:
-            name: key
-            type: SMALLINT
-        - column:
-            name: file_url
-            type: VARCHAR(255)
-        - column:
-            name: chords
-            type: VARCHAR(30000)
-        - column:
-            name: choir_id
-            type: BIGINT
-        - column:
-            name: song_id
-            type: BIGINT
-        tableName: notation
-- changeSet:
-    id: 1714734695027-5
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: song_id
-        baseTableName: notation
-        constraintName: FKegee4xyjhewbqvhp0afl4noj2
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: song
-        validate: true
-- changeSet:
-    id: 1714734695027-6
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: choir_id
-        baseTableName: notation
-        constraintName: FKodvho2hmoia9xtfpmmvq1a1qr
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: choir
-        validate: true
-- changeSet:
-    id: 1714734695027-7
-    author: Steven.Bontenbal (generated)
-    changes:
-    - dropForeignKeyConstraint:
-        baseTableName: score
-        constraintName: FK59e4hijvjq6p1nb5708rgiyd4
-- changeSet:
-    id: 1714734695027-9
-    author: Steven.Bontenbal (generated)
-    changes:
-    - dropTable:
-        tableName: score
+  - changeSet:
+      id: 1689428242005-1
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: categoryPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: type
+                  type: CHAR(1)
+              - column:
+                  name: choir_id
+                  type: BIGINT
+            tableName: category
+  - changeSet:
+      id: 1689428242005-2
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: choirPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: invite_token
+                  type: VARCHAR(255)
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: type
+                  type: VARCHAR(255)
+              - column:
+                  name: manager_id
+                  type: BIGINT
+            tableName: choir
+  - changeSet:
+      id: 1689428242005-3
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: chorister_userPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: display_name
+                  type: VARCHAR(255)
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: username
+                  type: VARCHAR(255)
+              - column:
+                  name: zitadel_id
+                  type: VARCHAR(255)
+              - column:
+                  name: choir_id
+                  type: BIGINT
+            tableName: chorister_user
+  - changeSet:
+      id: 1689428242005-4
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: invitePK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: accepted_date
+                  type: TIMESTAMP(6) WITHOUT TIME ZONE
+              - column:
+                  name: created_date
+                  type: TIMESTAMP(6) WITHOUT TIME ZONE
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: expired
+                  type: BOOLEAN
+              - column:
+                  name: token
+                  type: VARCHAR(255)
+              - column:
+                  name: choir_id
+                  type: BIGINT
+              - column:
+                  name: invited_by_id
+                  type: BIGINT
+              - column:
+                  name: user_id
+                  type: BIGINT
+            tableName: invite
+  - changeSet:
+      id: 1689428242005-5
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: registrationPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: choir_name
+                  type: VARCHAR(255)
+              - column:
+                  name: choir_type
+                  type: VARCHAR(255)
+              - column:
+                  name: display_name
+                  type: VARCHAR(255)
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: registration_uuid
+                  type: UUID
+              - column:
+                  name: username
+                  type: VARCHAR(255)
+              - column:
+                  name: choir_id
+                  type: BIGINT
+              - column:
+                  name: user_id
+                  type: BIGINT
+            tableName: registration
+  - changeSet:
+      id: 1689428242005-6
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: scorePK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+              - column:
+                  name: file_url
+                  type: VARCHAR(255)
+              - column:
+                  name: song_id
+                  type: BIGINT
+            tableName: score
+  - changeSet:
+      id: 1689428242005-7
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: setlistPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: date
+                  type: date
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: choir_id
+                  type: BIGINT
+            tableName: setlist
+  - changeSet:
+      id: 1689428242005-8
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: number
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: setlist_entryPK
+                  name: setlist_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: setlist_entryPK
+                  name: song_id
+                  type: BIGINT
+            tableName: setlist_entry
+  - changeSet:
+      id: 1689428242005-9
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: songPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: added_at
+                  type: TIMESTAMP(6) WITHOUT TIME ZONE
+              - column:
+                  name: composer
+                  type: VARCHAR(255)
+              - column:
+                  name: recording_url
+                  type: VARCHAR(255)
+              - column:
+                  name: score_url
+                  type: VARCHAR(255)
+              - column:
+                  name: slug
+                  type: VARCHAR(255)
+              - column:
+                  name: songbook_number
+                  type: INTEGER
+              - column:
+                  name: text
+                  type: VARCHAR(32000)
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: added_by_id
+                  type: BIGINT
+              - column:
+                  name: choir_id
+                  type: BIGINT
+              - column:
+                  name: songbook_id
+                  type: BIGINT
+            tableName: song
+  - changeSet:
+      id: 1689428242005-10
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: song_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: category_id
+                  type: BIGINT
+            tableName: song_category
+  - changeSet:
+      id: 1689428242005-11
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: songbookPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+            tableName: songbook
+  - changeSet:
+      id: 1689428242005-12
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: invite
+            constraintName: FK1qd94red8k5pjti2o787votx5
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: chorister_user
+            validate: true
+  - changeSet:
+      id: 1689428242005-13
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: manager_id
+            baseTableName: choir
+            constraintName: FK4codi2nt3ogslescnhoc9chw4
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: chorister_user
+            validate: true
+  - changeSet:
+      id: 1689428242005-14
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: invited_by_id
+            baseTableName: invite
+            constraintName: FK4s6cjqvvr5nl74670iy06xrb8
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: chorister_user
+            validate: true
+  - changeSet:
+      id: 1689428242005-15
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: registration
+            constraintName: FK55vnfdl5t5fbv55kabqrjyxa0
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: chorister_user
+            validate: true
+  - changeSet:
+      id: 1689428242005-16
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: song_id
+            baseTableName: score
+            constraintName: FK59e4hijvjq6p1nb5708rgiyd4
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: song
+            validate: true
+  - changeSet:
+      id: 1689428242005-17
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: song_id
+            baseTableName: song_category
+            constraintName: FK5nbpf87jlbfsw5jft5ltkkob4
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: song
+            validate: true
+  - changeSet:
+      id: 1689428242005-18
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: choir_id
+            baseTableName: song
+            constraintName: FK6ncctoirxhvq2f6yb9g69acae
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: choir
+            validate: true
+  - changeSet:
+      id: 1689428242005-19
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: choir_id
+            baseTableName: setlist
+            constraintName: FK7q31nna27f76r8gd1c6m8yf83
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: choir
+            validate: true
+  - changeSet:
+      id: 1689428242005-20
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: songbook_id
+            baseTableName: song
+            constraintName: FKbe6q3aeqocwlulft6id5ijbdi
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: songbook
+            validate: true
+  - changeSet:
+      id: 1689428242005-21
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: song_category
+            constraintName: FKhekaoilgunoajdf3310ai5yk3
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: category
+            validate: true
+  - changeSet:
+      id: 1689428242005-22
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: song_id
+            baseTableName: setlist_entry
+            constraintName: FKhruk0cy5p7w9gqopby40lrbnj
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: song
+            validate: true
+  - changeSet:
+      id: 1689428242005-23
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: choir_id
+            baseTableName: category
+            constraintName: FKivi48kr6t52rcc3aefusfgeh4
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: choir
+            validate: true
+  - changeSet:
+      id: 1689428242005-24
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: choir_id
+            baseTableName: invite
+            constraintName: FKmgy52xeqnduacucrdarsu02qe
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: choir
+            validate: true
+  - changeSet:
+      id: 1689428242005-25
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: choir_id
+            baseTableName: chorister_user
+            constraintName: FKn0yblvs09x0mpchilgytsorg5
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: choir
+            validate: true
+  - changeSet:
+      id: 1689428242005-26
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: choir_id
+            baseTableName: registration
+            constraintName: FKogmtigo559vwvrc2tme7ydctf
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: choir
+            validate: true
+  - changeSet:
+      id: 1689428242005-27
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: added_by_id
+            baseTableName: song
+            constraintName: FKt28ovxcyr2ve3wm7lgodh276h
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: chorister_user
+            validate: true
+  - changeSet:
+      id: 1689428242005-28
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: setlist_id
+            baseTableName: setlist_entry
+            constraintName: FKtcv572md6w1pgevxh1w27tdn5
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: setlist
+            validate: true
+  - changeSet:
+      id: 1714734695027-3
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: dtype
+                  type: VARCHAR(31)
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: notationPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+              - column:
+                  name: key
+                  type: SMALLINT
+              - column:
+                  name: file_url
+                  type: VARCHAR(255)
+              - column:
+                  name: chords
+                  type: VARCHAR(30000)
+              - column:
+                  name: choir_id
+                  type: BIGINT
+              - column:
+                  name: song_id
+                  type: BIGINT
+            tableName: notation
+  - changeSet:
+      id: 1714734695027-5
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: song_id
+            baseTableName: notation
+            constraintName: FKegee4xyjhewbqvhp0afl4noj2
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: song
+            validate: true
+  - changeSet:
+      id: 1714734695027-6
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: choir_id
+            baseTableName: notation
+            constraintName: FKodvho2hmoia9xtfpmmvq1a1qr
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: choir
+            validate: true
+  - changeSet:
+      id: 1714734695027-7
+      author: Steven.Bontenbal (generated)
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: score
+            constraintName: FK59e4hijvjq6p1nb5708rgiyd4
+  - changeSet:
+      id: 1714734695027-9
+      author: Steven.Bontenbal (generated)
+      changes:
+        - dropTable:
+            tableName: score
 
-- changeSet:
-    id: 1729343815383-3
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: filePK
-            name: id
-            type: BIGINT
-        - column:
-            name: s3key
-            type: VARCHAR(255)
-        - column:
-            name: choir_id
-            type: BIGINT
-        tableName: file
-- changeSet:
-    id: 1729343815383-4
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addColumn:
-        columns:
-        - column:
-            name: file_id
-            type: bigint
-        tableName: notation
-- changeSet:
-    id: 1729343815383-5
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: choir_id
-        baseTableName: file
-        constraintName: FK4q7pwifi0vherpvyboto1ymn1
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: choir
-        validate: true
-- changeSet:
-    id: 1729343815383-6
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: file_id
-        baseTableName: notation
-        constraintName: FKlolhxms5ebp7pv0852hv4v3gy
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: file
-        validate: true
+  - changeSet:
+      id: 1729343815383-3
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: filePK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: s3key
+                  type: VARCHAR(255)
+              - column:
+                  name: choir_id
+                  type: BIGINT
+            tableName: file
+  - changeSet:
+      id: 1729343815383-4
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: file_id
+                  type: bigint
+            tableName: notation
+  - changeSet:
+      id: 1729343815383-5
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: choir_id
+            baseTableName: file
+            constraintName: FK4q7pwifi0vherpvyboto1ymn1
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: choir
+            validate: true
+  - changeSet:
+      id: 1729343815383-6
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: file_id
+            baseTableName: notation
+            constraintName: FKlolhxms5ebp7pv0852hv4v3gy
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: file
+            validate: true
 
-- changeSet:
-    id: 1731670263026-3
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: eventPK
-            name: id
-            type: BIGINT
-        - column:
-            name: date
-            type: date
-        - column:
-            name: name
-            type: VARCHAR(255)
-        - column:
-            name: choir_id
-            type: BIGINT
-        tableName: event
-- changeSet:
-    id: 1731670263026-4
-    author: Steven.Bontenbal (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: event_entryPK
-            name: id
-            type: BIGINT
-        - column:
-            name: label
-            type: VARCHAR(255)
-        - column:
-            constraints:
-              nullable: false
-            name: sequence
-            type: INTEGER
-        - column:
-            name: event_id
-            type: BIGINT
-        - column:
-            name: song_id
-            type: BIGINT
-        tableName: event_entry
-- changeSet:
-    id: 1731670263026-5
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: song_id
-        baseTableName: event_entry
-        constraintName: FKe919fp3phfkslni1htthyw3tb
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: song
-        validate: true
-- changeSet:
-    id: 1731670263026-6
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: choir_id
-        baseTableName: event
-        constraintName: FKssop2edix9n99dfo0ry3ps08i
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: choir
-        validate: true
-- changeSet:
-    id: 1731670263026-7
-    author: Steven.Bontenbal (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: event_id
-        baseTableName: event_entry
-        constraintName: FKvqhkxe3llc057a3bipl5vwx9
-        deferrable: false
-        initiallyDeferred: false
-        referencedColumnNames: id
-        referencedTableName: event
-        validate: true
-- changeSet:
-    id: 1731670263026-8
-    author: Steven.Bontenbal (generated)
-    changes:
-    - dropForeignKeyConstraint:
-        baseTableName: setlist
-        constraintName: FK7q31nna27f76r8gd1c6m8yf83
-- changeSet:
-    id: 1731670263026-9
-    author: Steven.Bontenbal (generated)
-    changes:
-    - dropForeignKeyConstraint:
-        baseTableName: setlist_entry
-        constraintName: FKhruk0cy5p7w9gqopby40lrbnj
-- changeSet:
-    id: 1731670263026-10
-    author: Steven.Bontenbal (generated)
-    changes:
-    - dropForeignKeyConstraint:
-        baseTableName: setlist_entry
-        constraintName: FKtcv572md6w1pgevxh1w27tdn5
-- changeSet:
-    id: 1731670263026-12
-    author: Steven.Bontenbal (generated)
-    changes:
-    - dropTable:
-        tableName: setlist
-- changeSet:
-    id: 1731670263026-13
-    author: Steven.Bontenbal (generated)
-    changes:
-    - dropTable:
-        tableName: setlist_entry
-- changeSet:
-    id: enable-rls
-    author: Steven.Bontenbal
-    changes:
-    - sql:
-        sql: >-
-          ALTER TABLE choir ENABLE ROW LEVEL SECURITY;
-          DROP POLICY IF EXISTS choir_security ON choir;
-          CREATE POLICY choir_security ON choir
-          USING (current_setting('app.current_choir_id') = '' OR id::VARCHAR = current_setting('app.current_choir_id'));
-
-          ALTER TABLE category ENABLE ROW LEVEL SECURITY;
-          DROP POLICY IF EXISTS category_choir_security ON category;
-          CREATE POLICY category_choir_security ON category
-          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
-          
-          ALTER TABLE event ENABLE ROW LEVEL SECURITY;
-          DROP POLICY IF EXISTS event_choir_security ON event;
-          CREATE POLICY event_choir_security ON event
-          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
-          
-          ALTER TABLE file ENABLE ROW LEVEL SECURITY;
-          DROP POLICY IF EXISTS file_choir_security ON file;
-          CREATE POLICY file_choir_security ON file
-          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
-          
-          ALTER TABLE invite ENABLE ROW LEVEL SECURITY;
-          DROP POLICY IF EXISTS invite_choir_security ON invite;
-          CREATE POLICY invite_choir_security ON invite
-          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
-          
-          ALTER TABLE notation ENABLE ROW LEVEL SECURITY;
-          DROP POLICY IF EXISTS notation_choir_security ON notation;
-          CREATE POLICY notation_choir_security ON notation
-          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
-          
-          ALTER TABLE registration ENABLE ROW LEVEL SECURITY;
-          DROP POLICY IF EXISTS registration_choir_security ON registration;
-          CREATE POLICY registration_choir_security ON registration
-          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
-          
-          ALTER TABLE song ENABLE ROW LEVEL SECURITY;
-          DROP POLICY IF EXISTS song_choir_security ON song;
-          CREATE POLICY song_choir_security ON song
-          USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
+  - changeSet:
+      id: 1731670263026-3
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: eventPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: date
+                  type: date
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: choir_id
+                  type: BIGINT
+            tableName: event
+  - changeSet:
+      id: 1731670263026-4
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: event_entryPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: label
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: sequence
+                  type: INTEGER
+              - column:
+                  name: event_id
+                  type: BIGINT
+              - column:
+                  name: song_id
+                  type: BIGINT
+            tableName: event_entry
+  - changeSet:
+      id: 1731670263026-5
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: song_id
+            baseTableName: event_entry
+            constraintName: FKe919fp3phfkslni1htthyw3tb
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: song
+            validate: true
+  - changeSet:
+      id: 1731670263026-6
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: choir_id
+            baseTableName: event
+            constraintName: FKssop2edix9n99dfo0ry3ps08i
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: choir
+            validate: true
+  - changeSet:
+      id: 1731670263026-7
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: event_id
+            baseTableName: event_entry
+            constraintName: FKvqhkxe3llc057a3bipl5vwx9
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: event
+            validate: true
+  - changeSet:
+      id: 1731670263026-8
+      author: Steven.Bontenbal (generated)
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: setlist
+            constraintName: FK7q31nna27f76r8gd1c6m8yf83
+  - changeSet:
+      id: 1731670263026-9
+      author: Steven.Bontenbal (generated)
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: setlist_entry
+            constraintName: FKhruk0cy5p7w9gqopby40lrbnj
+  - changeSet:
+      id: 1731670263026-10
+      author: Steven.Bontenbal (generated)
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: setlist_entry
+            constraintName: FKtcv572md6w1pgevxh1w27tdn5
+  - changeSet:
+      id: 1731670263026-12
+      author: Steven.Bontenbal (generated)
+      changes:
+        - dropTable:
+            tableName: setlist
+  - changeSet:
+      id: 1731670263026-13
+      author: Steven.Bontenbal (generated)
+      changes:
+        - dropTable:
+            tableName: setlist_entry
+  - changeSet:
+      id: enable-rls
+      author: Steven.Bontenbal
+      changes:
+        - sql:
+            sql: >-
+              ALTER TABLE choir ENABLE ROW LEVEL SECURITY;
+              DROP POLICY IF EXISTS choir_security ON choir;
+              CREATE POLICY choir_security ON choir
+              USING (current_setting('app.current_choir_id') = '' OR id::VARCHAR = current_setting('app.current_choir_id'));
+              
+              ALTER TABLE category ENABLE ROW LEVEL SECURITY;
+              DROP POLICY IF EXISTS category_choir_security ON category;
+              CREATE POLICY category_choir_security ON category
+              USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
+              
+              ALTER TABLE event ENABLE ROW LEVEL SECURITY;
+              DROP POLICY IF EXISTS event_choir_security ON event;
+              CREATE POLICY event_choir_security ON event
+              USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
+              
+              ALTER TABLE file ENABLE ROW LEVEL SECURITY;
+              DROP POLICY IF EXISTS file_choir_security ON file;
+              CREATE POLICY file_choir_security ON file
+              USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
+              
+              ALTER TABLE invite ENABLE ROW LEVEL SECURITY;
+              DROP POLICY IF EXISTS invite_choir_security ON invite;
+              CREATE POLICY invite_choir_security ON invite
+              USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
+              
+              ALTER TABLE notation ENABLE ROW LEVEL SECURITY;
+              DROP POLICY IF EXISTS notation_choir_security ON notation;
+              CREATE POLICY notation_choir_security ON notation
+              USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
+              
+              ALTER TABLE registration ENABLE ROW LEVEL SECURITY;
+              DROP POLICY IF EXISTS registration_choir_security ON registration;
+              CREATE POLICY registration_choir_security ON registration
+              USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
+              
+              ALTER TABLE song ENABLE ROW LEVEL SECURITY;
+              DROP POLICY IF EXISTS song_choir_security ON song;
+              CREATE POLICY song_choir_security ON song
+              USING (choir_id::VARCHAR = current_setting('app.current_choir_id'));
