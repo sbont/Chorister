@@ -28,6 +28,7 @@ export interface EventEntry extends Identifiable {
 
 export interface EventEntryIn extends EventEntry, ApiEntityWith<SongLink & EventLink>, WithEmbedded<"song", SongIn> {
     event: Event,
+    song?: SongIn
 }
 
 export interface EventEntryOut extends EventEntry {
@@ -61,11 +62,18 @@ export function fromDomainEvent(event: DomainEvent): EventOut {
     };
 }
 
-export function toDomainEventEntry(apiEntry: EventEntryIn): DomainEventEntry {
-    const song = apiEntry._embedded?.song == null ? undefined : {
-        uri: untemplated(apiEntry._links!.song),
-        resolved: apiEntry._embedded.song ? toDomainSong(apiEntry._embedded.song) : undefined
+function toRef(link: Link, song?: SongIn) {
+    if (!song)
+        return undefined;
+
+    return {
+        uri: untemplated(link),
+        resolved: toDomainSong(song)
     };
+}
+
+export function toDomainEventEntry(apiEntry: EventEntryIn): DomainEventEntry {
+    const song = toRef(apiEntry._links!.song, apiEntry._embedded?.song) ?? toRef(apiEntry._links!.song, apiEntry.song)
     return {
         ...toDomain(apiEntry),
         song,
