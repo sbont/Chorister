@@ -1,13 +1,9 @@
 package nl.stevenbontenbal.chorister.domain.users
 
 import nl.stevenbontenbal.chorister.domain.InvalidIdentifierException
-import org.springframework.context.annotation.DependsOn
-import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 
 @Component
-@Lazy
-@DependsOn("accessPermissionEvaluator")
 class UserService(private val userRepository: IUserRepository, private val authService: IUserAuthorizationService) {
     fun getCurrentUser(): User {
         val userId = authService.getExternalUserId()

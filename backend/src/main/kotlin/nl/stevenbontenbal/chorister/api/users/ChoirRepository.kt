@@ -7,6 +7,4 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource
 
 @Primary
 @RepositoryRestResource
-interface ChoirRepository : CrudRepository<Choir, Long> {
-    fun findByName(name: String): Choir?
-}
+interface ChoirRepository : CrudRepository<Choir, Long>
