@@ -22,7 +22,7 @@
 
         <div id="navbarBasicExample" class="navbar-menu">
             <div v-if="isLoggedIn" class="navbar-start">
-                <router-link to="/planning" class="navbar-item">Planning</router-link>
+                <router-link to="/planning/upcoming" class="navbar-item">Planning</router-link>
                 <router-link to="/repertoire" class="navbar-item">Repertoire</router-link>
                 <router-link to="/mychoir" class="navbar-item">My Choir</router-link>
             </div>

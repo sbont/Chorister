@@ -7,7 +7,7 @@ const routes = [
         name: 'Landing',
         meta: {
             hideHeader: true,
-            forwardWhenAuthenticated: '/repertoire'
+            forwardWhenAuthenticated: '/planning/upcoming'
         },
         component: () => import('../components/Landing.vue'),
     },
@@ -86,6 +86,14 @@ const routes = [
                     requiresAuth: true
                 }
             },
+            {
+                path: 'upcoming',
+                name: ' Upcoming event',
+                component: () => import('../components/Upcoming.vue'),
+                meta: {
+                    requiresAuth: true
+                }
+            }
         ],
         meta: {
             requiresAuth: true

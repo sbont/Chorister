@@ -26,12 +26,16 @@ export const useEvents = defineStore('events', () => {
     const allEvents = computed(() => [...events.value.values()]);
     const futureEvents = computed(() => {
         const today = new Date();
-        return [...events.value.values()].filter(e => new Date(e.date) >= today);
+        return [...events.value.values()]
+            .filter(e => new Date(e.date) >= today)
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     });
 
     const pastEvents = computed(() => {
         const today = new Date();
-        return [...events.value.values()].filter(e => new Date(e.date) < today);
+        return [...events.value.values()]
+            .filter(e => new Date(e.date) < today)
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     });
 
     const getEntries = computed(() => (eventUri: Uri) => entriesByEventUri.value.get(eventUri) ?? []);
