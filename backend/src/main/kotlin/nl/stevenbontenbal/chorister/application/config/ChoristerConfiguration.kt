@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.core.Ordered
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration
+import org.springframework.data.rest.core.mapping.RepositoryDetectionStrategy
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer
 import org.springframework.data.rest.webmvc.mapping.LinkCollector
 import org.springframework.http.HttpMethod
@@ -97,6 +98,8 @@ class ChoristerConfiguration(
                 configuration.exposeIdsFor(User::class.java)
                 configuration.exposeIdsFor(Invite::class.java)
                 configuration.exposeIdsFor(File::class.java)
+                configuration.repositoryDetectionStrategy = RepositoryDetectionStrategy.RepositoryDetectionStrategies.ANNOTATED
+
                 corsRegistry.addMapping("/api/**")
                     .allowedMethods("*")
                     .allowedOrigins(properties.baseUrl)
