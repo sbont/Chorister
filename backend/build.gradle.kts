@@ -86,9 +86,9 @@ dependencies {
 
     liquibaseRuntime("info.picocli:picocli:4.7.3")
     liquibaseRuntime("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
-    liquibaseRuntime("org.liquibase:liquibase-core:4.20.0")
-    liquibaseRuntime("org.liquibase:liquibase-groovy-dsl:3.0.3")
-    liquibaseRuntime("org.liquibase.ext:liquibase-hibernate6:4.23.0")
+    liquibaseRuntime("org.liquibase:liquibase-core:4.33.0")
+    liquibaseRuntime("org.liquibase:liquibase-groovy-dsl:4.0.1")
+    liquibaseRuntime("org.liquibase.ext:liquibase-hibernate6:4.33.0")
     liquibaseRuntime("org.postgresql:postgresql:42.7.2")
     liquibaseRuntime("org.springframework.boot:spring-boot-starter-data-jpa")
     liquibaseRuntime(sourceSets.getByName("main").output)
