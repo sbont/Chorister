@@ -211,9 +211,9 @@ class ZitadelService(
             password = registrationRequest.password,
             passwordChangeRequired = false,
             profile = Profile(
-                firstName = registrationRequest.displayName.substring(0, 1),
-                lastName = registrationRequest.displayName.substring(1),
-                displayName = registrationRequest.displayName
+                firstName = registrationRequest.firstName,
+                lastName = registrationRequest.lastName,
+                displayName = registrationRequest.firstName
             )
         )
 }

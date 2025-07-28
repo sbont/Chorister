@@ -15,7 +15,9 @@ class User(
     var choir: Choir? = null,
     var email: String?,
     var username: String,
-    var displayName: String?,
+    @Column(name = "display_name")
+    var firstName: String?,
+    var lastName: String?,
     var zitadelId: String? = null
     )
 {

@@ -93,15 +93,16 @@ export default class ChoristerApi implements IChoristerApi {
 
     // Registration
 
-    register = (choirName: string, userDisplayName: string, email: string, password: string) =>
-        this.registration.register({ choirName, displayName: userDisplayName, email, password });
+    register = (choirName: string, firstName: string, lastName: string | undefined, email: string, password: string) =>
+        this.registration.register({ choirName, firstName, lastName, email, password });
 
     getInviteByToken = (token: string) => this.invite.get(token);
 
-    acceptInvite = (token: string, displayName: string, email: string, password: string) =>
+    acceptInvite = (token: string, firstName: string, lastName: string | undefined, email: string, password: string) =>
         this.invite.accept({
             token,
-            displayName,
+            firstName,
+            lastName,
             email,
             password,
         });

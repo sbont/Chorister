@@ -13,7 +13,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="member in members" class="member" :key="member.id">
-                                <th>{{ member.displayName }}</th>
+                                <th>{{ member.firstName }} {{ member.lastName }}</th>
                                 <td>{{ member.email }}</td>
                             </tr>
                         </tbody>
@@ -28,13 +28,8 @@
 
                     <div class="is-flex mb-3" v-if="inviteLink">
                         <div class="control has-icons-right is-flex-grow-1 mr-2" @click="copyToken">
-                            <input
-                                class="button input"
-                                v-on:focus="selectToken"
-                                ref="token"
-                                readonly
-                                :value="inviteLink"
-                            />
+                            <input class="button input" v-on:focus="selectToken" ref="token" readonly
+                                :value="inviteLink" />
                             <span class="icon is-small is-right">
                                 <i class="fas fa-copy"></i>
                             </span>

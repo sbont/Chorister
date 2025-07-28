@@ -854,3 +854,37 @@ databaseChangeLog:
               DROP POLICY IF EXISTS user_choir_security ON chorister_user;
               CREATE POLICY user_choir_security ON chorister_user
               USING (current_setting('app.current_choir_id') = '' OR choir_id::VARCHAR = current_setting('app.current_choir_id'));
+  - changeSet:
+      id: 1753452664585-3
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: last_name
+                  type: VARCHAR(255)
+            tableName: chorister_user
+  - changeSet:
+      id: 1753452664585-4
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addUniqueConstraint:
+            columnNames: manager_id
+            constraintName: UC_CHOIRMANAGER_ID_COL
+            tableName: choir
+  - changeSet:
+      id: 1753452664585-5
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addUniqueConstraint:
+            columnNames: file_id
+            constraintName: UC_NOTATIONFILE_ID_COL
+            tableName: notation
+  - changeSet:
+      id: 1753452664585-6
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addUniqueConstraint:
+            columnNames: user_id
+            constraintName: UC_REGISTRATIONUSER_ID_COL
+            tableName: registration

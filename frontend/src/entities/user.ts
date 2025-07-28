@@ -6,6 +6,7 @@ export interface User extends Entity {
     choir?: EntityRef<Choir>,
     email: string,
     username: string,
-    displayName: string,
+    firstName: string,
+    lastName?: string,
     zitadelId: string
 }

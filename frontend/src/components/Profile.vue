@@ -1,15 +1,22 @@
 <template>
     <div class="profile" v-if="!loading && user">
-        <DetailHeader :title="user?.displayName" subtitle="hello" subtitle-on-top />
+        <DetailHeader :title="user?.firstName" subtitle="hello" subtitle-on-top />
 
         <div class="pt-5">
             <section class="section">
                 <h1 class="title">User details</h1>
                 <div class="w-40">
                     <div class="field">
-                        <label class="label">Name</label>
+                        <label class="label">First name</label>
                         <div class="control">
-                            <input class="input" type="text" v-if="draftValues" v-model="draftValues.displayName" />
+                            <input class="input" type="text" v-if="draftValues" v-model="draftValues.firstName" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Last name</label>
+                        <div class="control">
+                            <input class="input" type="text" v-if="draftValues" v-model="draftValues.lastName" />
                         </div>
                     </div>
 

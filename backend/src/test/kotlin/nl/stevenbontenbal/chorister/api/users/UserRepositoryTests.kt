@@ -16,7 +16,7 @@ class UserRepositoryTests @Autowired constructor(
     @Test
     fun `When findByUsername then return User`() {
         // Arrange
-        val myUser = User(email = "johnny@email.com", username = "johnnyJ", displayName = "JohnnyJ")
+        val myUser = User(email = "johnny@email.com", username = "johnnyJ", firstName = "Johnny", lastName = "Johnson")
         entityManager.persist(myUser)
         entityManager.flush()
         // Act
@@ -28,7 +28,7 @@ class UserRepositoryTests @Autowired constructor(
     @Test
     fun `When findByEmail then return User`() {
         // Arrange
-        val myUser = User(email = "johnny@email.com", username = "johnnyJ", displayName = "JohnnyJ")
+        val myUser = User(email = "johnny@email.com", username = "johnnyJ", firstName = "JohnnyJ", lastName = "Johnson")
         entityManager.persist(myUser)
         entityManager.flush()
         // Act

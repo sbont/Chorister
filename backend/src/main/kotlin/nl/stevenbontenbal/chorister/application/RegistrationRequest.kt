@@ -1,7 +1,8 @@
 package nl.stevenbontenbal.chorister.application
 
 interface RegistrationRequest {
-    var displayName: String
+    var firstName: String
+    var lastName: String?
     var email: String
     var password: String
 }

@@ -136,7 +136,8 @@ open class RegistrationService(
         User(
             username = registrationRequest.email,
             email = registrationRequest.email,
-            displayName = registrationRequest.displayName,
+            firstName = registrationRequest.firstName,
+            lastName = registrationRequest.lastName,
             zitadelId = userId.getOrNull()
         )
 

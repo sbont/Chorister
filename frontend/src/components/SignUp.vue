@@ -10,9 +10,16 @@
 
         <div v-if="state == State.NewRegistration || state == State.InviteLoaded || state == State.Saving">
             <div class="field">
-                <label class="label">Name</label>
+                <label class="label">First name</label>
                 <div class="control">
-                    <input class="input" type="text" placeholder="Elvis" v-model="displayName" />
+                    <input class="input" type="text" placeholder="Elvis" v-model="firstName" />
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Last name</label>
+                <div class="control">
+                    <input class="input" type="text" placeholder="Elvis" v-model="lastName" />
                 </div>
             </div>
 
@@ -50,7 +57,8 @@
             </div>
         </div>
 
-        <div v-if="state == State.Finished" class="has-text-success">Account successfully created. You can now login your username <b>{{ email }}</b> and your password.</div>
+        <div v-if="state == State.Finished" class="has-text-success">Account successfully created. You can now login
+            your username <b>{{ email }}</b> and your password.</div>
 
         <div v-if="state == State.Failed" class="has-text-danger">
             Failed to save user:<br>
@@ -82,7 +90,8 @@ const api = inject(ApiKey)!;
 const state = ref<State>(State.Loading);
 const token = route.query.invite as string;
 const isInvite = !!token;
-const displayName = ref<string>();
+const firstName = ref<string>();
+const lastName = ref<string>();
 const email = ref<string>();
 const password = ref<string>();
 const choirName = ref<string>();
@@ -110,8 +119,8 @@ onMounted(() => {
 });
 
 const submit = () => {
-    if (displayName.value == undefined || displayName.value === "") {
-        errorMessage.value = "Please enter a valid display name";
+    if (firstName.value == undefined || firstName.value === "") {
+        errorMessage.value = "Please enter a valid first name";
         return;
     }
     if (email.value == undefined || email.value === "") {
@@ -130,8 +139,8 @@ const submit = () => {
     state.value = State.Saving;
     errorMessage.value = undefined;
     let promise;
-    if (isInvite) promise = api.acceptInvite(token, displayName.value, email.value, password.value);
-    else promise = api.register(choirName.value!, displayName.value, email.value, password.value);
+    if (isInvite) promise = api.acceptInvite(token, firstName.value, lastName.value, email.value, password.value);
+    else promise = api.register(choirName.value!, firstName.value, lastName.value, email.value, password.value);
     promise
         .then((response) => {
             console.log(response);

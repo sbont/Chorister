@@ -25,8 +25,8 @@ export interface Api {
     files: FilesApiEndpoint
 
     // Registration
-    register: (choirName: string, userDisplayName: string, email: string, password: string) => Promise<User>
-    acceptInvite: (token: string, displayName: string, email: string, password: string) => Promise<User>
+    register: (choirName: string, firstName: string, lastName: string | undefined, email: string, password: string) => Promise<User>
+    acceptInvite: (token: string, firstName: string, lastName: string | undefined, email: string, password: string) => Promise<User>
 
     // Songs
     getSongById: (id: number) => Promise<Song>

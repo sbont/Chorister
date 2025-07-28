@@ -51,7 +51,8 @@ fun Category.Companion.create(choir: Choir, categoryType: CategoryType): Categor
 
 fun User.Companion.create(): User {
     return User(
-        displayName = "Me",
+        firstName = "Me",
+        lastName = "Myself",
         username = "me@chorister.io",
         email = "me@chorister.io",
     )

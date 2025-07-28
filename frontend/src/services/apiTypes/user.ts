@@ -9,7 +9,8 @@ export interface User extends Identifiable, ApiEntityWith<ChoirLink> {
     choir?: Choir;
     email: string;
     username: string;
-    displayName: string;
+    firstName: string;
+    lastName?: string;
 }
 
 export interface ChoirLink extends WithAssociation {
@@ -19,7 +20,7 @@ export interface ChoirLink extends WithAssociation {
 export function toDomainUser(user: User): DomainUser {
     const choir = user._links?.choir ? {
         uri: untemplated(user._links?.choir)
-    } : (user.choir ? new EntityRef<DomainChoir>(toDomainChoir(user.choir)) : undefined );
+    } : (user.choir ? new EntityRef<DomainChoir>(toDomainChoir(user.choir)) : undefined);
     return {
         ...toDomain(user),
         choir: choir
@@ -31,7 +32,8 @@ export function fromDomainUser(user: DomainUser): User {
         id: user.id,
         email: user.email,
         username: user.username,
-        displayName: user.displayName,
+        firstName: user.firstName,
+        lastName: user.lastName,
         _links: undefined,
     };
 }
