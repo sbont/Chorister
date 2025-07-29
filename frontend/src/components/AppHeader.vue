@@ -1,59 +1,47 @@
 <template>
-    <nav class="navbar px-2" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-            <router-link to="/" class="navbar-item">
+    <b-navbar>
+        <template #brand>
+            <b-navbar-item tag="router-link" :to="{ path: '/' }">
                 <img src="@/assets/logo.png" alt="Chorister logo" />
-            </router-link>
+            </b-navbar-item>
             <div class="has-text-primary is-size-7" style="margin-top: 0.5rem; margin-left: -32px; z-index: 2">
                 beta
             </div>
-            <a
-                role="button"
-                class="navbar-burger"
-                aria-label="menu"
-                aria-expanded="false"
-                data-target="navbarBasicExample"
-            >
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-            </a>
-        </div>
+        </template>
+        <template #start v-if="isLoggedIn">
+            <b-navbar-item tag="router-link" :to="{ path: '/planning/upcoming' }"> Planning </b-navbar-item>
+            <b-navbar-item tag="router-link" :to="{ path: '/repertoire' }"> Repertoire </b-navbar-item>
+            <b-navbar-item tag="router-link" :to="{ path: '/mychoir' }"> My Choir </b-navbar-item>
+        </template>
 
-        <div id="navbarBasicExample" class="navbar-menu">
-            <div v-if="isLoggedIn" class="navbar-start">
-                <router-link to="/planning/upcoming" class="navbar-item">Planning</router-link>
-                <router-link to="/repertoire" class="navbar-item">Repertoire</router-link>
-                <router-link to="/mychoir" class="navbar-item">My Choir</router-link>
-            </div>
+        <template #end>
+            <b-navbar-item tag="div">
+                <div class="buttons">
+                    <a v-if="!isLoggedIn" class="button is-primary" @click="onLogin()">
+                        <strong>Log in</strong>
+                    </a>
+                </div>
+            </b-navbar-item>
 
-            <div class="navbar-end">
-                <div class="navbar-item">
-                    <div class="buttons">
-                        <a v-if="!isLoggedIn" class="button is-primary" @click="onLogin()">
-                            <strong>Log in</strong>
-                        </a>
-                    </div>
-                </div>
-                <div v-if="isLoggedIn" class="navbar-item has-dropdown is-hoverable">
-                    <a class="navbar-link"> Account </a>
-                    <div class="navbar-dropdown">
-                        <router-link to="/profile" class="navbar-item"> Profile</router-link>
-                        <hr class="navbar-divider" />
-                        <a href="https://github.com/sbont/Chorister/issues" class="navbar-item" target="_blank">
-                            Report an issue
-                        </a>
-                        <a @click="onLogout()" class="navbar-item"> Log out </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+            <b-navbar-dropdown v-if="isLoggedIn" label="Account">
+                <b-navbar-item tag="router-link" :to="{ path: '/profile' }"> Profile </b-navbar-item>
+                <hr class="navbar-divider" />
+                <b-navbar-item href="https://github.com/sbont/Chorister/issues" target="_blank">
+                    Report an issue
+                </b-navbar-item>
+                <b-navbar-item @click="onLogout()"> 
+                    Log out
+                </b-navbar-item>
+            </b-navbar-dropdown>
+        </template>
+    </b-navbar>
+
 </template>
 
 <script setup lang="ts">
 import { useAuth } from "@/services/authStore";
 import { storeToRefs } from "pinia";
+import { BNavbar, BNavbarDropdown, BNavbarItem } from "buefy";
 
 // State
 const auth = useAuth();
