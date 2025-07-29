@@ -57,7 +57,7 @@
             </div>
         </div>
 
-        <div v-if="state == State.Finished" class="has-text-success">Account successfully created. You can now login
+        <div v-if="state == State.Finished" class="has-text-success">Account successfully created. You can now login with
             your username <b>{{ email }}</b> and your password.</div>
 
         <div v-if="state == State.Failed" class="has-text-danger">

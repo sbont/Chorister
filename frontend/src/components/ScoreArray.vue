@@ -2,24 +2,36 @@
     <div class="scores m-2 p-3">
         <div class="is-size-4">Scores</div>
         <div v-if="error" class="is-danger">{{ error }}</div>
-        <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
-            <ScoreComponent v-for="score in scores" :key="score.id" :value="(score as Score)"
-                :song="song" @remove="removeScore(score)"></ScoreComponent>
 
-            <div v-if="!draftValues">
-                <button class="button is-primary" @click="addScore">
-                    Add
-                </button>
-            </div>
-            <div v-else>
-                <ScoreComponent :value="draftValues" @cancel="cancelAdd" @added="onAdded"></ScoreComponent>
-            </div>
-        </div>
+        <table class="table is-hoverable is-fullwidth scores-table" v-cloak>
+            <thead>
+                <tr>
+                    <th class="col-no" title="number"></th>
+                    <th class="col-name">Description</th>
+                    <th class="col-key">Key</th>
+                    <th class="col-action"></th>
+                    <th class="col-action"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <ScoreCopy v-for="(score, index) in scores" :key="score.id" :value="(score as Score)" :song="song"
+                    :number="oneBased(index)" />
+                <tr v-if="!draftValues">
+                    <td colspan="2">
+                        <button class="button is-primary" @click="addScore">
+                            Add
+                        </button>
+                    </td>
+                </tr>
+                <ScoreCopy v-else :value="draftValues" @cancel="cancelAdd" @added="onAdded" />
+            </tbody>
+            <tfoot></tfoot>
+        </table>
+
     </div>
 </template>
 
 <script setup lang="ts">
-import ScoreComponent from "@/components/Score.vue"
 import { ref } from "vue";
 import { isNew } from "@/utils";
 import { useScores } from "@/application/scoreStore";
@@ -27,6 +39,7 @@ import { AxiosError } from "axios";
 import { Song } from "@/entities/song";
 import { Score } from "@/entities/score";
 import { EntityRef } from "@/entities/entity";
+import ScoreCopy from "./Score.vue";
 
 type DraftScore = Partial<Score> & {
     song: EntityRef<Song>
@@ -50,6 +63,8 @@ else {
     error.value = "No association found";
 }
 const draftValues = ref<DraftScore | undefined>(undefined)
+
+const oneBased = (index: number) => index + 1;
 
 const addScore = () => draftValues.value = { song: new EntityRef(props.song) }
 const cancelAdd = () => draftValues.value = undefined

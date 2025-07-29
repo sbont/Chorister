@@ -173,8 +173,8 @@
         </div>
 
         <div v-if="!editing && song">
-            <ChordsArray :song="song" />
             <ScoreArray :song="song" />
+            <ChordsArray :song="song" />
         </div>
 
     </div>

@@ -1,65 +1,93 @@
 <template>
-    <div>
-        <div v-if="!editing" class="card score mr-2">
-            <header class="card-header">
-                <p class="card-header-title">
-                    <a v-if="score.file?.fileInfoUri" @click.prevent="openFile" @auxclick.prevent="openFile" @mousedown.middle.prevent="openFile"
-                        href="#" class="icon-text">
-                        <span class="icon">
-                            <i class="fas fa-cloud-download-alt"></i>
-                        </span>
-                        <span>
-                            {{ score.description }}
-                        </span>
-                    </a>
-                    <span v-else>
-                        {{ score.description }}
-                    </span>
-                </p>
-            </header>
-            <footer class="card-footer">
-                <a @click.prevent="edit" href="#" class="card-footer-item">Edit</a>
-                <a @click.prevent="$emit('remove')" href="#" class="card-footer-item has-text-danger">Delete</a>
-            </footer>
-        </div>
-        <div v-if="editing" class="card mr-2">
-            <div class="card-content-editing">
-                <div class="content">
-                    <FileUpload name="file[]" :disabled="uploadDisabled()" @uploader="onUpload" @select="selectFile"
-                        @remove="removeFile" :multiple="false" :file-limit="1" accept="application/pdf,image/*"
-                        :maxFileSize="2000000" invalidFileSizeMessage="File exceeds maximum size of 2GB."
-                        choose-label="Browse" customUpload>
-                        <template #empty>
-                            <span>Drag and drop files to here to upload.</span>
-                        </template>
-                    </FileUpload>
-                    <div class="is-flex is-flex-direction-column card-content pt-0">
-                        <div class="field">
-                            <label class="label">Description</label>
-                            <div class="control">
-                                <input class="input" type="text" v-model="draftValues!.description"
-                                    placeholder="Version name, instrument, tonality..." />
-                            </div>
-                        </div>
-                        <div v-if="error" class="card-content p-0">
-                            <div class="content is-flex has-text-danger">
-                                {{ error }}
-                            </div>
-                        </div>
+    <tr v-if="state == State.Ready">
+        <td>
+            {{ number }}
+        </td>
+        <td>
+            <a v-if="score.file?.fileInfoUri" @click.prevent="openFile" @auxclick.prevent="openFile"
+                @mousedown.middle.prevent="openFile" href="#" class="icon-text has-text-link">
+                <span class="icon">
+                    <i class="fas fa-cloud-download-alt"></i>
+                </span>
+                <span>
+                    {{ score.description }}
+                </span>
+            </a>
+            <span v-else>
+                {{ score.description }}
+            </span>
+        </td>
+        <td>
+            {{ score.key ? keyLabelMapping[score.key] : "" }}
+        </td>
+        <td class="shrink">
+            <button class="button is-info is-inverted is-small" @click.prevent="edit">
+                <span class="icon is-small">
+                    <i class="fas fa-pen"></i>
+                </span>
+            </button>
+        </td>
+        <td class="shrink">
+            <button class="button is-danger is-inverted is-small" @click="$emit('remove')">
+                <span class="icon is-small">
+                    <i class="fas fa-times"></i>
+                </span>
+            </button>
+        </td>
+    </tr>
+    <tr v-else>
+        <td colspan="2">
+            <div class="is-flex">
+                <FileUpload name="file[]" :disabled="uploadDisabled()" @uploader="onUpload" @select="selectFile"
+                    @remove="removeFile" :multiple="false" :file-limit="1" accept="application/pdf,image/*"
+                    :maxFileSize="2000000" invalidFileSizeMessage="File exceeds maximum size of 2GB."
+                    choose-label="Browse" customUpload>
+                </FileUpload>
+                <div class="field is-flex-grow-1 ml-3">
+                    <div class="control">
+                        <input class="input" type="text" v-model="draftValues!.description"
+                            placeholder="Version name, instrument, tonality..." />
+                    </div>
+                </div>
+                <div v-if="error" class="card-content p-0">
+                    <div class="content is-flex has-text-danger">
+                        {{ error }}
                     </div>
                 </div>
             </div>
-            <footer class="card-footer">
-                <a href="#" class="card-footer-item" @click.prevent="save">
-                    Save
-                </a>
-                <a href="#" class="card-footer-item has-text-danger" @click.prevent="cancelEdit">
-                    Cancel
-                </a>
-            </footer>
-        </div>
-    </div>
+        </td>
+        <td>
+            <div class="field is-flex-grow-1 ml-3">
+                <div class="control">
+                    <div class="select">
+                        <select v-model="draftValues!.key">
+                            <option v-bind:value="undefined" disabled>Select...</option>
+                            <option v-for="(key, i) in keyOptions" class="song" :key="key" draggable="true"
+                                v-bind:value="key">{{ keyLabelMapping[key] }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </td>
+        <td class="shrink">
+            <button class="button is-info is-small" @click.prevent="save"
+                :class="{ 'is-loading': state == State.Saving, 'is-inverted': state == State.Editing }">
+                <span class="icon is-small">
+                    <i class="fas fa-check"></i>
+                </span>
+            </button>
+        </td>
+        <td class="shrink">
+            <button class="button is-danger is-inverted is-small" @click.prevent="cancelEdit" :disabled="state == State.Saving">
+                <span class="icon is-small">
+                    <i class="fas fa-times"></i>
+                </span>
+            </button>
+        </td>
+    </tr>
 </template>
+
 <script setup lang="ts">
 import { useFiles } from '@/application/fileStore';
 import { useScores } from "@/application/scoreStore";
@@ -67,6 +95,7 @@ import { EntityRef } from '@/entities/entity';
 import { Score } from '@/entities/score';
 import { Song } from '@/entities/song';
 import { downloadFile } from '@/services/fileService';
+import { Key, KeyLabelMapping } from '@/types/Key';
 import { isNew } from "@/utils";
 import { AxiosError } from 'axios';
 import { extension } from 'mime-types';
@@ -77,11 +106,18 @@ type DraftScore = Partial<Score> & {
     song: EntityRef<Song>
 }
 
+enum State {
+    Ready,
+    Editing,
+    Saving
+}
+
 const props = defineProps({
     value: {
         type: Object as PropType<Score | DraftScore>,
         required: true
     },
+    number: { type: Number },
     song: {
         type: Object as PropType<Song>
     }
@@ -93,11 +129,13 @@ const fileStore = useFiles();
 
 // state
 const score = ref(props.value);
-const editing = ref(false);
+const state = ref<State>(State.Ready);
 const draftValues = ref<DraftScore>();
-const saving = ref(false);
 const error = ref<string>();
 const selectedFile = ref<File>()
+
+const keyLabelMapping = KeyLabelMapping
+const keyOptions = Object.values(Key);
 
 // Computed
 onMounted(() => {
@@ -123,7 +161,7 @@ const removeFile = (_: FileUploadRemoveEvent) => {
 
 const edit = async () => {
     draftValues.value = score.value as DraftScore;
-    editing.value = true;
+    state.value = State.Editing;
 }
 
 const onUpload = async (event: FileUploadUploaderEvent) => {
@@ -157,8 +195,7 @@ const save = async () => {
         return;
     }
 
-    editing.value = false;
-    saving.value = true;
+    state.value = State.Saving;
 
     let fileInfo;
     if (selectedFile.value) {
@@ -179,20 +216,20 @@ const save = async () => {
     if (wasNew)
         emit("added", savedScore)
 
-    saving.value = false;
+    state.value = State.Ready;
 }
 
 const cancelEdit = () => {
-    editing.value = false;
+    state.value = State.Ready;
     draftValues.value = undefined;
     emit("cancel")
 }
 
 const openFile = async (event: MouseEvent) => {
     const fileUri = score.value.file?.fileInfoUri;
-    if (!fileUri){
+    if (!fileUri) {
         return;
-    }   
+    }
 
     try {
         const location = await fileStore.getDownloadUrl(fileUri);
@@ -233,13 +270,25 @@ const openFile = async (event: MouseEvent) => {
     max-height: initial;
 }
 
+.table td {
+    align-content: center;
+}
+
+.table .shrink {
+    width: 0;
+}
+
 .p-fileupload .p-fileupload-upload-button,
 .p-fileupload .p-fileupload-cancel-button {
     display: none;
 }
 
-.p-fileupload .p-fileupload-file {
+.p-fileupload .p-fileupload-file, .p-fileupload .p-fileupload-header {
     padding: 0;
+}
+
+.p-fileupload .p-fileupload-content {
+    display: none;
 }
 
 .p-fileupload-advanced {
