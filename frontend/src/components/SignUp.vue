@@ -12,14 +12,14 @@
             <div class="field">
                 <label class="label">First name</label>
                 <div class="control">
-                    <input class="input" type="text" placeholder="Elvis" v-model="firstName" />
+                    <input class="input" type="text" placeholder="John" v-model="firstName" />
                 </div>
             </div>
 
             <div class="field">
                 <label class="label">Last name</label>
                 <div class="control">
-                    <input class="input" type="text" placeholder="Elvis" v-model="lastName" />
+                    <input class="input" type="text" placeholder="Mayer" v-model="lastName" />
                 </div>
             </div>
 
