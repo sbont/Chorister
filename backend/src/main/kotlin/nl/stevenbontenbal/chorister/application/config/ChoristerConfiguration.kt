@@ -66,19 +66,12 @@ class ChoristerConfiguration(
                 csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
                 csrfTokenRequestHandler = SpaCsrfTokenRequestHandler()
             }
+            cors {
+                configurationSource = corsConfigurationSource()
+            }
         }
         http.oauth2ResourceServer { it.jwt(Customizer.withDefaults()) }
         return http.build()
-    }
-
-    @Bean
-    fun corsConfigurer(): WebMvcConfigurer? {
-        return object : WebMvcConfigurer {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/api/**")
-                    .allowedOrigins(properties.baseUrl)
-            }
-        }
     }
 
     @Bean
@@ -99,10 +92,6 @@ class ChoristerConfiguration(
                 configuration.exposeIdsFor(Invite::class.java)
                 configuration.exposeIdsFor(File::class.java)
                 configuration.repositoryDetectionStrategy = RepositoryDetectionStrategy.RepositoryDetectionStrategies.ANNOTATED
-
-                corsRegistry.addMapping("/api/**")
-                    .allowedMethods("*")
-                    .allowedOrigins(properties.baseUrl)
             }
 
             override fun customizeLinkCollector(collector: LinkCollector): LinkCollector {
@@ -111,8 +100,7 @@ class ChoristerConfiguration(
         }
     }
 
-    @Bean
-    fun corsFilter(): FilterRegistrationBean<*> {
+    fun corsConfigurationSource(): UrlBasedCorsConfigurationSource {
         val source = UrlBasedCorsConfigurationSource()
         val config = CorsConfiguration()
         config.allowCredentials = true
@@ -120,9 +108,7 @@ class ChoristerConfiguration(
         config.addAllowedHeader("*")
         config.addAllowedMethod("*")
         source.registerCorsConfiguration("/**", config)
-        val bean: FilterRegistrationBean<*> = FilterRegistrationBean(CorsFilter(source))
-        bean.order = Ordered.HIGHEST_PRECEDENCE
-        return bean
+        return source
     }
 
     @Bean
