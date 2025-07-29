@@ -46,7 +46,6 @@ export const useEvents = defineStore('events', () => {
             entriesByEventUri.value.set(key, []);
 
         entriesByEventUri.value.get(key)!.push(value)
-        console.log('Added to ' + key)
     }
     
     function removeFrom(key: Uri, value: EventEntry): void {

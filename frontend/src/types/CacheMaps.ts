@@ -13,7 +13,6 @@ export class CacheListMap<K, V> extends CacheMap<K, Array<V>> {
             this.set(key, Array<V>())
         
         this.get(key)!.push(value)
-        console.log(JSON.stringify(this.get(key)?.values()))
     }
 
     addAllTo(key: K, values: Array<V>): void {

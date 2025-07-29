@@ -32,15 +32,13 @@ spring:
           introspection-uri: http://localhost:9000/oauth/v2/introspect
           client-id: ${CHORISTER_API_CLIENT_ID}
           client-secret: ${CHORISTER_API_SECRET}
-debug: true
+debug: false
 logging:
   level:
     org:
       springframework:
-        security: TRACE
+        security: INFO
         web: DEBUG
-      zalando:
-        logbook: TRACE
     reactor:
       netty:
         http:

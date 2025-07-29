@@ -27,10 +27,8 @@ logging:
   level:
     org:
       springframework:
-        security: TRACE
+        security: INFO
         web: DEBUG
-      zalando:
-        logbook: TRACE
     reactor:
       netty:
         http:

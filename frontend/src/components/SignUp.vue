@@ -143,7 +143,6 @@ const submit = () => {
     else promise = api.register(choirName.value!, firstName.value, lastName.value, email.value, password.value);
     promise
         .then((response) => {
-            console.log(response);
             state.value = State.Finished;
         })
         .catch((error) => {

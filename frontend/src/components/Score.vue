@@ -238,12 +238,10 @@ const openFile = async (event: MouseEvent) => {
         else {
             const response = await downloadFile(location);
             const contentType = response.headers["content-type"]?.toString() ?? "";
-            console.log(response.headers);
 
             const blob = new Blob([response.data], { type: contentType });
             const link = document.createElement('a')
             link.href = URL.createObjectURL(blob)
-            console.log(contentType);
 
             const ext = extension(contentType)
             link.download = `${props.song?.title} - ${score.value?.description}.${ext}`;
