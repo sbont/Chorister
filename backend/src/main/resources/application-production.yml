@@ -34,6 +34,7 @@ logging:
       springframework:
         security: INFO
         web: DEBUG
+    nl.stevenbontenbal.chorister: DEBUG
     reactor:
       netty:
         http:
