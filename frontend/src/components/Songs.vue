@@ -9,8 +9,6 @@
                     <th class="col-no" title="number"></th>
                     <th class="col-title">Title</th>
                     <th class="col-composer">Composer</th>
-                    <th class="col-songbook">Songbook</th>
-                    <th class="col-songbook-no">No.</th>
                     <th class="col-last-played">Last Played</th>
                     <th class="col-category">Categories</th>
                 </tr>
@@ -24,8 +22,6 @@
                             }}</router-link>
                     </th>
                     <td>{{ song.composer }}</td>
-                    <td>{{ (song.songbook || {}).title }}</td>
-                    <td>{{ song.songbookNumber }}</td>
                     <td>{{ song.lastEvent?.date }}</td>
                     <td class="col-category">
                         <div class="tags">
@@ -48,14 +44,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useSongs } from "@/application/songStore.js";
 import { useRoute } from "vue-router";
 import { Song } from "@/entities/song";
 
 // Types
 const songStore = useSongs();
-const { fetchAll, fetchAllForCategory } = songStore;
+const { fetchAll, fetchAllForCategory, allSongs } = songStore;
 const route = useRoute();
 
 // state
@@ -63,31 +59,32 @@ const songs = ref<Array<Song>>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
-onMounted(() => {
-    loadSongs();
-});
+const routeName = route.name;
+let id = Number(route.params.id);
+let songsLoaded;
+switch (routeName) {
+    case "Repertoire":
+        songsLoaded = fetchAll();
+        songs.value = allSongs;
+        if (songs.value.length)
+            loading.value = false;
+
+        break;
+    case "CategorySeason":
+    case "CategoryLiturgical":
+        songsLoaded = fetchAllForCategory(id);
+        break;
+}
+songsLoaded!
+    .then(data => {
+        songs.value = data;
+    })
+    .finally(() => (loading.value = false));
+
 
 // Methods
 const pluralize = function (n: number) {
     return n === 1 ? "song" : "songs";
-}
-
-const loadSongs = function () {
-    const routeName = route.name;
-    let id = Number(route.params.id);
-    let songsLoaded;
-    switch (routeName) {
-        case 'Repertoire':
-            songsLoaded = fetchAll();
-            break;
-        case 'CategorySeason':
-        case 'CategoryLiturgical':
-            songsLoaded = fetchAllForCategory(id);
-            break;
-    }
-    songsLoaded!
-        .then(data => songs.value = data)
-        .finally(() => (loading.value = false));
 }
 
 const handleErrorClick = function () {
