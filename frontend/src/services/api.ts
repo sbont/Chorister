@@ -52,7 +52,7 @@ export default class ChoristerApi implements IChoristerApi {
     constructor() {
         this.instance = axios.create({
             baseURL: SERVER_URL,
-            timeout: 5000,
+            timeout: 12000,
         });
         const auth = useAuth();
         this.instance.interceptors.request.use(async (config) => {
