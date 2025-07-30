@@ -32,6 +32,7 @@ eventStore.fetch(eventId).then((result) => {
 
 <style>
 .text p {
+    margin-top: 12px;
     min-height: 18px;
 }
 </style>
