@@ -29,6 +29,14 @@ This starts containers runnning our database (CockroachDB), our S3 file storage 
 1. For this user, generate a personal access token and store this as a variable with key `CHORISTER_ADMIN_ACCESS_TOKEN`.
 1. Next, let's set up our S3 server. Go to `localhost:9012` and log in with username `minioadmin` and the same as its password, `minioadmin`.
 1. Create a bucket called `chorister-files`.
+1. Finally, create a database user by executing ```
+CREATE USER app_user WITH PASSWORD 'user1234!';
+GRANT CONNECT ON DATABASE chorister TO app_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE ON SEQUENCES TO app_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO app_user;
+GRANT SELECT, INSERT, DELETE, UPDATE ON all TABLES in schema public TO app_user;
+```
 
 #### Manual setup
 To run a local database, install a local Cockroach cluster using [the guidelines](https://www.cockroachlabs.com/docs/stable/secure-a-cluster). Zitadel is used as the authentication provider, you can find a deployment guide [here](https://zitadel.com/docs/self-hosting/deploy/overview).
