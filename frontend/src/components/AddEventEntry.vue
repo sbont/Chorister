@@ -113,6 +113,7 @@ const save = async () => {
         await eventStore.addEventEntry(props.eventId, { label: headerName.value });
     }
     state.value = State.Ready;
+    selectedSongId.value = undefined;
 };
 
 const cancel = () => (state.value = State.Ready);

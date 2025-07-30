@@ -35,7 +35,7 @@ export const useEvents = defineStore('events', () => {
         const today = new Date();
         return [...events.value.values()]
             .filter(e => new Date(e.date) < today)
-            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+            .sort((a, b) => new Date(b.date).getTime()  - new Date(a.date).getTime()); // notice that this is the reverse of l31
     });
 
     const getEntries = computed(() => (eventUri: Uri) => entriesByEventUri.value.get(eventUri) ?? []);
