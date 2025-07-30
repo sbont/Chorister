@@ -1,17 +1,22 @@
 chorister:
   base-url: "https://chorister.co"
+  datasource:
+    system:
+      url: ${CHORISTER_DATA_SOURCE_URL}
+      driver-class-name: org.postgresql.Driver
+      username: ${CHORISTER_DATABASE_ADMIN_USERNAME}
+      password: ${CHORISTER_DATABASE_ADMIN_PASSWORD}
+      hikari:
+        connection-test-query: SELECT 1
+        maximum-pool-size: 50
+        minimum-idle: 20
+    user:
+      url: ${CHORISTER_DATA_SOURCE_URL}
+      username: ${CHORISTER_DATABASE_USER_USERNAME}
+      password: ${CHORISTER_DATABASE_USER_PASSWORD}
 server:
   port: 8090
 spring:
-  datasource:
-    url: ${CHORISTER_DATA_SOURCE_URL}
-    driver-class-name: org.postgresql.Driver
-    username: ${CHORISTER_DATABASE_USER}
-    password: ${CHORISTER_DATABASE_PASSWORD}
-    hikari:
-      connection-test-query: SELECT 1
-      maximum-pool-size: 50
-      minimum-idle: 20
   security:
     oauth2:
       resourceserver:
