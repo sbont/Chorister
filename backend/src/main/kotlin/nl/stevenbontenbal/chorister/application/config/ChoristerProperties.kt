@@ -8,14 +8,8 @@ data class ChoristerProperties(
     var title: String,
     val version: String,
     val baseUrl: String,
-    val defaultCategories: DefaultCategories,
     val datasource: DataSource,
 ) {
-    data class DefaultCategories(
-        val liturgicalMoment: List<String>,
-        val season: List<String>
-    )
-
     data class DataSource(
         val system: DataSourceProperties,
         val user: DataSourceProperties,

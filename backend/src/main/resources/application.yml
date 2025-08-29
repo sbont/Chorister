@@ -1,22 +1,6 @@
 chorister:
   title: Chorister
   version: 0.1
-  default-categories:
-    liturgical-moment:
-      - Opening
-      - Gloria
-      - Alleluia
-      - Sanctus
-      - Lord's Prayer
-      - Communion
-      - Closing
-    season:
-      - Advent
-      - Christmas
-      - Ordinary Time
-      - Lent
-      - Easter
-      - Pentecost
 server:
   port: 8090
   forward-headers-strategy: framework

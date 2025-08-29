@@ -86,6 +86,7 @@ class ChoristerConfiguration(
                 configuration.exposeIdsFor(Chords::class.java)
                 configuration.exposeIdsFor(Score::class.java)
                 configuration.exposeIdsFor(Category::class.java)
+                configuration.exposeIdsFor(CategoryType::class.java)
                 configuration.exposeIdsFor(Event::class.java)
                 configuration.exposeIdsFor(EventEntry::class.java)
                 configuration.exposeIdsFor(User::class.java)
@@ -133,9 +134,9 @@ class ChoristerConfiguration(
 
     @Bean
     fun categorisationService(
-        choristerProperties: ChoristerProperties,
-        categoryRepository: ICategoryRepository
-    ): CategorisationService = CategorisationService(choristerProperties, categoryRepository)
+        categoryRepository: ICategoryRepository,
+        categoryTypeRepository: ICategoryTypeRepository
+    ): CategorisationService = CategorisationService(categoryRepository, categoryTypeRepository)
 
     @Bean
     fun fileService(

@@ -35,7 +35,7 @@ class CategoryRepositoryTests @Autowired constructor(
         // Arrange
         val choir = Choir.create()
         entityManager.persist(choir)
-        val category1 = Category(name = "Advent", type = CategoryType.SEASON, choir = choir)
+        val category1 = Category(name = "Advent", categoryType = CategoryType.SEASON, choir = choir)
         val category2 = Category.create(choir, CategoryType.SEASON)
         entityManager.persist(category1)
         entityManager.persist(category2)

@@ -888,3 +888,67 @@ databaseChangeLog:
             columnNames: user_id
             constraintName: UC_REGISTRATIONUSER_ID_COL
             tableName: registration
+  - changeSet:
+      id: 1756484259153-3
+      author: Steven.Bontenbal (generated)
+      changes:
+      - createTable:
+          columns:
+          - column:
+              autoIncrement: true
+              constraints:
+                nullable: false
+                primaryKey: true
+                primaryKeyName: category_typePK
+              name: id
+              type: BIGINT
+          - column:
+              name: name
+              type: VARCHAR(255)
+          - column:
+              name: choir_id
+              type: BIGINT
+          tableName: category_type
+  - changeSet:
+      id: 1756484259153-4
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addColumn:
+          columns:
+          - column:
+              name: category_type_id
+              type: BIGINT
+          tableName: category
+  - changeSet:
+      id: 1756484259153-5
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addForeignKeyConstraint:
+          baseColumnNames: category_type_id
+          baseTableName: category
+          constraintName: FKbnp66sfbd5fxd6ap2vanudxth
+          deferrable: false
+          initiallyDeferred: false
+          referencedColumnNames: id
+          referencedTableName: category_type
+          validate: true
+  - changeSet:
+      id: 1756484259153-6
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addForeignKeyConstraint:
+          baseColumnNames: choir_id
+          baseTableName: category_type
+          constraintName: FKcqxwmvg4mruhn0n0m3kd5tx6s
+          deferrable: false
+          initiallyDeferred: false
+          referencedColumnNames: id
+          referencedTableName: choir
+          validate: true
+  - changeSet:
+      id: 1756484259153-9
+      author: Steven.Bontenbal (generated)
+      changes:
+      - dropColumn:
+          columnName: type
+          tableName: category

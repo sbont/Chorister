@@ -13,7 +13,9 @@ class Category(
     @JoinColumn(name = "CHOIR_ID")
     override var choir: Choir?,
     var name: String,
-    var type: CategoryType
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "CATEGORY_TYPE_ID")
+    var categoryType: CategoryType
 ): ChoirOwnedEntity {
     companion object
 }

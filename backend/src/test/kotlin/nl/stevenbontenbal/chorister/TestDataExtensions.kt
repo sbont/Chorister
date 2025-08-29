@@ -45,7 +45,7 @@ fun Category.Companion.create(choir: Choir, categoryType: CategoryType): Categor
     return Category(
         name = "Christmas",
         choir = choir,
-        type = categoryType
+        categoryType = categoryType
     )
 }
 
