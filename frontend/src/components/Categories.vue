@@ -3,16 +3,17 @@
         <h4 class="title is-4">Categories</h4>
         <div v-if="!loading">
             <div class="columns p-3">
-                <div class="column is-3">
-                    <h4 class="title is-5">by time of the year</h4>
+
+                <div class="column is-3" v-for="categoryType in categoryStore.categoryTypes">
+                    <h4 class="title is-5">by {{ categoryType.name }}</h4>
                     <CategoriesByType
-                        :categories="categoryStore.categories.season"
-                        :category-type="CategoryType.Season"
+                        :categories="categoryStore.categories.getOrEmpty(categoryType.uri!)"
+                        :category-type="categoryType"
                         @save="onSave"
                         @remove="onDelete"
                     />
                 </div>
-                <div class="column is-3">
+                <!-- <div class="column is-3">
                     <h4 class="title is-5">by liturgical moment</h4>
                     <CategoriesByType
                         :categories="categoryStore.categories.liturgical"
@@ -20,7 +21,7 @@
                         @save="onSave"
                         @remove="onDelete"
                     />
-                </div>
+                </div> -->
             </div>
             <div class="p-3"></div>
         </div>
@@ -32,7 +33,7 @@ import { ref } from "vue";
 import { useCategories } from "@/application/categoryStore";
 import CategoriesByType from "@/components/CategoriesByType.vue";
 import { AxiosError } from "axios";
-import { Category, CategoryType } from "@/entities/category";
+import { Category } from "@/entities/category";
 
 // state
 const loading = ref(true);

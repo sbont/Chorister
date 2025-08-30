@@ -1,37 +1,40 @@
 import { defineStore } from "pinia";
-import { CacheListMap } from "@/types/CacheMaps";
+import { CacheListMap, CacheMap } from "@/types/CacheMaps";
 import { computed, inject, ref } from "vue";
-import { ApiKey } from "./api";
-import { Category, CategoryType } from "@/entities/category";
+import { Api, ApiKey } from "./api";
+import { Category } from "@/entities/category";
+import { Uri } from "@/types";
+import { useEntityStore } from "./entityStore";
+import { CategoryType } from "@/entities/categoryType";
 
 export const useCategories = defineStore("categories", () => {
     const api = inject(ApiKey)!;
+    const categoryTypeEndpoint = (api: Api) => api.categoryTypes;
+    const categoryTypeStore = useEntityStore("categoryTypes", categoryTypeEndpoint)();
 
     // state
-    const categories = ref<{ season: Array<Category>, liturgical: Array<Category> }>({ season: [], liturgical: [] });
+    const categoryTypes = ref<CategoryType[]>([])
+    const categories = ref(new CacheListMap<Uri, Category>());
     const categoriesBySongId = ref(new CacheListMap<number, Category>());
     
     // getters
     const allCategories = computed(() => {
-        return [... categories.value.season, ... categories.value.liturgical];
+        return categories.value.values().toArray().flat();
     });
     
     async function fetchOne(categoryId: number) {
         const data = await api.getCategoryById(categoryId);
-        if (data.type === "SEASON")
-            categories.value.season.push(data);
-        else if(data.type === "LITURGICAL_MOMENT")
-            categories.value.liturgical.push(data);
-        
+        categories.value.addTo(data.categoryType.uri, data);
+
         return data;
     }
 
     async function fetchAll() {
-        const data = await api.getAllCategories()      
-        categories.value = {
-            season: data.filter(category => category.type === "SEASON"),
-            liturgical: data.filter(category => category.type === "LITURGICAL_MOMENT")
-        }
+        const types = await categoryTypeStore.fetchAll();
+        categoryTypes.value.push(...types);
+        
+        const data = await api.getAllCategories()    
+        data.forEach(category => categories.value.addTo(category.categoryType.uri, category));
     }
 
     async function fetchForSong(songId: number) {
@@ -41,7 +44,7 @@ export const useCategories = defineStore("categories", () => {
     }
     
     async function get(categoryId: number) {
-        const found = allCategories.value.find((category) => category.id === categoryId);
+        const found = allCategories.value.find(category => category.id === categoryId);
         return found ?? await fetchOne(categoryId);
     }
 
@@ -66,18 +69,13 @@ export const useCategories = defineStore("categories", () => {
 
     async function save(category: Category) {
         const data = await api.createNewCategory(category);
-        if (category.type == CategoryType.Season) {
-            categories.value.season.push(data);
-        } else {
-            categories.value.liturgical.push(data);
-        }
+        categories.value.addTo(data.categoryType.uri, data);
     }
 
     async function deleteCategory(category: Category) {
         await api.deleteEntity(category);
-        categories.value.liturgical = categories.value.liturgical.filter(c => c.id !== category.id);
-        categories.value.season = categories.value.season.filter(c => c.id !== category.id);
+        categories.value.removeFrom(category.categoryType.uri, category);
     }
 
-    return { categories, get, fetchAll, getForSong, putForSong, save, deleteCategory }
+    return { categories, categoryTypes, get, fetchAll, getForSong, putForSong, save, deleteCategory }
 });

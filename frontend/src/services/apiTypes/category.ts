@@ -1,30 +1,35 @@
 import { Category as DomainCategory } from "@/entities/category";
 import { Uri } from "@/types";
-import { ApiEntityWith, fromDomain, Identifiable, Link, toDomain, WithAssociation } from ".";
+import { ApiEntityWith, fromDomain, Identifiable, Link, toDomain, untemplated, WithAssociation } from ".";
 import { EntityRef } from "@/entities/entity";
+import { CategoryType } from "./categoryType";
 
-export interface Category extends Identifiable, ApiEntityWith<ChoirLink> {
+export interface Category extends Identifiable, ApiEntityWith<ChoirLink & CategoryTypeLink> {
     id: number,
     choir?: Uri,
     name: string,
-    type: CategoryType
-}
-
-export enum CategoryType {
-    Season = "SEASON",
-    Liturgical = "LITURGICAL_MOMENT"
+    categoryType: Uri
 }
 
 export interface ChoirLink extends WithAssociation {
     choir: Link
 }
 
+export interface CategoryTypeLink extends WithAssociation {
+    categoryType: Link
+}
+
 export function toDomainCategory(category: Category): DomainCategory {
-    return { ... toDomain(category),
-        choir: category._links?.choir ? new EntityRef(category._links.choir.href) : undefined
+    return {
+        ...toDomain(category),
+        choir: category._links?.choir ? { uri: untemplated(category._links.choir) } : undefined,
+        categoryType: { uri: untemplated(category._links!.categoryType) }
     };
 }
 
 export function fromDomainCategory(category: DomainCategory): Category {
-    return { ... fromDomain(category) };
+    return {
+        ...fromDomain(category),
+        categoryType: category.categoryType.uri
+    };
 }

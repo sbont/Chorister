@@ -47,7 +47,8 @@
 </template>
 
 <script setup lang="ts">
-import { Category, CategoryType } from "@/entities/category";
+import { Category } from "@/entities/category";
+import { CategoryType } from "@/entities/categoryType";
 import { ref } from "vue";
 
 const props = defineProps<{

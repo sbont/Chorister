@@ -1,4 +1,5 @@
 import { Category } from "@/entities/category"
+import { CategoryType } from "@/entities/categoryType"
 import { Choir } from "@/entities/choir"
 import { Chords } from "@/entities/chords"
 import { Entity } from "@/entities/entity"
@@ -9,8 +10,6 @@ import { Song } from "@/entities/song"
 import { User } from "@/entities/user"
 import { Uri } from "@/types"
 import { InjectionKey } from "vue"
-
-export type EndpointIdentifier = "songs" | "chords" | "scores";
 
 export interface Api {
     // Generic
@@ -23,6 +22,7 @@ export interface Api {
     events: EventsApiEndpoint
     eventEntries: ApiEndpoint<EventEntry>
     files: FilesApiEndpoint
+    categoryTypes: ApiEndpoint<CategoryType>
 
     // Registration
     register: (choirName: string, firstName: string, lastName: string | undefined, email: string, password: string) => Promise<User>

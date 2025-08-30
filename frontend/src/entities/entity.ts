@@ -19,9 +19,8 @@ export class EntityRef<T extends Entity> {
     id?: number;
     resolved?: T;
 
-    constructor(uri: Uri)
     constructor(entity: T);
-    constructor(entity?: T, uri?: Uri) {
+    constructor(entity: T | undefined, uri?: Uri) {
         this.resolved = entity;
         this.id = entity?.id;
         this._uri = uri ?? entity?.uri;

@@ -1,5 +1,6 @@
 import { Api as IChoristerApi, ApiEndpoint, EventsApiEndpoint, ScoresApiEndpoint } from "@/application/api";
 import { Category as DomainCategory } from "@/entities/category";
+import { CategoryType as DomainCategoryType } from "@/entities/categoryType";
 import { Choir as DomainChoir } from "@/entities/choir";
 import { Chords as DomainChords } from "@/entities/chords";
 import { Entity, isNew } from "@/entities/entity";
@@ -11,6 +12,7 @@ import { ApiEntityIn, ApiEntityOut } from "@/services/apiTypes";
 import { useAuth } from "@/services/authStore";
 import axios, { AxiosInstance } from "axios";
 import { Category, fromDomainCategory, toDomainCategory } from "./apiTypes/category";
+import { CategoryType, fromDomainCategoryType, toDomainCategoryType } from "./apiTypes/categoryType";
 import { Choir, fromDomainChoir, toDomainChoir } from "./apiTypes/choir";
 import { Chords, fromDomainChords, toDomainChords } from "./apiTypes/chords";
 import {
@@ -48,6 +50,7 @@ export default class ChoristerApi implements IChoristerApi {
     public readonly scores: ScoresEndpoint;
     public readonly events: EventsEndpoint;
     public readonly eventEntries: EntityEndpoint<DomainEventEntry, EventEntryIn, EventEntryOut>;
+    public readonly categoryTypes: EntityEndpoint<DomainCategoryType, CategoryType, CategoryType>;
 
     constructor() {
         this.instance = axios.create({
@@ -75,6 +78,7 @@ export default class ChoristerApi implements IChoristerApi {
         this.files = new FilesEndpoint(this.instance);
         this.chords = new EntityEndpoint(this.instance, "chords", fromDomainChords, toDomainChords);
         this.scores = new ScoresEndpoint(this.instance, "scores", fromDomainScore, toDomainScore(this.files.getUri));
+        this.categoryTypes = new EntityEndpoint(this.instance, "categoryTypes", fromDomainCategoryType, toDomainCategoryType);
     }
 
     // Generic
