@@ -952,3 +952,13 @@ databaseChangeLog:
       - dropColumn:
           columnName: type
           tableName: category
+  - changeSet:
+      id: enable-rls-category-type
+      author: Steven.Bontenbal
+      changes:
+        - sql:
+            sql: >-
+              ALTER TABLE category_type ENABLE ROW LEVEL SECURITY;
+              DROP POLICY IF EXISTS category_type_choir_security ON category_type;
+              CREATE POLICY category_type_choir_security ON category_type
+              USING (current_setting('app.current_choir_id') = '' OR choir_id::VARCHAR = current_setting('app.current_choir_id'));
