@@ -6,5 +6,5 @@ export interface Category extends Entity {
     id: number,
     choir: EntityRef<Choir> | undefined,
     name: string,
-    categoryType: EntityRef<CategoryType>
+    categoryType: EntityRef<CategoryType> | undefined,
 }

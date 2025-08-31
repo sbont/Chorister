@@ -8,7 +8,7 @@ export interface Category extends Identifiable, ApiEntityWith<ChoirLink & Catego
     id: number,
     choir?: Uri,
     name: string,
-    categoryType: Uri
+    categoryType?: Uri
 }
 
 export interface ChoirLink extends WithAssociation {
@@ -23,13 +23,13 @@ export function toDomainCategory(category: Category): DomainCategory {
     return {
         ...toDomain(category),
         choir: category._links?.choir ? { uri: untemplated(category._links.choir) } : undefined,
-        categoryType: { uri: untemplated(category._links!.categoryType) }
+        categoryType: category._links?.categoryType ? { uri: untemplated(category._links.categoryType) } : undefined
     };
 }
 
 export function fromDomainCategory(category: DomainCategory): Category {
     return {
         ...fromDomain(category),
-        categoryType: category.categoryType.uri
+        categoryType: category.categoryType?.uri
     };
 }
