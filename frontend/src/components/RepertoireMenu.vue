@@ -1,26 +1,15 @@
 <template>
     <aside class="menu p-2">
         <p class="menu-label">Repertoire</p>
-        <ul class="menu-list">
+        <ul class="menu-list"  v-if="ready">
             <li>
                 <router-link :to="{ name: 'Repertoire' }">All songs</router-link>
             </li>
-            <li v-if="ready">
-                <div class="menu-header">By time of the year</div>
-                <ul>
-                    <li v-for="(category) in categories?.season" :key="category.id">
-                        <router-link :to="{ name: 'CategorySeason', params: { id: category.id } }" append>{{
-                            category.name
-                        }}
-                        </router-link>
-                    </li>
-                </ul>
-            </li>
-            <li v-if="ready">
-                <div class="menu-header">By liturgical place</div>
-                <ul>
-                    <li v-for="(category) in categories?.liturgical" :key="category.id">
-                        <router-link :to="{ name: 'CategoryLiturgical', params: { id: category.id } }" append>{{
+            <li v-for="entry in categories.entries()">
+                <div class="menu-header">By {{ categoryTypes.get(entry[0])?.name.toLowerCase() }}</div>
+                <ul v-if="!!categories">
+                    <li v-for="category in entry[1]" :key="category.id">
+                        <router-link :to="{ name: 'Category', params: { id: category.id } }" append>{{
                             category.name
                         }}
                         </router-link>
@@ -39,12 +28,9 @@ import { computed, onMounted } from 'vue';
 const categoryStore = useCategories();
 
 // State
-const { categories } = storeToRefs(categoryStore);
+const { categories, categoryTypes } = storeToRefs(categoryStore);
+categoryStore.fetchAll();
 
 // Computed
 const ready = computed(() => !!categories);
-
-onMounted(() => {
-    categoryStore.fetchAll();
-});
 </script>

@@ -32,16 +32,8 @@ const routes = [
                 },
             },
             {
-                path: 'by-season/:id',
-                name: 'CategorySeason',
-                component: () => import('../components/SongsByCategory.vue'),
-                meta: {
-                    requiresAuth: true
-                },
-            },
-            {
-                path: 'by-liturgical-moment/:id',
-                name: 'CategoryLiturgical',
+                path: 'category/:id',
+                name: 'Category',
                 component: () => import('../components/SongsByCategory.vue'),
                 meta: {
                     requiresAuth: true

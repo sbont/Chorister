@@ -70,8 +70,7 @@ switch (routeName) {
             loading.value = false;
 
         break;
-    case "CategorySeason":
-    case "CategoryLiturgical":
+    case "Category":
         songsLoaded = fetchAllForCategory(id);
         break;
 }

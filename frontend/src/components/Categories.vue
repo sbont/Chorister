@@ -5,23 +5,14 @@
             <div class="columns p-3">
 
                 <div class="column is-3" v-for="categoryType in categoryStore.categoryTypes">
-                    <h4 class="title is-5">by {{ categoryType.name }}</h4>
+                    <h4 class="title is-5">by {{ categoryType[1].name }}</h4>
                     <CategoriesByType
-                        :categories="categoryStore.categories.getOrEmpty(categoryType.uri!)"
-                        :category-type="categoryType"
+                        :categories="categoryStore.categories.getOrEmpty(categoryType[1].uri!)"
+                        :category-type="categoryType[1]"
                         @save="onSave"
                         @remove="onDelete"
                     />
                 </div>
-                <!-- <div class="column is-3">
-                    <h4 class="title is-5">by liturgical moment</h4>
-                    <CategoriesByType
-                        :categories="categoryStore.categories.liturgical"
-                        :category-type="CategoryType.Liturgical"
-                        @save="onSave"
-                        @remove="onDelete"
-                    />
-                </div> -->
             </div>
             <div class="p-3"></div>
         </div>

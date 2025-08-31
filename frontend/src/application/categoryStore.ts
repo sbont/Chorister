@@ -13,28 +13,20 @@ export const useCategories = defineStore("categories", () => {
     const categoryTypeStore = useEntityStore("categoryTypes", categoryTypeEndpoint)();
 
     // state
-    const categoryTypes = ref<CategoryType[]>([])
+    const categoryTypes = ref(new CacheMap<Uri, CategoryType>);
     const categories = ref(new CacheListMap<Uri, Category>());
     const categoriesBySongId = ref(new CacheListMap<number, Category>());
-    
-    // getters
-    const allCategories = computed(() => {
-        return categories.value.values().toArray().flat();
-    });
-    
-    async function fetchOne(categoryId: number) {
-        const data = await api.getCategoryById(categoryId);
-        categories.value.addTo(data.categoryType.uri, data);
 
-        return data;
-    }
+    // getters
+    const allCategories = computed(() => categories.value.allValues());
 
     async function fetchAll() {
         const types = await categoryTypeStore.fetchAll();
-        categoryTypes.value.push(...types);
-        
-        const data = await api.getAllCategories()    
-        data.forEach(category => categories.value.addTo(category.categoryType.uri, category));
+        types.filter(t => t.uri).forEach(t => categoryTypes.value.set(t.uri!, t))
+
+        const data = await api.getAllCategories();
+        categories.value.clear();
+        data.forEach(put);
     }
 
     async function fetchForSong(songId: number) {
@@ -44,8 +36,10 @@ export const useCategories = defineStore("categories", () => {
     }
     
     async function get(categoryId: number) {
-        const found = allCategories.value.find(category => category.id === categoryId);
-        return found ?? await fetchOne(categoryId);
+        if (!allCategories.value)
+            await fetchAll();
+
+        return allCategories.value.find(category => category.id === categoryId);
     }
 
     async function getForSong(songId: number) {
@@ -69,12 +63,21 @@ export const useCategories = defineStore("categories", () => {
 
     async function save(category: Category) {
         const data = await api.createNewCategory(category);
-        categories.value.addTo(data.categoryType.uri, data);
+        put(data);
+    }
+
+    function put(category: Category) {
+        if (!category.categoryType?.uri) {
+            console.error(`Category type unknown for category with  id ${category.id}`);
+        } else {
+            categories.value.addTo(category.categoryType.uri, category);
+        }   
     }
 
     async function deleteCategory(category: Category) {
         await api.deleteEntity(category);
-        categories.value.removeFrom(category.categoryType.uri, category);
+        if  (category.categoryType?.uri)
+            categories.value.removeFrom(category.categoryType.uri, category);
     }
 
     return { categories, categoryTypes, get, fetchAll, getForSong, putForSong, save, deleteCategory }

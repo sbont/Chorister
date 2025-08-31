@@ -46,4 +46,8 @@ export class CacheListMap<K, V> extends CacheMap<K, Array<V>> {
     }
 
     getOrEmpty = (key: K) => this.get(key) ?? new Array<V>
+
+    allValues(): Array<V> {
+        return [...this.values()].flat();
+    }
 }
