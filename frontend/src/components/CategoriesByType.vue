@@ -49,11 +49,12 @@
 <script setup lang="ts">
 import { Category } from "@/entities/category";
 import { CategoryType } from "@/entities/categoryType";
+import { EntityRef } from "@/entities/entity";
 import { ref } from "vue";
 
 const props = defineProps<{
-    categories: Array<Category>,
-    categoryType: CategoryType
+    categoryType: CategoryType,
+    categories: Array<Category>
 }>();
 const emit = defineEmits(["remove", "save"])
 
@@ -70,8 +71,8 @@ const create = () => {
 const save = () => {
     emit("save", {
         name: draftValue.value,
-        type: props.categoryType
-    });
+        categoryType: new EntityRef(props.categoryType)
+    } as Category);
     editing.value = false;
     draftValue.value = undefined;
 }

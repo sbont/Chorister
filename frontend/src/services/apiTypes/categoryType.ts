@@ -19,6 +19,6 @@ export function toDomainCategoryType(categoryType: CategoryType): DomainCategory
     };
 }
 
-export function fromDomainCategoryType(category: DomainCategoryType): CategoryType {
-    return { ... fromDomain(category) };
+export function fromDomainCategoryType(categoryType: DomainCategoryType): CategoryType {
+    return { ... fromDomain(categoryType) };
 }
