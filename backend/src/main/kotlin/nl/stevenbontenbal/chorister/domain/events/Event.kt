@@ -1,6 +1,7 @@
 package nl.stevenbontenbal.chorister.domain.events
 
 import jakarta.persistence.*
+import nl.stevenbontenbal.chorister.domain.rites.OrderOfService
 import nl.stevenbontenbal.chorister.domain.users.Choir
 import nl.stevenbontenbal.chorister.domain.users.ChoirOwnedEntity
 import java.time.LocalDate
@@ -17,6 +18,9 @@ class Event (
     override var choir: Choir?,
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "event", cascade=[CascadeType.REMOVE])
     var entries: MutableList<EventEntry> = mutableListOf(),
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ORDER_OF_SERVICE_ID")
+    var orderOfService: OrderOfService?,
 ): ChoirOwnedEntity {
     companion object
 }

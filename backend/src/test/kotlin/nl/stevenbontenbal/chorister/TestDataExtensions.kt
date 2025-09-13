@@ -34,6 +34,7 @@ fun Event.Companion.create(choir: Choir, id: Long? = null): Event {
         choir = choir,
         name = "Christmas Morning",
         date = LocalDate.of(2022, 12, 25),
+        orderOfService = null
     )
 }
 
@@ -79,7 +80,9 @@ fun EventEntry.Companion.create(event: Event, song: Song, sequence: Int = 1): Ev
     return EventEntry(
         event = event,
         song = song,
-        sequence = sequence
+        sequence = sequence,
+        orderOfServiceElement = null,
+        elementText = null
     )
 }
 
