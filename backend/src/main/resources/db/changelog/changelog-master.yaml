@@ -962,3 +962,250 @@ databaseChangeLog:
               DROP POLICY IF EXISTS category_type_choir_security ON category_type;
               CREATE POLICY category_type_choir_security ON category_type
               USING (current_setting('app.current_choir_id') = '' OR choir_id::VARCHAR = current_setting('app.current_choir_id'));
+  - changeSet:
+      id: 1757766391923-3
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: element_textPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: short_description
+                  type: VARCHAR(255)
+              - column:
+                  name: text
+                  type: VARCHAR(255)
+              - column:
+                  name: liturgical_book_translation_id
+                  type: BIGINT
+            tableName: element_text
+  - changeSet:
+      id: 1757766391923-4
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: liturgical_book_translationPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: code
+                  type: VARCHAR(255)
+              - column:
+                  name: text
+                  type: VARCHAR(255)
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: rite_id
+                  type: BIGINT
+            tableName: liturgical_book_translation
+  - changeSet:
+      id: 1757766391923-5
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: order_of_servicePK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: rite_id
+                  type: BIGINT
+            tableName: order_of_service
+  - changeSet:
+      id: 1757766391923-6
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: order_of_service_elementPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: can_be_sung
+                  type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                  name: is_header
+                  type: BOOLEAN
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: sequence
+                  type: INTEGER
+              - column:
+                  name: order_of_service_id
+                  type: BIGINT
+            tableName: order_of_service_element
+  - changeSet:
+      id: 1757766391923-7
+      author: Steven.Bontenbal (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: ritePK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+            tableName: rite
+  - changeSet:
+      id: 1757766391923-8
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: element_text_id
+                  type: BIGINT
+            tableName: event_entry
+  - changeSet:
+      id: 1757766391923-9
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: order_of_service_element_id
+                  type: BIGINT
+            tableName: event_entry
+  - changeSet:
+      id: 1757766391923-10
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: order_of_service_id
+                  type: BIGINT
+            tableName: event
+  - changeSet:
+      id: 1757766391923-11
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: rite_id
+            baseTableName: liturgical_book_translation
+            constraintName: FK2ywomlglyrea32mnd35i3moii
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: rite
+            validate: true
+  - changeSet:
+      id: 1757766391923-12
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: order_of_service_id
+            baseTableName: order_of_service_element
+            constraintName: FK7cam4d6vvqjqn081n4ej24ayo
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: order_of_service
+            validate: true
+  - changeSet:
+      id: 1757766391923-13
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: liturgical_book_translation_id
+            baseTableName: element_text
+            constraintName: FK8gd8vgh69matom3hb7x838ldy
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: liturgical_book_translation
+            validate: true
+  - changeSet:
+      id: 1757766391923-14
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: element_text_id
+            baseTableName: event_entry
+            constraintName: FKe8ub1kraehvpuu13os484078k
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: element_text
+            validate: true
+  - changeSet:
+      id: 1757766391923-15
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: order_of_service_id
+            baseTableName: event
+            constraintName: FKk8rgosy3drvk7ft9eib4hvo46
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: order_of_service
+            validate: true
+  - changeSet:
+      id: 1757766391923-16
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: order_of_service_element_id
+            baseTableName: event_entry
+            constraintName: FKl1mf7wipc6uk633alk5p3v0av
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: order_of_service_element
+            validate: true
+  - changeSet:
+      id: 1757766391923-17
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: rite_id
+            baseTableName: order_of_service
+            constraintName: FKs9v0wvfgtmssfa6012p98yok4
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: rite
+            validate: true
