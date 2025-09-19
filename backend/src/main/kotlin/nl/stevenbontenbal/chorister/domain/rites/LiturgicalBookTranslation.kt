@@ -15,7 +15,6 @@ class LiturgicalBookTranslation(
     var id: Long? = null,
     var code: String,
     var title: String,
-    var text: String,
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "RITE_ID")
     var rite: Rite?,

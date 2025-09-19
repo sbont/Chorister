@@ -1209,3 +1209,55 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: rite
             validate: true
+  - changeSet:
+      id: 1757878746216-3
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addColumn:
+          columns:
+          - column:
+              constraints:
+                nullable: false
+              name: sequence
+              type: INTEGER
+          tableName: element_text
+  - changeSet:
+      id: 1757879241530-3
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addColumn:
+          columns:
+          - column:
+              name: element_id
+              type: BIGINT
+          tableName: element_text
+  - changeSet:
+      id: 1757879241530-4
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addForeignKeyConstraint:
+          baseColumnNames: element_id
+          baseTableName: element_text
+          constraintName: FKld0fcdmdy59tx43irmotgdg3l
+          deferrable: false
+          initiallyDeferred: false
+          referencedColumnNames: id
+          referencedTableName: order_of_service_element
+          validate: true
+  - changeSet:
+      id: 1757879241530-7
+      author: Steven.Bontenbal (generated)
+      changes:
+      - dropColumn:
+          columnName: text
+          tableName: liturgical_book_translation
+  - changeSet:
+      id: 1757955505311-3
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addColumn:
+          columns:
+          - column:
+              name: skip_to_step
+              type: INTEGER
+          tableName: element_text
