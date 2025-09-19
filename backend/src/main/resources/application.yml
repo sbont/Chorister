@@ -15,6 +15,7 @@ spring:
     hibernate.ddl-auto: validate
     properties:
       hibernate:
+        default_schema: order_of_service
         jdbc:
           lob:
             non_contextual_creation=true
@@ -24,7 +25,7 @@ spring:
         dialect: org.hibernate.dialect.CockroachDialect
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
-    default-schema:
+    default-schema: order_of_service
     drop-first: false
     contexts: crdb
     enabled: true
