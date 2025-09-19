@@ -3,38 +3,37 @@
         <div v-if="error" class="error" @click="handleErrorClick">
             ERROR: {{ error }}
         </div>
-        <table class="table is-hoverable is-fullwidth song-table" v-cloak>
-            <thead>
-                <tr>
-                    <th class="col-no" title="number"></th>
-                    <th class="col-title">Title</th>
-                    <th class="col-composer">Composer</th>
-                    <th class="col-last-played">Last Played</th>
-                    <th class="col-category">Categories</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(song, index) in songs" class="song" :key="song.id" draggable="true"
-                    @dragstart="startDrag($event, song)">
-                    <td>{{ oneBased(index) }}</td>
-                    <th>
-                        <router-link :to="{ name: 'Song', params: { id: song.id } }" append>{{ song.title
-                            }}</router-link>
-                    </th>
-                    <td>{{ song.composer }}</td>
-                    <td>{{ song.lastEvent?.date }}</td>
-                    <td class="col-category">
-                        <div class="tags">
-                            <span v-for="(category, index) in song.categories?.resolved"
-                                class="song-category tag is-normal" :key="index">
-                                {{ category.name }}
-                            </span>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-            <tfoot></tfoot>
-        </table>
+        <DataTable :value="songs" size="small">
+            <Column body-class="col-select" selection-mode="multiple"></Column>
+            <Column body-class="col-no">
+                <template #body="slotProps">
+                    <span>
+                        {{ oneBased(slotProps.index) }}
+                    </span>
+                </template>
+            </Column>
+            <Column header="Title" body-class="col-title">
+                <template #body="slotProps">
+                    <router-link :to="{ name: 'Song', params: { id: (slotProps.data as Song).id } }" append
+                        class="has-text-weight-semibold">
+                        {{ (slotProps.data as Song).title }}
+                    </router-link>
+                </template>
+            </Column>
+            <Column field="composer" header="Composer" body-class="col-composer"></Column>
+            <Column field="lastEvent.date" header="Last Included" body-class="col-last-played"></Column>
+            <Column header="Categories" body-class="col-category">
+                <template #body="slotProps">
+                    <div class="tags">
+                        <span v-for="(category, index) in slotProps.data.categories?.resolved"
+                            class="song-category tag is-normal" :key="index">
+                            {{ category.name }}
+                        </span>
+                    </div>
+                </template>
+            </Column>
+        </DataTable>
+
         <progress v-if="loading" class="progress is-medium is-info" max="100"></progress>
         <footer class="footer" v-cloak>
             <strong>{{ songs.length }}</strong>
@@ -48,6 +47,9 @@ import { ref } from 'vue'
 import { useSongs } from "@/application/songStore.js";
 import { useRoute } from "vue-router";
 import { Song } from "@/entities/song";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+
 
 // Types
 const songStore = useSongs();
@@ -112,6 +114,10 @@ const startDrag = function (event: DragEvent, song: Song) {
 
 td.p-1b {
     padding: 0.3em;
+}
+
+.col-select {
+    width: 3%;
 }
 
 .col-no {
