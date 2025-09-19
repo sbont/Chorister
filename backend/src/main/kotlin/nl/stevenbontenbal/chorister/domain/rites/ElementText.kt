@@ -13,8 +13,13 @@ class ElementText(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    var shortDescription: String,
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ELEMENT_ID")
+    var element: OrderOfServiceElement?,
+    var shortDescription: String?,
     var text: String,
+    var sequence: Int,
+    var skipToStep: Int?,
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "LITURGICAL_BOOK_TRANSLATION_ID")
     var translation: LiturgicalBookTranslation?,
