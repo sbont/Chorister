@@ -1,36 +1,31 @@
 @charset "utf-8";
 
-/* Your tokens (can be referenced in the config below) */
+// colors
 $purple: #9431a8;
-$blue:   #64b9d3;
+$blue: #64b9d3;
+$primary: $purple;
 
-/* Configure Bulma at first load */
-@use "bulma/sass" with (
-  /* colors / brand */
-  $primary: $purple,
+// Font
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,200;0,400;0,600;0,800;1,200;1,400;1,600;1,800&display=swap');
+$family-sans-serif: "Fira Sans", sans-serif;
+$family-primary: $family-sans-serif;
+$family-secondary: "Merriweather", serif;
+// $body-size: 11pt;
 
-  /* fonts */
-  $family-sans-serif: '"Fira Sans", sans-serif',
-  $family-primary:    '"Fira Sans", sans-serif',
-  $family-secondary:  '"Merriweather", serif',
+@import "../node_modules/bulma/sass/utilities/initial-variables.sass";
 
-  /* weights (Bulma’s $weight-semibold = 600) */
-  $strong-weight: 600,
+$strong-weight: $weight-semibold;
 
-  /* navbar */
-  $navbar-height: 3.75rem,
-);
+// menu
+$navbar-height: 3.75rem;
 
-:root {
-  /* menu (values mirror Bulma’s named colors) */
-  --menu-item-color:                    hsl(221, 14%, 96%);  /* $white-ter   */
-  --menu-item-hover-color:              hsl(221, 14%, 98%);  /* $white-bis   */
-  --menu-item-hover-background-color:   hsl(221, 14%, 29%);  /* $grey-dark   */
-  --menu-item-active-color:             hsl(221, 14%, 100%); /* $white       */
-  --menu-item-active-background-color:  #{$purple};            /* was $primary */
-  --menu-label-color:                   hsl(221, 14%, 86%);  /* $grey-lighter*/
-}
 
-/* Load fonts (CSS @imports go AFTER @use) */
-@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,200;0,400;0,600;0,800;1,200;1,400;1,600;1,800&display=swap");
+$menu-item-color: $white-ter;
+$menu-item-hover-color: $white-bis;
+$menu-item-hover-background-color: $grey-dark;
+$menu-item-active-color: $white;
+$menu-item-active-background-color: $primary;
+$menu-label-color: $grey-lighter;
+
+@import "../node_modules/bulma/bulma.sass";
