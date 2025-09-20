@@ -1,31 +1,36 @@
 @charset "utf-8";
 
-// colors
+/* Your tokens (can be referenced in the config below) */
 $purple: #9431a8;
-$blue: #64b9d3;
-$family-sans-serif: "Fira Sans", sans-serif;
+$blue:   #64b9d3;
 
-// copy from initial-variables because SASS is stupid
-$weight-semibold: 600 !default;
-$white-ter: hsl(221, 14%, 96%) !default;
-$white-bis: hsl(221, 14%, 98%) !default;
-$white: hsl(221, 14%, 100%) !default;
-
-$grey-dark: hsl(221, 14%, 29%) !default;
-$grey: hsl(221, 14%, 48%) !default;
-$grey-light: hsl(221, 14%, 71%) !default;
-$grey-lighter: hsl(221, 14%, 86%) !default;
-
+/* Configure Bulma at first load */
 @use "bulma/sass" with (
-    $primary: $purple,
-    $purple: $purple,
-    $blue: $blue,
-    $family-primary: $family-sans-serif,
-    $family-secondary: '"Merriweather", serif',
-    $strong-weight: $weight-semibold,
-    $navbar-height: 3.75rem,
+  /* colors / brand */
+  $primary: $purple,
+
+  /* fonts */
+  $family-sans-serif: '"Fira Sans", sans-serif',
+  $family-primary:    '"Fira Sans", sans-serif',
+  $family-secondary:  '"Merriweather", serif',
+
+  /* weights (Bulma’s $weight-semibold = 600) */
+  $strong-weight: 600,
+
+  /* navbar */
+  $navbar-height: 3.75rem,
 );
 
-// Font
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,200;0,400;0,600;0,800;1,200;1,400;1,600;1,800&display=swap');
+:root {
+  /* menu (values mirror Bulma’s named colors) */
+  --menu-item-color:                    hsl(221, 14%, 96%);  /* $white-ter   */
+  --menu-item-hover-color:              hsl(221, 14%, 98%);  /* $white-bis   */
+  --menu-item-hover-background-color:   hsl(221, 14%, 29%);  /* $grey-dark   */
+  --menu-item-active-color:             hsl(221, 14%, 100%); /* $white       */
+  --menu-item-active-background-color:  #{$purple};            /* was $primary */
+  --menu-label-color:                   hsl(221, 14%, 86%);  /* $grey-lighter*/
+}
+
+/* Load fonts (CSS @imports go AFTER @use) */
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,200;0,400;0,600;0,800;1,200;1,400;1,600;1,800&display=swap");
