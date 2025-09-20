@@ -4,6 +4,26 @@
             ERROR: {{ error }}
         </div>
         <DataTable :value="songs" size="small">
+            <template #header>
+                <div class="is-flex is-justify-content-space-between">
+                    <div class="is-flex title">
+                        All songs
+                    </div>
+                    <div class="is-flex is-gap-2">
+                        <button class="button">Categorise</button>
+
+                        <router-link class="button is-primary" :to="{ name: 'NewSong' }" append tag="button">
+                            <span class="icon is-small">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span>Add</span>
+                        </router-link>
+
+                    </div>
+                </div>
+            </template>
+            <template #empty> No customers found. </template>
+
             <Column body-class="col-select" selection-mode="multiple"></Column>
             <Column body-class="col-no">
                 <template #body="slotProps">
