@@ -1,18 +1,20 @@
 @charset "utf-8";
-@use "bulma/sass/utilities/initial-variables" as v;
 
 // colors
 $purple: #9431a8;
 $blue: #64b9d3;
-$family-sans-serif: '"Fira Sans", sans-serif';
+$family-sans-serif: "Fira Sans", sans-serif;
 
-// shadow
-$weight-semibold: v.$weight-semibold;
-$white-ter: v.$white-ter;
-$white-bis: v.$white-bis;
-$grey-dark: v.$grey-dark;
-$white: v.$white;
-$grey-lighter: v.$grey-lighter;
+// copy from initial-variables because SASS is stupid
+$weight-semibold: 600 !default;
+$white-ter: hsl(221, 14%, 96%) !default;
+$white-bis: hsl(221, 14%, 98%) !default;
+$white: hsl(221, 14%, 100%) !default;
+
+$grey-dark: hsl(221, 14%, 29%) !default;
+$grey: hsl(221, 14%, 48%) !default;
+$grey-light: hsl(221, 14%, 71%) !default;
+$grey-lighter: hsl(221, 14%, 86%) !default;
 
 @use "bulma/sass" with (
     $primary: $purple,
@@ -21,12 +23,6 @@ $grey-lighter: v.$grey-lighter;
     $family-primary: $family-sans-serif,
     $family-secondary: '"Merriweather", serif',
     $strong-weight: $weight-semibold,
-    $menu-item-color: $white-ter,
-    $menu-item-hover-color: $white-bis,
-    $menu-item-hover-background-color: $grey-dark,
-    $menu-item-active-color: $white,
-    $menu-item-active-background-color: $purple,
-    $menu-label-color: $grey-lighter,
     $navbar-height: 3.75rem,
 );
 
