@@ -1,31 +1,35 @@
 @charset "utf-8";
+@use "bulma/sass/utilities/initial-variables" as v;
 
 // colors
 $purple: #9431a8;
 $blue: #64b9d3;
-$primary: $purple;
+$family-sans-serif: '"Fira Sans", sans-serif';
+
+// shadow
+$weight-semibold: v.$weight-semibold;
+$white-ter: v.$white-ter;
+$white-bis: v.$white-bis;
+$grey-dark: v.$grey-dark;
+$white: v.$white;
+$grey-lighter: v.$grey-lighter;
+
+@use "bulma/sass" with (
+    $primary: $purple,
+    $purple: $purple,
+    $blue: $blue,
+    $family-primary: $family-sans-serif,
+    $family-secondary: '"Merriweather", serif',
+    $strong-weight: $weight-semibold,
+    $menu-item-color: $white-ter,
+    $menu-item-hover-color: $white-bis,
+    $menu-item-hover-background-color: $grey-dark,
+    $menu-item-active-color: $white,
+    $menu-item-active-background-color: $purple,
+    $menu-label-color: $grey-lighter,
+    $navbar-height: 3.75rem,
+);
 
 // Font
 @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,200;0,400;0,600;0,800;1,200;1,400;1,600;1,800&display=swap');
-$family-sans-serif: "Fira Sans", sans-serif;
-$family-primary: $family-sans-serif;
-$family-secondary: "Merriweather", serif;
-// $body-size: 11pt;
-
-@import "../node_modules/bulma/sass/utilities/initial-variables.sass";
-
-$strong-weight: $weight-semibold;
-
-// menu
-$navbar-height: 3.75rem;
-
-
-$menu-item-color: $white-ter;
-$menu-item-hover-color: $white-bis;
-$menu-item-hover-background-color: $grey-dark;
-$menu-item-active-color: $white;
-$menu-item-active-background-color: $primary;
-$menu-label-color: $grey-lighter;
-
-@import "../node_modules/bulma/bulma.sass";

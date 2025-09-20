@@ -1,10 +1,28 @@
-@media (min-width:600px) {
+:root {
+    --bulma-purple: #9431a8;
+    --bulma-blue: #64b9d3;
+    --bulma-family-sans-serif: '"Fira Sans", sans-serif';
+
+    --bulma-navbar-height: 3.75rem;
+    --bulma-primary: var(--bulma-purple);
+    --bulma-family-secondary: '"Merriweather", serif';
+    --bulma-family-primary: var(--bulma-family-sans-serif);
+    --bulma-strong-weight: var(--bulma-weight-semibold);
+    --bulma-menu-item-color: var(--bulma-white-ter);
+    --bulma-menu-item-hover-color: var(--bulma-white-bis);
+    --bulma-menu-item-hover-background-color: var(--bulma-grey-dark);
+    --bulma-menu-item-active-color: var(--bulma-white);
+    --bulma-menu-item-active-background-color: var(--bulma-purple);
+    --bulma-menu-label-color: var(--bulma-grey-lighter);
+}
+
+@media (min-width: 600px) {
     #menu {
         min-height: 100vh;
     }
 }
 th {
-    font-weight: 600;;
+    font-weight: 600;
 }
 .field-flex {
     display: flex;
@@ -18,9 +36,6 @@ th {
 .field-flex-col.is-one-third {
     width: 33.33%;
     flex: none;
-}
-.field-body .tags .tag {
-    /*margin-bottom: 0;*/
 }
 .field.static {
     height: 100%;
