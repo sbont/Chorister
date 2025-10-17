@@ -51,12 +51,9 @@ export const useCategories = defineStore("categories", () => {
 
     async function fetchForSong(songId: number) {
         const data = await api.getSongCategories(songId);
-        console.log(data);
-        
         const categoryIds = data.map(c => c.id).filter(notNullOrUndefined);
-        console.log(categoryIds);
-        
         categoriesBySongId.value.set(songId, categoryIds);
+
         return data;
     }
 
@@ -67,8 +64,9 @@ export const useCategories = defineStore("categories", () => {
         return allCategories.value.find(category => category.id === categoryId);
     }
 
-    async function getForSong(songId: number) {
-        return categoriesBySongId.value.has(songId) ? categoriesBySongId.value.get(songId) : await fetchForSong(songId)
+    async function getForSong(songId: number): Promise<Category[]> {
+        return categoriesBySongId.value.get(songId)?.map(id => categories.value.get(id)).filter(notNullOrUndefined)
+            ?? await fetchForSong(songId);
     }
 
     async function putForSong(songId: number, newCategories: Category[]) {
@@ -94,6 +92,10 @@ export const useCategories = defineStore("categories", () => {
             const previousCategories = categoriesBySongId.value.get(song.id) ?? [];
             return !previousCategories.some(c => c === category.id);
         });
+        
+        if (!newlyAddded.length)
+            return;
+
         await api.postCategorySongs(category.id, newlyAddded);
         newlyAddded.forEach(song => categoriesBySongId.value.set(song.id, [...categoriesBySongId.value.get(song.id) ?? [], category.id!]));
     }
@@ -101,11 +103,6 @@ export const useCategories = defineStore("categories", () => {
     async function save(category: Category) {
         const data = await api.createNewCategory(category);
         put(data);
-    }
-
-    function onSongLoaded(song: Song) {
-        const categoryIds = song.categories?.resolved?.map(category => category.id).filter(notNullOrUndefined) ?? [];
-        categoriesBySongId.value.set(song.id, categoryIds);
     }
 
     function put(category: Category) {
@@ -123,5 +120,5 @@ export const useCategories = defineStore("categories", () => {
             categoriesByType.value.removeFrom(category.categoryType.uri, category);
     }
 
-    return { categories, categoriesBySongId, categoriesByType, categoryTypes, songCategories, initialize, get, fetchAll, getForSong, putForSong, addForSongs, save, deleteCategory, onSongLoaded }
+    return { categories, categoriesBySongId, categoriesByType, categoryTypes, songCategories, initialize, get, fetchAll, getForSong, putForSong, addForSongs, save, deleteCategory }
 });

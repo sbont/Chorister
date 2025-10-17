@@ -20,12 +20,6 @@ export interface CategoryTypeLink extends WithAssociation {
 }
 
 export function toDomainCategory(category: Category): DomainCategory {
-    console.log({
-        ...toDomain(category),
-        choir: category._links?.choir ? { uri: untemplated(category._links.choir) } : undefined,
-        categoryType: category._links?.categoryType ? { uri: untemplated(category._links.categoryType) } : undefined
-    });
-    
     return {
         ...toDomain(category),
         choir: category._links?.choir ? { uri: untemplated(category._links.choir) } : undefined,
