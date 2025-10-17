@@ -40,7 +40,7 @@ export default class ChoristerApi implements IChoristerApi {
     private choirs: ChoirsEndpoint;
     private registration: RegistrationEndpoint;
     private invite: InviteEndpoint;
-    private categories: EntityEndpoint<DomainCategory, Category, Category>;
+    private categories: CategoriesEndpoint;
     private users: EntityEndpoint<DomainUser, User, User>;
     private user: UserEndpoint
 
@@ -72,7 +72,7 @@ export default class ChoristerApi implements IChoristerApi {
         this.choirs = new ChoirsEndpoint(this.instance, "choirs", fromDomainChoir, toDomainChoir);
         this.registration = new RegistrationEndpoint(this.instance);
         this.invite = new InviteEndpoint(this.instance);
-        this.categories = new EntityEndpoint(this.instance, "categories", fromDomainCategory, toDomainCategory);
+        this.categories = new CategoriesEndpoint(this.instance);
         this.users = new EntityEndpoint(this.instance, "users", fromDomainUser, toDomainUser);
         this.user = new UserEndpoint(this.instance);
         this.files = new FilesEndpoint(this.instance);
@@ -142,6 +142,9 @@ export default class ChoristerApi implements IChoristerApi {
 
     deleteSongCategory = (songId: number, category: DomainCategory) =>
         this.categories.deleteAssociation(this.songs.getUri(songId) + "/categories", category);
+
+    postCategorySongs = (categoryId: number, songs: Array<DomainSong>) =>
+        this.categories.postCategorySongs(this.categories.getUri(categoryId), songs);
 
     // Chords
 
@@ -451,5 +454,16 @@ class EventsEndpoint extends EntityEndpoint<DomainEvent, EventIn, EventOut> impl
     async putEntries(uri: Uri, domainEntries: Array<DomainEventEntry>): Promise<void> {
         const entries = domainEntries.map(fromDomainEventEntry)
         await this.instance.put(`${uri}/list`, { "_embedded": { "eventEntries": entries } }, { headers: { "Content-Type": "application/json" } });
+    }
+}
+
+class CategoriesEndpoint extends EntityEndpoint<DomainCategory, Category, Category> {
+    constructor(instance: AxiosInstance) {
+        super(instance, "categories", fromDomainCategory, toDomainCategory);
+    }
+
+    async postCategorySongs(uri: Uri, songs: Array<DomainSong>): Promise<void> {
+        const songUris = songs.map(s => s.uri);
+        await this.instance.post(`${uri}/songs`, { songs: songUris }, { headers: { "Content-Type": "application/json" } });
     }
 }

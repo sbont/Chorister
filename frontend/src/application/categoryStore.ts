@@ -1,11 +1,13 @@
 import { defineStore } from "pinia";
 import { CacheListMap, CacheMap } from "@/types/CacheMaps";
-import { computed, inject, ref } from "vue";
+import { computed, inject, reactive, ref } from "vue";
 import { Api, ApiKey } from "./api";
 import { Category } from "@/entities/category";
 import { Uri } from "@/types";
 import { useEntityStore } from "./entityStore";
 import { CategoryType } from "@/entities/categoryType";
+import { Song } from "@/entities/song";
+import { notNullOrUndefined } from "@/utils";
 
 export const useCategories = defineStore("categories", () => {
     const api = inject(ApiKey)!;
@@ -13,28 +15,51 @@ export const useCategories = defineStore("categories", () => {
     const categoryTypeStore = useEntityStore("categoryTypes", categoryTypeEndpoint)();
 
     // state
+    const initialized = ref(false);
+    const initializing = ref(false);
     const categoryTypes = ref(new CacheMap<Uri, CategoryType>);
-    const categories = ref(new CacheListMap<Uri, Category>());
-    const categoriesBySongId = ref(new CacheListMap<number, Category>());
+    const categories = ref(new CacheMap<number, Category>);
+    const categoriesByType = ref(new CacheListMap<Uri, Category>());
+    const categoriesBySongId = ref(new Map<number, number[]>());
 
     // getters
-    const allCategories = computed(() => categories.value.allValues());
+    const allCategories = computed(() => categoriesByType.value.allValues());
+    const songCategories = computed(() => (songId: number) => {
+        const categoryIds = categoriesBySongId.value.get(songId) ?? [];
+        return categoryIds.map(id => categories.value.get(id)).filter(notNullOrUndefined);
+    });
+
+    // actions
+    async function initialize() {
+        if (initialized.value || initializing.value)
+            return;
+
+        initializing.value = true;
+        await fetchAll();
+        initializing.value = false;
+        initialized.value = true;
+    }
 
     async function fetchAll() {
         const types = await categoryTypeStore.fetchAll();
         types.filter(t => t.uri).forEach(t => categoryTypes.value.set(t.uri!, t))
 
         const data = await api.getAllCategories();
-        categories.value.clear();
+        categoriesByType.value.clear();
         data.forEach(put);
     }
 
     async function fetchForSong(songId: number) {
         const data = await api.getSongCategories(songId);
-        categoriesBySongId.value.set(songId, data);
+        console.log(data);
+        
+        const categoryIds = data.map(c => c.id).filter(notNullOrUndefined);
+        console.log(categoryIds);
+        
+        categoriesBySongId.value.set(songId, categoryIds);
         return data;
     }
-    
+
     async function get(categoryId: number) {
         if (!allCategories.value)
             await fetchAll();
@@ -46,19 +71,31 @@ export const useCategories = defineStore("categories", () => {
         return categoriesBySongId.value.has(songId) ? categoriesBySongId.value.get(songId) : await fetchForSong(songId)
     }
 
-    async function putForSong(songId: number, categories: Category[]) {
+    async function putForSong(songId: number, newCategories: Category[]) {
         let previousCategories = categoriesBySongId.value.get(songId) ?? [];
-        let newCategories = categories.filter(draftCategory => !previousCategories.some(previousCategory => draftCategory.id === previousCategory.id));
-        let deletedCategories = previousCategories.filter(previousCategory => !categories.some(draftCategory => previousCategory.id === draftCategory.id));
+        let categoriesToAdd = newCategories.filter(draftCategory => !previousCategories.some(previousCategory => draftCategory.id === previousCategory));
+        let categoriesToDelete = previousCategories.filter(previousCategory => !newCategories.some(draftCategory => previousCategory === draftCategory.id));
         const promises = [];
-        if (newCategories.length) {
-            const posted = api.postSongCategories(songId, newCategories);
+        if (categoriesToAdd.length) {
+            const posted = api.postSongCategories(songId, categoriesToAdd);
             promises.push(posted);
         }
-        deletedCategories.forEach(songCategory => promises.push(api.deleteSongCategory(songId, songCategory)));
-        await Promise.all(promises)
-        categoriesBySongId.value.addAllTo(songId, newCategories)
-        categoriesBySongId.value.removeAllFrom(songId, deletedCategories)
+        categoriesToDelete.forEach(songCategory => {
+            const category = categories.value.get(songCategory);
+            if (category)
+                promises.push(api.deleteSongCategory(songId, category))
+        });
+        await Promise.all(promises);
+        categoriesBySongId.value.set(songId, newCategories.map(c => c.id));
+    }
+
+    async function addForSongs(songs: Array<Song>, category: Category) {
+        const newlyAddded = songs.filter(song => {
+            const previousCategories = categoriesBySongId.value.get(song.id) ?? [];
+            return !previousCategories.some(c => c === category.id);
+        });
+        await api.postCategorySongs(category.id, newlyAddded);
+        newlyAddded.forEach(song => categoriesBySongId.value.set(song.id, [...categoriesBySongId.value.get(song.id) ?? [], category.id!]));
     }
 
     async function save(category: Category) {
@@ -66,19 +103,25 @@ export const useCategories = defineStore("categories", () => {
         put(data);
     }
 
+    function onSongLoaded(song: Song) {
+        const categoryIds = song.categories?.resolved?.map(category => category.id).filter(notNullOrUndefined) ?? [];
+        categoriesBySongId.value.set(song.id, categoryIds);
+    }
+
     function put(category: Category) {
+        categories.value.set(category.id, category);
         if (!category.categoryType?.uri) {
             console.error(`Category type unknown for category with  id ${category.id}`);
         } else {
-            categories.value.addTo(category.categoryType.uri, category);
-        }   
+            categoriesByType.value.addTo(category.categoryType.uri, category);
+        }
     }
 
     async function deleteCategory(category: Category) {
         await api.deleteEntity(category);
-        if  (category.categoryType?.uri)
-            categories.value.removeFrom(category.categoryType.uri, category);
+        if (category.categoryType?.uri)
+            categoriesByType.value.removeFrom(category.categoryType.uri, category);
     }
 
-    return { categories, categoryTypes, get, fetchAll, getForSong, putForSong, save, deleteCategory }
+    return { categories, categoriesBySongId, categoriesByType, categoryTypes, songCategories, initialize, get, fetchAll, getForSong, putForSong, addForSongs, save, deleteCategory, onSongLoaded }
 });

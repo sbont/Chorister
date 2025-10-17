@@ -45,6 +45,8 @@ export interface Api {
     getSongCategories: (songId: number) => Promise<Array<Category>>
     postSongCategories: (songId: number, categories: Array<Category>) => Promise<void>
     deleteSongCategory: (songId: number, category: Category) => Promise<void>
+    
+    postCategorySongs: (categoryId: number, songs: Array<Song>) => Promise<void>
 
     // Chords
     getChords: (songId: number) => Promise<Array<Chords>>

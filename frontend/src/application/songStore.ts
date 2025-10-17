@@ -5,11 +5,15 @@ import { computed, inject, ref } from "vue";
 import { ApiKey } from "./api";
 import { Score } from "@/entities/score";
 import { Chords } from "@/entities/chords";
+import { useCategories } from "./categoryStore";
 
 export const useSongs = defineStore("songs", () => {
     const api = inject(ApiKey)!;
+    const categoryStore = useCategories();
 
     // state
+    const initialized = ref(false);
+    const initializing = ref(false);
     const songs = ref(new CacheMap<number, Song>());
     const chordsBySong = ref(new CacheListMap<number, Chords>);
     const scoresBySong = ref(new CacheListMap<number, Score>);
@@ -24,6 +28,18 @@ export const useSongs = defineStore("songs", () => {
             chordsBySong.value.addAllTo(song.id, chords);
         if (scores)
             scoresBySong.value.addAllTo(song.id, scores);
+
+        categoryStore.onSongLoaded(song);
+    }
+
+    async function initialize() {
+        if (initialized.value || initializing.value)
+            return;
+
+        initializing.value = true;
+        await fetchAll();
+        initializing.value = false;
+        initialized.value = true;
     }
 
     async function fetchAll() {
@@ -75,7 +91,7 @@ export const useSongs = defineStore("songs", () => {
         songs.value.delete(song.id);
     }
 
-    return { allSongs, fetchAll, get, save, deleteSong, fetchAllForCategory, put }
+    return { allSongs, initialize, fetchAll, get, save, deleteSong, fetchAllForCategory, put }
 });
 
 const sort = (data: Array<Song>) => data.sort((songA, songB) => songA.title.localeCompare(songB.title));

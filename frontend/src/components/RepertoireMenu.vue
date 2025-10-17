@@ -1,7 +1,7 @@
 <template>
     <aside class="menu p-2">
         <p class="menu-label">Repertoire</p>
-        <ul class="menu-list"  v-if="ready">
+        <ul class="menu-list" v-if="ready">
             <li>
                 <router-link :to="{ name: 'Repertoire' }">All songs</router-link>
             </li>
@@ -11,7 +11,7 @@
                     <li v-for="category in entry[1]" :key="category.id">
                         <router-link :to="{ name: 'Category', params: { id: category.id } }" append>{{
                             category.name
-                        }}
+                            }}
                         </router-link>
                     </li>
                 </ul>
@@ -28,7 +28,7 @@ import { computed, onMounted } from 'vue';
 const categoryStore = useCategories();
 
 // State
-const { categories, categoryTypes } = storeToRefs(categoryStore);
+const { categoriesByType: categories, categoryTypes } = storeToRefs(categoryStore);
 categoryStore.fetchAll();
 
 // Computed

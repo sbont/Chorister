@@ -26,7 +26,7 @@ const routes = [
             {
                 path: '',
                 name: 'Repertoire',
-                component: () => import('../components/AllSongs.vue'),
+                component: () => import('../components/Songs.vue'),
                 meta: {
                     requiresAuth: true
                 },
@@ -34,7 +34,7 @@ const routes = [
             {
                 path: 'category/:id',
                 name: 'Category',
-                component: () => import('../components/SongsByCategory.vue'),
+                component: () => import('../components/Songs.vue'),
                 meta: {
                     requiresAuth: true
                 },
