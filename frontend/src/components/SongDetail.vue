@@ -1,14 +1,10 @@
 <template>
     <div class="song">
-        <DetailHeader 
-            :title="song?.title" 
-            :subtitle="subtitle"
-            :mode="!editing ? 'view' : songIsNew ? 'create' : 'edit'" 
-            :onEdit="edit" 
-            :edit-disabled="loading"
+        <DetailHeader :title="song?.title" :subtitle="subtitle"
+            :mode="!editing ? 'view' : songIsNew ? 'create' : 'edit'" :onEdit="edit" :edit-disabled="loading"
             :onDelete="remove" />
 
-        <div class="song-info m-2 columns">
+        <div class="song-info m-2 columns" v-if="song">
             <div class="column">
                 <div>
                     <div class="field is-horizontal">
@@ -22,7 +18,7 @@
                                         :class="{ 'is-danger': v$.title.$error }" type="text"
                                         placeholder="The name of the song or hymn" @blur="v$.title.$touch" />
                                     <span v-else>
-                                        {{ song?.title }}
+                                        {{ song.title }}
                                     </span>
                                 </div>
                             </div>
@@ -38,7 +34,7 @@
                                     <input v-if="editing && draftValues" v-model="draftValues.composer" class="input"
                                         type="text" placeholder="Artist / composer / writer" />
                                     <span v-else>
-                                        {{ song?.composer }}
+                                        {{ song.composer }}
                                     </span>
                                 </div>
                             </div>
@@ -56,7 +52,7 @@
                                             class="input" type="text"
                                             placeholder="Songbook, hymnal or collection title" />
                                         <span v-else>
-                                            {{ song?.songbook?.title }}
+                                            {{ song.songbook?.title }}
                                         </span>
                                     </div>
                                 </div>
@@ -72,7 +68,7 @@
                                                 <input v-if="editing && draftValues"
                                                     v-model="draftValues.songbookNumber" class="input" type="text"
                                                     placeholder="Song number in the book" />
-                                                <span v-else>{{ song?.songbookNumber }}</span>
+                                                <span v-else>{{ song.songbookNumber }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -80,44 +76,24 @@
                             </div>
                         </div>
                     </div>
-                    <div class="field is-horizontal">
+                    <div v-for="(categoryType) in categoryTypes.values()" class="field is-horizontal">
                         <div class="field-label is-normal">
-                            <label class="label">Time of the year</label>
+                            <label class="label">{{ categoryType.name }}</label>
                         </div>
                         <div class="field-body">
                             <div class="field" v-bind:class="{ static: !editing }">
                                 <div class="control">
                                     <div class="select is-multiple">
-                                        <VueMultiselect v-if="editing" v-model="draftSongCategories.season"
-                                            :multiple="true" :options="categories.season" track-by="name" label="name"
-                                            :close-on-select="false"></VueMultiselect>
-
-                                        <div v-else class="tags are-medium">
-                                            <span v-for="(category) in songCategories?.season" :key="category.id"
-                                                class="tag">
-                                                {{ category.name }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field is-horizontal">
-                        <div class="field-label is-normal">
-                            <label class="label">Liturgical place</label>
-                        </div>
-                        <div class="field-body">
-                            <div class="field" v-bind:class="{ static: !editing }">
-                                <div class="control">
-                                    <div class="select is-multiple">
-                                        <VueMultiselect v-if="editing" v-model="draftSongCategories.liturgical"
-                                            :multiple="true" :options="categories.liturgical" track-by="name"
+                                        <VueMultiselect v-if="editing"
+                                            :modelValue="draftCategoriesByType!.get(categoryType.uri!)!"
+                                            @update:modelValue="updateDraftCategories(categoryType.uri!)($event)" 
+                                            :multiple="true"
+                                            :options="categoriesByType.get(categoryType.uri!)" track-by="name"
                                             label="name" :close-on-select="false"></VueMultiselect>
 
                                         <div v-else class="tags are-medium">
-                                            <span v-for="(category) in songCategories?.liturgical" :key="category.id"
-                                                class="tag">
+                                            <span v-for="(category) in songCategoriesForType(categoryType.uri!)"
+                                                :key="category.id" class="tag">
                                                 {{ category.name }}
                                             </span>
                                         </div>
@@ -164,7 +140,7 @@
 
                 <div class="text">
                     <div class="is-size-4">Text</div>
-                    <div v-if="!editing" v-html="song?.text"></div>
+                    <div v-if="!editing" v-html="song.text"></div>
                     <div v-else>
                         <editor-content :editor="editor" />
                     </div>
@@ -194,9 +170,12 @@ import { useCategories } from "@/application/categoryStore";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 import { Song, Songbook } from "@/entities/song"
-import { isNew } from "@/utils"
+import { isNew, notNullOrUndefined } from "@/utils"
 import { Category } from "@/entities/category";
 import DetailHeader from "./ui/DetailHeader.vue";
+import { Uri } from "@/types";
+import { value } from "effect/Secret";
+import { CacheListMap } from "@/types/CacheMaps";
 
 type DraftSongbook = Partial<Songbook>
 
@@ -204,18 +183,22 @@ interface DraftSong extends Omit<Partial<Song>, "songbook"> {
     songbook?: DraftSongbook
 }
 
-const songStore = useSongs();
-const categoryStore = useCategories();
 const route = useRoute();
 const router = useRouter()
+const songId = Number(route.params.id);
+const songStore = useSongs();
+const categoryStore = useCategories();
 
 // State
-const { categories } = storeToRefs(categoryStore);
+const { categoryTypes, categoriesByType } = storeToRefs(categoryStore);
+
 const song = ref<Song>()
-const songCategories = ref({ season: [] as Array<Category>, liturgical: [] as Array<Category> });
 const editing = ref(false);
 const draftValues = ref<DraftSong>();
-const draftSongCategories = ref();
+
+const songCategoriesForType = computed(() => (uri: Uri) => (categoryStore.songCategories(songId) ?? []).filter(c => c.categoryType?.uri === uri));
+const draftCategoriesByType = ref<CacheListMap<Uri, Category>>();
+
 const loading = ref(true);
 const saving = ref(false);
 const rules = {
@@ -252,19 +235,14 @@ const subtitle = computed(() => {
 });
 
 onMounted(() => {
-    const categoriesLoaded = categoryStore.fetchAll();
+    const categoriesLoaded = categoryStore.initialize();
     if (route.name === "NewSong") {
         draftValues.value = {
             songbook: {},
         };
-        draftSongCategories.value = {
-            season: [],
-            liturgical: []
-        }
         editing.value = true;
         categoriesLoaded.finally(() => loading.value = false);
     } else {
-        const songId = Number(route.params.id);
         const songLoaded = songStore.get(songId)
             .then((value) => {
                 if (value) {
@@ -272,14 +250,7 @@ onMounted(() => {
                 }
             });
         const songCategoriesLoaded = categoryStore.getForSong(songId);
-        Promise.all([songLoaded, categoriesLoaded, songCategoriesLoaded])
-            .then(([, , songCategoryResponse]) => {
-                songCategories.value = {
-                    season: categories.value.season!.filter(category => songCategoryResponse!.some(songCategory => category.id === songCategory.id)),
-                    liturgical: categories.value.liturgical!.filter(category => songCategoryResponse!.some(songCategory => category.id === songCategory.id))
-                };
-            })
-            .finally(() => loading.value = false);
+        Promise.all([songLoaded, categoriesLoaded, songCategoriesLoaded]).finally(() => loading.value = false);
     }
 })
 
@@ -299,13 +270,13 @@ const save = async () => {
     if (wasNew) {
         songDraft.id = newSong.id;
     }
-    categoryStore.putForSong(newSong.id, draftSongCategories.value.season.concat(draftSongCategories.value.liturgical));
+    const allCategories = [...draftCategoriesByType.value!.values()].flat();
+    categoryStore.putForSong(newSong.id, allCategories);
     editing.value = false;
     saving.value = false;
     song.value = songDraft as Song;
-    songCategories.value = draftSongCategories.value;
     draftValues.value = undefined;
-    draftSongCategories.value = [];
+    draftCategoriesByType.value = undefined;
     if (wasNew) {
         router.push({
             name: "Song",
@@ -327,7 +298,8 @@ const edit = () => {
     draftValues.value = structuredClone(toRaw(song.value as DraftSong))
     editor.value!.commands.setContent(draftValues.value.text ?? "")
     draftValues.value.songbook ??= {}
-    draftSongCategories.value = Object.assign({}, songCategories.value);
+    draftCategoriesByType.value = new CacheListMap<Uri, Category>();
+    categoryStore.songCategories(songId).forEach(c => draftCategoriesByType.value?.addTo(c.categoryType!.uri, c));
     editing.value = true;
 }
 
@@ -336,8 +308,12 @@ const cancelEdit = () => {
         router.push({ name: "Repertoire" });
 
     draftValues.value = undefined;
-    draftSongCategories.value = null;
+    draftCategoriesByType.value = new CacheListMap<Uri, Category>();
     editing.value = false;
+}
+
+const updateDraftCategories = (categoryTypeUri: Uri) => (newValues: Category[]) => {
+    draftCategoriesByType.value?.set(categoryTypeUri, newValues);
 }
 
 </script>
