@@ -92,7 +92,7 @@ export const useCategories = defineStore("categories", () => {
             const previousCategories = categoriesBySongId.value.get(song.id) ?? [];
             return !previousCategories.some(c => c === category.id);
         });
-        
+
         if (!newlyAddded.length)
             return;
 
@@ -103,6 +103,12 @@ export const useCategories = defineStore("categories", () => {
     async function save(category: Category) {
         const data = await api.createNewCategory(category);
         put(data);
+    }
+
+    function onSongLoaded(song: Song) {
+        const categoryIds = song.categories?.embedded?.map(category => category.id).filter(notNullOrUndefined);
+        if (categoryIds)
+            categoriesBySongId.value.set(song.id, categoryIds);
     }
 
     function put(category: Category) {
@@ -120,5 +126,5 @@ export const useCategories = defineStore("categories", () => {
             categoriesByType.value.removeFrom(category.categoryType.uri, category);
     }
 
-    return { categories, categoriesBySongId, categoriesByType, categoryTypes, songCategories, initialize, get, fetchAll, getForSong, putForSong, addForSongs, save, deleteCategory }
+    return { categories, categoriesBySongId, categoriesByType, categoryTypes, songCategories, initialize, get, fetchAll, getForSong, putForSong, addForSongs, save, deleteCategory, onSongLoaded }
 });

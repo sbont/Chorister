@@ -29,7 +29,7 @@ export const useSongs = defineStore("songs", () => {
         if (scores)
             scoresBySong.value.addAllTo(song.id, scores);
 
-        categoryStore.getForSong(song.id);
+        categoryStore.onSongLoaded(song);
     }
 
     async function initialize() {
