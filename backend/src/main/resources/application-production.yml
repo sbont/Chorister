@@ -14,8 +14,6 @@ chorister:
       url: ${CHORISTER_DATA_SOURCE_URL}
       username: ${CHORISTER_DATABASE_USER_USERNAME}
       password: ${CHORISTER_DATABASE_USER_PASSWORD}
-server:
-  port: 8090
 spring:
   security:
     oauth2:
@@ -32,13 +30,13 @@ logging:
   level:
     org:
       springframework:
-        security: INFO
-        web: DEBUG
+        security: OFF
+        web: ERROR
     nl.stevenbontenbal.chorister: DEBUG
     reactor:
       netty:
         http:
-          client: DEBUG
+          client: ERROR
 zitadel:
   base-url: https://login.chorister.co/management/v1
   admin-access-token: ${CHORISTER_ZITADEL_ACCESS_TOKEN}

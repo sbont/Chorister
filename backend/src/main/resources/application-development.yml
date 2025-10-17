@@ -14,8 +14,6 @@ chorister:
       url: ${chorister.datasource.system.url}
       username: app_user
       password: user1234!
-server:
-  port: 8090
 spring:
   liquibase:
     parameters:
@@ -35,15 +33,16 @@ spring:
 debug: false
 logging:
   level:
-    org:
-      springframework:
-        security: INFO
-        web: DEBUG
     nl.stevenbontenbal.chorister: DEBUG
+    org.hibernate.stat: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.springframework:
+      security: WARN
+      web: INFO
     reactor:
       netty:
         http:
-          client: DEBUG
+          client: INFO
 zitadel:
   base-url: http://localhost:9000/management/v1
   admin-access-token: ${CHORISTER_ADMIN_ACCESS_TOKEN}

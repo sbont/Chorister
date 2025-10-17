@@ -3,6 +3,8 @@ chorister:
   version: 0.1
 server:
   port: 8090
+  compression:
+    enabled: true
   forward-headers-strategy: framework
 spring:
   jackson:
