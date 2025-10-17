@@ -174,7 +174,6 @@ import { isNew, notNullOrUndefined } from "@/utils"
 import { Category } from "@/entities/category";
 import DetailHeader from "./ui/DetailHeader.vue";
 import { Uri } from "@/types";
-import { value } from "effect/Secret";
 import { CacheListMap } from "@/types/CacheMaps";
 
 type DraftSongbook = Partial<Songbook>
