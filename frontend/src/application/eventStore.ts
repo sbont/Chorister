@@ -35,7 +35,7 @@ export const useEvents = defineStore('events', () => {
         const today = new Date();
         return [...events.value.values()]
             .filter(e => new Date(e.date) < today)
-            .sort((a, b) => new Date(b.date).getTime()  - new Date(a.date).getTime()); // notice that this is the reverse of l31
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // notice that this is the reverse of l31
     });
 
     const getEntries = computed(() => (eventUri: Uri) => entriesByEventUri.value.get(eventUri) ?? []);
@@ -47,7 +47,7 @@ export const useEvents = defineStore('events', () => {
 
         entriesByEventUri.value.get(key)!.push(value)
     }
-    
+
     function removeFrom(key: Uri, value: EventEntry): void {
         const values = entriesByEventUri.value.get(key);
         if (!values) return;
@@ -55,7 +55,7 @@ export const useEvents = defineStore('events', () => {
         const i = values.findIndex(e => e === value);
         values.splice(i, 1);
     }
-    
+
     async function fetchAll(): Promise<Array<Event>> {
         loading.value = true;
         const data = await eventEndpoint.getAll();
@@ -68,7 +68,7 @@ export const useEvents = defineStore('events', () => {
         loading.value = true;
         const data = await eventEndpoint.getOne(eventId);
         put(data);
-        if (!data.entries.resolved) {
+        if (!data.entries.embedded) {
             fetchEntries(data);
         }
 
@@ -78,24 +78,24 @@ export const useEvents = defineStore('events', () => {
 
     async function fetchEntries(event: Event) {
         if (!event.entries.uri)
-             return;
+            return;
 
         const entries = await entriesEndpoint.getAllAssociated(event.entries.uri);
         putEntries(event.uri!, entries);
     }
 
     async function get(eventId: number) {
-        const uri =  eventEndpoint.getUri(eventId);
+        const uri = eventEndpoint.getUri(eventId);
         if (!events.value.has(uri)) {
             return await fetch(eventId);
         } else {
             return events.value.get(uri);
         }
     }
-    
+
     function sort(entries: EventEntry[]): EventEntry[] {
         return entries.sort((entryA, entryB) => entryA.sequence - entryB.sequence);
-    } 
+    }
 
     function sortEntries(eventUri: Uri) {
         let entries = entriesByEventUri.value.get(eventUri);
@@ -105,13 +105,13 @@ export const useEvents = defineStore('events', () => {
     }
 
     async function reorder(event: Event, oldIndex: number, newIndex: number): Promise<EventEntry[]> {
-        const uri =  event.uri ?? eventEndpoint.getUri(event.id!)
+        const uri = event.uri ?? eventEndpoint.getUri(event.id!)
         let entries = entriesByEventUri.value.get(uri)
         if (!entries) return [];
 
         const moved = entries[oldIndex];
         moved.sequence = newIndex + 1;
-        
+
         const direction = newIndex > oldIndex ? 1 : -1;
         for (let i = newIndex; i != oldIndex; i -= direction) {
             entries[i].sequence -= direction;
@@ -120,22 +120,22 @@ export const useEvents = defineStore('events', () => {
         entriesByEventUri.value.set(uri, entries);
         entriesByEventUri.value.set(uri, entries);
         await eventEndpoint.putEntries(uri, entries);
-        return entries;        
+        return entries;
     }
 
     function put(event: Event) {
-        const uri =  event.uri ?? eventEndpoint.getUri(event.id!)
+        const uri = event.uri ?? eventEndpoint.getUri(event.id!)
         events.value.set(uri, event);
-        if (event.entries.resolved) {
-            putEntries(uri, event.entries.resolved)
+        if (event.entries.embedded) {
+            putEntries(uri, event.entries.embedded)
         }
     }
 
     function putEntries(eventUri: string, entries: EventEntry[]) {
         entriesByEventUri.value.set(eventUri, entries);
         entries.forEach(entry => {
-            if (entry.song?.resolved)
-                songStore.put(entry.song.resolved);
+            if (entry.song?.embedded)
+                songStore.put(entry.song.embedded);
         })
         sortEntries(eventUri);
     }
@@ -148,7 +148,7 @@ export const useEvents = defineStore('events', () => {
     }
 
     async function addEventEntry(eventId: number, entry: { label?: string, songId?: number }) {
-        const uri =  eventEndpoint.getUri(eventId);
+        const uri = eventEndpoint.getUri(eventId);
         const event = await get(eventId);
         if (!event) {
             console.log("Event not found");
@@ -184,18 +184,18 @@ export const useEvents = defineStore('events', () => {
 
     async function remove(event: Event) {
         await eventEndpoint.delete(event);
-        const uri =  event.uri ?? eventEndpoint.getUri(event.id!)
+        const uri = event.uri ?? eventEndpoint.getUri(event.id!)
         events.value.delete(uri);
     }
-    
+
     async function deleteEntry(eventEntry: EventEntry) {
-        const eventUri =  eventEntry.event.uri ?? eventEndpoint.getUri(eventEntry.event.id!);
+        const eventUri = eventEntry.event.uri ?? eventEndpoint.getUri(eventEntry.event.id!);
         const event = events.value.get(eventUri)!;
         removeFrom(eventUri, eventEntry);
         const entries = resequence(eventUri);
         eventEndpoint.putEntries(eventUri, entries);
     }
-    
+
     function resequence(eventUri: Uri) {
         const entries = entriesByEventUri.value.get(eventUri)!;
         entries.forEach((entry, i) => entry.sequence = i + 1);

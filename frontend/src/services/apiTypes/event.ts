@@ -48,17 +48,17 @@ export interface EventLink extends WithAssociation {
 export function toDomainEvent(apiEvent: EventIn): DomainEvent {
     return {
         ...toDomain(apiEvent),
-        entries: { 
+        entries: {
             uri: untemplated(apiEvent._links!.entries),
-            resolved: apiEvent._embedded?.entries.map(toDomainEventEntry)
-         } 
+            embedded: apiEvent._embedded?.entries.map(toDomainEventEntry)
+        }
     };
 }
 
 export function fromDomainEvent(event: DomainEvent): EventOut {
     return {
         ...fromDomain(event),
-        entries: event.entries?.resolved?.map(e => e.uri!)
+        entries: event.entries?.embedded?.map(e => e.uri!)
     };
 }
 
@@ -68,7 +68,7 @@ function toRef(link: Link, song?: SongIn) {
 
     return {
         uri: untemplated(link),
-        resolved: toDomainSong(song)
+        embedded: toDomainSong(song)
     };
 }
 

@@ -2,8 +2,8 @@
     <div class="text">
         <div v-for="entry in entries" :key="entry.id">
             <div v-if="entry.label"><b>{{ entry.label }}</b></div>
-            <div v-if="entry.song"><b>{{ entry.song.resolved?.title }}</b></div>
-            <div v-if="entry.song" v-html="entry.song.resolved?.text"></div>
+            <div v-if="entry.song"><b>{{ entry.song.embedded?.title }}</b></div>
+            <div v-if="entry.song" v-html="entry.song.embedded?.text"></div>
             <p></p>
         </div>
     </div>

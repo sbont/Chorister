@@ -13,16 +13,16 @@
                                 {{ (slotProps.data as EventEntry).label }}
                             </span>
                             <router-link v-else
-                                :to="{ name: 'Song', params: { id: (slotProps.data as EventEntry).song?.resolved?.id } }"
+                                :to="{ name: 'Song', params: { id: (slotProps.data as EventEntry).song?.embedded?.id } }"
                                 append class="has-text-weight-semibold">
-                                {{ (slotProps.data as EventEntry).song?.resolved?.title }}
+                                {{ (slotProps.data as EventEntry).song?.embedded?.title }}
                             </router-link>
                         </template>
                     </Column>
 
-                    <Column field="song.resolved.composer" header="Composer"></Column>
-                    <Column field="song.resolved.songbook.title" header="Songbook"></Column>
-                    <Column field="song.resolved.songbookNumber" header="no."></Column>
+                    <Column field="song.embedded.composer" header="Composer"></Column>
+                    <Column field="song.embedded.songbook.title" header="Songbook"></Column>
+                    <Column field="song.embedded.songbookNumber" header="no."></Column>
                     <Column body-class="delete-btn-cell">
                         <template #body="slotProps">
                             <button class="button is-danger is-inverted is-small"
