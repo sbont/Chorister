@@ -1,6 +1,7 @@
 <template>
     <div class="categories">
         <h4 class="title is-4">Categories</h4>
+        <div v-if="error">{{ error }}</div>
         <div v-if="!loading">
             <div class="columns p-3">
 
@@ -34,13 +35,19 @@ categoryStore.fetchAll().finally(() => {
 // Computed
 
 // Methods
-const onSave = (category: Category) => {
-    categoryStore.save(category);
+const onSave = async (category: Category) => {
+    error.value = undefined;
+    try {
+        await categoryStore.save(category);
+    } catch (e) {
+        error.value = (e as AxiosError).message;
+    }
 };
 
-const onDelete = (category: Category) => {
+const onDelete = async (category: Category) => {
+    error.value = undefined;
     try {
-        categoryStore.deleteCategory(category);
+        await categoryStore.deleteCategory(category);
     } catch (e) {
         error.value = (e as AxiosError).message;
     }
