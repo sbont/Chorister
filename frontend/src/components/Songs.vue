@@ -35,7 +35,7 @@
                     </span>
                 </template>
             </Column>
-            <Column header="Title" body-class="col-title">
+            <Column field="title" header="Title" body-class="col-title" sortable>
                 <template #body="slotProps">
                     <router-link :to="{ name: 'Song', params: { id: (slotProps.data as Song).id } }" append
                         class="has-text-weight-semibold">
@@ -43,8 +43,8 @@
                     </router-link>
                 </template>
             </Column>
-            <Column field="composer" header="Composer" body-class="col-composer"></Column>
-            <Column field="lastEvent.date" header="Last Included" body-class="col-last-played">
+            <Column field="composer" header="Composer" body-class="col-composer" sortable></Column>
+            <Column field="lastEvent.date" header="Last Included" body-class="col-last-played" sortable>
                 <template #body="slotProps">
                     {{ slotProps.data.lastEvent ? useDateFormat(slotProps.data.lastEvent?.date, 'DD-MM-YYYY') : '' }}
                 </template>
