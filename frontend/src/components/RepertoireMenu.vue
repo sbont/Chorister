@@ -29,7 +29,7 @@ const categoryStore = useCategories();
 
 // State
 const { categoriesByType: categories, categoryTypes } = storeToRefs(categoryStore);
-categoryStore.fetchAll();
+categoryStore.initialize();
 
 // Computed
 const ready = computed(() => !!categories);
