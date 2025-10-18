@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
 import { User, UserManager, WebStorageStateStore } from 'oidc-client'
+import { computed, ref } from "vue";
 
 const settings = {
-    userStore: new WebStorageStateStore({store: window.localStorage}),
+    userStore: new WebStorageStateStore({ store: window.localStorage }),
     authority: import.meta.env.VITE_APP_AUTHORITY_URL,
     client_id: import.meta.env.VITE_APP_CHORISTER_WEB_CLIENT_ID,
     response_type: 'code',
@@ -11,75 +12,75 @@ const settings = {
     scope: `openid profile urn:zitadel:iam:user:metadata urn:zitadel:iam:org:projects:roles urn:zitadel:iam:org:project:id:${import.meta.env.VITE_APP_CHORISTER_PROJECT_ID}:aud`,
     automaticSilentRenew: true
 }
-let userManager = new UserManager(settings)
-userManager.events.addAccessTokenExpired(() => {
-    console.log("Access token expired. Logging out...");
-    useAuth().removeSession();
-});
 
-export const useAuth = defineStore('auth', {
-    state: () => ({
-        user: null as User | null
-    }),
-    getters: {
-        isLoggedIn: (state) => state.user !== null
-    },
-    actions: {
-        init() {
-            userManager.getUser().then(user => this.user = user);
-        },
+export const useAuth = defineStore('auth', () => {
+    const user = ref<User | null>(null);
+    const userManager = new UserManager(settings)
 
-        login() {
-            return userManager.signinRedirect();
-        },
+    // getters
+    const isLoggedIn = computed(() => user.value !== null);
 
-        logout() {
-            userManager.signoutRedirect()
-                .then(() => {
-                    console.log('User logged out')
-                })
-                .catch(error => console.log(error))
-        },
-
-        handleLoginRedirect() {
-            return userManager.signinRedirectCallback().then((user) => this.user = user);
-        },
-
-        handleLogoutRedirect() {
-            return userManager.signoutRedirectCallback().then(() => this.user = null);
-        },
-
-        getUser() {
-            return new Promise((resolve, reject) => {
-                userManager.getUser()
-                    .then(user => {
-                        resolve(user)
-                    })
-                    .catch(error => reject(error))
-            })
-        },
-
-        getAccessToken() {
-            return new Promise((resolve, reject) => {
-                userManager.getUser()
-                    .then(user => {
-                        if (user) {
-                            resolve(user.access_token)
-                        } else {
-                            resolve(null)
-                        }
-                    })
-                    .catch(error => reject(error))
-            })
-        },
-
-        removeSession() {
-            this.user = null
-            return userManager.signinRedirect();
-        },
-
-        getUserZitadelId() {
-            return this.user?.profile?.sub;
-        }
+    // actions
+    function init() {
+        userManager.getUser().then(u => user.value = u);
+        userManager.events.addAccessTokenExpired(() => {
+            console.log("Access token expired. Logging out...");
+            useAuth().removeSession();
+        });
     }
-})
+
+    function login() {
+        return userManager.signinRedirect();
+    }
+
+    function logout() {
+        userManager.signoutRedirect()
+            .then(() => {
+                console.log('User logged out')
+            })
+            .catch(error => console.log(error))
+    }
+
+    function handleLoginRedirect() {
+        return userManager.signinRedirectCallback().then(u => user.value = u);
+    }
+
+    function handleLogoutRedirect() {
+        return userManager.signoutRedirectCallback().then(() => user.value = null);
+    }
+
+    function getUser() {
+        return new Promise((resolve, reject) => {
+            userManager.getUser()
+                .then(user => {
+                    resolve(user)
+                })
+                .catch(error => reject(error))
+        })
+    }
+
+    function getAccessToken() {
+        return new Promise((resolve, reject) => {
+            userManager.getUser()
+                .then(user => {
+                    if (user) {
+                        resolve(user.access_token)
+                    } else {
+                        resolve(null)
+                    }
+                })
+                .catch(error => reject(error))
+        })
+    }
+
+    function removeSession() {
+        user.value = null
+        return userManager.signinRedirect();
+    }
+
+    function getUserZitadelId() {
+        return user.value?.profile?.sub;
+    }
+
+    return { getAccessToken, handleLoginRedirect, handleLogoutRedirect, init, isLoggedIn, login, logout, removeSession }
+});
