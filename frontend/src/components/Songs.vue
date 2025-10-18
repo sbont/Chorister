@@ -3,7 +3,8 @@
         <div v-if="error" class="error" @click="handleErrorClick">
             ERROR: {{ error }}
         </div>
-        <DataTable :value="songs" ref="datatable" v-model:selection="selectedRows" size="small" :loading="loading">
+        <DataTable :value="songs" ref="datatable" v-model:selection="selectedRows" size="small" :loading="loading"
+            paginator :rows="25" :rowsPerPageOptions="[25, 50, 100]">
             <template #header>
                 <div class="is-flex is-justify-content-space-between">
                     <div class="is-flex title">
@@ -28,13 +29,6 @@
             <template #empty v-if="loading == false"> No songs found. </template>
 
             <Column body-class="col-select" selection-mode="multiple"></Column>
-            <Column body-class="col-no">
-                <template #body="slotProps">
-                    <span>
-                        {{ oneBased(slotProps.index) }}
-                    </span>
-                </template>
-            </Column>
             <Column field="title" header="Title" body-class="col-title" sortable>
                 <template #body="slotProps">
                     <router-link :to="{ name: 'Song', params: { id: (slotProps.data as Song).id } }" append
