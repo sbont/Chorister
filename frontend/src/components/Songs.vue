@@ -51,7 +51,11 @@
                 </template>
             </Column>
             <Column field="composer" header="Composer" body-class="col-composer"></Column>
-            <Column field="lastEvent.date" header="Last Included" body-class="col-last-played"></Column>
+            <Column field="lastEvent.date" header="Last Included" body-class="col-last-played">
+                <template #body="slotProps">
+                    {{ slotProps.data.lastEvent ? useDateFormat(slotProps.data.lastEvent?.date, 'DD-MM-YYYY') : '' }}
+                </template>
+            </Column>
             <Column header="Categories" body-class="col-category">
                 <template #body="slotProps">
                     <div class="tags">
@@ -85,6 +89,7 @@ import { useCategories } from '@/application/categoryStore';
 import { storeToRefs } from 'pinia';
 import type { MenuItem, MenuItemCommandEvent } from 'primevue/menuitem';
 import { Category } from '@/entities/category';
+import { useDateFormat, useNow } from '@vueuse/core'
 
 // Types
 const songStore = useSongs();
@@ -227,6 +232,7 @@ td.p-1b {
 
 .col-category {
     width: 32%;
+    max-width: 40%;
 }
 
 .col-category .tags {

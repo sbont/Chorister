@@ -27,6 +27,7 @@
     "@vueform/multiselect": "^2.5.6",
     "@vuelidate/core": "^2.0.0",
     "@vuelidate/validators": "^2.0.0",
+    "@vueuse/core": "^13.9.0",
     "axios": "^1.7.7",
     "buefy": "^1.0.1",
     "depcheck": "^1.4.3",

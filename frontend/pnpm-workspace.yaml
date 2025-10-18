@@ -2,3 +2,4 @@ packages:
   - "src/**"
   - "style/**"
   - "!public/"
+ignore-workspace-root-check: true
