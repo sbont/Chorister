@@ -351,6 +351,11 @@ const updateDraftCategories = (categoryTypeUri: Uri) => (newValues: Category[]) 
     min-height: 18px;
 }
 
+.text p {
+    margin-top: 12px;
+    min-height: 18px;
+}
+
 .label.is-required::after {
     content: ' *';
     color: red;
