@@ -5,7 +5,7 @@
         </div>
         <div class="songs-container">
             <div class="p-2">
-                <DataTable :value="entries" @row-reorder="reorder">
+                <DataTable :value="entries" @row-reorder="reorder" :loading="state == State.Loading">
                     <Column row-reorder class="first-col"></Column>
                     <Column body-class="header" header="Title">
                         <template #body="slotProps">
@@ -34,11 +34,10 @@
                             </button>
                         </template>
                     </Column>
-                </DataTable>
-
-                <progress v-if="state == State.Loading" class="progress is-medium is-info" max="100"></progress>
-
-                <AddEventEntry :event-id="eventId" />
+                    <template #footer>
+                        <AddEventEntry :event-id="eventId" />
+                    </template>
+                </DataTable>                
             </div>
         </div>
     </div>
@@ -61,7 +60,7 @@ enum State {
     Deleting,
 }
 
-const state = ref<State>(State.Ready);
+const state = ref<State>(State.Loading);
 const route = useRoute();
 const eventId = Number(route.params.id);
 const eventStore = useEvents();
@@ -69,9 +68,13 @@ const { entries: getEntries } = storeToRefs(eventStore);
 const event = ref<Event>();
 const entries = computed(() => event.value ? getEntries.value(event.value.uri!) : []);
 
-eventStore.fetch(eventId).then((result) => {
-    event.value = result;
-});
+eventStore.fetch(eventId)
+    .then((result) => {
+        event.value = result;
+    })
+    .finally(() => {
+        state.value = State.Ready;
+    });
 
 const removeEntryFromEvent = async function (entry: EventEntry) {
     state.value = State.Deleting;
@@ -97,6 +100,10 @@ table td.col0 {
 
 .p-datatable-tbody>tr>td.delete-btn-cell {
     padding: 0.5em 0.75em;
+}
+
+.p-datatable-footer {
+    padding: 0;
 }
 
 .first-col {

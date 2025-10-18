@@ -3,23 +3,16 @@
         <div v-if="error" class="error" @click="handleErrorClick">
             ERROR: {{ error }}
         </div>
-        <DataTable :value="songs" ref="datatable" v-model:selection="selectedRows" size="small">
+        <DataTable :value="songs" ref="datatable" v-model:selection="selectedRows" size="small" :loading="loading">
             <template #header>
                 <div class="is-flex is-justify-content-space-between">
                     <div class="is-flex title">
                         {{ header }}
                     </div>
                     <div class="is-flex is-gap-2">
-                        <Button type="button" 
-                            class="button mr-2" 
-                            label="Categorise" 
-                            @click="toggleCategorizeMenu"
-                            :disabled="!selectedRows.length" 
-                            :class="{ 'is-loading': isSavingCategories }"
-                            aria-haspopup="true" 
-                            aria-controls="overlay_tmenu" 
-                            unstyled
-                            ></Button>
+                        <Button type="button" class="button mr-2" label="Categorise" @click="toggleCategorizeMenu"
+                            :disabled="!selectedRows.length" :class="{ 'is-loading': isSavingCategories }"
+                            aria-haspopup="true" aria-controls="overlay_tmenu" unstyled></Button>
                         <TieredMenu ref="customizeMenu" id="overlay_tmenu" :model="categorizeMenuEntries" popup />
 
                         <router-link class="button is-primary" :to="{ name: 'NewSong' }" append tag="button">
@@ -66,13 +59,10 @@
                     </div>
                 </template>
             </Column>
+            <template #footer>
+                <strong>{{ songs.length }}</strong> {{ pluralize(songs.length) }}
+            </template>
         </DataTable>
-
-        <progress v-if="loading" class="progress is-medium is-info" max="100"></progress>
-        <footer class="footer" v-cloak>
-            <strong>{{ songs.length }}</strong>
-            {{ pluralize(songs.length) }}
-        </footer>
     </div>
 </template>
 
