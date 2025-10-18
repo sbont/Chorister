@@ -3,16 +3,23 @@
         <div v-if="error" class="error" @click="handleErrorClick">
             ERROR: {{ error }}
         </div>
-        <DataTable :value="songs" ref="datatable" @row-select="selectionChanged" size="small">
+        <DataTable :value="songs" ref="datatable" v-model:selection="selectedRows" size="small">
             <template #header>
                 <div class="is-flex is-justify-content-space-between">
                     <div class="is-flex title">
                         {{ header }}
                     </div>
                     <div class="is-flex is-gap-2">
-                        <Button type="button" class="button mr-2" label="Categorise" @click="toggleCategorizeMenu"
-                            :disabled="!selectedRows.length" aria-haspopup="true" aria-controls="overlay_tmenu"
-                            unstyled></Button>
+                        <Button type="button" 
+                            class="button mr-2" 
+                            label="Categorise" 
+                            @click="toggleCategorizeMenu"
+                            :disabled="!selectedRows.length" 
+                            :class="{ 'is-loading': isSavingCategories }"
+                            aria-haspopup="true" 
+                            aria-controls="overlay_tmenu" 
+                            unstyled
+                            ></Button>
                         <TieredMenu ref="customizeMenu" id="overlay_tmenu" :model="categorizeMenuEntries" popup />
 
                         <router-link class="button is-primary" :to="{ name: 'NewSong' }" append tag="button">
@@ -77,15 +84,13 @@ import Button from "primevue/button";
 import { useCategories } from '@/application/categoryStore';
 import { storeToRefs } from 'pinia';
 import type { MenuItem, MenuItemCommandEvent } from 'primevue/menuitem';
-import { Uri } from '@/types';
 import { Category } from '@/entities/category';
 
 // Types
 const songStore = useSongs();
 const { fetchAll, fetchAllForCategory, allSongs } = songStore;
 const categoryStore = useCategories();
-const { categoriesByType, categoriesBySongId } = storeToRefs(categoryStore);
-const songCategories = computed(() => (songId: number) => categoryStore.songCategories(songId));
+const { categoriesByType } = storeToRefs(categoryStore);
 
 const route = useRoute();
 const customizeMenu = ref();
@@ -94,10 +99,12 @@ const customizeMenu = ref();
 categoryStore.initialize();
 const header = ref("All songs");
 const loading = ref(true);
+const isSavingCategories = ref(false);
 const error = ref<string | null>(null);
 const datatable = ref();
 
 const routeName = route.name;
+
 let songsLoaded;
 const songs = ref<Array<Song>>([]);
 
@@ -162,23 +169,19 @@ const toggleCategorizeMenu = (event: Event) => {
 }
 
 const categorizeFn = (category: Category) => {
-    return (_: MenuItemCommandEvent) => {
-        categoryStore.addForSongs(selectedRows.value, category);
+    return async (_: MenuItemCommandEvent) => {
+        isSavingCategories.value = true;
+        try {
+            await categoryStore.addForSongs(selectedRows.value, category);
+            selectedRows.value = [];
+        } catch(e) {
+            console.log(e);
+            error.value = `${error}`;
+        }
+        isSavingCategories.value = false;
     }
 } 
 
-const selectionChanged = (event: DataTableRowSelectEvent) => {
-    const input = event.originalEvent.target as HTMLInputElement;
-    const isAdd = input.checked;
-
-    const song = event.data as Song;
-    if (isAdd) {
-        selectedRows.value?.push(song);
-    } else {
-        selectedRows.value = selectedRows.value.filter(s => s.uri !== song.uri);
-    }
-    console.log(selectedRows.value);    
-}
 </script>
 
 <style>
