@@ -4,7 +4,7 @@
             :mode="!editing ? 'view' : songIsNew ? 'create' : 'edit'" :onEdit="edit" :edit-disabled="loading"
             :onDelete="remove" />
 
-        <div class="song-info m-2 columns" v-if="song">
+        <div class="song-info m-2 columns">
             <div class="column">
                 <div>
                     <div class="field is-horizontal">
@@ -18,7 +18,7 @@
                                         :class="{ 'is-danger': v$.title.$error }" type="text"
                                         placeholder="The name of the song or hymn" @blur="v$.title.$touch" />
                                     <span v-else>
-                                        {{ song.title }}
+                                        {{ song?.title }}
                                     </span>
                                 </div>
                             </div>
@@ -34,7 +34,7 @@
                                     <input v-if="editing && draftValues" v-model="draftValues.composer" class="input"
                                         type="text" placeholder="Artist / composer / writer" />
                                     <span v-else>
-                                        {{ song.composer }}
+                                        {{ song?.composer }}
                                     </span>
                                 </div>
                             </div>
@@ -52,7 +52,7 @@
                                             class="input" type="text"
                                             placeholder="Songbook, hymnal or collection title" />
                                         <span v-else>
-                                            {{ song.songbook?.title }}
+                                            {{ song?.songbook?.title }}
                                         </span>
                                     </div>
                                 </div>
@@ -68,7 +68,7 @@
                                                 <input v-if="editing && draftValues"
                                                     v-model="draftValues.songbookNumber" class="input" type="text"
                                                     placeholder="Song number in the book" />
-                                                <span v-else>{{ song.songbookNumber }}</span>
+                                                <span v-else>{{ song?.songbookNumber }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -140,7 +140,7 @@
 
                 <div class="text">
                     <div class="is-size-4">Text</div>
-                    <div v-if="!editing" v-html="song.text"></div>
+                    <div v-if="!editing" v-html="song?.text"></div>
                     <div v-else>
                         <editor-content :editor="editor" />
                     </div>
