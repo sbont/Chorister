@@ -1261,3 +1261,37 @@ databaseChangeLog:
               name: skip_to_step
               type: INTEGER
           tableName: element_text
+  - changeSet:
+      id: 1761397600443-3
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addColumn:
+          columns:
+          - column:
+              constraints:
+                nullable: false
+              name: can_be_sung
+              type: BOOLEAN
+          tableName: element_text
+  - changeSet:
+      id: 1761397600443-4
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addUniqueConstraint:
+          columnNames: manager_id
+          constraintName: UC_CHOIRMANAGER_ID_COL
+          tableName: choir
+  - changeSet:
+      id: 1761397600443-6
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addForeignKeyConstraint:
+          baseColumnNames: manager_id
+          baseTableName: choir
+          constraintName: FK4codi2nt3ogslescnhoc9chw4
+          deferrable: false
+          initiallyDeferred: false
+          referencedColumnNames: id
+          referencedTableName: chorister_user
+          validate: true
+

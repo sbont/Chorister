@@ -23,6 +23,7 @@ class ElementText(
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "LITURGICAL_BOOK_TRANSLATION_ID")
     var translation: LiturgicalBookTranslation?,
+    var canBeSung: Boolean,
 )
 {
     companion object
