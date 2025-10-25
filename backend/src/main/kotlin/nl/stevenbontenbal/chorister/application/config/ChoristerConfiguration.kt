@@ -9,7 +9,6 @@ import nl.stevenbontenbal.chorister.application.FileService
 import nl.stevenbontenbal.chorister.application.RegistrationService
 import nl.stevenbontenbal.chorister.domain.events.Event
 import nl.stevenbontenbal.chorister.domain.events.EventEntry
-import nl.stevenbontenbal.chorister.domain.rites.IRiteRepository
 import nl.stevenbontenbal.chorister.domain.songs.*
 import nl.stevenbontenbal.chorister.domain.users.*
 import nl.stevenbontenbal.chorister.persistence.ChoirAwareDataSource
@@ -17,11 +16,9 @@ import org.modelmapper.ModelMapper
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
-import org.springframework.core.Ordered
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration
 import org.springframework.data.rest.core.mapping.RepositoryDetectionStrategy
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer
@@ -37,9 +34,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
-import org.springframework.web.filter.CorsFilter
 import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import javax.sql.DataSource
 
 @EnableWebSecurity(debug = true)
@@ -121,7 +116,6 @@ class ChoristerConfiguration(
         categorisationService: CategorisationService,
         choirRepository: IChoirRepository,
         inviteRepository: IInviteRepository,
-        riteRepository: IRiteRepository,
         userAuthorizationService: IUserAuthorizationService,
         userRepository: IUserRepository,
         userService: UserService
@@ -130,7 +124,6 @@ class ChoristerConfiguration(
         categorisationService,
         choirRepository,
         inviteRepository,
-        riteRepository,
         userRepository,
         userService
     )

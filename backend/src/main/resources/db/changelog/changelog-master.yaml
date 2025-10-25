@@ -1322,3 +1322,26 @@ databaseChangeLog:
           referencedColumnNames: id
           referencedTableName: rite
           validate: true
+  - changeSet:
+      id: 1761406022513-3
+      author: test (generated)
+      changes:
+      - addColumn:
+          columns:
+          - column:
+              name: liturgical_book_translation_id
+              type: BIGINT
+          tableName: choir
+  - changeSet:
+      id: 1761406022513-5
+      author: test (generated)
+      changes:
+      - addForeignKeyConstraint:
+          baseColumnNames: liturgical_book_translation_id
+          baseTableName: choir
+          constraintName: FKa7fk3lhe7hn8h8dyk1bcea3ex
+          deferrable: false
+          initiallyDeferred: false
+          referencedColumnNames: id
+          referencedTableName: liturgical_book_translation
+          validate: true

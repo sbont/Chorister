@@ -3,8 +3,6 @@ package nl.stevenbontenbal.chorister.application
 import nl.stevenbontenbal.chorister.application.models.AcceptInviteRequest
 import nl.stevenbontenbal.chorister.application.models.InviteDetail
 import nl.stevenbontenbal.chorister.application.models.NewChoirRegistrationRequest
-import nl.stevenbontenbal.chorister.domain.rites.IRiteRepository
-import nl.stevenbontenbal.chorister.domain.rites.Rite
 import nl.stevenbontenbal.chorister.domain.users.*
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -15,7 +13,6 @@ open class RegistrationService(
     private val categorisationService: CategorisationService,
     private val choirRepository: IChoirRepository,
     private val inviteRepository: IInviteRepository,
-    private val riteRepository: IRiteRepository,
     private val userRepository: IUserRepository,
     private val userService: UserService,
 ) {
@@ -149,6 +146,5 @@ open class RegistrationService(
             name = registrationRequest.choirName,
             type = registrationRequest.choirType,
             manager = user,
-            rite = riteRepository.findAll().single()
         )
 }

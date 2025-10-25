@@ -2,6 +2,7 @@ package nl.stevenbontenbal.chorister.domain.users
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import jakarta.persistence.*
+import nl.stevenbontenbal.chorister.domain.rites.LiturgicalBookTranslation
 import nl.stevenbontenbal.chorister.domain.rites.Rite
 
 @Entity
@@ -20,7 +21,10 @@ class Choir(
     var manager: User?,
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "RITE_ID")
-    var rite: Rite?
+    var rite: Rite? = null,
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "LITURGICAL_BOOK_TRANSLATION_ID")
+    var liturgicalBookTranslation: LiturgicalBookTranslation? = null,
 )
 {
     companion object
