@@ -1005,7 +1005,7 @@ databaseChangeLog:
                   type: VARCHAR(255)
               - column:
                   name: text
-                  type: VARCHAR(32000)
+                  type: VARCHAR(255)
               - column:
                   name: title
                   type: VARCHAR(255)
@@ -1299,3 +1299,26 @@ databaseChangeLog:
         - addNotNullConstraint:
             columnName: can_be_sung
             tableName: element_text
+  - changeSet:
+      id: 1761405335210-3
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addColumn:
+          columns:
+          - column:
+              name: rite_id
+              type: BIGINT
+          tableName: choir
+  - changeSet:
+      id: 1761405335210-5
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addForeignKeyConstraint:
+          baseColumnNames: rite_id
+          baseTableName: choir
+          constraintName: FKffmxpqcx7ig43j8l1ylgy896d
+          deferrable: false
+          initiallyDeferred: false
+          referencedColumnNames: id
+          referencedTableName: rite
+          validate: true

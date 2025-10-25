@@ -9,6 +9,7 @@ import nl.stevenbontenbal.chorister.application.FileService
 import nl.stevenbontenbal.chorister.application.RegistrationService
 import nl.stevenbontenbal.chorister.domain.events.Event
 import nl.stevenbontenbal.chorister.domain.events.EventEntry
+import nl.stevenbontenbal.chorister.domain.rites.IRiteRepository
 import nl.stevenbontenbal.chorister.domain.songs.*
 import nl.stevenbontenbal.chorister.domain.users.*
 import nl.stevenbontenbal.chorister.persistence.ChoirAwareDataSource
@@ -117,18 +118,20 @@ class ChoristerConfiguration(
 
     @Bean
     fun registrationService(
-        userRepository: IUserRepository,
+        categorisationService: CategorisationService,
         choirRepository: IChoirRepository,
         inviteRepository: IInviteRepository,
+        riteRepository: IRiteRepository,
         userAuthorizationService: IUserAuthorizationService,
-        categorisationService: CategorisationService,
+        userRepository: IUserRepository,
         userService: UserService
     ): RegistrationService = RegistrationService(
-        userRepository,
-        choirRepository,
-        inviteRepository,
         userAuthorizationService,
         categorisationService,
+        choirRepository,
+        inviteRepository,
+        riteRepository,
+        userRepository,
         userService
     )
 
