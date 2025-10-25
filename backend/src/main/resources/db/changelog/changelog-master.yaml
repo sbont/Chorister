@@ -1005,7 +1005,7 @@ databaseChangeLog:
                   type: VARCHAR(255)
               - column:
                   name: text
-                  type: VARCHAR(255)
+                  type: VARCHAR(32000)
               - column:
                   name: title
                   type: VARCHAR(255)

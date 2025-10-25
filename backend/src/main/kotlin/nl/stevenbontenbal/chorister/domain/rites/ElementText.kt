@@ -1,5 +1,6 @@
 package nl.stevenbontenbal.chorister.domain.rites
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
@@ -17,6 +18,7 @@ class ElementText(
     @JoinColumn(name = "ELEMENT_ID")
     var element: OrderOfServiceElement?,
     var shortDescription: String?,
+    @Column(length = 32000)
     var text: String,
     var sequence: Int,
     var skipToStep: Int?,
