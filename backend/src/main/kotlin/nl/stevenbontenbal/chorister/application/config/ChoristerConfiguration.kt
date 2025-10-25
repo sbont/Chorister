@@ -9,6 +9,8 @@ import nl.stevenbontenbal.chorister.application.FileService
 import nl.stevenbontenbal.chorister.application.RegistrationService
 import nl.stevenbontenbal.chorister.domain.events.Event
 import nl.stevenbontenbal.chorister.domain.events.EventEntry
+import nl.stevenbontenbal.chorister.domain.rites.LiturgicalBookTranslation
+import nl.stevenbontenbal.chorister.domain.rites.OrderOfService
 import nl.stevenbontenbal.chorister.domain.songs.*
 import nl.stevenbontenbal.chorister.domain.users.*
 import nl.stevenbontenbal.chorister.persistence.ChoirAwareDataSource
@@ -88,6 +90,8 @@ class ChoristerConfiguration(
                 configuration.exposeIdsFor(User::class.java)
                 configuration.exposeIdsFor(Invite::class.java)
                 configuration.exposeIdsFor(File::class.java)
+                configuration.exposeIdsFor(OrderOfService::class.java)
+                configuration.exposeIdsFor(LiturgicalBookTranslation::class.java)
                 configuration.repositoryDetectionStrategy = RepositoryDetectionStrategy.RepositoryDetectionStrategies.ANNOTATED
             }
 

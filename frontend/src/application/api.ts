@@ -5,6 +5,7 @@ import { Chords } from "@/entities/chords"
 import { Entity } from "@/entities/entity"
 import { Event, EventEntry } from "@/entities/event"
 import { Invite } from "@/entities/invite"
+import { OrderOfService } from "@/entities/orderOfService"
 import { Score } from "@/entities/score"
 import { Song } from "@/entities/song"
 import { User } from "@/entities/user"
@@ -23,6 +24,7 @@ export interface Api {
     eventEntries: ApiEndpoint<EventEntry>
     files: FilesApiEndpoint
     categoryTypes: ApiEndpoint<CategoryType>
+    ordersOfService: OrdersOfServiceApiEndpoint
 
     // Registration
     register: (choirName: string, firstName: string, lastName: string | undefined, email: string, password: string) => Promise<User>
@@ -130,6 +132,10 @@ export interface EventsApiEndpoint extends ApiEndpoint<Event> {
 
 export interface FilesApiEndpoint {
     getUri: (id: number) => Uri
+}
+
+export interface OrdersOfServiceApiEndpoint extends ApiEndpoint<OrderOfService> {
+    getAllForRite: (riteUri: Uri) => Promise<Array<OrderOfService>>
 }
 
 export const ApiKey: InjectionKey<Api> = Symbol("api");

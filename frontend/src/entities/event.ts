@@ -1,11 +1,13 @@
 import { Entity, EntityCollectionRef, EntityRef } from "./entity";
+import { OrderOfService } from "./orderOfService";
 import { Song } from "./song";
 
 export interface Event extends Entity {
     id?: number,
     name: string,
     date: Date,
-    entries: EntityCollectionRef<EventEntry>
+    entries: EntityCollectionRef<EventEntry>,
+    template?: EntityRef<OrderOfService>
 }
 
 export interface EventEntry extends Entity {

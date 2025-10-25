@@ -5,7 +5,7 @@ import { ApiEntityWith, fromDomain, Identifiable, Link, toDomain, WithAssociatio
 import { toDomainUser, User } from "./user";
 import { EntityRef } from "@/entities/entity";
 
-export interface Choir extends Identifiable, ApiEntityWith<ManagerLink> {
+export interface Choir extends Identifiable, ApiEntityWith<ManagerLink & RiteLink> {
     id: number
     name: string
     type: string
@@ -17,6 +17,10 @@ export interface ManagerLink extends WithAssociation {
     manager: Link
 }
 
+export interface RiteLink extends WithAssociation {
+    rite: Link
+}
+
 export function toDomainChoir(choir: Choir): DomainChoir {
     const manager = choir.manager ?
         ((choir.manager as User).id ?
@@ -25,7 +29,8 @@ export function toDomainChoir(choir: Choir): DomainChoir {
         undefined;
     return {
         ...toDomain(choir),
-        manager
+        manager,
+        rite: { uri: choir._links!.rite.href }
     };
 }
 

@@ -8,6 +8,7 @@ interface Event extends Identifiable {
     name: string,
     date: Date,
     choir?: Uri,
+    orderOfService?: Uri,
 }
 
 export type EventIn = Event & WithEmbedded<"entries", Array<EventEntryIn>> & ApiEntityWith<EventEntriesLink>;
@@ -58,7 +59,8 @@ export function toDomainEvent(apiEvent: EventIn): DomainEvent {
 export function fromDomainEvent(event: DomainEvent): EventOut {
     return {
         ...fromDomain(event),
-        entries: event.entries?.embedded?.map(e => e.uri!)
+        entries: event.entries?.embedded?.map(e => e.uri!),
+        orderOfService: event.template?.uri
     };
 }
 

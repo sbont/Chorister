@@ -1,9 +1,6 @@
 package nl.stevenbontenbal.chorister.domain.rites
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 
 @Entity
 class Rite(
@@ -11,5 +8,7 @@ class Rite(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
     var name: String,
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "rite")
+    var ordersOfService: MutableList<OrderOfService>? = mutableListOf(),
 ) {
 }

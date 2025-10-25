@@ -32,6 +32,8 @@ import { fromDomainSong, SongIn, SongOut, toDomainSong } from "./apiTypes/song";
 import { fromDomainUser, toDomainUser, User } from "./apiTypes/user";
 import { Uri } from "@/types";
 import { SingleInvite, toDomainInvite } from "@/services/apiTypes/invite";
+import { OrderOfService as DomainOrderOfService } from "@/entities/orderOfService";
+import { OrderOfService, toDomainOrderOfService } from "./apiTypes/orderOfService";
 
 const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + "/api";
 
@@ -51,6 +53,7 @@ export default class ChoristerApi implements IChoristerApi {
     public readonly events: EventsEndpoint;
     public readonly eventEntries: EntityEndpoint<DomainEventEntry, EventEntryIn, EventEntryOut>;
     public readonly categoryTypes: EntityEndpoint<DomainCategoryType, CategoryType, CategoryType>;
+    public readonly ordersOfService: OrdersOfServiceEndpoint;
 
     constructor() {
         this.instance = axios.create({
@@ -79,6 +82,7 @@ export default class ChoristerApi implements IChoristerApi {
         this.chords = new EntityEndpoint(this.instance, "chords", fromDomainChords, toDomainChords);
         this.scores = new ScoresEndpoint(this.instance, "scores", fromDomainScore, toDomainScore(this.files.getUri));
         this.categoryTypes = new EntityEndpoint(this.instance, "categoryTypes", fromDomainCategoryType, toDomainCategoryType);
+        this.ordersOfService = new OrdersOfServiceEndpoint(this.instance);
     }
 
     // Generic
@@ -465,5 +469,17 @@ class CategoriesEndpoint extends EntityEndpoint<DomainCategory, Category, Catego
     async postCategorySongs(uri: Uri, songs: Array<DomainSong>): Promise<void> {
         const songUris = songs.map(s => s.uri);
         await this.instance.post(`${uri}/songs`, { songs: songUris }, { headers: { "Content-Type": "application/json" } });
+    }
+}
+
+class OrdersOfServiceEndpoint extends EntityEndpoint<DomainOrderOfService, OrderOfService, OrderOfService> {
+    constructor(instance: AxiosInstance) {
+        super(instance, "ordersOfService", () => { throw new Error(" Not implemented") }, toDomainOrderOfService);
+    }
+
+    async getAllForRite(riteUri: Uri): Promise<Array<DomainOrderOfService>> {
+        const uri = `${riteUri}/ordersOfService`;
+        const response = await this.instance.get(uri, this.getGetConfig("orderOfServices"));
+        return response.data.map(this.toDomain);
     }
 }
