@@ -1268,8 +1268,6 @@ databaseChangeLog:
       - addColumn:
           columns:
           - column:
-              constraints:
-                nullable: false
               name: can_be_sung
               type: BOOLEAN
           tableName: element_text
@@ -1294,4 +1292,10 @@ databaseChangeLog:
           referencedColumnNames: id
           referencedTableName: chorister_user
           validate: true
-
+  - changeSet:
+      id: 1761397600443-7
+      author: Steven.Bontenbal
+      changes:
+        - addNotNullConstraint:
+            columnName: can_be_sung
+            tableName: element_text
