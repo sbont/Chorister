@@ -132,9 +132,15 @@ const save = async () => {
     if (!newEvent.name)
         newEvent.name = new Date(newEvent.date).toLocaleDateString();
 
-    newEvent = await store.save(newEvent);
+    try {
+        newEvent = await store.save(newEvent);
+    } catch(e) {
+        error.value = "Saving event failed. " + e;
+        saving.value = false;
+        return;
+    }
+
     pageState.value = "view";
-    saving.value = false;
     event.value = newEvent;
     draftValues.value = null;
     if (isNewEvent) {
