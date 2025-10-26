@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.domain.users.events
+package nl.stevenbontenbal.chorister.persistence.users
 
 import nl.stevenbontenbal.chorister.domain.users.IChoirRepository
 import nl.stevenbontenbal.chorister.domain.users.User

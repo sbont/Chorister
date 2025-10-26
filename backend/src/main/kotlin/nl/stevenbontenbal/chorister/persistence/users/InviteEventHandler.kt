@@ -1,18 +1,20 @@
-package nl.stevenbontenbal.chorister.domain.songs.events
+package nl.stevenbontenbal.chorister.persistence.users
 
-import nl.stevenbontenbal.chorister.domain.songs.Notation
+import nl.stevenbontenbal.chorister.domain.users.Invite
 import nl.stevenbontenbal.chorister.domain.users.UserService
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler
 import org.springframework.stereotype.Component
 
 @Component
-@RepositoryEventHandler(Notation::class)
-class NotationEventHandler(
+@RepositoryEventHandler(Invite::class)
+class InviteEventHandler(
     private val userService: UserService
 ) {
+
     @HandleBeforeCreate
-    fun handleNotationCreate(notation: Notation) {
-        notation.linkChoir(userService)
+    fun handleInviteCreate(invite: Invite) {
+        invite.linkChoir(userService)
+        invite.invitedBy = userService.getCurrentUser()
     }
 }

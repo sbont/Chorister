@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.domain.events.events
+package nl.stevenbontenbal.chorister.persistence.events
 
 import nl.stevenbontenbal.chorister.domain.events.EventEntry
 import nl.stevenbontenbal.chorister.domain.events.IEventEntryRepository

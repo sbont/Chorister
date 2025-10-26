@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.domain.songs.events
+package nl.stevenbontenbal.chorister.persistence.songs
 
 import nl.stevenbontenbal.chorister.domain.songs.CategoryType
 import nl.stevenbontenbal.chorister.domain.users.UserService

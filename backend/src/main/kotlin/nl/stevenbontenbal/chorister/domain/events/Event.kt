@@ -16,7 +16,7 @@ class Event (
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
     override var choir: Choir?,
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "event", cascade=[CascadeType.REMOVE])
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "event", cascade=[CascadeType.ALL])
     var entries: MutableList<EventEntry> = mutableListOf(),
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ORDER_OF_SERVICE_ID")

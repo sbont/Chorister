@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.domain.songs.events
+package nl.stevenbontenbal.chorister.persistence.songs
 
 import kotlinx.coroutines.runBlocking
 import nl.stevenbontenbal.chorister.domain.songs.IFileService

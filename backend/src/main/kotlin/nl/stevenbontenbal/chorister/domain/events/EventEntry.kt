@@ -15,7 +15,7 @@ class EventEntry(
     var event: Event?,
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "SONG_ID")
-    var song: Song?,
+    var song: Song? = null,
     var label: String? = null,
     var sequence: Int = event?.entries?.size?.plus(1) ?: 0,
     @ManyToOne(fetch = FetchType.LAZY)

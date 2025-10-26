@@ -11,6 +11,8 @@ class OrderOfService(
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "RITE_ID")
     var rite: Rite?,
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "orderOfService")
+    var elements: MutableList<OrderOfServiceElement>? = mutableListOf()
 ) {
     companion object
 }
