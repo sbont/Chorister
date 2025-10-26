@@ -32,24 +32,30 @@ class EventEventHandler(
         val elementTexts = elementTextRepository.findByOrderOfServiceAndTranslation(oosId, translationId)
         val eventEntries = event.orderOfService?.elements?.flatMap { element ->
             val elementEntry = EventEntry(event = event, orderOfServiceElement = element, label = element.name)
-            val elementTextsBySequence = elementTexts
+            
+            val defaultElementTextBySequence = elementTexts
                 .filter { text -> text.element == element }
                 .sortedBy { it.sequence }
                 .groupBy { it.sequence }
                 .mapValues { it.value.first() }
 
-            var nextIndex = 1
-            val textsInFlow = mutableListOf<ElementText>()
-            while (nextIndex > 0 && elementTextsBySequence.containsKey(nextIndex)) {
-                val next = elementTextsBySequence[nextIndex]
-                next?.let { textsInFlow.add(it) }
-                nextIndex = next?.skipToStep ?: (nextIndex + 1)
-            }
+            val textsInFlow = getDefaultFlowOfTexts(defaultElementTextBySequence)
             val textEntries = textsInFlow.map { elementText -> EventEntry(event = event, orderOfServiceElement = element, elementText = elementText, label = elementText.shortDescription) }
             listOf(elementEntry) + textEntries
         }
         eventEntries?.forEachIndexed { index, entry -> entry.sequence = index + 1 }
         event.entries = (eventEntries?.toMutableList() ?: mutableListOf())
+    }
+
+    private fun getDefaultFlowOfTexts(defaultElementTextBySequence: Map<Int, ElementText>): MutableList<ElementText> {
+        var nextIndex = 1
+        val textsInFlow = mutableListOf<ElementText>()
+        while (nextIndex > 0 && defaultElementTextBySequence.containsKey(nextIndex)) {
+            val next = defaultElementTextBySequence[nextIndex]
+            next?.let { textsInFlow.add(it) }
+            nextIndex = next?.skipToStep ?: (nextIndex + 1)
+        }
+        return textsInFlow
     }
 
 }
