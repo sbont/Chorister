@@ -11,6 +11,6 @@ class UserController(
 ) {
     @GetMapping("/api/user")
     fun getCurrentUser(): User {
-        return userService.getCurrentUser()
+        return userService.currentUser
     }
 }

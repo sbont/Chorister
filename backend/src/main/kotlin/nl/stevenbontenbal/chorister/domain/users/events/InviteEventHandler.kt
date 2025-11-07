@@ -15,6 +15,6 @@ class InviteEventHandler(
     @HandleBeforeCreate
     fun handleInviteCreate(invite: Invite) {
         invite.linkChoir(userService)
-        invite.invitedBy = userService.getCurrentUser()
+        invite.invitedBy = userService.currentUser
     }
 }

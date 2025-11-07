@@ -19,7 +19,7 @@ interface SongProjection {
     var scoreUrl: String?
     var songbook: Songbook?
     var songbookNumber: Int?
-    var addedAt: LocalDateTime
+    var createdDate: LocalDateTime
     var slug: String
     var text: String?
     var categories: MutableList<Category>?

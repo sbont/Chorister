@@ -18,7 +18,7 @@ class UserControllerTests {
     @BeforeEach
     fun init() {
         clearAllMocks()
-        every { userService.getCurrentUser() } returns mockCurrentUser
+        every { userService.currentUser } returns mockCurrentUser
     }
 
     @Test

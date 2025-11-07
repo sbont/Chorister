@@ -23,7 +23,6 @@ fun Song.Companion.create(choir: Choir): Song {
         songbook = null,
         songbookNumber = 23,
         choir = choir,
-        addedBy = null,
         text = ""
     )
 }

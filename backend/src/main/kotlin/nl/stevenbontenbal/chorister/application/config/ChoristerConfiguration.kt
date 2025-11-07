@@ -16,11 +16,11 @@ import org.modelmapper.ModelMapper
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
-import org.springframework.core.Ordered
+import org.springframework.data.domain.AuditorAware
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration
 import org.springframework.data.rest.core.mapping.RepositoryDetectionStrategy
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer
@@ -36,13 +36,12 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
-import org.springframework.web.filter.CorsFilter
 import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import javax.sql.DataSource
 
 @EnableWebSecurity(debug = true)
 @EnableMethodSecurity
+@EnableJpaAuditing(auditorAwareRef="auditorProvider")
 @Configuration
 class ChoristerConfiguration(
     private val properties: ChoristerProperties
@@ -55,7 +54,7 @@ class ChoristerConfiguration(
             authorizeHttpRequests {
                 authorize(HttpMethod.POST, "/api/registration", permitAll)
                 authorize("/api/invite/**", permitAll)
-                authorize("/api/**",authenticated)
+                authorize("/api/**", authenticated)
             }
             addFilterAfter<SecurityContextHolderAwareRequestFilter>(ChoirContextFilter(userService))
             headers {
@@ -72,6 +71,11 @@ class ChoristerConfiguration(
         }
         http.oauth2ResourceServer { it.jwt(Customizer.withDefaults()) }
         return http.build()
+    }
+
+    @Bean
+    fun auditorProvider(userService: UserService): AuditorAware<Long> {
+        return AuditorProvider(userService)
     }
 
     @Bean
@@ -143,7 +147,7 @@ class ChoristerConfiguration(
         fileRepository: IFileRepository,
         s3Configuration: S3Configuration,
         userService: UserService
-        ): FileService = FileService(fileRepository, s3Configuration, userService)
+    ): FileService = FileService(fileRepository, s3Configuration, userService)
 
     @Bean
     fun scoreService(

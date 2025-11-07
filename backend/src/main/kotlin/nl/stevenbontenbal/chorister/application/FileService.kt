@@ -25,7 +25,7 @@ class FileService(
     private val userService: UserService,
 ) : IFileService {
     override fun createFile(): File {
-        val choir = userService.getCurrentUser().choir
+        val choir = userService.currentUser.choir
             ?: throw InvalidIdentifierException("Choir ID is unknown for current user")
         val uuid = UUID.randomUUID()
         val key = "${choir.id}/$uuid"

@@ -1,6 +1,7 @@
 package nl.stevenbontenbal.chorister.domain.songs
 
 import jakarta.persistence.*
+import nl.stevenbontenbal.chorister.domain.EntityBase
 import nl.stevenbontenbal.chorister.domain.events.EventEntry
 import nl.stevenbontenbal.chorister.domain.users.Choir
 import nl.stevenbontenbal.chorister.domain.users.ChoirOwnedEntity
@@ -11,9 +12,6 @@ import java.util.*
 
 @Entity
 class Song(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CHOIR_ID")
     override var choir: Choir?,
@@ -30,9 +28,6 @@ class Song(
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "song")
     var chords: MutableList<Chords>? = mutableListOf(),
     var slug: String = title.toSlug(),
-    var addedAt: LocalDateTime = LocalDateTime.now(),
-    @ManyToOne(fetch = FetchType.EAGER)
-    var addedBy: User?,
     @ManyToMany(cascade = [CascadeType.REMOVE])
     @JoinTable(
         name = "SONG_CATEGORY",
@@ -44,7 +39,7 @@ class Song(
     var eventEntries: MutableList<EventEntry>? = mutableListOf(),
     @Column(length = 32000)
     var text: String?,
-) : ChoirOwnedEntity {
+) : EntityBase(), ChoirOwnedEntity {
     companion object {
         fun String.toSlug() = lowercase(Locale.getDefault())
             .replace("\n", " ")

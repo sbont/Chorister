@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class UserService(private val userRepository: IUserRepository, private val authService: IUserAuthorizationService) {
-    fun getCurrentUser(): User {
+    val currentUser: User by lazy {
         val userId = authService.getExternalUserId()
-        return userRepository.findByZitadelId(userId) ?: throw InvalidIdentifierException("User with external ID $userId not found.")
+        userRepository.findByZitadelId(userId) ?: throw InvalidIdentifierException("User with external ID $userId not found.")
     }
 
     fun getCurrentChoirId(): Long? {
@@ -30,7 +30,6 @@ class UserService(private val userRepository: IUserRepository, private val authS
     }
 
     fun hasAccess(targetDomainObject: Any): Boolean {
-        val currentUser = getCurrentUser()
         return when (targetDomainObject) {
             is ChoirOwnedEntity -> currentUser.choir != null && currentUser.choir!!.id == targetDomainObject.choir?.id
             is Choir -> currentUser.choir != null && currentUser.choir!!.id == targetDomainObject.id

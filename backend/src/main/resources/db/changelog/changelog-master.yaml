@@ -962,3 +962,73 @@ databaseChangeLog:
               DROP POLICY IF EXISTS category_type_choir_security ON category_type;
               CREATE POLICY category_type_choir_security ON category_type
               USING (current_setting('app.current_choir_id') = '' OR choir_id::VARCHAR = current_setting('app.current_choir_id'));
+  - changeSet:
+      id: 1762516704004-3
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addColumn:
+          columns:
+          - column:
+              name: created_by
+              type: BIGINT
+          tableName: song
+  - changeSet:
+      id: 1762516704004-4
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addColumn:
+          columns:
+          - column:
+              name: created_date
+              type: TIMESTAMP(6) WITHOUT TIME ZONE
+          tableName: song
+      - addNotNullConstraint:
+          tableName: song
+          columnName: created_date
+          defaultNullValue: 2015-01-01T00:00:00
+  - changeSet:
+      id: 1762516704004-5
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addColumn:
+          columns:
+          - column:
+              name: modified_by
+              type: BIGINT
+          tableName: song
+  - changeSet:
+      id: 1762516704004-6
+      author: Steven.Bontenbal (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: modified_date
+                  type: TIMESTAMP(6) WITHOUT TIME ZONE
+            tableName: song
+          tableName: song
+  - changeSet:
+      id: 1762516704005-1
+      author: Steven.Bontenbal
+      changes:
+        - dropColumn:
+            columnName: created_date
+            tableName: song
+        - renameColumn:
+            oldColumnName: added_at
+            newColumnName: created_date
+            tableName: song
+  - changeSet:
+      id: 1762517914129-3
+      author: Steven.Bontenbal (generated)
+      changes:
+      - dropForeignKeyConstraint:
+          baseTableName: song
+          constraintName: FKt28ovxcyr2ve3wm7lgodh276h
+  - changeSet:
+      id: 1762517914129-7
+      author: Steven.Bontenbal (generated)
+      changes:
+      - dropColumn:
+          columnName: added_by_id
+          tableName: song

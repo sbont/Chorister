@@ -28,7 +28,7 @@ open class RegistrationService(
     }
 
     open fun generateChoirInviteToken(): String? {
-        val choir = userService.getCurrentUser().choir
+        val choir = userService.currentUser.choir
         if (choir != null) {
             val token = UUID.randomUUID().toString()
             choir.inviteToken = token
@@ -38,7 +38,7 @@ open class RegistrationService(
     }
 
     open fun nullifyChoirInviteToken() {
-        val choir = userService.getCurrentUser().choir
+        val choir = userService.currentUser.choir
         if (choir != null) {
             choir.inviteToken = null
             choirRepository.save(choir)
