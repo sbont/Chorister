@@ -57,7 +57,7 @@ import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { isNew } from "@/entities/entity";
 import DetailHeader from "./ui/DetailHeader.vue";
-import { PageState } from "@/types";
+import { PageMode, PageState } from "@/types";
 
 type DraftEvent = Partial<Event>;
 
@@ -71,7 +71,7 @@ const draftValues = ref<DraftEvent | null>(null);
 const loading = ref(true);
 const saving = ref(false);
 const error = ref<string | null>(null);
-const pageState = ref<PageState>()
+const pageState = ref<PageMode>()
 if (route.name === "NewEvent") {
     draftValues.value = {};
     pageState.value = "create"
