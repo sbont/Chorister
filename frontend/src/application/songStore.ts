@@ -6,20 +6,21 @@ import { ApiKey } from "./api";
 import { Score } from "@/entities/score";
 import { Chords } from "@/entities/chords";
 import { useCategories } from "./categoryStore";
+import { StoreState } from "./entityStore";
 
 export const useSongs = defineStore("songs", () => {
     const api = inject(ApiKey)!;
     const categoryStore = useCategories();
 
     // state
-    const initialized = ref(false);
-    const initializing = ref(false);
+    const state = ref<StoreState>(StoreState.Uninitialized);
     const songs = ref(new CacheMap<number, Song>());
     const chordsBySong = ref(new CacheListMap<number, Chords>);
     const scoresBySong = ref(new CacheListMap<number, Score>);
 
     // computed
-    const allSongs = computed(() => [...songs.value.values()]);
+    const allSongs = computed(() => Array.from(songs.value.values()).sort((a, b) => a.title == b.title ? 0 : a.title > b.title ? 1 : -1));
+    const isLoading = computed(() => state.value !== StoreState.Ready);
 
     // actions
     function put(song: Song, chords?: Array<Chords>, scores?: Array<Score>) {
@@ -33,13 +34,19 @@ export const useSongs = defineStore("songs", () => {
     }
 
     async function initialize() {
-        if (initialized.value || initializing.value)
+        if (state.value !== StoreState.Uninitialized)
             return;
 
-        initializing.value = true;
-        await fetchAll();
-        initializing.value = false;
-        initialized.value = true;
+        state.value = StoreState.Initializing;
+
+        try {
+            await fetchAll();
+        } catch (e) {
+            state.value = StoreState.Uninitialized;
+            return;
+        }
+
+        state.value = StoreState.Ready;
     }
 
     async function fetchAll() {
@@ -71,7 +78,7 @@ export const useSongs = defineStore("songs", () => {
         data.forEach(song => put(song));
         return data;
     }
-    
+
     async function save(song: Song) {
         const data = await saveToServer(song);
         songs.value.set(data.id, data);
@@ -85,13 +92,13 @@ export const useSongs = defineStore("songs", () => {
             return api.createNewSong(song);
         }
     }
-    
+
     async function deleteSong(song: Song) {
         await api.deleteSong(song);
         songs.value.delete(song.id);
     }
 
-    return { allSongs, initialize, fetchAll, get, save, deleteSong, fetchAllForCategory, put }
+    return { allSongs, state, isLoading, initialize, fetchAll, get, save, deleteSong, fetchAllForCategory, put }
 });
 
 const sort = (data: Array<Song>) => data.sort((songA, songB) => songA.title.localeCompare(songB.title));

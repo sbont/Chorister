@@ -61,23 +61,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed, Ref, ref } from 'vue'
-import { useSongs } from "@/application/songStore.js";
-import { useRoute } from "vue-router";
-import { Song } from "@/entities/song";
-import DataTable, { DataTableRowSelectEvent } from "primevue/datatable";
-import Column from "primevue/column";
-import TieredMenu from "primevue/tieredmenu";
-import Button from "primevue/button";
 import { useCategories } from '@/application/categoryStore';
-import { storeToRefs } from 'pinia';
-import type { MenuItem, MenuItemCommandEvent } from 'primevue/menuitem';
+import { StoreState } from '@/application/entityStore';
+import { useSongs } from "@/application/songStore.js";
 import { Category } from '@/entities/category';
-import { useDateFormat, useNow } from '@vueuse/core'
+import { Song } from "@/entities/song";
+import { useDateFormat } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
+import Button from "primevue/button";
+import Column from "primevue/column";
+import DataTable from "primevue/datatable";
+import type { MenuItem, MenuItemCommandEvent } from 'primevue/menuitem';
+import TieredMenu from "primevue/tieredmenu";
+import { computed, ref } from 'vue';
+import { useRoute } from "vue-router";
 
 // Types
 const songStore = useSongs();
-const { fetchAll, fetchAllForCategory, allSongs } = songStore;
+const { allSongs, isLoading } = storeToRefs(songStore);
 const categoryStore = useCategories();
 const { categoriesByType } = storeToRefs(categoryStore);
 
@@ -85,39 +86,34 @@ const route = useRoute();
 const customizeMenu = ref();
 
 // state
+songStore.initialize();
 categoryStore.initialize();
 const header = ref("All songs");
-const loading = ref(true);
 const isSavingCategories = ref(false);
 const error = ref<string | null>(null);
 const datatable = ref();
 
-const routeName = route.name;
+var songs = ref<Array<Song>>([]);
+const loadingCategorySongs = ref(false);
+const loading = computed(() => loadingCategorySongs.value || isLoading.value );
 
-let songsLoaded;
-const songs = ref<Array<Song>>([]);
-
-switch (routeName) {
+switch (route.name) {
+    
     case "Repertoire":
-        songsLoaded = fetchAll();
-        songs.value = allSongs;
-        if (songs.value.length)
-            loading.value = false;
-
+        songs = allSongs;
         break;
+
     case "Category":
+        loadingCategorySongs.value = true;
         const categoryId = Number(route.params.id);
         categoryStore.get(categoryId).then((data) => {
             header.value = data?.name ?? "Category";
         });
-        songsLoaded = fetchAllForCategory(categoryId);
+        songStore.fetchAllForCategory(categoryId).then(data => {
+            songs.value = data;
+        }).finally(() => (loadingCategorySongs.value = false));
         break;
 }
-songsLoaded!
-    .then(data => {
-        songs.value = data;
-    })
-    .finally(() => (loading.value = false));
 
 const categorizeMenuEntries = computed(() => {
     if (categoriesByType.value.size) {
@@ -150,8 +146,6 @@ const pluralize = function (n: number) {
 const handleErrorClick = function () {
     error.value = null;
 }
-
-const oneBased = (index: number) => index + 1;
 
 const toggleCategorizeMenu = (event: Event) => {
     customizeMenu.value.toggle(event);

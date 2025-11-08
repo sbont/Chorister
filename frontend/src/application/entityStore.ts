@@ -6,6 +6,12 @@ import { computed, inject, Ref, ref } from "vue";
 import { Api, ApiEndpoint, ApiKey } from "./api";
 import { Uri } from "@/types";
 
+export enum StoreState {
+    Uninitialized,
+    Initializing,
+    Ready
+}
+
 export const useEntityStore = <T extends Entity>(name: string, getEndpoint: (api: Api) => ApiEndpoint<T>) => defineStore(name, () => {
     const api = inject(ApiKey);
     if (!api)
