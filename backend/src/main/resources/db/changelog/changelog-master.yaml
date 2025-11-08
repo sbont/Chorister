@@ -982,10 +982,6 @@ databaseChangeLog:
               name: created_date
               type: TIMESTAMP(6) WITHOUT TIME ZONE
           tableName: song
-      - addNotNullConstraint:
-          tableName: song
-          columnName: created_date
-          defaultNullValue: 2015-01-01T00:00:00
   - changeSet:
       id: 1762516704004-5
       author: Steven.Bontenbal (generated)
