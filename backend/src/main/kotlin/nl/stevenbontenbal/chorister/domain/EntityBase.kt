@@ -18,10 +18,10 @@ abstract class EntityBase {
 
     @Column(nullable = false, updatable = false)
     @CreatedDate
-    var createdDate: LocalDateTime = LocalDateTime.now()
+    var createdDate: LocalDateTime? = LocalDateTime.now()
 
     @LastModifiedDate
-    var modifiedDate: LocalDateTime = LocalDateTime.now()
+    var modifiedDate: LocalDateTime? = LocalDateTime.now()
 
     @CreatedBy
     var createdBy: Long? = null

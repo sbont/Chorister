@@ -5,9 +5,7 @@ import nl.stevenbontenbal.chorister.domain.EntityBase
 import nl.stevenbontenbal.chorister.domain.events.EventEntry
 import nl.stevenbontenbal.chorister.domain.users.Choir
 import nl.stevenbontenbal.chorister.domain.users.ChoirOwnedEntity
-import nl.stevenbontenbal.chorister.domain.users.User
 import org.springframework.data.rest.core.annotation.RestResource
-import java.time.LocalDateTime
 import java.util.*
 
 @Entity
