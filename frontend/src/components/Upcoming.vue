@@ -1,5 +1,13 @@
 <template>
-    <div v-if="state == State.NotFound" class="p-3">
+    <div v-if="isLoading" class="p-3">
+        <span class="icon-text">
+            <span class="icon">
+                <i class="fas fa-spinner fa-pulse"></i>
+            </span>
+            <span>Loading...</span>
+        </span>
+    </div>
+    <div v-else-if="state == State.NotFound" class="p-3">
         <h3>
             No upcoming events planned.
             <router-link :to="{ name: 'NewEvent' }" append>
@@ -28,7 +36,8 @@ enum State {
 const state = ref<State>(State.Loading);
 const router = useRouter();
 const eventStore = useEvents();
-const { futureEvents } = storeToRefs(eventStore);
+const { futureEvents, isLoading } = storeToRefs(eventStore);
+eventStore.initialize().then(() => setUpcoming());
 
 function setUpcoming() {
     const upcoming = futureEvents.value[0];
@@ -39,12 +48,5 @@ function setUpcoming() {
         state.value = State.NotFound;
     }
 }
-
-if (!futureEvents.value.length)
-    eventStore.fetchAll().then(_ => {
-        setUpcoming();
-    })
-else
-    setUpcoming();
 
 </script>

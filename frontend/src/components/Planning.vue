@@ -16,32 +16,34 @@
 
                 <p class="menu-label">Upcoming</p>
                 <ul class="menu-list">
-                    <li
-                        v-for="event in futureEvents"
-                        :key="event.id"
-                        class="droppable"
-                        @drop="dropSong($event, event)"
-                        @dragover.prevent
-                        @dragenter.prevent
-                    >
-                        <router-link :to="{ name: 'Event', params: { id: event.id } }" append
-                            >{{ event.name }}
+                    <li v-if="isLoading">
+                        <span class="icon-text">
+                            <span class="icon">
+                                <i class="fas fa-spinner fa-pulse"></i>
+                            </span>
+                            <span>Loading...</span>
+                        </span>
+                    </li>
+                    <li v-else v-for="event in futureEvents" :key="event.id">
+                        <router-link :to="{ name: 'Event', params: { id: event.id } }" append>
+                            {{ event.name }}
                         </router-link>
                     </li>
                 </ul>
 
                 <p class="menu-label">Past</p>
                 <ul class="menu-list">
-                    <li
-                        v-for="event in pastEvents"
-                        :key="event.id"
-                        class="droppable"
-                        @drop="dropSong($event, event)"
-                        @dragover.prevent
-                        @dragenter.prevent
-                    >
-                        <router-link :to="{ name: 'Event', params: { id: event.id } }" append
-                            >{{ event.name }}
+                    <li v-if="isLoading">
+                        <span class="icon-text">
+                            <span class="icon">
+                                <i class="fas fa-spinner fa-pulse"></i>
+                            </span>
+                            <span>Loading...</span>
+                        </span>
+                    </li>
+                    <li v-else v-for="event in pastEvents" :key="event.id">
+                        <router-link :to="{ name: 'Event', params: { id: event.id } }" append>
+                            {{ event.name }}
                         </router-link>
                     </li>
                 </ul>
@@ -60,19 +62,13 @@ import { storeToRefs } from "pinia";
 import { Event } from "@/entities/event";
 
 const eventStore = useEvents();
-eventStore.fetchAll();
+eventStore.initialize();
 
 // State
-const { futureEvents, pastEvents } = storeToRefs(eventStore);
+const { futureEvents, pastEvents, isLoading } = storeToRefs(eventStore);
 
 // Computed
 const ready = computed(() => !!futureEvents);
 
-// Methods
-const dropSong = (dragEvent: DragEvent, event: Event) => {
-    let eventId = event.id;
-    let songUri = dragEvent.dataTransfer?.getData("text");
-    const songId = songUri ? parseInt(songUri?.substring(songUri.lastIndexOf("/"))) : undefined;
-    if (songId && eventId) eventStore.addEventEntry(eventId, { songId: songId });
-};
+
 </script>

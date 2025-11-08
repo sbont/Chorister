@@ -4,8 +4,9 @@ import { useSongs } from "@/application/songStore";
 import { computed, inject, ref } from "vue";
 import { ApiKey } from "./api";
 import { Event, EventEntry } from "@/entities/event";
-import { Uri } from "@/types";
+import { PageState, Uri } from "@/types";
 import { EntityCollectionRef, EntityRef, isNew } from "@/entities/entity";
+import { StoreState } from "./entityStore";
 
 export const useEvents = defineStore('events', () => {
     const api = inject(ApiKey);
@@ -15,12 +16,12 @@ export const useEvents = defineStore('events', () => {
     const eventEndpoint = api.events;
     const entriesEndpoint = api.eventEntries;
     const songStore = useSongs();
+    songStore.initialize();
 
     // State
+    const state = ref<StoreState>(StoreState.Uninitialized);
     const events = ref(new CacheMap<Uri, Event>());
     const entriesByEventUri = ref(new Map<Uri, Array<EventEntry>>());
-    const loading = ref(false);
-    const error = ref<string | null>(null);
 
     // Getters
     const allEvents = computed(() => [...events.value.values()]);
@@ -39,8 +40,25 @@ export const useEvents = defineStore('events', () => {
     });
 
     const getEntries = computed(() => (eventUri: Uri) => entriesByEventUri.value.get(eventUri) ?? []);
+    const isLoading = computed(() => state.value !== StoreState.Ready);
 
     // Actions
+    async function initialize() {
+        if (state.value !== StoreState.Uninitialized)
+            return;
+
+        state.value = StoreState.Initializing;
+
+        try {
+            await fetchAll();
+        } catch (e) {
+            state.value = StoreState.Uninitialized;
+            return;
+        }
+
+        state.value = StoreState.Ready;
+    }
+
     function addTo(key: Uri, value: EventEntry): void {
         if (!entriesByEventUri.value.has(key))
             entriesByEventUri.value.set(key, []);
@@ -57,22 +75,18 @@ export const useEvents = defineStore('events', () => {
     }
 
     async function fetchAll(): Promise<Array<Event>> {
-        loading.value = true;
         const data = await eventEndpoint.getAll();
         data.forEach(put);
-        loading.value = false;
         return data;
     }
 
     async function fetch(eventId: number): Promise<Event> {
-        loading.value = true;
         const data = await eventEndpoint.getOne(eventId);
         put(data);
         if (!data.entries.embedded) {
             fetchEntries(data);
         }
 
-        loading.value = false;
         return data;
     }
 
@@ -207,6 +221,8 @@ export const useEvents = defineStore('events', () => {
         futureEvents,
         pastEvents,
         entries: getEntries,
+        isLoading,
+        initialize,
         get,
         fetch,
         fetchAll,
