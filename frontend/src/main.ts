@@ -11,6 +11,7 @@ import { useAuth } from "@/services/authStore";
 import { ILoggerOptions } from 'vuejs3-logger/dist/interfaces/logger-options';
 import { ApiKey } from './application/api';
 import ChoristerApi from './services/api';
+import { Log } from "oidc-client-ts";
 
 loadScript("https://kit.fontawesome.com/e168ca8cb0.js")
 
@@ -18,6 +19,9 @@ const app = createApp(App)
 const pinia = createPinia()
 app.use(pinia)
 useAuth().init();
+
+Log.setLogger(console);
+Log.setLevel(Log.DEBUG);
 
 const logOptions = {
     isEnabled: true,
