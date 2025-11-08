@@ -34,7 +34,7 @@
     "effect": "^2.0.3",
     "mime-types": "^2.1.35",
     "moment": "^2.29.4",
-    "oidc-client": "^1.11.5",
+    "oidc-client-ts": "^3.3.0",
     "pinia": "^2.0.23",
     "primevue": "^4.3.9",
     "vite": "^5.0.11",

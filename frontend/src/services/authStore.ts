@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { User, UserManager, WebStorageStateStore } from 'oidc-client'
+import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts'
 import { computed, ref } from "vue";
 
 const settings = {
