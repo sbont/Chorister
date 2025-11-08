@@ -32,6 +32,7 @@ import { fromDomainSong, SongIn, SongOut, toDomainSong } from "./apiTypes/song";
 import { fromDomainUser, toDomainUser, User } from "./apiTypes/user";
 import { Uri } from "@/types";
 import { SingleInvite, toDomainInvite } from "@/services/apiTypes/invite";
+import { ApiError } from "@/types/api-error";
 
 const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + "/api";
 
@@ -56,6 +57,7 @@ export default class ChoristerApi implements IChoristerApi {
         this.instance = axios.create({
             baseURL: SERVER_URL,
             timeout: 12000,
+
         });
         const auth = useAuth();
         this.instance.interceptors.request.use(async (config) => {
@@ -64,6 +66,10 @@ export default class ChoristerApi implements IChoristerApi {
                 config.headers.Authorization = "Bearer " + accessToken;
             }
             return config;
+        });
+        this.instance.interceptors.response.use(response => response, error => {
+            const message = error.status >= 500 ? "A server error occurred. Try again or report an issue if the problem keeps reoccurring." : error.message;
+            return Promise.reject({ statusCode: error.status, message } satisfies ApiError)
         });
 
         this.songs = new SongsEndpoint(this.instance, "songs", fromDomainSong, toDomainSong);

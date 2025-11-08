@@ -3,6 +3,7 @@ import App from './App.vue'
 import VueLogger from 'vuejs3-logger';
 import router from './router'
 import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
 import Aura from '@primevue/themes/aura';
 import { loadScript } from 'vue-plugin-load-script';
 import { createPinia } from 'pinia'
@@ -34,5 +35,6 @@ app.use(PrimeVue, {
         preset: Aura
     }
 });
+app.use(ToastService);
 app.provide(ApiKey, new ChoristerApi());
 app.mount('#app');

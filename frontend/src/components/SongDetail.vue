@@ -1,10 +1,10 @@
 <template>
     <div class="song">
-        <DetailHeader :title="song?.title" :subtitle="subtitle"
-            :mode="!editing ? 'view' : songIsNew ? 'create' : 'edit'" :onEdit="edit" :edit-disabled="loading"
-            :onDelete="remove" />
+        <DetailHeader :title="title" :subtitle="subtitle"
+            :mode="state.mode === PageState.Ready ? 'view' : state.mode === PageState.Editing && state.isNew ? 'create' : 'edit'"
+            :onEdit="edit" :edit-disabled="state.mode === PageState.Loading" :onDelete="remove" />
 
-        <div class="song-info m-2 columns">
+        <div class="song-info m-2 columns" v-if="state.mode !== PageState.Loading">
             <div class="column">
                 <div>
                     <div class="field is-horizontal">
@@ -12,14 +12,16 @@
                             <label class="label is-required">Title</label>
                         </div>
                         <div class="field-body">
-                            <div class="field" v-bind:class="{ static: !editing }">
+                            <div class="field" v-bind:class="{ static: state.mode !== PageState.Editing }">
                                 <div class="control">
-                                    <input v-if="editing && draftValues" v-model="draftValues.title" class="input"
+                                    <span v-if="state.mode === PageState.Ready">
+                                        {{ state.song.title }}
+                                    </span>
+
+                                    <input v-else="state.mode === PageState.Editing || state.mode === PageState.Saving"
+                                        v-model="state.draft.title" class="input"
                                         :class="{ 'is-danger': v$.title.$error }" type="text"
                                         placeholder="The name of the song or hymn" @blur="v$.title.$touch" />
-                                    <span v-else>
-                                        {{ song?.title }}
-                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -29,13 +31,15 @@
                             <label class="label">Composer</label>
                         </div>
                         <div class="field-body">
-                            <div class="field" v-bind:class="{ static: !editing }">
+                            <div class="field" v-bind:class="{ static: state.mode !== PageState.Editing }">
                                 <div class="control">
-                                    <input v-if="editing && draftValues" v-model="draftValues.composer" class="input"
-                                        type="text" placeholder="Artist / composer / writer" />
-                                    <span v-else>
-                                        {{ song?.composer }}
+                                    <span v-if="state.mode === PageState.Ready">
+                                        {{ state.song?.composer }}
                                     </span>
+
+                                    <input v-else v-model="state.draft.composer" class="input" type="text"
+                                        placeholder="Artist / composer / writer" />
+
                                 </div>
                             </div>
                         </div>
@@ -46,14 +50,13 @@
                         </div>
                         <div class="field-body field-flex">
                             <div class="field-flex-col">
-                                <div class="field" v-bind:class="{ static: !editing }">
+                                <div class="field" v-bind:class="{ static: state.mode !== PageState.Editing }">
                                     <div class="control">
-                                        <input v-if="editing && draftValues" v-model="draftValues.songbook!.title"
-                                            class="input" type="text"
-                                            placeholder="Songbook, hymnal or collection title" />
-                                        <span v-else>
-                                            {{ song?.songbook?.title }}
+                                        <span v-if="state.mode === PageState.Ready">
+                                            {{ state.song.songbook?.title }}
                                         </span>
+                                        <input v-else v-model="state.draft.songbook!.title" class="input" type="text"
+                                            placeholder="Songbook, hymnal or collection title" />
                                     </div>
                                 </div>
                             </div>
@@ -63,12 +66,13 @@
                                         <label class="label">Number</label>
                                     </div>
                                     <div class="field-body">
-                                        <div class="field" v-bind:class="{ static: !editing, }">
+                                        <div class="field" v-bind:class="{ static: state.mode !== PageState.Editing, }">
                                             <div class="control">
-                                                <input v-if="editing && draftValues"
-                                                    v-model="draftValues.songbookNumber" class="input" type="text"
-                                                    placeholder="Song number in the book" />
-                                                <span v-else>{{ song?.songbookNumber }}</span>
+                                                <span v-if="state.mode === PageState.Ready">
+                                                    {{ state.song?.songbookNumber }}
+                                                </span>
+                                                <input v-else v-model="state.draft.songbookNumber" class="input"
+                                                    type="text" placeholder="Song number in the book" />
                                             </div>
                                         </div>
                                     </div>
@@ -81,15 +85,14 @@
                             <label class="label">{{ categoryType.name }}</label>
                         </div>
                         <div class="field-body">
-                            <div class="field" v-bind:class="{ static: !editing }">
+                            <div class="field" v-bind:class="{ static: state.mode !== PageState.Editing }">
                                 <div class="control">
                                     <div class="select is-multiple">
-                                        <VueMultiselect v-if="editing"
-                                            :modelValue="draftCategoriesByType!.get(categoryType.uri!)!"
-                                            @update:modelValue="updateDraftCategories(categoryType.uri!)($event)" 
-                                            :multiple="true"
-                                            :options="categoriesByType.get(categoryType.uri!)" track-by="name"
-                                            label="name" :close-on-select="false"></VueMultiselect>
+                                        <VueMultiselect v-if="state.mode == PageState.Editing"
+                                            :modelValue="state.categoriesByType.get(categoryType.uri!)!"
+                                            @update:modelValue="updateDraftCategories(categoryType.uri!)($event)"
+                                            :multiple="true" :options="categoriesByType.get(categoryType.uri!)"
+                                            track-by="name" label="name" :close-on-select="false"></VueMultiselect>
 
                                         <div v-else class="tags are-medium">
                                             <span v-for="(category) in songCategoriesForType(categoryType.uri!)"
@@ -105,13 +108,13 @@
                 </div>
 
                 <div class="field is-grouped mt-5">
-                    <p v-if="editing" class="control">
+                    <p v-if="state.mode === PageState.Editing" class="control">
                         <button @click="save" class="button is-link"
-                            :class="{ 'is-loading': saving, 'is-static': v$.$errors.length }">
+                            :class="{ 'is-loading': state.isSaving, 'is-static': v$.$errors.length }">
                             Save changes
                         </button>
                     </p>
-                    <p v-if="editing" class="control">
+                    <p v-if="state.mode === PageState.Editing" class="control">
                         <button @click="cancelEdit" class="button">
                             Cancel
                         </button>
@@ -121,17 +124,18 @@
 
             <div class="column">
                 <div class="is-size-4">Play</div>
-                <div v-if="youtubeId && !editing" class="yt-wrapper">
+                <div v-if="youtubeId && state.mode !== PageState.Editing" class="yt-wrapper">
                     <iframe id="ytplayer" type="text/html" :src="'https://www.youtube.com/embed/' +
                         youtubeId +
                         '?autoplay=0'
                         " frameborder="0"></iframe>
                 </div>
-                <div v-if="editing" class="field is-horizontal">
+                <div v-if="state.mode === PageState.Editing"
+                    class="field is-horizontal">
                     <div class="field-body">
-                        <div class="field" v-bind:class="{ static: !editing }">
-                            <div class="control" v-if="editing && draftValues">
-                                <input v-model="draftValues.recordingUrl" class="input" type="url"
+                        <div class="field">
+                            <div class="control">
+                                <input v-model="state.draft.recordingUrl" class="input" type="url"
                                     placeholder="https://www.youtube.com/watch?v=..." />
                             </div>
                         </div>
@@ -140,7 +144,7 @@
 
                 <div class="text">
                     <div class="is-size-4">Text</div>
-                    <div v-if="!editing" v-html="song?.text"></div>
+                    <div v-if="state.mode === PageState.Ready" v-html="state.song.text"></div>
                     <div v-else>
                         <editor-content :editor="editor" />
                     </div>
@@ -148,9 +152,9 @@
             </div>
         </div>
 
-        <div v-if="!editing && song">
-            <ScoreArray :song="song" />
-            <ChordsArray :song="song" />
+        <div v-if="state.mode === PageState.Ready">
+            <ScoreArray :song="state.song" />
+            <ChordsArray :song="state.song" />
         </div>
 
     </div>
@@ -173,8 +177,39 @@ import { Song, Songbook } from "@/entities/song"
 import { isNew, notNullOrUndefined } from "@/utils"
 import { Category } from "@/entities/category";
 import DetailHeader from "./ui/DetailHeader.vue";
-import { Uri } from "@/types";
+import { PageState, Uri } from "@/types";
 import { CacheListMap } from "@/types/CacheMaps";
+import { useToast } from 'primevue/usetoast';
+import { ApiError } from "@/types/api-error";
+
+type SongDetailState = SongDetailLoadingState | SongDetailViewState | SongDetailEditState | SongDetailCreateState;
+
+type SongDetailViewState = {
+    mode: PageState.Ready;
+    song: Song;
+}
+
+type SongDetailEditState = {
+    mode: PageState.Editing;
+    isNew: false;
+    song: Song;
+} & SongDetailWriteState;
+
+type SongDetailLoadingState = {
+    mode: PageState.Loading;
+}
+
+type SongDetailCreateState = {
+    mode: PageState.Editing;
+    isNew: true;
+} & SongDetailWriteState;
+
+type SongDetailWriteState = {
+    isNew: boolean;
+    isSaving: boolean;
+    draft: DraftSong;
+    categoriesByType: CacheListMap<Uri, Category>;
+}
 
 type DraftSongbook = Partial<Songbook>
 
@@ -183,27 +218,26 @@ interface DraftSong extends Omit<Partial<Song>, "songbook"> {
 }
 
 const route = useRoute();
-const router = useRouter()
+const router = useRouter();
 const songId = Number(route.params.id);
 const songStore = useSongs();
 const categoryStore = useCategories();
+const toast = useToast();
 
 // State
 const { categoryTypes, categoriesByType } = storeToRefs(categoryStore);
+const state = ref<SongDetailState>({ mode: PageState.Loading });
 
-const song = ref<Song>()
-const editing = ref(false);
-const draftValues = ref<DraftSong>();
+// const song = ref<Song>()
+// const draftValues = ref<DraftSong>();
 
 const songCategoriesForType = computed(() => (uri: Uri) => (categoryStore.songCategories(songId) ?? []).filter(c => c.categoryType?.uri === uri));
-const draftCategoriesByType = ref<CacheListMap<Uri, Category>>();
+// const draftCategoriesByType = ref<CacheListMap<Uri, Category>>();
 
-const loading = ref(true);
-const saving = ref(false);
 const rules = {
     title: { required },
 }
-const v$ = useVuelidate<DraftSong>(rules, draftValues as DraftSong)
+const v$ = useVuelidate<DraftSong>(rules, computed(() => state.value.mode === PageState.Editing ? state.value.draft : {}));
 const editor = useEditor({
     content: null,
     extensions: [
@@ -218,101 +252,154 @@ const editor = useEditor({
 })
 
 // Computed
-const songIsNew = computed(() => !song.value || isNew(song.value))
-const youtubeId = computed(() => song.value?.recordingUrl ? song.value.recordingUrl.split("?v=")[1] : null);
+const youtubeId = computed(() =>
+    state.value.mode === PageState.Ready && state.value.song.recordingUrl
+        ? state.value.song.recordingUrl.split("?v=")[1]
+        : null
+);
+const title = computed(() => {
+    if (state.value.mode !== PageState.Ready)
+        return;
+
+    return state.value.song.title;
+});
 const subtitle = computed(() => {
+    if (state.value.mode !== PageState.Ready && !(state.value.mode === PageState.Editing && state.value.isNew === false))
+        return;
+
+    const song = state.value.song;
     let result = "";
-    if (song.value?.composer)
-        result += song.value.composer
-    if (song.value?.composer && song.value.songbook?.title)
+    if (song.composer)
+        result += song.composer
+    if (song.composer && song.songbook?.title)
         result += " | ";
-    if (song.value?.songbook?.title)
-        result += song.value.songbook.title;
-    if (song.value?.songbook?.title && song.value.songbookNumber)
-        result += " " + song.value.songbookNumber;
+    if (song.songbook?.title)
+        result += song.songbook.title;
+    if (song.songbook?.title && song.songbookNumber)
+        result += " " + song.songbookNumber;
+
     return result;
 });
 
 onMounted(() => {
     const categoriesLoaded = categoryStore.initialize();
     if (route.name === "NewSong") {
-        draftValues.value = {
-            songbook: {},
+        state.value = {
+            mode: PageState.Editing,
+            draft: {
+                songbook: {},
+            },
+            categoriesByType: new CacheListMap<Uri, Category>(),
+            isNew: true,
+            isSaving: false
         };
-        editing.value = true;
-        categoriesLoaded.finally(() => loading.value = false);
     } else {
-        const songLoaded = songStore.get(songId)
-            .then((value) => {
-                if (value) {
-                    song.value = value;
-                }
-            });
+        const songLoaded = songStore.get(songId);
         const songCategoriesLoaded = categoryStore.getForSong(songId);
-        Promise.all([songLoaded, categoriesLoaded, songCategoriesLoaded]).finally(() => loading.value = false);
+        Promise.all([songLoaded, categoriesLoaded, songCategoriesLoaded]).then(([song, ,]) => {
+            if (song) {
+                state.value = {
+                    mode: PageState.Ready,
+                    song,
+                };
+            }
+        });
     }
 })
 
 // methods
 const save = async () => {
-    saving.value = true;
+    if (state.value.mode !== PageState.Editing)
+        return;
+
     const lyricsHtml = editor.value?.getHTML();
-    const songDraft = draftValues.value;
-    songDraft!.text = lyricsHtml;
     const isFormCorrect = await v$.value.$validate()
-    if (!songDraft || !isFormCorrect) {
-        saving.value = false;
+    if (!isFormCorrect) {
         return;
     }
-    const newSong = await songStore.save(songDraft as Song);
-    const wasNew = isNew(songDraft);
-    if (wasNew) {
-        songDraft.id = newSong.id;
+
+    state.value = {
+        ...state.value,
+        draft: {
+            ...state.value.draft,
+            text: lyricsHtml
+        },
+        isSaving: true
+    };
+
+    var newSong;
+    try {
+        newSong = await songStore.save(state.value.draft as Song);
+        const allCategories = [...state.value.categoriesByType.values()].flat();
+        categoryStore.putForSong(newSong.id, allCategories);
+    } catch (e) {
+        const error = e as ApiError;
+        toast.add({ severity: "error", summary: "Error while saving song", detail: error.message });
+        state.value.isSaving = false;
+
+        return;
     }
-    const allCategories = [...draftCategoriesByType.value!.values()].flat();
-    categoryStore.putForSong(newSong.id, allCategories);
-    editing.value = false;
-    saving.value = false;
-    song.value = songDraft as Song;
-    draftValues.value = undefined;
-    draftCategoriesByType.value = undefined;
-    if (wasNew) {
+
+    state.value = {
+        mode: PageState.Ready,
+        song: newSong
+    }
+
+    if (route.name === "NewSong") {
         router.push({
             name: "Song",
-            params: { id: songDraft.id },
+            params: { id: newSong.id },
         });
     }
 }
 
 const remove = () => {
-    if (song.value) {
-        songStore.deleteSong(song.value)
-            .then((_) => {
-                router.push({ name: "Repertoire" });
-            });
+    if (state.value.mode === PageState.Ready) {
+        songStore.deleteSong(state.value.song).then((_) => {
+            router.push({ name: "Repertoire" });
+        });
     }
 }
 
 const edit = () => {
-    draftValues.value = structuredClone(toRaw(song.value as DraftSong))
-    editor.value!.commands.setContent(draftValues.value.text ?? "")
-    draftValues.value.songbook ??= {}
-    draftCategoriesByType.value = new CacheListMap<Uri, Category>();
-    categoryStore.songCategories(songId).forEach(c => draftCategoriesByType.value?.addTo(c.categoryType!.uri, c));
-    editing.value = true;
+    if (state.value.mode !== PageState.Ready)
+        return;
+
+    const song = state.value.song;
+    const categoriesByType = new CacheListMap<Uri, Category>();
+    categoryStore.songCategories(songId).forEach(c => categoriesByType.addTo(c.categoryType!.uri, c));
+    state.value = {
+        mode: PageState.Editing,
+        draft: {
+            ...toRaw(song as DraftSong),
+        },
+        song,
+        isNew: false,
+        isSaving: false,
+        categoriesByType
+    }
+    state.value.draft.songbook ??= {};
+    editor.value!.commands.setContent(song.text ?? "");
 }
 
 const cancelEdit = () => {
-    if (songIsNew.value)
-        router.push({ name: "Repertoire" });
+    if (state.value.mode !== PageState.Editing || state.value.isSaving)
+        return;
 
-    draftValues.value = undefined;
-    draftCategoriesByType.value = new CacheListMap<Uri, Category>();
-    editing.value = false;
+    if (state.value.isNew)
+        router.push({ name: "Repertoire" });
+    else {
+        state.value = {
+            ...state.value,
+            mode: PageState.Ready
+        };
+    }
+
 }
 
 const updateDraftCategories = (categoryTypeUri: Uri) => (newValues: Category[]) => {
-    draftCategoriesByType.value?.set(categoryTypeUri, newValues);
+    if (state.value.mode === PageState.Editing)
+        state.value.categoriesByType.set(categoryTypeUri, newValues);
 }
 
 </script>

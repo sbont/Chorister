@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { PageState } from '@/types';
+import { PageMode, PageState } from '@/types';
 
 defineEmits(["edit", "delete", "cancelEdit"]);
 
@@ -41,7 +41,7 @@ interface Props {
     title?: string
     subtitle?: string
     subtitleOnTop?: boolean
-    mode?: PageState
+    mode?: PageMode
     onEdit?: (_: MouseEvent) => void 
     editDisabled?: boolean
     onDelete?: (_: MouseEvent) => void
