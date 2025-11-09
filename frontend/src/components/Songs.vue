@@ -4,7 +4,7 @@
             ERROR: {{ error }}
         </div>
         <DataTable :value="songs" ref="datatable" v-model:selection="selectedRows" size="small" :loading="loading"
-            paginator :rows="25" :rowsPerPageOptions="[25, 50, 100]">
+            paginator :rows="page.size" :first="first" :rowsPerPageOptions="[25, 50, 100]" @page="onPaged">
             <template #header>
                 <div class="is-flex is-justify-content-space-between">
                     <div class="is-flex title">
@@ -70,11 +70,11 @@ import { useDateFormat } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import Button from "primevue/button";
 import Column from "primevue/column";
-import DataTable from "primevue/datatable";
+import DataTable, { DataTablePageEvent } from "primevue/datatable";
 import type { MenuItem, MenuItemCommandEvent } from 'primevue/menuitem';
 import TieredMenu from "primevue/tieredmenu";
 import { computed, ref } from 'vue';
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 // Types
 const songStore = useSongs();
@@ -83,6 +83,7 @@ const categoryStore = useCategories();
 const { categoriesByType } = storeToRefs(categoryStore);
 
 const route = useRoute();
+const router = useRouter();
 const customizeMenu = ref();
 
 // state
@@ -92,13 +93,31 @@ const header = ref("All songs");
 const isSavingCategories = ref(false);
 const error = ref<string | null>(null);
 const datatable = ref();
+const page = computed({
+    get() {
+        return {
+            number: route.query.page ? +route.query.page : 1,
+            size: route.query.size ? +route.query.size : 25
+        };
+    },
+    set({ number, size }) {
+        router.replace({
+            query: {
+                page: number,
+                size
+            }
+        })
+    },
+})
+const first = computed(() => (page.value.number - 1) * page.value.size);
 
 var songs = ref<Array<Song>>([]);
+const selectedRows = ref<Song[]>([]);
 const loadingCategorySongs = ref(false);
-const loading = computed(() => loadingCategorySongs.value || isLoading.value );
+const loading = computed(() => loadingCategorySongs.value || isLoading.value);
 
 switch (route.name) {
-    
+
     case "Repertoire":
         songs = allSongs;
         break;
@@ -120,9 +139,9 @@ const categorizeMenuEntries = computed(() => {
         return Array.from(categoriesByType.value, ([typeUri, categories]) => {
             return {
                 label: categoryStore.categoryTypes.get(typeUri)?.name,
-                items: categories.map(c => ({ 
-                    label: c.name, 
-                    key: c.uri ,
+                items: categories.map(c => ({
+                    label: c.name,
+                    key: c.uri,
                     command: categorizeFn(c)
                 })),
             } as MenuItem;
@@ -135,35 +154,37 @@ const categorizeMenuEntries = computed(() => {
     }
 });
 
-const selectedRows = ref<Song[]>([]);
-
 
 // Methods
-const pluralize = function (n: number) {
+function pluralize(n: number) {
     return n === 1 ? "song" : "songs";
 }
 
-const handleErrorClick = function () {
+function handleErrorClick() {
     error.value = null;
 }
 
-const toggleCategorizeMenu = (event: Event) => {
+function toggleCategorizeMenu(event: Event) {
     customizeMenu.value.toggle(event);
 }
 
-const categorizeFn = (category: Category) => {
+function categorizeFn(category: Category) {
     return async (_: MenuItemCommandEvent) => {
         isSavingCategories.value = true;
         try {
             await categoryStore.addForSongs(selectedRows.value, category);
             selectedRows.value = [];
-        } catch(e) {
+        } catch (e) {
             console.log(e);
             error.value = `${error}`;
         }
         isSavingCategories.value = false;
     }
-} 
+}
+
+function onPaged(event: DataTablePageEvent) {
+    page.value = { number: event.page + 1, size: event.rows };
+}
 
 </script>
 
