@@ -173,7 +173,6 @@ function categorizeFn(category: Category) {
         isSavingCategories.value = true;
         try {
             await categoryStore.addForSongs(selectedRows.value, category);
-            selectedRows.value = [];
         } catch (e) {
             console.log(e);
             error.value = `${error}`;
