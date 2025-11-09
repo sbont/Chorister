@@ -176,6 +176,10 @@ const categorizeFn = (category: Category) => {
     table-layout: fixed;
 }
 
+.p-datatable-table-container {
+    overflow: visible !important;
+}
+
 td.p-1b {
     padding: 0.3em;
 }
