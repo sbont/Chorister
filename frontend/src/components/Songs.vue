@@ -199,6 +199,11 @@ function onPaged(event: DataTablePageEvent) {
 .p-datatable-table-container {
     overflow: visible !important;
 }
+.p-overlay-mask {
+    background: white;
+    color: black;
+    opacity: 50%;
+}
 
 td.p-1b {
     padding: 0.3em;
@@ -239,5 +244,4 @@ td.p-1b {
 
 .col-category .tags {
     flex-wrap: initial;
-}
-</style>
+}</style>
