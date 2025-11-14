@@ -67,7 +67,7 @@ open class RegistrationService(
         else {
             val choir = choirRepository.findByInviteToken(acceptInviteRequest.token)
             if (choir != null)
-                userService.addUserToChoir(user, choir)
+                userService.addUserToChoir(user, choir, AccessLevel.VIEWER)
             else
                 throw InvalidInputException("Invalid invite")
         }
@@ -102,13 +102,13 @@ open class RegistrationService(
 
     private fun registerNewChoir(user: User, registrationRequest: NewChoirRegistrationRequest) {
         val choir = registerChoir(registrationRequest, user)
-        userService.addUserToChoir(user, choir)
+        userService.addUserToChoir(user, choir, AccessLevel.MANAGER)
         initializeChoirData(choir)
     }
 
     private fun addInviteeToChoir(user: User, invite: Invite) {
         val choir = invite.choir!!
-        userService.addUserToChoir(user, choir)
+        userService.addUserToChoir(user, choir, AccessLevel.VIEWER)
         invite.user = user
         invite.acceptedDate = LocalDateTime.now()
         inviteRepository.save(invite)

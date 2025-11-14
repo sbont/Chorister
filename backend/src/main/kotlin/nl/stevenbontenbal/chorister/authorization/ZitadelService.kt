@@ -4,7 +4,6 @@ import nl.stevenbontenbal.chorister.application.RegistrationRequest
 import nl.stevenbontenbal.chorister.authorization.models.Email
 import nl.stevenbontenbal.chorister.authorization.models.Profile
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelError
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelProjectRolesPostRequest
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelResourceDetails
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelUserEmailGetResponse
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelUserEmailPutRequest
@@ -15,6 +14,9 @@ import nl.stevenbontenbal.chorister.authorization.models.ZitadelUsernamePutReque
 import nl.stevenbontenbal.chorister.application.config.ZitadelProperties
 import nl.stevenbontenbal.chorister.application.InvalidInputException
 import nl.stevenbontenbal.chorister.application.UsernameAlreadyExistingException
+import nl.stevenbontenbal.chorister.authorization.models.Role
+import nl.stevenbontenbal.chorister.authorization.models.ZitadelProjectRolesBulkPostRequest
+import nl.stevenbontenbal.chorister.domain.users.AccessLevel
 import nl.stevenbontenbal.chorister.domain.users.IUserAuthorizationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -92,10 +94,10 @@ class ZitadelService(
     }
 
     override fun createRolesForTenant(tenantId: Long) {
-        val body = createRolesRequest(tenantId, AccessLevel.MANAGER)
+        val body = createRolesBulkRequest(tenantId)
         webClient
             .post()
-            .uri("/projects/${zitadelConfiguration.projectId}/roles")
+            .uri("/projects/${zitadelConfiguration.projectId}/roles/_bulk")
             .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
             .contentType(MediaType.APPLICATION_JSON)
             .body(BodyInserters.fromValue(body))
@@ -109,19 +111,23 @@ class ZitadelService(
             .block()
     }
 
-    private fun createRolesRequest(tenantId: Long, accessLevel: AccessLevel): ZitadelProjectRolesPostRequest =
-        ZitadelProjectRolesPostRequest(
-            roleKey = roleKey(tenantId, accessLevel),
-            displayName = "Tenant $tenantId ${accessLevel.name.lowercase().replaceFirstChar { it.uppercase() }}",
-            group = "tenant.$tenantId"
+    private fun createRolesBulkRequest(tenantId: Long): ZitadelProjectRolesBulkPostRequest =
+        ZitadelProjectRolesBulkPostRequest(
+            roles = AccessLevel.entries.map {
+                Role(
+                    key = roleKey(tenantId, it),
+                    displayName = "Tenant $tenantId ${it.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                    group = "tenant.$tenantId"
+                )
+            }
         )
 
     private fun roleKey(tenantId: Long, accessLevel: AccessLevel): String {
         return "tenant.$tenantId.${accessLevel.name.lowercase()}"
     }
 
-    override fun addRoleToUser(userId: ZitadelUserId, tenantId: Long) {
-        val body = createAddRolesRequest(tenantId)
+    override fun addRoleToUser(userId: ZitadelUserId, tenantId: Long, accessLevel: AccessLevel) {
+        val body = createAddRolesRequest(tenantId, accessLevel)
         webClient
             .post()
             .uri("/users/$userId/grants")
@@ -141,10 +147,10 @@ class ZitadelService(
             .block()
     }
 
-    private fun createAddRolesRequest(tenantId: Long): ZitadelUserGrantsRequest =
+    private fun createAddRolesRequest(tenantId: Long, accessLevel: AccessLevel): ZitadelUserGrantsRequest =
         ZitadelUserGrantsRequest(
             projectId = zitadelConfiguration.projectId,
-            roleKeys = listOf(roleKey(tenantId, AccessLevel.MANAGER))
+            roleKeys = listOf(roleKey(tenantId, accessLevel))
         )
 
     private fun changeUserName(

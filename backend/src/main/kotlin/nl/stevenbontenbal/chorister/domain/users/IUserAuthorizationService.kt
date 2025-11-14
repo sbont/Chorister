@@ -13,5 +13,5 @@ interface IUserAuthorizationService {
 
     fun createRolesForTenant(tenantId: Long)
 
-    fun addRoleToUser(userId: String, tenantId: Long)
+    fun addRoleToUser(userId: String, tenantId: Long, accessLevel: AccessLevel)
 }

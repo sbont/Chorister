@@ -1,9 +1,6 @@
 package nl.stevenbontenbal.chorister.authorization
 
-enum class AccessLevel {
-    MANAGER,
-    VIEWER,
-}
+import nl.stevenbontenbal.chorister.domain.users.AccessLevel
 
 interface UserRole {
     companion object {

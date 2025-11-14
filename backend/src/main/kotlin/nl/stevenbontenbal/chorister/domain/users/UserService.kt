@@ -14,11 +14,11 @@ class UserService(private val userRepository: IUserRepository, private val authS
         return authService.getTenantId()
     }
 
-    fun addUserToChoir(user: User, choir: Choir) {
+    fun addUserToChoir(user: User, choir: Choir, accessLevel: AccessLevel = AccessLevel.VIEWER) {
         user.choir = choir
         userRepository.save(user)
         val zitadelId = user.zitadelId ?: throw InvalidIdentifierException("Zitadel user ID unknown.")
-        authService.addRoleToUser(zitadelId, choir.id!!)
+        authService.addRoleToUser(zitadelId, choir.id!!, accessLevel)
     }
 
     fun setUserEmail(user: User) {
