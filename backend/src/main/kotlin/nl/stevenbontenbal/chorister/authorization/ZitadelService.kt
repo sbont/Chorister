@@ -28,6 +28,8 @@ import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 
+private const val RolesClaim = "urn:zitadel:iam:org:project:roles"
+
 @Component
 class ZitadelService(
     private val zitadelConfiguration: ZitadelProperties,
@@ -88,7 +90,11 @@ class ZitadelService(
 
     private fun getRoles(): Set<UserRole> {
         val jwt = getAuthToken()
-        val rolesClaim = jwt?.getClaim<Map<String, String>>("urn:zitadel:iam:org:project:roles")
+        return if (jwt == null) setOf() else getRolesFromJwt(jwt)
+    }
+
+    override fun getRolesFromJwt(jwt: Jwt): Set<UserRole> {
+        val rolesClaim = jwt.getClaim<Map<String, String>>(RolesClaim)
         val roles = rolesClaim?.keys?.map { UserRole.parse(it) }
         return roles?.toSet() ?: setOf()
     }

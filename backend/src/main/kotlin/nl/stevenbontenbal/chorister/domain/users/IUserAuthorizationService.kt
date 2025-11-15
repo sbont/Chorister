@@ -1,6 +1,8 @@
 package nl.stevenbontenbal.chorister.domain.users
 
 import nl.stevenbontenbal.chorister.application.RegistrationRequest
+import nl.stevenbontenbal.chorister.authorization.UserRole
+import org.springframework.security.oauth2.jwt.Jwt
 
 interface IUserAuthorizationService {
     fun postUser(registrationRequest: RegistrationRequest): Result<String?>
@@ -14,4 +16,6 @@ interface IUserAuthorizationService {
     fun createRolesForTenant(tenantId: Long)
 
     fun addRoleToUser(userId: String, tenantId: Long, accessLevel: AccessLevel)
+
+    fun getRolesFromJwt(jwt: Jwt): Set<UserRole>
 }

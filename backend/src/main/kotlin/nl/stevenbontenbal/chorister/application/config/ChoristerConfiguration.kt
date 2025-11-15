@@ -7,11 +7,13 @@ import nl.stevenbontenbal.chorister.api.SpaCsrfTokenRequestHandler
 import nl.stevenbontenbal.chorister.application.CategorisationService
 import nl.stevenbontenbal.chorister.application.FileService
 import nl.stevenbontenbal.chorister.application.RegistrationService
+import nl.stevenbontenbal.chorister.authorization.ZitadelJwtConverter
 import nl.stevenbontenbal.chorister.domain.events.Event
 import nl.stevenbontenbal.chorister.domain.events.EventEntry
 import nl.stevenbontenbal.chorister.domain.songs.*
 import nl.stevenbontenbal.chorister.domain.users.*
 import nl.stevenbontenbal.chorister.persistence.ChoirAwareDataSource
+import org.modelmapper.Converter
 import org.modelmapper.ModelMapper
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource
@@ -26,11 +28,11 @@ import org.springframework.data.rest.core.mapping.RepositoryDetectionStrategy
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer
 import org.springframework.data.rest.webmvc.mapping.LinkCollector
 import org.springframework.http.HttpMethod
-import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter
@@ -49,7 +51,7 @@ class ChoristerConfiguration(
 
     @Bean
     @Throws(Exception::class)
-    fun securityFilterChain(http: HttpSecurity, userService: UserService): SecurityFilterChain {
+    fun securityFilterChain(http: HttpSecurity, userService: UserService, jwtConverter: ZitadelJwtConverter): SecurityFilterChain {
         http {
             authorizeHttpRequests {
                 authorize(HttpMethod.POST, "/api/registration", permitAll)
@@ -69,8 +71,13 @@ class ChoristerConfiguration(
                 configurationSource = corsConfigurationSource()
             }
         }
-        http.oauth2ResourceServer { it.jwt(Customizer.withDefaults()) }
+        http.oauth2ResourceServer { it.jwt { customizer -> customizer.jwtAuthenticationConverter(jwtConverter) }}
         return http.build()
+    }
+
+    @Bean
+    fun jwtConverter(userAuthorizationService: IUserAuthorizationService): ZitadelJwtConverter {
+        return ZitadelJwtConverter(userAuthorizationService)
     }
 
     @Bean
