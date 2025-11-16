@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
-import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts'
+import { User, UserManager, UserManagerSettings, WebStorageStateStore } from 'oidc-client-ts'
 import { computed, ref } from "vue";
 
-const settings = {
+const settings: UserManagerSettings = {
     userStore: new WebStorageStateStore({ store: window.localStorage }),
     authority: import.meta.env.VITE_APP_AUTHORITY_URL,
     client_id: import.meta.env.VITE_APP_CHORISTER_WEB_CLIENT_ID,
@@ -11,14 +11,18 @@ const settings = {
     post_logout_redirect_uri: import.meta.env.VITE_APP_BASE_URL,
     scope: `openid profile urn:zitadel:iam:user:metadata urn:zitadel:iam:org:projects:roles urn:zitadel:iam:org:project:id:${import.meta.env.VITE_APP_CHORISTER_PROJECT_ID}:aud`,
     automaticSilentRenew: true
-}
+};
 
 export const useAuth = defineStore('auth', () => {
     const user = ref<User | null>(null);
     const userManager = new UserManager(settings)
 
     // getters
-    const isLoggedIn = computed(() => user.value !== null);
+    const isLoggedIn = computed(() => { 
+        console.log(user.value?.access_token);
+        console.log(user.value?.refresh_token);
+        
+        return user.value !== null});
 
     // actions
     function init() {
