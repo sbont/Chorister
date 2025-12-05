@@ -29,7 +29,7 @@
                 <b-navbar-item href="https://github.com/sbont/Chorister/issues" target="_blank">
                     Report an issue
                 </b-navbar-item>
-                <b-navbar-item @click="onLogout()"> 
+                <b-navbar-item @click="onLogout()">
                     Log out
                 </b-navbar-item>
             </b-navbar-dropdown>
@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAuth } from "@/services/authStore";
+import { useAuth } from "@/application/authStore";
 import { storeToRefs } from "pinia";
 import { BNavbar, BNavbarDropdown, BNavbarItem } from "buefy";
 

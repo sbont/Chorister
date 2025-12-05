@@ -1,4 +1,4 @@
-import { Key } from "@/types/Key";
+import { Key } from "@/types/key";
 import { Entity, EntityRef } from "./entity";
 import { Song } from "./song";
 import { FileInfo } from "./fileInfo";

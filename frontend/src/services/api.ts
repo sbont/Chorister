@@ -9,7 +9,7 @@ import { Score as DomainScore } from "@/entities/score";
 import { Song as DomainSong } from "@/entities/song";
 import { User as DomainUser } from "@/entities/user";
 import { ApiEntityIn, ApiEntityOut } from "@/services/apiTypes";
-import { useAuth } from "@/services/authStore";
+import { useAuth } from "@/application/authStore";
 import axios, { AxiosInstance } from "axios";
 import { Category, fromDomainCategory, toDomainCategory } from "./apiTypes/category";
 import { CategoryType, fromDomainCategoryType, toDomainCategoryType } from "./apiTypes/categoryType";

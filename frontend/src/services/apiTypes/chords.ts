@@ -1,6 +1,6 @@
 import { Chords as DomainChords } from "@/entities/chords";
 import { Uri } from "@/types";
-import { Key } from "@/types/Key";
+import { Key } from "@/types/key";
 import { ApiEntityWith, fromDomain, Link, toDomain, untemplated, WithAssociation } from ".";
 
 export interface Chords extends ApiEntityWith<SongLink> {
@@ -16,13 +16,15 @@ export interface SongLink extends WithAssociation {
 }
 
 export function fromDomainChords(chords: DomainChords): Chords {
-    return { ... fromDomain(chords),
+    return {
+        ...fromDomain(chords),
         song: chords.song.uri!
     };
 }
 
 export function toDomainChords(chords: Chords): DomainChords {
-    return {... toDomain(chords),
+    return {
+        ...toDomain(chords),
         song: { uri: untemplated(chords._links!.song) }
     };
 }

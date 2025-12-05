@@ -1,5 +1,5 @@
 import { Entity, EntityCollectionRef, EntityRef } from "@/entities/entity";
-import { CacheListMap, CacheMap } from "@/types/CacheMaps";
+import { CacheListMap, CacheMap } from "@/types/cache-maps";
 import { isNew } from "@/utils";
 import { defineStore } from "pinia";
 import { computed, inject, Ref, ref } from "vue";

@@ -69,7 +69,7 @@ import { useChords } from "@/application/chordsStore";
 import { Chords } from '@/entities/chords';
 import { EntityRef } from '@/entities/entity';
 import { Song } from '@/entities/song';
-import { Key, KeyLabelMapping } from "@/types/Key";
+import { Key, KeyLabelMapping } from "@/types/key";
 import { isNew } from "@/utils";
 import FontFamily from '@tiptap/extension-font-family';
 import TextStyle from '@tiptap/extension-text-style';

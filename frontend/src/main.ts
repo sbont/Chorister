@@ -7,7 +7,7 @@ import ToastService from 'primevue/toastservice';
 import Aura from '@primevue/themes/aura';
 import { loadScript } from 'vue-plugin-load-script';
 import { createPinia } from 'pinia'
-import { useAuth } from "@/services/authStore";
+import { useAuth } from "@/application/authStore";
 import { ILoggerOptions } from 'vuejs3-logger/dist/interfaces/logger-options';
 import { ApiKey } from './application/api';
 import ChoristerApi from './services/api';

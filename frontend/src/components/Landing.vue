@@ -37,13 +37,10 @@
                 <div class="columns is-centered mt-6">
                     <div class="column is-half">
                         <p class="is-size-7">
-                            <i
-                                >Chorister is currently in beta and your
-                                <a href="https://github.com/sbont/Chorister/issues" class="has-text-link-light"
-                                    >feedback</a
-                                >
-                                is most welcome.</i
-                            >
+                            <i>Chorister is currently in beta and your
+                                <a href="https://github.com/sbont/Chorister/issues"
+                                    class="has-text-link-light">feedback</a>
+                                is most welcome.</i>
                         </p>
                     </div>
                 </div>
@@ -71,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAuth } from "@/services/authStore";
+import { useAuth } from "@/application/authStore";
 
 // State
 const auth = useAuth();

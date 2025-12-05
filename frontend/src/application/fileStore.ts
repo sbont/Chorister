@@ -1,7 +1,7 @@
 import { ApiKey } from "@/application/api";
 import { FileInfo } from "@/entities/fileInfo";
 import { submitFile } from "@/services/fileService";
-import { CacheMap } from "@/types/CacheMaps";
+import { CacheMap } from "@/types/cache-maps";
 import moment from "moment";
 import { defineStore } from "pinia";
 import { inject, ref } from "vue";

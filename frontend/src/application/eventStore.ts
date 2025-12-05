@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { CacheMap } from "@/types/CacheMaps";
+import { CacheMap } from "@/types/cache-maps";
 import { useSongs } from "@/application/songStore";
 import { computed, inject, ref } from "vue";
 import { ApiKey } from "./api";

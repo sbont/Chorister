@@ -1,6 +1,6 @@
 import { Score as DomainScore } from "@/entities/score";
 import { Uri } from "@/types";
-import { Key } from "@/types/Key";
+import { Key } from "@/types/key";
 import { ApiEntityWith, fromDomain, Link, toDomain, untemplated, WithAssociation } from ".";
 import { FileInfo } from "./fileInfo";
 

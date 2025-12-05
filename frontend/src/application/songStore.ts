@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { Song } from "@/entities/song";
-import { CacheListMap, CacheMap } from "@/types/CacheMaps";
+import { CacheListMap, CacheMap } from "@/types/cache-maps";
 import { computed, inject, ref } from "vue";
 import { ApiKey } from "./api";
 import { Score } from "@/entities/score";

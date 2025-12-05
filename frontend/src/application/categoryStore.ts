@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { CacheListMap, CacheMap } from "@/types/CacheMaps";
+import { CacheListMap, CacheMap } from "@/types/cache-maps";
 import { computed, inject, reactive, ref } from "vue";
 import { Api, ApiKey } from "./api";
 import { Category } from "@/entities/category";

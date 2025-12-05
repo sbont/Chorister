@@ -130,8 +130,7 @@
                         '?autoplay=0'
                         " frameborder="0"></iframe>
                 </div>
-                <div v-if="state.mode === PageState.Editing"
-                    class="field is-horizontal">
+                <div v-if="state.mode === PageState.Editing" class="field is-horizontal">
                     <div class="field-body">
                         <div class="field">
                             <div class="control">
@@ -178,7 +177,7 @@ import { isNew, notNullOrUndefined } from "@/utils"
 import { Category } from "@/entities/category";
 import DetailHeader from "./ui/DetailHeader.vue";
 import { PageState, Uri } from "@/types";
-import { CacheListMap } from "@/types/CacheMaps";
+import { CacheListMap } from "@/types/cache-maps";
 import { useToast } from 'primevue/usetoast';
 import { ApiError } from "@/types/api-error";
 

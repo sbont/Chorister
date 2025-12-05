@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuth } from "@/services/authStore";
+import { useAuth } from "@/application/authStore";
 import { storeToRefs } from 'pinia';
 
 const routes = [
@@ -134,7 +134,7 @@ router.beforeEach((to, from, next) => {
     if (to.path === '/authorized') {
         // Inform the authentication of the login redirect. Afterwards we send the user to the main page
         console.log('/authorized');
-        
+
         auth.handleLoginRedirect()
             .then(() => next('/'))
             .catch(error => {
@@ -143,7 +143,7 @@ router.beforeEach((to, from, next) => {
             })
     } else if (to.path === '/logout') {
         console.log('/logout');
-        
+
         // This is similar to the "/callback" route not leading to an actual component but only to handle the logout callback from the authentication server.
         auth.handleLogoutRedirect()
             .then(() => next('/'))
@@ -161,15 +161,15 @@ router.beforeEach((to, from, next) => {
                 })
         } else {
             console.log('Already authenticated');
-            
+
             next()
         }
     } else if (to.matched.some(record => record.meta.forwardWhenAuthenticated) && auth.isLoggedIn) {
 
-            console.log('Forward when authenticated');
+        console.log('Forward when authenticated');
         next(to.meta.forwardWhenAuthenticated!)
     } else {
-            console.log('Default next');
+        console.log('Default next');
         // Default case. The user is send to the desired route.
         next()
     }

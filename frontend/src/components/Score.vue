@@ -79,7 +79,8 @@
             </button>
         </td>
         <td class="shrink">
-            <button class="button is-danger is-inverted is-small" @click.prevent="cancelEdit" :disabled="state == State.Saving">
+            <button class="button is-danger is-inverted is-small" @click.prevent="cancelEdit"
+                :disabled="state == State.Saving">
                 <span class="icon is-small">
                     <i class="fas fa-times"></i>
                 </span>
@@ -95,7 +96,7 @@ import { EntityRef } from '@/entities/entity';
 import { Score } from '@/entities/score';
 import { Song } from '@/entities/song';
 import { downloadFile } from '@/services/fileService';
-import { Key, KeyLabelMapping } from '@/types/Key';
+import { Key, KeyLabelMapping } from '@/types/key';
 import { isNew } from "@/utils";
 import { AxiosError } from 'axios';
 import { extension } from 'mime-types';
@@ -281,7 +282,8 @@ const openFile = async (event: MouseEvent) => {
     display: none;
 }
 
-.p-fileupload .p-fileupload-file, .p-fileupload .p-fileupload-header {
+.p-fileupload .p-fileupload-file,
+.p-fileupload .p-fileupload-header {
     padding: 0;
 }
 

@@ -1,6 +1,6 @@
 import { Score } from "@/entities/score";
 import { Uri } from "@/types";
-import { CacheMap } from "@/types/CacheMaps";
+import { CacheMap } from "@/types/cache-maps";
 import { defineStore, storeToRefs } from "pinia";
 import { inject, Ref, ref } from "vue";
 import { Api, ApiKey } from "./api";
@@ -37,7 +37,8 @@ export const useScores = defineStore("scores", () => {
         fetchAllRelated: core.fetchAllRelated,
         save: core.save,
         delete: core.delete,
-        linkFile };
+        linkFile
+    };
 });
 
 
