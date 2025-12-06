@@ -20,7 +20,7 @@
                         <tfoot></tfoot>
                     </table>
                 </div>
-                <div class="new-invite mt-5">
+                <div class="new-invite mt-5" v-if="authStore.userCan('create', 'user')">
                     <h4 class="title is-4">Invite someone</h4>
                     <button class="button is-info mb-3" @click="generateToken" v-if="inviteLink == undefined">
                         Create invite link
@@ -51,8 +51,10 @@ import { computed, ref } from "vue";
 import { User } from "@/entities/user";
 import { useUsers } from "@/application/userStore.js";
 import { useChoir } from "@/application/choirStore";
+import { useAuth } from "@/application/authStore";
 
 // state
+const authStore = useAuth();
 const userStore = useUsers();
 const choirStore = useChoir();
 const inviteLink = computed(() => {

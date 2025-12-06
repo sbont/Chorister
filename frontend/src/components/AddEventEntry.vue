@@ -79,6 +79,7 @@ import { useSongs } from "@/application/songStore";
 import { ref } from "vue";
 import Select from "primevue/select";
 import { storeToRefs } from "pinia";
+import { useAuth } from "@/application/authStore";
 
 const props = defineProps<{ eventId: number }>();
 

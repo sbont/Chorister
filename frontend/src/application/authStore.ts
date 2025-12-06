@@ -7,7 +7,7 @@ import { EntityLevelPermissions, EntityType } from "./authorization";
 
 const MetadataScope: string = 'urn:zitadel:iam:user:metadata';
 const ProjectsRoleScope: string = 'urn:zitadel:iam:org:projects:roles';
-const ProjectIdRoleScope: string = `urn:zitadel:iam:org:project:id:${import.meta.env.VITE_APP_CHORISTER_PROJECT_ID}`;
+const ProjectIdRoleScope: string = `urn:zitadel:iam:org:project:id:${import.meta.env.VITE_APP_CHORISTER_PROJECT_ID}:aud`;
 const ProjectRoleClaim: string = 'urn:zitadel:iam:org:project:roles';
 const ProjectIdRoleClaim: string = `urn:zitadel:iam:org:project:${import.meta.env.VITE_APP_CHORISTER_PROJECT_ID}:roles`;
 
@@ -77,6 +77,9 @@ export const useAuth = defineStore('auth', () => {
     function setUser(value: User) {
         user.value = value;
         const roles = value.profile[ProjectIdRoleClaim] as Record<number, string>;
+        if (!roles)
+            return;
+
         const roleNames = Object.keys(roles);
         const accessLevels = roleNames.map(roleName => {
             const parts = roleName.split('.');
@@ -117,5 +120,5 @@ export const useAuth = defineStore('auth', () => {
         return accessLevel.value >= minimumAccessLevel;
     }
 
-    return { getAccessToken, handleLoginRedirect, handleLogoutRedirect, init, isLoggedIn, login, logout, removeSession }
+    return { accessLevel, isLoggedIn, getAccessToken, handleLoginRedirect, handleLogoutRedirect, init, login, logout, removeSession, userCan }
 });

@@ -5,8 +5,8 @@
         </div>
         <div class="songs-container">
             <div class="p-2">
-                <DataTable :value="entries" @row-reorder="reorder" :loading="state == State.Loading">
-                    <Column row-reorder class="first-col"></Column>
+                <DataTable :value="entries" @row-reorder="authStore.userCan('update', 'eventEntry') ? reorder : undefined" :loading="state == State.Loading">
+                    <Column row-reorder class="first-col" v-if="authStore.userCan('update', 'eventEntry')"></Column>
                     <Column body-class="header" header="Title">
                         <template #body="slotProps">
                             <span v-if="(slotProps.data as EventEntry).label" class="has-text-weight-semibold">
@@ -23,7 +23,7 @@
                     <Column field="song.embedded.composer" header="Composer"></Column>
                     <Column field="song.embedded.songbook.title" header="Songbook"></Column>
                     <Column field="song.embedded.songbookNumber" header="no."></Column>
-                    <Column body-class="delete-btn-cell">
+                    <Column body-class="delete-btn-cell" v-if="authStore.userCan('delete', 'eventEntry')">
                         <template #body="slotProps">
                             <button class="button is-danger is-inverted is-small"
                                 :class="{ 'is-loading': state == State.Deleting }"
@@ -35,7 +35,7 @@
                         </template>
                     </Column>
                     <template #footer>
-                        <AddEventEntry :event-id="eventId" />
+                        <AddEventEntry :event-id="eventId" v-if="authStore.userCan('create', 'eventEntry')" />
                     </template>
                 </DataTable>                
             </div>
@@ -53,6 +53,7 @@ import Column from "primevue/column";
 import AddEventEntry from "./AddEventEntry.vue";
 import { Event, EventEntry } from "@/entities/event";
 import { storeToRefs } from "pinia";
+import { useAuth } from "@/application/authStore";
 
 enum State {
     Ready,
@@ -62,6 +63,7 @@ enum State {
 
 const state = ref<State>(State.Loading);
 const route = useRoute();
+const authStore = useAuth();
 const eventId = Number(route.params.id);
 const eventStore = useEvents();
 const { entries: getEntries } = storeToRefs(eventStore);

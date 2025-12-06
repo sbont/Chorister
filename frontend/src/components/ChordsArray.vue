@@ -1,24 +1,29 @@
 <template>
-    <div class="m-2 p-3">
+    <div class="m-2 p-3" v-if="authStore.userCan('read', 'chords')">
         <div class="is-size-4">Chords</div>
         <div>{{ error }}</div>
         <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
             <ChordsComponent v-for="chords in chordses" :key="chords.id" :value="(chords as Chords)"
-                @remove="removeChords(chords)"></ChordsComponent>
-            <div v-if="!draftValues">
-                <button class="button is-primary" @click="addChords">
-                    Add
-                </button>
+                @remove="removeChords(chords)">
+            </ChordsComponent>
+            <div v-if="authStore.userCan('create', 'chords')">
+                <div v-if="!draftValues">
+                    <button class="button is-primary" @click="addChords">
+                        Add
+                    </button>
+                </div>
+                <div v-else>
+                    <ChordsComponent :value="draftValues" @cancel="cancelAdd" @added="onAdded"></ChordsComponent>
+                </div>
             </div>
-            <div v-else>
-                <ChordsComponent :value="draftValues" @cancel="cancelAdd" @added="onAdded"></ChordsComponent>
-            </div>
+
 
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { useAuth } from "@/application/authStore";
 import { useChords } from "@/application/chordsStore";
 import ChordsComponent from "@/components/Chords.vue";
 import { Chords } from "@/entities/chords";
@@ -35,6 +40,7 @@ const props = defineProps<{
     song: Song
 }>();
 
+const authStore = useAuth();
 const loading = ref(true)
 const error = ref<string | undefined>(undefined)
 const chordsStore = useChords();

@@ -2,7 +2,9 @@
     <div class="song">
         <DetailHeader :title="title" :subtitle="subtitle"
             :mode="state.mode === PageState.Ready ? 'view' : state.mode === PageState.Editing && state.isNew ? 'create' : 'edit'"
-            :onEdit="edit" :edit-disabled="state.mode === PageState.Loading" :onDelete="remove" />
+            :onEdit="edit" :edit-disabled="state.mode === PageState.Loading" :onDelete="remove"
+            entity="song"
+        />
 
         <div class="song-info m-2 columns" v-if="state.mode !== PageState.Loading">
             <div class="column">

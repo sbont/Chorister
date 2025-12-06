@@ -2,8 +2,8 @@
     <div class="columns is-gapless">
         <div class="column is-one-third-tablet is-one-fifth-desktop has-background-grey-darker" id="menu">
             <aside class="menu p-2">
-                <p class="menu-label">Create</p>
-                <ul class="menu-list">
+                <p class="menu-label" v-if="authStore.userCan('create', 'event')">Create</p>
+                <ul class="menu-list" v-if="authStore.userCan('create', 'event')">
                     <li>
                         <router-link :to="{ name: 'NewEvent' }" append>
                             <span class="icon">
@@ -62,8 +62,9 @@
 import { computed } from "vue";
 import { useEvents } from "@/application/eventStore";
 import { storeToRefs } from "pinia";
-import { Event } from "@/entities/event";
+import { useAuth } from "@/application/authStore";
 
+const authStore = useAuth();
 const eventStore = useEvents();
 eventStore.initialize();
 

@@ -1,7 +1,7 @@
 <template>
     <div class="mychoir">
         <div>
-            <DetailHeader :title="choir.name" subtitle="My choir" subtitle-on-top v-if="choir" />
+            <DetailHeader :title="choir.name" subtitle="My choir" subtitle-on-top v-if="choir" entity="choir"/>
 
             <div class="p-3" v-if="!loading">
                 <div class="tabs">

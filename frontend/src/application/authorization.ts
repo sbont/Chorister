@@ -32,7 +32,7 @@ export const EntityLevelPermissions = {
         update: AccessLevel.EDITOR,
         delete: AccessLevel.MANAGER
     },
-    eventEntries: {
+    eventEntry: {
         read: AccessLevel.VIEWER,
         create: AccessLevel.EDITOR,
         update: AccessLevel.EDITOR,

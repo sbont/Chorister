@@ -20,14 +20,14 @@
         <td>
             {{ score.key ? keyLabelMapping[score.key] : "" }}
         </td>
-        <td class="shrink">
+        <td class="shrink" v-if="authStore.userCan('update', 'score')">
             <button class="button is-info is-inverted is-small" @click.prevent="edit">
                 <span class="icon is-small">
                     <i class="fas fa-pen"></i>
                 </span>
             </button>
         </td>
-        <td class="shrink">
+        <td class="shrink" v-if="authStore.userCan('delete', 'score')">
             <button class="button is-danger is-inverted is-small" @click="$emit('remove')">
                 <span class="icon is-small">
                     <i class="fas fa-times"></i>
@@ -90,6 +90,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAuth } from '@/application/authStore';
 import { useFiles } from '@/application/fileStore';
 import { useScores } from "@/application/scoreStore";
 import { EntityRef } from '@/entities/entity';
@@ -127,6 +128,7 @@ const emit = defineEmits(["remove", "cancel", "added"])
 
 const scoreStore = useScores();
 const fileStore = useFiles();
+const authStore = useAuth();
 
 // state
 const score = ref(props.value);

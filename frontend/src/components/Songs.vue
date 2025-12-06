@@ -13,11 +13,13 @@
                     <div class="is-flex is-gap-2">
                         <Button type="button" class="button mr-2" label="Categorise" @click="toggleCategorizeMenu"
                             :disabled="!selectedRows.length" :class="{ 'is-loading': isSavingCategories }"
-                            aria-haspopup="true" aria-controls="overlay_tmenu" unstyled></Button>
+                            aria-haspopup="true" aria-controls="overlay_tmenu" unstyled
+                            v-if="authStore.userCan('update', 'song')" />
                         <TieredMenu ref="customizeMenu" id="overlay_tmenu" :model="categorizeMenuEntries" popup />
 
-                        <router-link class="button is-primary" :to="{ name: 'NewSong' }" append tag="button">
-                            <span class="icon is-small">
+                        <router-link class="button is-primary" :to="{ name: 'NewSong' }" append tag="button"
+                            v-if="authStore.userCan('create', 'song')">
+                            <span class=" icon is-small">
                                 <i class="fas fa-plus"></i>
                             </span>
                             <span>Add</span>
@@ -61,6 +63,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAuth } from '@/application/authStore';
 import { useCategories } from '@/application/categoryStore';
 import { StoreState } from '@/application/entityStore';
 import { useSongs } from "@/application/songStore.js";
@@ -77,6 +80,7 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter } from "vue-router";
 
 // Types
+const authStore = useAuth();
 const songStore = useSongs();
 const { allSongs, isLoading } = storeToRefs(songStore);
 const categoryStore = useCategories();
@@ -199,6 +203,7 @@ function onPaged(event: DataTablePageEvent) {
 .p-datatable-table-container {
     overflow: visible !important;
 }
+
 .p-overlay-mask {
     background: white;
     color: black;
@@ -244,4 +249,5 @@ td.p-1b {
 
 .col-category .tags {
     flex-wrap: initial;
-}</style>
+}
+</style>

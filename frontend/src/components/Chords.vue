@@ -11,8 +11,12 @@
                 <div class="content mono" v-html="chords.chords"></div>
             </div>
             <footer class="card-footer">
-                <a @click.prevent="edit" href="#" class="card-footer-item">Edit</a>
-                <a @click.prevent="$emit('remove')" href="#" class="card-footer-item has-text-danger">Delete</a>
+                <a @click.prevent="edit" href="#" class="card-footer-item" v-if="authStore.userCan('update', 'chords')">
+                    Edit
+                </a>
+                <a @click.prevent="$emit('remove')" href="#" class="card-footer-item has-text-danger" v-if="authStore.userCan('delete', 'chords')">
+                    Delete
+                </a>
             </footer>
         </div>
         <div v-if="editing" class="card mr-2">
@@ -65,6 +69,7 @@
     </div>
 </template>
 <script setup lang="ts">
+import { useAuth } from "@/application/authStore";
 import { useChords } from "@/application/chordsStore";
 import { Chords } from '@/entities/chords';
 import { EntityRef } from '@/entities/entity';
@@ -89,6 +94,7 @@ const props = defineProps({
 })
 const emit = defineEmits(["remove", "cancel", "added"])
 
+const authStore = useAuth();
 const chordsStore = useChords();
 const keyLabelMapping = KeyLabelMapping
 const editor = useEditor({

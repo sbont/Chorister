@@ -1,13 +1,9 @@
 <template>
     <div class="event-detail">
-        <DetailHeader 
-            :mode="pageState" 
-            :title="event?.name" 
-            :subtitle="event ? format(event?.date) : ''" 
-            :onEdit="edit" 
-            :onDelete="remove"
-            @cancel-edit="cancelEdit"
-            :custom-buttons="[{ 'label': 'Export texts', action: exportText }]"
+        <DetailHeader :mode="pageState" :title="event?.name" :subtitle="event ? format(event?.date) : ''" :onEdit="edit"
+            :onDelete="remove" @cancel-edit="cancelEdit"
+            :customActions="[{ 'label': 'Export texts', action: exportText, accessLevel: AccessLevel.EDITOR }]" 
+            entity="event"
         />
 
         <div v-if="!loading">
@@ -58,6 +54,7 @@ import { useRoute, useRouter } from "vue-router";
 import { isNew } from "@/entities/entity";
 import DetailHeader from "./ui/DetailHeader.vue";
 import { PageMode, PageState } from "@/types";
+import { AccessLevel } from "@/types/access-level";
 
 type DraftEvent = Partial<Event>;
 
@@ -91,9 +88,9 @@ const format = (date: Date) => new Date(date).toLocaleDateString();
 const save = async () => {
     saving.value = true;
     let newEvent = draftValues.value as Event;
-    if (!newEvent) 
+    if (!newEvent)
         return;
-    
+
     const isNewEvent = isNew(newEvent);
     if (!newEvent.name && !newEvent.date) {
         error.value = "Either Name or Date is required";
@@ -103,7 +100,7 @@ const save = async () => {
         error.value = null;
     }
 
-    if (!newEvent.name) 
+    if (!newEvent.name)
         newEvent.name = new Date(newEvent.date).toLocaleDateString();
 
     newEvent = await store.save(newEvent);
@@ -132,7 +129,7 @@ const cancelEdit = () => {
 const remove = () => {
     if (event.value)
         store.delete(event.value).then(() =>
-            router.push({name: "Planning"}));
+            router.push({ name: "Planning" }));
 }
 
 const exportText = () => {

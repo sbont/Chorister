@@ -10,7 +10,7 @@
     <div v-else-if="state == State.NotFound" class="p-3">
         <h3>
             No upcoming events planned.
-            <router-link :to="{ name: 'NewEvent' }" append>
+            <router-link :to="{ name: 'NewEvent' }" append v-if="authStore.userCan('create', 'event')">
                 <span class="icon">
                     <i class="fas fa-plus-square"></i>
                 </span>
@@ -21,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAuth } from "@/application/authStore";
 import { useEvents } from "@/application/eventStore";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
@@ -35,6 +36,7 @@ enum State {
 
 const state = ref<State>(State.Loading);
 const router = useRouter();
+const authStore = useAuth();
 const eventStore = useEvents();
 const { futureEvents, isLoading } = storeToRefs(eventStore);
 eventStore.initialize().then(() => setUpcoming());
@@ -43,7 +45,7 @@ function setUpcoming() {
     const upcoming = futureEvents.value[0];
     if (upcoming) {
         state.value = State.Redirecting;
-        router.push({ name: "Event", params: { id: upcoming.id }});
+        router.push({ name: "Event", params: { id: upcoming.id } });
     } else {
         state.value = State.NotFound;
     }

@@ -16,14 +16,14 @@
             <tbody>
                 <ScoreCopy v-for="(score, index) in scores" :key="score.id" :value="(score as Score)" :song="song"
                     :number="oneBased(index)" />
-                <tr v-if="!draftValues">
+                <tr v-if="!draftValues && authStore.userCan('create', 'score')">
                     <td colspan="2">
                         <button class="button is-primary" @click="addScore">
                             Add
                         </button>
                     </td>
                 </tr>
-                <ScoreCopy v-else :value="draftValues" @cancel="cancelAdd" @added="onAdded" />
+                <ScoreCopy v-if="draftValues" :value="draftValues" @cancel="cancelAdd" @added="onAdded" />
             </tbody>
             <tfoot></tfoot>
         </table>
@@ -40,6 +40,7 @@ import { Song } from "@/entities/song";
 import { Score } from "@/entities/score";
 import { EntityRef } from "@/entities/entity";
 import ScoreCopy from "./Score.vue";
+import { useAuth } from "@/application/authStore";
 
 type DraftScore = Partial<Score> & {
     song: EntityRef<Song>
@@ -49,6 +50,7 @@ const props = defineProps<{
     song: Song
 }>();
 
+const authStore = useAuth();
 const loading = ref(true)
 const error = ref<string>()
 const scoreStore = useScores();

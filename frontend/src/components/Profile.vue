@@ -1,6 +1,6 @@
 <template>
     <div class="profile" v-if="!loading && user">
-        <DetailHeader :title="user?.firstName" subtitle="hello" subtitle-on-top />
+        <DetailHeader :title="user?.firstName" subtitle="hello" subtitle-on-top entity="user"/>
 
         <div class="pt-5">
             <section class="section">

@@ -11,7 +11,7 @@
                 <tr v-for="category in props.categories" class="category" :key="category.id">
                     <td class="grow">{{ category.name }}</td>
                     <td class="p-1">
-                        <button class="button is-danger is-inverted is-small" @click="$emit('remove', category)">
+                        <button class="button is-danger is-inverted is-small" @click="$emit('remove', category)" v-if="authStore.userCan('delete', 'category')">
                             <span class="icon is-small">
                                 <i class="fas fa-times"></i>
                             </span>
@@ -20,7 +20,7 @@
                 </tr>
             </tbody>
             <tfoot>
-                <tr>
+                <tr v-if="authStore.userCan('create', 'category')">
                     <td v-if="!editing">
                         <a @click.prevent="create" href="#" class="card-footer-item">Add...</a>
                     </td>
@@ -47,6 +47,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAuth } from "@/application/authStore";
 import { Category } from "@/entities/category";
 import { CategoryType } from "@/entities/categoryType";
 import { EntityRef } from "@/entities/entity";
@@ -59,6 +60,7 @@ const props = defineProps<{
 const emit = defineEmits(["remove", "save"])
 
 // state
+const authStore = useAuth();
 const draftValue = ref<String | undefined>(undefined)
 const editing = ref(false)
 
