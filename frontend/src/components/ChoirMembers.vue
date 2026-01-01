@@ -8,19 +8,19 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Email</th>
+                                <th v-if="accessLevel && accessLevel >= AccessLevel.MANAGER">Email</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="member in members" class="member" :key="member.id">
                                 <th>{{ member.firstName }} {{ member.lastName }}</th>
-                                <td>{{ member.email }}</td>
+                                <td v-if="accessLevel && accessLevel >= AccessLevel.MANAGER">{{ member.email }}</td>
                             </tr>
                         </tbody>
                         <tfoot></tfoot>
                     </table>
                 </div>
-                <div class="new-invite mt-5" v-if="authStore.userCan('create', 'user')">
+                <div class="new-invite mt-5" v-if="userCan('create', 'user')">
                     <h4 class="title is-4">Invite someone</h4>
                     <button class="button is-info mb-3" @click="generateToken" v-if="inviteLink == undefined">
                         Create invite link
@@ -52,9 +52,13 @@ import { User } from "@/entities/user";
 import { useUsers } from "@/application/userStore.js";
 import { useChoir } from "@/application/choirStore";
 import { useAuth } from "@/application/authStore";
+import { storeToRefs } from "pinia";
+import { AccessLevel } from "@/types/access-level";
 
 // state
 const authStore = useAuth();
+const { userCan } = authStore;
+const { accessLevel } = storeToRefs(authStore);
 const userStore = useUsers();
 const choirStore = useChoir();
 const inviteLink = computed(() => {
