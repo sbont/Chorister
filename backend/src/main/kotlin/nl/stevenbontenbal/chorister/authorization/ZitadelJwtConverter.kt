@@ -34,15 +34,10 @@ class ZitadelJwtConverter(val authService: IUserAuthorizationService): Converter
 
     private fun extractRoles(source: Jwt): Set<SimpleGrantedAuthority?>? {
         val userRoles = authService.getRolesFromJwt(source)
+        val includingLowerRoles = userRoles.flatMap { it.allInHierarchy() }
 
-        val collect = userRoles.stream()
-            .map { role ->
-                val roleName = when (role) {
-                    is Admin -> "ROLE_ADMIN"
-                    is TenantUser -> "ROLE_" + role.accessLevel.name.uppercase()
-                    else -> "UNKNOWN"
-                }
-                SimpleGrantedAuthority(roleName) }
+        val collect = includingLowerRoles.stream()
+            .map { role ->  SimpleGrantedAuthority(role.name) }
             .collect(Collectors.toSet())
         return collect
     }

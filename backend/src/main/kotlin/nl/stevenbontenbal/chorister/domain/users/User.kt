@@ -19,7 +19,7 @@ class User(
     var firstName: String?,
     var lastName: String?,
     var zitadelId: String? = null
-    )
+)
 {
     companion object
 }
