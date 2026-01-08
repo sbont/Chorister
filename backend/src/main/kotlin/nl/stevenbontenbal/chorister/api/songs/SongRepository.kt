@@ -21,22 +21,7 @@ interface SongRepository : CrudRepository<Song, Long> {
     override fun <S : Song> save(entity: S): S
 
     @PreAuthorize("hasRole('EDITOR')")
-    override fun <S : Song> saveAll(entities: Iterable<S>): Iterable<S>
-
-    @PreAuthorize("hasRole('EDITOR')")
     override fun delete(entity: Song)
-
-    @PreAuthorize("hasRole('EDITOR')")
-    override fun deleteById(id: Long)
-
-    @PreAuthorize("hasRole('MANAGER')")
-    override fun deleteAll()
-
-    @PreAuthorize("hasRole('MANAGER')")
-    override fun deleteAllById(ids: Iterable<Long?>)
-
-    @PreAuthorize("hasRole('MANAGER')")
-    override fun deleteAll(entities: Iterable<Song?>)
 
     @RestResource(path = "bycategory", rel = "bycategory")
     @EntityGraph(attributePaths = ["categories", "eventEntries"])
