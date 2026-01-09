@@ -20,7 +20,9 @@ interface IUserAuthorizationService {
 
     fun getRolesFromJwt(jwt: Jwt): Set<UserRole>
 
-    fun retrieveUserRoles(tenantId: Long): Map<ZitadelUserId, Set<UserRole>>
+    fun retrieveUserRoles(tenantId: Long): Map<String, Set<UserRole>>
 
-    fun replaceUserRoles(userId: ZitadelUserId, tenantId: Long, accessLevel: AccessLevel)
+    fun replaceUserRoles(userId: String, tenantId: Long, accessLevel: AccessLevel)
+
+    fun getRoles(): Set<UserRole>
 }

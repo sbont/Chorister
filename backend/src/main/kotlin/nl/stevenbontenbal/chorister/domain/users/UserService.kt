@@ -1,5 +1,6 @@
 package nl.stevenbontenbal.chorister.domain.users
 
+import nl.stevenbontenbal.chorister.authorization.UserRole
 import nl.stevenbontenbal.chorister.domain.InvalidIdentifierException
 import org.springframework.stereotype.Component
 
@@ -13,6 +14,8 @@ class UserService(private val userRepository: IUserRepository, private val authS
     fun getCurrentChoirId(): Long? {
         return authService.getTenantId()
     }
+
+    fun getUserRoles() = authService.getRoles()
 
     fun addUserToChoir(user: User, choir: Choir, accessLevel: AccessLevel = AccessLevel.VIEWER) {
         user.choir = choir
@@ -36,5 +39,13 @@ class UserService(private val userRepository: IUserRepository, private val authS
             is User -> currentUser == targetDomainObject || currentUser.choir != null && currentUser.choir!!.id == targetDomainObject.choir?.id
             else -> false
         }
+    }
+
+    fun getUsersByChoirId(choirId: Long): List<User> {
+        return userRepository.findByChoirId(choirId)
+    }
+
+    fun retrieveRolesByExternalUserId(tenantId: Long): Map<String, Set<UserRole>> {
+        return authService.retrieveUserRoles(tenantId)
     }
 }

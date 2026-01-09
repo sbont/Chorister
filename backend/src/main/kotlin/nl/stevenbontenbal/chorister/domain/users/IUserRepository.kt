@@ -11,4 +11,6 @@ interface IUserRepository : CrudRepository<User, Long> {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun findByZitadelId(zitadelId: String): User?
+
+    fun findByChoirId(choirId: Long): List<User>
 }

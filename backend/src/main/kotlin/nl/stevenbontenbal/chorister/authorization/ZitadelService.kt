@@ -1,36 +1,26 @@
 package nl.stevenbontenbal.chorister.authorization
 
-import nl.stevenbontenbal.chorister.application.RegistrationRequest
-import nl.stevenbontenbal.chorister.authorization.models.Email
-import nl.stevenbontenbal.chorister.authorization.models.Profile
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelError
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelResourceDetails
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelUserEmailGetResponse
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelUserEmailPutRequest
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelAddUserGrantsRequest
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelUserPostRequest
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelUserPostResponse
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelUsernamePutRequest
-import nl.stevenbontenbal.chorister.application.config.ZitadelProperties
+import io.netty.handler.logging.LogLevel
 import nl.stevenbontenbal.chorister.application.InvalidInputException
+import nl.stevenbontenbal.chorister.application.RegistrationRequest
 import nl.stevenbontenbal.chorister.application.UsernameAlreadyExistingException
-import nl.stevenbontenbal.chorister.authorization.models.Role
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelGrantsSearchRequest
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelGrantsSearchResponse
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelProjectRolesBulkPostRequest
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelPutUserGrantsRequest
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelUserGrant
+import nl.stevenbontenbal.chorister.application.config.ZitadelProperties
+import nl.stevenbontenbal.chorister.authorization.models.*
 import nl.stevenbontenbal.chorister.domain.users.AccessLevel
 import nl.stevenbontenbal.chorister.domain.users.IUserAuthorizationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
+import reactor.netty.http.client.HttpClient
+import reactor.netty.transport.logging.AdvancedByteBufFormat
+
 
 private const val RolesClaim = "urn:zitadel:iam:org:project:roles"
 
@@ -38,7 +28,16 @@ private const val RolesClaim = "urn:zitadel:iam:org:project:roles"
 class ZitadelService(
     private val zitadelConfiguration: ZitadelProperties,
 ) : IUserAuthorizationService {
-    private val webClient: WebClient = WebClient.create(zitadelConfiguration.baseUrl)
+    private val httpClient: HttpClient = HttpClient
+        .create()
+        .baseUrl(zitadelConfiguration.baseUrl)
+        .wiretap(
+            "reactor.netty.http.client.HttpClient",
+            LogLevel.DEBUG, AdvancedByteBufFormat.TEXTUAL
+        )
+    private val webClient: WebClient = WebClient.builder()
+        .clientConnector(ReactorClientHttpConnector(httpClient))
+        .build()
 
     override fun postUser(registrationRequest: RegistrationRequest): Result<String?> {
         val request = createUserPostRequest(registrationRequest)
@@ -92,7 +91,7 @@ class ZitadelService(
 
     private fun getAuthToken(): Jwt? = SecurityContextHolder.getContext().authentication?.principal as Jwt?
 
-    private fun getRoles(): Set<UserRole> {
+    override fun getRoles(): Set<UserRole> {
         val jwt = getAuthToken()
         return if (jwt == null) setOf() else getRolesFromJwt(jwt)
     }
