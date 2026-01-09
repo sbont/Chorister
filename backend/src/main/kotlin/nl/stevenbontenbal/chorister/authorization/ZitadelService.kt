@@ -7,7 +7,7 @@ import nl.stevenbontenbal.chorister.authorization.models.ZitadelError
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelResourceDetails
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelUserEmailGetResponse
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelUserEmailPutRequest
-import nl.stevenbontenbal.chorister.authorization.models.ZitadelUserGrantsRequest
+import nl.stevenbontenbal.chorister.authorization.models.ZitadelAddUserGrantsRequest
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelUserPostRequest
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelUserPostResponse
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelUsernamePutRequest
@@ -15,7 +15,10 @@ import nl.stevenbontenbal.chorister.application.config.ZitadelProperties
 import nl.stevenbontenbal.chorister.application.InvalidInputException
 import nl.stevenbontenbal.chorister.application.UsernameAlreadyExistingException
 import nl.stevenbontenbal.chorister.authorization.models.Role
+import nl.stevenbontenbal.chorister.authorization.models.ZitadelGrantsSearchRequest
+import nl.stevenbontenbal.chorister.authorization.models.ZitadelGrantsSearchResponse
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelProjectRolesBulkPostRequest
+import nl.stevenbontenbal.chorister.authorization.models.ZitadelPutUserGrantsRequest
 import nl.stevenbontenbal.chorister.domain.users.AccessLevel
 import nl.stevenbontenbal.chorister.domain.users.IUserAuthorizationService
 import org.springframework.http.HttpStatus
@@ -153,8 +156,60 @@ class ZitadelService(
             .block()
     }
 
-    private fun createAddRolesRequest(tenantId: Long, accessLevel: AccessLevel): ZitadelUserGrantsRequest =
-        ZitadelUserGrantsRequest(
+    override fun replaceUserRoles(userId: ZitadelUserId, tenantId: Long, accessLevel: AccessLevel) {
+        val grantId = findUserGrantId(userId)
+        val roleKeys = listOf(roleKey(tenantId, accessLevel))
+        val requestBody = ZitadelPutUserGrantsRequest(roleKeys)
+        webClient
+            .put()
+            .uri("/users/$userId/grants/$grantId")
+            .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(requestBody))
+            .retrieve()
+            .onStatus(HttpStatusCode::is4xxClientError) {
+                it.bodyToMono(ZitadelError::class.java).flatMap { err ->
+                    Mono.error(InvalidInputException("Error while updating user grant: ${err.message}"))
+                }
+            }
+            .onStatus(HttpStatusCode::is5xxServerError) {
+                Mono.error(RuntimeException("Zitadel server error: ${it.statusCode()}"))
+            }
+            .toBodilessEntity()
+            .block()
+    }
+
+    private fun findUserGrantId(userId: ZitadelUserId): String {
+        val requestBody = ZitadelGrantsSearchRequest.userIdQuery(userId)
+        val grants = webClient
+            .post()
+            .uri("/users/grants/_search")
+            .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(requestBody))
+            .retrieve()
+            .onStatus(HttpStatusCode::is4xxClientError) {
+                it.bodyToMono(ZitadelError::class.java).flatMap { err ->
+                    Mono.error(InvalidInputException("Error while retrieving user grants: ${err.message}"))
+                }
+            }
+            .onStatus(HttpStatusCode::is5xxServerError) {
+                Mono.error(RuntimeException("Zitadel server error: ${it.statusCode()}"))
+            }
+            .toEntity(ZitadelGrantsSearchResponse::class.java)
+            .block()
+        val grantId = grants?.body?.result
+            ?.firstOrNull { it.projectId == zitadelConfiguration.projectId }
+            ?.id
+
+        if (grantId == null)
+            throw AuthException("No user grants found")
+
+        return grantId
+    }
+
+    private fun createAddRolesRequest(tenantId: Long, accessLevel: AccessLevel): ZitadelAddUserGrantsRequest =
+        ZitadelAddUserGrantsRequest(
             projectId = zitadelConfiguration.projectId,
             roleKeys = listOf(roleKey(tenantId, accessLevel))
         )
