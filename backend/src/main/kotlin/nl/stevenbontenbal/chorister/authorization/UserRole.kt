@@ -8,13 +8,15 @@ interface UserRole {
     fun allInHierarchy(): List<UserRole>
 
     companion object {
-        const val PREFIX = "ROLE_"
+        const val SPRING_ROLE_PREFIX = "ROLE_"
+        const val ADMIN_ROLE_PREFIX = "admin"
+        const val TENANT_ROLE_PREFIX = "tenant"
 
         fun parse(value: String): UserRole {
             val parts = value.split('.')
             return when (parts.first()) {
-                "admin" -> Admin
-                "tenant" -> parseTenantUser(parts.drop(1))
+                ADMIN_ROLE_PREFIX -> Admin
+                TENANT_ROLE_PREFIX -> parseTenantUser(parts.drop(1))
                 else -> throw AuthException("Role cannot be determined for user")
             }
         }
@@ -31,7 +33,7 @@ interface UserRole {
 }
 
 object Admin : UserRole {
-    override val name: String = UserRole.PREFIX + "ADMIN"
+    override val name: String = UserRole.SPRING_ROLE_PREFIX + "ADMIN"
     override fun allInHierarchy(): List<UserRole> = listOf(Admin)
 }
 
@@ -39,7 +41,7 @@ data class TenantUser(
     val tenantId: Long,
     val accessLevel: AccessLevel
 ) : UserRole {
-    override val name = UserRole.PREFIX + accessLevel.name.uppercase()
+    override val name = UserRole.SPRING_ROLE_PREFIX + accessLevel.name.uppercase()
 
     override fun allInHierarchy(): List<UserRole> {
         val levels = AccessLevel.entries

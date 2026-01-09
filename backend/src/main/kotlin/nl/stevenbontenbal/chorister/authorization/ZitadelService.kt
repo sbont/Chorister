@@ -157,9 +157,11 @@ class ZitadelService(
             .block()
     }
 
-    override fun retrieveUserRoles(userId: ZitadelUserId): Set<UserRole> {
-        val grants = findUserGrants(userId)
-        return grants.flatMap { it.roleKeys }.map { UserRole.parse(it) }.toSet()
+    override fun retrieveUserRoles(tenantId: Long): Map<ZitadelUserId, Set<UserRole>> {
+        val searchString = "${UserRole.TENANT_ROLE_PREFIX}.$tenantId."
+        val requestBody = ZitadelGrantsSearchRequest.roleKeyQuery(searchString)
+        val grants = findUserGrants(requestBody)
+        return grants.associate { grant -> grant.userId to grant.roleKeys.map { UserRole.parse(it) }.toSet() }
     }
 
     override fun replaceUserRoles(userId: ZitadelUserId, tenantId: Long, accessLevel: AccessLevel) {
@@ -186,14 +188,14 @@ class ZitadelService(
     }
 
     private fun findUserGrantId(userId: ZitadelUserId): String {
-        val grants = findUserGrants(userId)
+        val requestBody = ZitadelGrantsSearchRequest.userIdQuery(userId)
+        val grants = findUserGrants(requestBody)
         val grantId = grants.firstOrNull { it.projectId == zitadelConfiguration.projectId }?.id
 
         return grantId ?: throw AuthException("No user grant found")
     }
 
-    private fun findUserGrants(userId: ZitadelUserId): List<ZitadelUserGrant> {
-        val requestBody = ZitadelGrantsSearchRequest.userIdQuery(userId)
+    private fun findUserGrants(requestBody: ZitadelGrantsSearchRequest): List<ZitadelUserGrant> {
         val response = webClient
             .post()
             .uri("/users/grants/_search")
