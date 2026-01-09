@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.authorization.models
+package nl.stevenbontenbal.chorister.authorization.models.zitadelv1
 
 data class ZitadelAddUserGrantsRequest(
     val projectId: String,

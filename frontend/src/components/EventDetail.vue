@@ -2,9 +2,8 @@
     <div class="event-detail">
         <DetailHeader :mode="pageState" :title="event?.name" :subtitle="event ? format(event?.date) : ''" :onEdit="edit"
             :onDelete="remove" @cancel-edit="cancelEdit"
-            :customActions="[{ 'label': 'Export texts', action: exportText, accessLevel: AccessLevel.EDITOR }]" 
-            entity="event"
-        />
+            :customActions="[{ 'label': 'Export texts', action: exportText, accessLevel: Role.EDITOR }]"
+            entity="event" />
 
         <div v-if="!loading">
             <div v-if="error">{{ error }}</div>
@@ -54,7 +53,7 @@ import { useRoute, useRouter } from "vue-router";
 import { isNew } from "@/entities/entity";
 import DetailHeader from "./ui/DetailHeader.vue";
 import { PageMode, PageState } from "@/types";
-import { AccessLevel } from "@/types/access-level";
+import { Role } from "@/types/role";
 
 type DraftEvent = Partial<Event>;
 

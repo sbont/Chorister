@@ -1,63 +1,63 @@
-import { AccessLevel } from "@/types/access-level";
+import { Role } from "@/types/role";
 import { Operation } from "@/types/operations";
 
 export const EntityLevelPermissions = {
     category: {
-        read: AccessLevel.VIEWER,
-        create: AccessLevel.EDITOR,
-        update: AccessLevel.MANAGER,
-        delete: AccessLevel.MANAGER
+        read: Role.VIEWER,
+        create: Role.EDITOR,
+        update: Role.MANAGER,
+        delete: Role.MANAGER
     },
     categoryType: {
-        read: AccessLevel.VIEWER,
-        create: AccessLevel.MANAGER,
-        update: AccessLevel.MANAGER,
-        delete: AccessLevel.MANAGER
+        read: Role.VIEWER,
+        create: Role.MANAGER,
+        update: Role.MANAGER,
+        delete: Role.MANAGER
     },
     choir: {
-        read: AccessLevel.VIEWER,
-        create: AccessLevel.VIEWER,
-        update: AccessLevel.MANAGER,
-        delete: AccessLevel.MANAGER
+        read: Role.VIEWER,
+        create: Role.VIEWER,
+        update: Role.MANAGER,
+        delete: Role.MANAGER
     },
     chords: {
-        read: AccessLevel.VIEWER,
-        create: AccessLevel.EDITOR,
-        update: AccessLevel.EDITOR,
-        delete: AccessLevel.EDITOR
+        read: Role.VIEWER,
+        create: Role.EDITOR,
+        update: Role.EDITOR,
+        delete: Role.EDITOR
     },
     event: {
-        read: AccessLevel.VIEWER,
-        create: AccessLevel.EDITOR,
-        update: AccessLevel.EDITOR,
-        delete: AccessLevel.MANAGER
+        read: Role.VIEWER,
+        create: Role.EDITOR,
+        update: Role.EDITOR,
+        delete: Role.MANAGER
     },
     eventEntry: {
-        read: AccessLevel.VIEWER,
-        create: AccessLevel.EDITOR,
-        update: AccessLevel.EDITOR,
-        delete: AccessLevel.EDITOR
+        read: Role.VIEWER,
+        create: Role.EDITOR,
+        update: Role.EDITOR,
+        delete: Role.EDITOR
     },
     score: {
-        read: AccessLevel.VIEWER,
-        create: AccessLevel.EDITOR,
-        update: AccessLevel.EDITOR,
-        delete: AccessLevel.EDITOR
+        read: Role.VIEWER,
+        create: Role.EDITOR,
+        update: Role.EDITOR,
+        delete: Role.EDITOR
     },
     song: {
-        read: AccessLevel.VIEWER,
-        create: AccessLevel.EDITOR,
-        update: AccessLevel.EDITOR,
-        delete: AccessLevel.MANAGER
+        read: Role.VIEWER,
+        create: Role.EDITOR,
+        update: Role.EDITOR,
+        delete: Role.MANAGER
     },
     user: {
-        read: AccessLevel.VIEWER,
-        create: AccessLevel.MANAGER,
-        update: AccessLevel.MANAGER,
-        delete: AccessLevel.MANAGER
+        read: Role.VIEWER,
+        create: Role.MANAGER,
+        update: Role.MANAGER,
+        delete: Role.MANAGER
     }
 } satisfies Record<string, Permissions>;
 
 export type EntityType = keyof typeof EntityLevelPermissions;
 
-export type Permissions = Record<Operation, AccessLevel>;
+export type Permissions = Record<Operation, Role>;

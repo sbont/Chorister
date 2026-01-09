@@ -8,10 +8,10 @@ sealed interface UserViews {
      * Basic view - includes only firstName and lastName
      * For EDITOR and VIEWER roles
      */
-    object Basic
+    interface Basic
     /**
      * Manager view - includes all user details
      * For MANAGER role
      */
-    object Manager
+    object Manager : Basic
 }

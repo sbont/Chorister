@@ -7,53 +7,51 @@ import nl.stevenbontenbal.chorister.authorization.TenantUser
 import nl.stevenbontenbal.chorister.domain.users.AccessLevel
 import nl.stevenbontenbal.chorister.domain.users.User
 import nl.stevenbontenbal.chorister.domain.users.UserService
+import org.springframework.data.rest.webmvc.BasePathAwareController
+import org.springframework.data.rest.webmvc.RepositoryRestController
+import org.springframework.hateoas.server.ExposesResourceFor
+import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.json.MappingJacksonValue
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RestController
 
-@RestController
+@BasePathAwareController
+@ExposesResourceFor(User::class)
 class UserController(
     private val userService: UserService
 ) {
-    @GetMapping("/api/user")
-    fun getCurrentUser(): User {
-        return userService.currentUser
+    @GetMapping("/users/me")
+    fun getCurrentUser(): ResponseEntity<User> {
+        return ResponseEntity.ok(userService.currentUser)
     }
 
-    @GetMapping("/api/users")
-    fun getUsers(): MappingJacksonValue {
+    @GetMapping("/users")
+    fun getUsers(): ResponseEntity<MappingJacksonValue> {
         val currentTenantId = userService.getCurrentChoirId()
         val currentUserRoles = userService.getUserRoles()
-        
-        return if (currentTenantId != null) {
-            val allUsers = userService.getUsersByChoirId(currentTenantId)
-            val userRolesMap = userService.retrieveRolesByExternalUserId(currentTenantId)
-            
-            // Convert users to DTOs with roles
-            val userDtos = allUsers.map { user ->
-                UserViewDto(
-                    id = user.id,
-                    firstName = user.firstName,
-                    lastName = user.lastName,
-                    email = user.email,
-                    roles = user.zitadelId?.let { zitadelId ->
-                        userRolesMap[zitadelId]?.mapNotNull { role ->
-                            (role as? TenantUser)?.takeIf { it.tenantId == currentTenantId }?.accessLevel
-                        }?.toList()
-                    }
-                )
-            }
-            
-            // Apply JsonView based on user role
-            val viewClass = determineViewClass(currentUserRoles)
-            MappingJacksonValue(userDtos).apply {
-                serializationView = viewClass
-            }
-        } else {
-            MappingJacksonValue(emptyList<UserViewDto>()).apply {
-                serializationView = UserViews.Basic::class.java
-            }
+
+        if (currentTenantId == null)
+            return ResponseEntity.ok(MappingJacksonValue(emptyList<UserViewDto>()).apply { serializationView = UserViews.Basic::class.java })
+
+        val allUsers = userService.getUsersByChoirId(currentTenantId)
+        val accessLevelsMap = userService.retrieveRolesByExternalUserId(currentTenantId)
+
+        // Convert users to DTOs with roles
+        val userDtos = allUsers.map { user ->
+            UserViewDto(
+                id = user.id,
+                firstName = user.firstName,
+                lastName = user.lastName,
+                email = user.email,
+                roles = user.zitadelId?.let { accessLevelsMap[it] }
+            )
         }
+
+        // Apply JsonView based on user role
+        val viewClass = determineViewClass(currentUserRoles)
+        val result = MappingJacksonValue(userDtos).apply {
+            serializationView = viewClass
+        }
+        return ResponseEntity.ok(result)
     }
 
     /**

@@ -45,7 +45,7 @@ class UserService(private val userRepository: IUserRepository, private val authS
         return userRepository.findByChoirId(choirId)
     }
 
-    fun retrieveRolesByExternalUserId(tenantId: Long): Map<String, Set<UserRole>> {
+    fun retrieveRolesByExternalUserId(tenantId: Long): Map<String, List<AccessLevel>> {
         return authService.retrieveUserRoles(tenantId)
     }
 }

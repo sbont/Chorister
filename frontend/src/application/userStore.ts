@@ -11,11 +11,11 @@ export const useUsers = defineStore("users", () => {
     const users = ref(new CacheMap<number, User>());
 
     // actions
-    async function fetch(userId: number) {
-        const data = await api.getUserById(userId)
-        users.value.set(data.id, data);
-        return data;
-    }
+    // async function fetch(userId: number) {
+    //     const data = await api.getUserById(userId)
+    //     users.value.set(data.id, data);
+    //     return data;
+    // }
 
     async function fetchAll() {
         const data = await api.getAllUsers()
@@ -23,13 +23,13 @@ export const useUsers = defineStore("users", () => {
         return data;
     }
 
-    async function get(userId: number) {
-        if (!users.value.has(userId)) {
-            return await fetch(userId);
-        } else {
-            return users.value.get(userId);
-        }
-    }
+    // async function get(userId: number) {
+    //     if (!users.value.has(userId)) {
+    //         return await fetch(userId);
+    //     } else {
+    //         return users.value.get(userId);
+    //     }
+    // }
 
     async function getCurrent() {
         const data = await api.getUser()
@@ -42,5 +42,5 @@ export const useUsers = defineStore("users", () => {
         return api.updateUser(user);
     }
 
-    return { users, fetchAll, get, getCurrent, save };
+    return { users, fetchAll, getCurrent, save };
 })

@@ -8,13 +8,15 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th v-if="accessLevel && accessLevel >= AccessLevel.MANAGER">Email</th>
+                                <th v-if="role && role >= Role.MANAGER">Email</th>
+                                <th>Role</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="member in members" class="member" :key="member.id">
                                 <th>{{ member.firstName }} {{ member.lastName }}</th>
-                                <td v-if="accessLevel && accessLevel >= AccessLevel.MANAGER">{{ member.email }}</td>
+                                <td v-if="role && role >= Role.MANAGER">{{ member.email }}</td>
+                                <td>{{ displayRoles(member.roles) }}</td>
                             </tr>
                         </tbody>
                         <tfoot></tfoot>
@@ -47,18 +49,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { capitalize, computed, ref } from "vue";
 import { User } from "@/entities/user";
 import { useUsers } from "@/application/userStore.js";
 import { useChoir } from "@/application/choirStore";
 import { useAuth } from "@/application/authStore";
 import { storeToRefs } from "pinia";
-import { AccessLevel } from "@/types/access-level";
+import { Role } from "@/types/role";
 
 // state
 const authStore = useAuth();
 const { userCan } = authStore;
-const { accessLevel } = storeToRefs(authStore);
+const { role } = storeToRefs(authStore);
 const userStore = useUsers();
 const choirStore = useChoir();
 const inviteLink = computed(() => {
@@ -83,6 +85,8 @@ userStore
         error.value = "Failed to load members";
     })
     .finally(() => (loading.value = false));
+
+const displayRoles = (roles: Role[]) => roles.map(role => capitalize(role.toLocaleString().toLocaleLowerCase())).join(", ")
 
 const generateToken = () => choirStore.generateToken();
 

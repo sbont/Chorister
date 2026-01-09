@@ -10,9 +10,9 @@ import java.util.Optional
 
 @Primary
 @RepositoryRestResource
-interface UserRepository : CrudRepository<User, Long> {
+interface UserRepository : CrudRepository<User, String> {
     @RestResource(exported = false)
-    override fun findById(id: Long): Optional<User?>
+    override fun findById(id: String): Optional<User?>
 
     @RestResource(exported = false)
     override fun findAll(): Iterable<User?>

@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { User, UserManager, UserManagerSettings, WebStorageStateStore } from 'oidc-client-ts'
 import { computed, ref } from "vue";
-import { AccessLevel } from "@/types/access-level";
+import { Role } from "@/types/role";
 import { Operation } from "@/types/operations";
 import { EntityLevelPermissions, EntityType } from "./authorization";
 
@@ -26,14 +26,15 @@ const settings: UserManagerSettings = {
 export const useAuth = defineStore('auth', () => {
     const user = ref<User | null>(null);
     const userManager = new UserManager(settings);
-    const accessLevel = ref<AccessLevel>();
+    const role = ref<Role>();
 
     // getters
-    const isLoggedIn = computed(() => { 
+    const isLoggedIn = computed(() => {
         console.log(user.value?.access_token);
         console.log(user.value?.refresh_token);
-        
-        return user.value !== null});
+
+        return user.value !== null
+    });
 
     // actions
     function init() {
@@ -76,17 +77,17 @@ export const useAuth = defineStore('auth', () => {
 
     function setUser(value: User) {
         user.value = value;
-        const roles = value.profile[ProjectIdRoleClaim] as Record<number, string>;
-        if (!roles)
+        const roleClaims = value.profile[ProjectIdRoleClaim] as Record<number, string>;
+        if (!roleClaims)
             return;
 
-        const roleNames = Object.keys(roles);
-        const accessLevels = roleNames.map(roleName => {
+        const roleNames = Object.keys(roleClaims);
+        const roles = roleNames.map(roleName => {
             const parts = roleName.split('.');
-            const accessLevel = parts.at(-1)?.toUpperCase();
-            return AccessLevel[accessLevel as keyof typeof AccessLevel];
+            const role = parts.at(-1)?.toUpperCase();
+            return Role[role as keyof typeof Role];
         });
-        accessLevel.value = accessLevels.sort((a, b) => b - a).at(0);
+        role.value = roles.sort((a, b) => b - a).at(0);
     }
 
     function getAccessToken() {
@@ -113,12 +114,12 @@ export const useAuth = defineStore('auth', () => {
     }
 
     function userCan(operation: Operation, entity: EntityType): boolean {
-        if (accessLevel.value === undefined) 
+        if (role.value === undefined)
             return false;
 
         const minimumAccessLevel = EntityLevelPermissions[entity][operation];
-        return accessLevel.value >= minimumAccessLevel;
+        return role.value >= minimumAccessLevel;
     }
 
-    return { accessLevel, isLoggedIn, getAccessToken, handleLoginRedirect, handleLogoutRedirect, init, login, logout, removeSession, userCan }
+    return { role, isLoggedIn, getAccessToken, handleLoginRedirect, handleLogoutRedirect, init, login, logout, removeSession, userCan }
 });

@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.authorization.models
+package nl.stevenbontenbal.chorister.authorization.models.zitadelv1
 
 data class ZitadelGrantsSearchRequest(
     var queries: List<GrantsQuery>
@@ -14,13 +14,12 @@ data class ZitadelGrantsSearchRequest(
             )
         }
 
-        fun roleKeyQuery(substring: String): ZitadelGrantsSearchRequest {
+        fun roleKeyQuery(roleKey: String): ZitadelGrantsSearchRequest {
             return ZitadelGrantsSearchRequest(
                 listOf(
                     GrantsQuery(
                         roleKeyQuery = RoleKeyQuery(
-                            roleKey = substring,
-                            method = "TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE"
+                            roleKey
                         )
                     )
                 )

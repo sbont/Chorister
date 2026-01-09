@@ -38,7 +38,7 @@
 import { EntityType } from '@/application/authorization';
 import { useAuth } from '@/application/authStore';
 import { PageMode, PageState } from '@/types';
-import { AccessLevel } from '@/types/access-level';
+import { Role } from '@/types/role';
 import { storeToRefs } from 'pinia';
 
 defineEmits(["edit", "delete", "cancelEdit"]);
@@ -54,7 +54,7 @@ interface Props {
     onDelete?: (_: MouseEvent) => void
     deleteDisabled?: boolean
     onCancelEdit?: (_: MouseEvent) => void
-    customActions?: Array<{ action: () => void, label: string, disabled?: boolean, accessLevel: AccessLevel }>
+    customActions?: Array<{ action: () => void, label: string, disabled?: boolean, accessLevel: Role }>
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -65,8 +65,8 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const authStore = useAuth();
-const { accessLevel } = storeToRefs(authStore); 
+const { role } = storeToRefs(authStore);
 
-const accessibleActions = props.customActions?.filter(action => !accessLevel.value || action.accessLevel <= accessLevel.value);
+const accessibleActions = props.customActions?.filter(action => !role.value || action.accessLevel <= role.value);
 
 </script>

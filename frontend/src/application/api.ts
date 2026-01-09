@@ -75,7 +75,7 @@ export interface Api {
 
     // Users
     getAllUsers: () => Promise<Array<User>>
-    getUserById: (userId: number) => Promise<User>
+    // getUserById: (userId: number) => Promise<User>
     getUser: () => Promise<User>
     updateUser: (user: User) => Promise<User>
 

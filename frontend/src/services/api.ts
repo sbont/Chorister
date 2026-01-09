@@ -42,8 +42,7 @@ export default class ChoristerApi implements IChoristerApi {
     private registration: RegistrationEndpoint;
     private invite: InviteEndpoint;
     private categories: CategoriesEndpoint;
-    private users: EntityEndpoint<DomainUser, User, User>;
-    private user: UserEndpoint
+    private users: UsersEndpoint;
 
     public readonly files: FilesEndpoint;
     public readonly songs: SongsEndpoint;
@@ -79,8 +78,7 @@ export default class ChoristerApi implements IChoristerApi {
         this.registration = new RegistrationEndpoint(this.instance);
         this.invite = new InviteEndpoint(this.instance);
         this.categories = new CategoriesEndpoint(this.instance);
-        this.users = new EntityEndpoint(this.instance, "users", fromDomainUser, toDomainUser);
-        this.user = new UserEndpoint(this.instance);
+        this.users = new UsersEndpoint(this.instance);
         this.files = new FilesEndpoint(this.instance);
         this.chords = new EntityEndpoint(this.instance, "chords", fromDomainChords, toDomainChords);
         this.scores = new ScoresEndpoint(this.instance, "scores", fromDomainScore, toDomainScore(this.files.getUri));
@@ -202,11 +200,11 @@ export default class ChoristerApi implements IChoristerApi {
 
     // Users
 
-    getUser = () => this.user.get();
+    getUser = () => this.users.get();
 
     getAllUsers = () => this.users.getAll();
 
-    getUserById = (userId: number) => this.users.getOne(userId);
+    // getUserById = (userId: number) => this.users.getOne(userId);
 
     updateUser = (user: DomainUser) => this.users.update(user);
 
@@ -376,16 +374,31 @@ class RegistrationEndpoint {
     }
 }
 
-class UserEndpoint {
+class UsersEndpoint {
     private instance: AxiosInstance;
-    private path = "user";
+    private path = "users";
 
     constructor(instance: AxiosInstance) {
         this.instance = instance;
     }
 
     get = async () => {
-        const response = await this.instance.get<User>(this.path);
+        const response = await this.instance.get<User>(this.path + "/me");
+        return toDomainUser(response.data);
+    }
+
+    getAll = async () => {
+        const response = await this.instance.get<User[]>(this.path);
+        return response.data.map(toDomainUser);
+    }
+
+    update = async (obj: DomainUser) => {
+        if (isNew(obj))
+            throw new Error("Object has no id");
+
+        const data = fromDomainUser(obj);
+        const uri = obj.uri ?? `${this.path}/` + data.id;
+        const response = await this.instance.patch<User>(uri, data);
         return toDomainUser(response.data);
     }
 }
