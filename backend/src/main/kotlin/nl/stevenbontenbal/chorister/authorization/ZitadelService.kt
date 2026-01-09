@@ -19,6 +19,7 @@ import nl.stevenbontenbal.chorister.authorization.models.ZitadelGrantsSearchRequ
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelGrantsSearchResponse
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelProjectRolesBulkPostRequest
 import nl.stevenbontenbal.chorister.authorization.models.ZitadelPutUserGrantsRequest
+import nl.stevenbontenbal.chorister.authorization.models.ZitadelUserGrant
 import nl.stevenbontenbal.chorister.domain.users.AccessLevel
 import nl.stevenbontenbal.chorister.domain.users.IUserAuthorizationService
 import org.springframework.http.HttpStatus
@@ -156,6 +157,11 @@ class ZitadelService(
             .block()
     }
 
+    override fun retrieveUserRoles(userId: ZitadelUserId): Set<UserRole> {
+        val grants = findUserGrants(userId)
+        return grants.flatMap { it.roleKeys }.map { UserRole.parse(it) }.toSet()
+    }
+
     override fun replaceUserRoles(userId: ZitadelUserId, tenantId: Long, accessLevel: AccessLevel) {
         val grantId = findUserGrantId(userId)
         val roleKeys = listOf(roleKey(tenantId, accessLevel))
@@ -180,8 +186,15 @@ class ZitadelService(
     }
 
     private fun findUserGrantId(userId: ZitadelUserId): String {
+        val grants = findUserGrants(userId)
+        val grantId = grants.firstOrNull { it.projectId == zitadelConfiguration.projectId }?.id
+
+        return grantId ?: throw AuthException("No user grant found")
+    }
+
+    private fun findUserGrants(userId: ZitadelUserId): List<ZitadelUserGrant> {
         val requestBody = ZitadelGrantsSearchRequest.userIdQuery(userId)
-        val grants = webClient
+        val response = webClient
             .post()
             .uri("/users/grants/_search")
             .headers { it.setBearerAuth(zitadelConfiguration.adminAccessToken) }
@@ -198,14 +211,8 @@ class ZitadelService(
             }
             .toEntity(ZitadelGrantsSearchResponse::class.java)
             .block()
-        val grantId = grants?.body?.result
-            ?.firstOrNull { it.projectId == zitadelConfiguration.projectId }
-            ?.id
 
-        if (grantId == null)
-            throw AuthException("No user grants found")
-
-        return grantId
+        return response?.body?.result ?: throw AuthException("Something went wrong while retrieving user grants")
     }
 
     private fun createAddRolesRequest(tenantId: Long, accessLevel: AccessLevel): ZitadelAddUserGrantsRequest =
