@@ -8,15 +8,24 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th v-if="role && role >= Role.MANAGER">Email</th>
+                                <th v-if="role && equalsOrGreaterThan(role, 'MANAGER')">Email</th>
                                 <th>Role</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="member in members" class="member" :key="member.id">
                                 <th>{{ member.firstName }} {{ member.lastName }}</th>
-                                <td v-if="role && role >= Role.MANAGER">{{ member.email }}</td>
-                                <td>{{ displayRoles(member.roles) }}</td>
+                                <td v-if="role && equalsOrGreaterThan(role, 'MANAGER')">{{ member.email }}</td>
+                                <td>
+                                    {{ displayRoles(member.roles) }}
+                                    <span v-if="canEditUserRoles(member.id)" class="ml-2">
+                                        <button @click="openRoleDialog(member)" class="button is-small is-text">
+                                            <span class="icon is-small">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </span>
+                                        </button>
+                                    </span>
+                                </td>
                             </tr>
                         </tbody>
                         <tfoot></tfoot>
@@ -46,6 +55,29 @@
             </div>
         </div>
     </div>
+
+    <!-- Role Edit Dialog -->
+    <Dialog v-model:visible="roleDialogVisible" header="Edit User Role" modal class="p-fluid">
+        <div class="field">
+            <label class="label">User</label>
+            <div class="control">
+                {{ selectedUser ? `${selectedUser.firstName} ${selectedUser.lastName ?? ''}` : '' }}
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Role</label>
+            <div class="control">
+                <Select v-model="selectedRole" :options="roleOptions" optionLabel="name" optionValue="value"
+                    placeholder="Select a role" class="w-full" />
+            </div>
+        </div>
+
+        <template #footer>
+            <Button label="Cancel" icon="pi pi-times" @click="roleDialogVisible = false" class="p-button-text" />
+            <Button label="Save" icon="pi pi-check" @click="saveRole" autofocus class="p-button-primary" />
+        </template>
+    </Dialog>
 </template>
 
 <script setup lang="ts">
@@ -55,7 +87,10 @@ import { useUsers } from "@/application/userStore.js";
 import { useChoir } from "@/application/choirStore";
 import { useAuth } from "@/application/authStore";
 import { storeToRefs } from "pinia";
-import { Role } from "@/types/role";
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
+import Select from "primevue/select";
+import { Role, equalsOrGreaterThan } from "@/types/role";
 
 // state
 const authStore = useAuth();
@@ -74,6 +109,16 @@ const inviteLink = computed(() => {
 const members = ref<Array<User>>([]);
 const token = ref();
 const loading = ref(true);
+const roleDialogVisible = ref(false);
+const selectedUser = ref<User | null>(null);
+const selectedRole = ref<Role | null>(null);
+const currentUserId = ref<number | null>(null);
+
+const roleOptions = [
+    { value: "VIEWER", name: "Viewer" },
+    { value: "EDITOR", name: "Editor" },
+    { value: "MANAGER", name: "Manager" }
+];
 
 userStore
     .fetchAll()
@@ -86,16 +131,58 @@ userStore
     })
     .finally(() => (loading.value = false));
 
-const displayRoles = (roles: Role[]) => roles.map(role => capitalize(role.toLocaleString().toLocaleLowerCase())).join(", ")
 
-const generateToken = () => choirStore.generateToken();
+function displayRoles(roles: Role[] | undefined) {
+    return roles?.map(capitalizeRoleName).join(", ") ?? '';
+}
 
-const deleteToken = () => choirStore.deleteToken();
+function capitalizeRoleName(role: Role) {
+    return capitalize(role.toLocaleLowerCase());
+}
 
-const selectToken = (event: Event) => (event.target as HTMLInputElement).select();
+function generateToken() {
+    return choirStore.generateToken();
+}
 
-const copyToken = function () {
+function deleteToken() {
+    return choirStore.deleteToken();
+}
+
+function selectToken(event: Event) {
+    return (event.target as HTMLInputElement).select();
+}
+
+function copyToken() {
     token.value.focus();
     document.execCommand("copy");
-};
+}
+
+userStore.getCurrent().then((currentUser) => {
+    currentUserId.value = currentUser.id;
+});
+
+function canEditUserRoles(userId: number) {
+    // User must be a MANAGER and cannot edit their own role
+    return role.value === "MANAGER" && userId !== currentUserId.value;
+}
+
+function openRoleDialog(user: User) {
+    selectedUser.value = user;
+    selectedRole.value = user.roles.length > 0 ? user.roles[0] : "VIEWER";
+    roleDialogVisible.value = true;
+}
+
+async function saveRole() {
+    if (selectedUser.value && selectedRole.value) {
+        try {
+            await userStore.updateUserRoles(selectedUser.value.id, [selectedRole.value]);
+            // Refresh the members list
+            const updatedMembers = await userStore.fetchAll();
+            members.value = updatedMembers;
+            roleDialogVisible.value = false;
+        } catch (error) {
+            console.error('Failed to update user role:', error);
+        }
+    }
+}
 </script>

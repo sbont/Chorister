@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { User, UserManager, UserManagerSettings, WebStorageStateStore } from 'oidc-client-ts'
 import { computed, ref } from "vue";
-import { Role } from "@/types/role";
+import { equalsOrGreaterThan, Role } from "@/types/role";
 import { Operation } from "@/types/operations";
 import { EntityLevelPermissions, EntityType } from "./authorization";
 
@@ -85,9 +85,9 @@ export const useAuth = defineStore('auth', () => {
         const roles = roleNames.map(roleName => {
             const parts = roleName.split('.');
             const role = parts.at(-1)?.toUpperCase();
-            return Role[role as keyof typeof Role];
+            return role as Role;
         });
-        role.value = roles.sort((a, b) => b - a).at(0);
+        role.value = roles.at(0);
     }
 
     function getAccessToken() {
@@ -118,7 +118,7 @@ export const useAuth = defineStore('auth', () => {
             return false;
 
         const minimumAccessLevel = EntityLevelPermissions[entity][operation];
-        return role.value >= minimumAccessLevel;
+        return equalsOrGreaterThan(role.value, minimumAccessLevel);
     }
 
     return { role, isLoggedIn, getAccessToken, handleLoginRedirect, handleLogoutRedirect, init, login, logout, removeSession, userCan }

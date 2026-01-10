@@ -9,6 +9,7 @@ import { Score } from "@/entities/score"
 import { Song } from "@/entities/song"
 import { User } from "@/entities/user"
 import { Uri } from "@/types"
+import { Role } from "@/types/role"
 import { InjectionKey } from "vue"
 
 export interface Api {
@@ -45,7 +46,7 @@ export interface Api {
     getSongCategories: (songId: number) => Promise<Array<Category>>
     postSongCategories: (songId: number, categories: Array<Category>) => Promise<void>
     deleteSongCategory: (songId: number, category: Category) => Promise<void>
-    
+
     postCategorySongs: (categoryId: number, songs: Array<Song>) => Promise<void>
 
     // Chords
@@ -78,6 +79,7 @@ export interface Api {
     // getUserById: (userId: number) => Promise<User>
     getUser: () => Promise<User>
     updateUser: (user: User) => Promise<User>
+    updateUserRoles: (userId: number, roles: Role[]) => Promise<any>
 
     // Scores
     getScores: (songId: number) => Promise<Array<Score>>

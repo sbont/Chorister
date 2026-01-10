@@ -3,6 +3,7 @@ import { CacheMap } from "@/types/cache-maps";
 import { User } from "@/entities/user";
 import { ApiKey } from "./api";
 import { inject, ref } from "vue";
+import { Role } from "@/types/role";
 
 export const useUsers = defineStore("users", () => {
     const api = inject(ApiKey)!;
@@ -42,5 +43,12 @@ export const useUsers = defineStore("users", () => {
         return api.updateUser(user);
     }
 
-    return { users, fetchAll, getCurrent, save };
+    async function updateUserRoles(userId: number, roles: Role[]) {
+        await api.updateUserRoles(userId, roles);
+        // Refresh the user data to get updated roles
+        const updatedUsers = await fetchAll();
+        return updatedUsers.find(user => user.id === userId);
+    }
+
+    return { users, fetchAll, getCurrent, save, updateUserRoles };
 })

@@ -1,60 +1,60 @@
-import { Role } from "@/types/role";
 import { Operation } from "@/types/operations";
+import { Role } from "@/types/role";
 
 export const EntityLevelPermissions = {
     category: {
-        read: Role.VIEWER,
-        create: Role.EDITOR,
-        update: Role.MANAGER,
-        delete: Role.MANAGER
+        read: "VIEWER",
+        create: "EDITOR",
+        update: "MANAGER",
+        delete: "MANAGER"
     },
     categoryType: {
-        read: Role.VIEWER,
-        create: Role.MANAGER,
-        update: Role.MANAGER,
-        delete: Role.MANAGER
+        read: "VIEWER",
+        create: "MANAGER",
+        update: "MANAGER",
+        delete: "MANAGER"
     },
     choir: {
-        read: Role.VIEWER,
-        create: Role.VIEWER,
-        update: Role.MANAGER,
-        delete: Role.MANAGER
+        read: "VIEWER",
+        create: "VIEWER",
+        update: "MANAGER",
+        delete: "MANAGER"
     },
     chords: {
-        read: Role.VIEWER,
-        create: Role.EDITOR,
-        update: Role.EDITOR,
-        delete: Role.EDITOR
+        read: "VIEWER",
+        create: "EDITOR",
+        update: "EDITOR",
+        delete: "EDITOR"
     },
     event: {
-        read: Role.VIEWER,
-        create: Role.EDITOR,
-        update: Role.EDITOR,
-        delete: Role.MANAGER
+        read: "VIEWER",
+        create: "EDITOR",
+        update: "EDITOR",
+        delete: "MANAGER"
     },
     eventEntry: {
-        read: Role.VIEWER,
-        create: Role.EDITOR,
-        update: Role.EDITOR,
-        delete: Role.EDITOR
+        read: "VIEWER",
+        create: "EDITOR",
+        update: "EDITOR",
+        delete: "EDITOR"
     },
     score: {
-        read: Role.VIEWER,
-        create: Role.EDITOR,
-        update: Role.EDITOR,
-        delete: Role.EDITOR
+        read: "VIEWER",
+        create: "EDITOR",
+        update: "EDITOR",
+        delete: "EDITOR"
     },
     song: {
-        read: Role.VIEWER,
-        create: Role.EDITOR,
-        update: Role.EDITOR,
-        delete: Role.MANAGER
+        read: "VIEWER",
+        create: "EDITOR",
+        update: "EDITOR",
+        delete: "MANAGER"
     },
     user: {
-        read: Role.VIEWER,
-        create: Role.MANAGER,
-        update: Role.MANAGER,
-        delete: Role.MANAGER
+        read: "VIEWER",
+        create: "MANAGER",
+        update: "MANAGER",
+        delete: "MANAGER"
     }
 } satisfies Record<string, Permissions>;
 

@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { EntityType } from '@/application/authorization';
 import { useAuth } from '@/application/authStore';
-import { PageMode, PageState } from '@/types';
+import { PageMode } from '@/types';
 import { Role } from '@/types/role';
 import { storeToRefs } from 'pinia';
 

@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.json.MappingJacksonValue
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import kotlin.jvm.optionals.getOrElse
@@ -28,7 +29,7 @@ class UserController(
 ) {
     @GetMapping("/users/me")
     fun getCurrentUser(): ResponseEntity<User> {
-        return ResponseEntity.ok(userService.getCurrentUser())
+        return ResponseEntity.ok(userService.retrieveCurrentUser())
     }
 
     @GetMapping("/users")
@@ -63,9 +64,18 @@ class UserController(
 
     @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/users/{id}/roles")
-    fun updateUserRole(id: Long, @RequestBody request: UpdateUserRolesRequest): ResponseEntity<Any> {
-        val user = userRepository.findById(id).getOrElse { return ResponseEntity.notFound().build() }
-        val accessLevel = request.roles.singleOrNull().toOptional().getOrElse { return ResponseEntity.badRequest().body("`roles` should exactly contain one role") }
+    fun updateUserRole(@PathVariable id: Long?, @RequestBody request: UpdateUserRolesRequest): ResponseEntity<Any> {
+        if (id == null)
+            return ResponseEntity.badRequest().build()
+
+        val user = userRepository.findById(id).getOrElse {
+            return ResponseEntity.notFound().build()
+        }
+
+        val accessLevel = request.roles.singleOrNull().toOptional().getOrElse {
+            return ResponseEntity.badRequest().body("`roles` should exactly contain one role")
+        }
+
         userService.updateUserRole(user, accessLevel)
         return ResponseEntity.ok(Result.success(accessLevel))
     }

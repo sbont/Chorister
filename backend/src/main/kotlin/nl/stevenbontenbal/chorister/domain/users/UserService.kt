@@ -9,9 +9,9 @@ class UserService(private val userRepository: IUserRepository, private val authS
         authService.getExternalUserId()
     }
 
-    val currentUser: User by lazy { getCurrentUser() }
+    val currentUser: User by lazy { retrieveCurrentUser() }
 
-    fun getCurrentUser(): User = userRepository.findByZitadelId(userExternalId) ?: throw InvalidIdentifierException("User with external ID $userExternalId not found.")
+    fun retrieveCurrentUser(): User = userRepository.findByZitadelId(userExternalId) ?: throw InvalidIdentifierException("User with external ID $userExternalId not found.")
 
     fun getCurrentChoirId(): Long? {
         return authService.getTenantId()

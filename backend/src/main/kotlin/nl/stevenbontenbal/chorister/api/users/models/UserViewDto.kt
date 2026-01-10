@@ -20,6 +20,6 @@ data class UserViewDto(
     @field:JsonView(UserViews.Manager::class)
     val email: String?,
     
-    @field:JsonView(UserViews.Manager::class)
+    @field:JsonView(UserViews.Basic::class)
     val roles: List<AccessLevel>?
 )

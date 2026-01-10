@@ -33,6 +33,7 @@ import { fromDomainUser, toDomainUser, User } from "./apiTypes/user";
 import { Uri } from "@/types";
 import { SingleInvite, toDomainInvite } from "@/services/apiTypes/invite";
 import { ApiError } from "@/types/api-error";
+import { Role } from "@/types/role";
 
 const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + "/api";
 
@@ -207,6 +208,8 @@ export default class ChoristerApi implements IChoristerApi {
     // getUserById = (userId: number) => this.users.getOne(userId);
 
     updateUser = (user: DomainUser) => this.users.update(user);
+
+    updateUserRoles = (userId: number, roles: Role[]) => this.users.updateUserRoles(userId, roles);
 
     // Scores
 
@@ -400,6 +403,11 @@ class UsersEndpoint {
         const uri = obj.uri ?? `${this.path}/` + data.id;
         const response = await this.instance.patch<User>(uri, data);
         return toDomainUser(response.data);
+    }
+
+    updateUserRoles = async (userId: number, roles: Role[]) => {
+        const response = await this.instance.put(`${this.path}/${userId}/roles`, { roles });
+        return response.data;
     }
 }
 
