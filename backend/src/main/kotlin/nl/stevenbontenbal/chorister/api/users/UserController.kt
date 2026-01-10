@@ -1,22 +1,30 @@
 package nl.stevenbontenbal.chorister.api.users
 
+import nl.stevenbontenbal.chorister.api.users.models.UpdateUserRolesRequest
 import nl.stevenbontenbal.chorister.api.users.models.UserViewDto
 import nl.stevenbontenbal.chorister.api.users.views.UserViews
 import nl.stevenbontenbal.chorister.authorization.UserRole
 import nl.stevenbontenbal.chorister.authorization.TenantUser
 import nl.stevenbontenbal.chorister.domain.users.AccessLevel
+import nl.stevenbontenbal.chorister.domain.users.IUserRepository
 import nl.stevenbontenbal.chorister.domain.users.User
 import nl.stevenbontenbal.chorister.domain.users.UserService
+import nl.stevenbontenbal.chorister.shared.toOptional
 import org.springframework.data.rest.webmvc.BasePathAwareController
 import org.springframework.hateoas.server.ExposesResourceFor
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.json.MappingJacksonValue
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import kotlin.jvm.optionals.getOrElse
 
 @BasePathAwareController
 @ExposesResourceFor(User::class)
 class UserController(
-    private val userService: UserService
+    private val userService: UserService,
+    private val userRepository: IUserRepository
 ) {
     @GetMapping("/users/me")
     fun getCurrentUser(): ResponseEntity<User> {
@@ -51,6 +59,15 @@ class UserController(
             serializationView = viewClass
         }
         return ResponseEntity.ok(result)
+    }
+
+    @PreAuthorize("hasRole('MANAGER')")
+    @PutMapping("/users/{id}/roles")
+    fun updateUserRole(id: Long, @RequestBody request: UpdateUserRolesRequest): ResponseEntity<Any> {
+        val user = userRepository.findById(id).getOrElse { return ResponseEntity.notFound().build() }
+        val accessLevel = request.roles.singleOrNull().toOptional().getOrElse { return ResponseEntity.badRequest().body("`roles` should exactly contain one role") }
+        userService.updateUserRole(user, accessLevel)
+        return ResponseEntity.ok(Result.success(accessLevel))
     }
 
     /**

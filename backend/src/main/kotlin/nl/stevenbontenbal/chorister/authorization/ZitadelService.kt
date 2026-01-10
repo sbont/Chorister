@@ -7,6 +7,7 @@ import nl.stevenbontenbal.chorister.authorization.models.zitadelv1.ZitadelUserEm
 import nl.stevenbontenbal.chorister.authorization.models.zitadelv1.ZitadelUsernamePutRequest
 import nl.stevenbontenbal.chorister.domain.users.AccessLevel
 import nl.stevenbontenbal.chorister.domain.users.IUserAuthorizationService
+import nl.stevenbontenbal.chorister.domain.users.User
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
@@ -85,7 +86,9 @@ class ZitadelService(
         return pairs.groupBy({ it.first }, { it.second})
     }
 
-    override fun replaceUserRoles(userId: ZitadelUserId, tenantId: Long, accessLevel: AccessLevel) {
+    override fun replaceUserRoles(user: User, accessLevel: AccessLevel) {
+        val userId = user.zitadelId ?: throw AuthException("User has no Zitadel ID")
+        val tenantId = user.choir?.id ?: throw AuthException("User choir ID unknown")
         val grantId = zitadelV1Client.findUserGrantId(userId)
         val roleKeys = listOf(roleKey(tenantId, accessLevel))
         zitadelV1Client.putGrantRoles(userId, grantId, roleKeys)

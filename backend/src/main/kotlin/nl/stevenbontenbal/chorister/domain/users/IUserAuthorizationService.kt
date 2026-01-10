@@ -22,7 +22,7 @@ interface IUserAuthorizationService {
 
     fun retrieveUserRoles(tenantId: Long): Map<ZitadelUserId, List<AccessLevel>>
 
-    fun replaceUserRoles(userId: String, tenantId: Long, accessLevel: AccessLevel)
+    fun replaceUserRoles(user: User, accessLevel: AccessLevel)
 
     fun getRoles(): Set<UserRole>
 }

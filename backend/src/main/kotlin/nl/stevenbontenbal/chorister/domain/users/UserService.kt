@@ -50,4 +50,8 @@ class UserService(private val userRepository: IUserRepository, private val authS
     fun retrieveRolesByExternalUserId(tenantId: Long): Map<String, List<AccessLevel>> {
         return authService.retrieveUserRoles(tenantId)
     }
+
+    fun updateUserRole(user: User, accessLevel: AccessLevel) {
+        authService.replaceUserRoles(user, accessLevel)
+    }
 }

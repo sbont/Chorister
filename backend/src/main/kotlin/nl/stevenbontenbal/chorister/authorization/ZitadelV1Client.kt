@@ -122,7 +122,6 @@ class ZitadelV1Client(
     }
 
     fun retrieveUserRoles(tenantId: Long): Map<ZitadelUserId, Set<UserRole>> {
-
         val searchString = "${UserRole.TENANT_ROLE_PREFIX}.$tenantId."
         val requestBody = ZitadelGrantsSearchRequest.roleKeyQuery(searchString)
         val grants = findUserGrants(requestBody)
