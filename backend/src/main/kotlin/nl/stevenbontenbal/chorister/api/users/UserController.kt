@@ -72,6 +72,9 @@ class UserController(
             return ResponseEntity.notFound().build()
         }
 
+        if (user.id == userService.currentUser.id)
+            return ResponseEntity.badRequest().body("You can not update your own role")
+
         val accessLevel = request.roles.singleOrNull().toOptional().getOrElse {
             return ResponseEntity.badRequest().body("`roles` should exactly contain one role")
         }
