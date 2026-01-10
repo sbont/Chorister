@@ -44,7 +44,7 @@ logging:
         http:
           client: INFO
 zitadel:
-  base-url: http://localhost:9000/management/v1
+  base-url: http://localhost:9000
   admin-access-token: ${CHORISTER_ADMIN_ACCESS_TOKEN}
   project-id: ${CHORISTER_PROJECT_ID}
 s3:

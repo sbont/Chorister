@@ -1,3 +1,4 @@
+import { Role } from "@/types/role";
 import { Choir } from "./choir";
 import { Entity, EntityRef } from "./entity";
 
@@ -8,5 +9,6 @@ export interface User extends Entity {
     username: string,
     firstName: string,
     lastName?: string,
-    zitadelId: string
+    zitadelId: string,
+    roles: Role[]
 }

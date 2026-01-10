@@ -1,15 +1,17 @@
 package nl.stevenbontenbal.chorister.domain.users
 
-import nl.stevenbontenbal.chorister.authorization.UserRole
 import nl.stevenbontenbal.chorister.domain.InvalidIdentifierException
 import org.springframework.stereotype.Component
 
 @Component
 class UserService(private val userRepository: IUserRepository, private val authService: IUserAuthorizationService) {
-    val currentUser: User by lazy {
-        val userId = authService.getExternalUserId()
-        userRepository.findByZitadelId(userId) ?: throw InvalidIdentifierException("User with external ID $userId not found.")
+    val userExternalId: String by lazy {
+        authService.getExternalUserId()
     }
+
+    val currentUser: User by lazy { getCurrentUser() }
+
+    fun getCurrentUser(): User = userRepository.findByZitadelId(userExternalId) ?: throw InvalidIdentifierException("User with external ID $userExternalId not found.")
 
     fun getCurrentChoirId(): Long? {
         return authService.getTenantId()

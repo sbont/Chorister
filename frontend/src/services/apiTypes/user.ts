@@ -3,6 +3,7 @@ import { EntityRef } from "@/entities/entity";
 import { User as DomainUser } from "@/entities/user";
 import { ApiEntityWith, Identifiable, Link, toDomain, untemplated, WithAssociation } from ".";
 import { Choir, toDomainChoir } from "./choir";
+import { Role } from "@/types/role";
 
 export interface User extends Identifiable, ApiEntityWith<ChoirLink> {
     id: number;
@@ -11,6 +12,7 @@ export interface User extends Identifiable, ApiEntityWith<ChoirLink> {
     username: string;
     firstName: string;
     lastName?: string;
+    roles?: Role[]
 }
 
 export interface ChoirLink extends WithAssociation {

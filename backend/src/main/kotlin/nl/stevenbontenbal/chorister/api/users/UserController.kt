@@ -8,7 +8,6 @@ import nl.stevenbontenbal.chorister.domain.users.AccessLevel
 import nl.stevenbontenbal.chorister.domain.users.User
 import nl.stevenbontenbal.chorister.domain.users.UserService
 import org.springframework.data.rest.webmvc.BasePathAwareController
-import org.springframework.data.rest.webmvc.RepositoryRestController
 import org.springframework.hateoas.server.ExposesResourceFor
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.json.MappingJacksonValue
@@ -21,7 +20,7 @@ class UserController(
 ) {
     @GetMapping("/users/me")
     fun getCurrentUser(): ResponseEntity<User> {
-        return ResponseEntity.ok(userService.currentUser)
+        return ResponseEntity.ok(userService.getCurrentUser())
     }
 
     @GetMapping("/users")
