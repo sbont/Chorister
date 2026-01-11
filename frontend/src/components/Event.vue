@@ -5,7 +5,7 @@
         </div>
         <div class="songs-container">
             <div class="p-2">
-                <DataTable :value="entries" @row-reorder="authStore.userCan('update', 'eventEntry') ? reorder : undefined" :loading="state == State.Loading">
+                <DataTable :value="entries" @row-reorder="reorder" :loading="state == State.Loading">
                     <Column row-reorder class="first-col" v-if="authStore.userCan('update', 'eventEntry')"></Column>
                     <Column body-class="header" header="Title">
                         <template #body="slotProps">
@@ -90,7 +90,7 @@ const removeEntryFromEvent = async function (entry: EventEntry) {
 };
 
 const reorder = (reorder: DataTableRowReorderEvent) => {
-    if (event.value)
+    if (authStore.userCan('update', 'eventEntry') && event.value)
         eventStore.reorder(event.value, reorder.dragIndex, reorder.dropIndex)
 };
 
