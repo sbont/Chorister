@@ -27,18 +27,39 @@ export const useAuth = defineStore('auth', () => {
     const user = ref<User | null>(null);
     const userManager = new UserManager(settings);
     const role = ref<Role>();
+    const isLoggingIn = ref(false);
 
     // getters
     const isLoggedIn = computed(() => {
-        console.log(user.value?.access_token);
-        console.log(user.value?.refresh_token);
+        const hasUser = user.value !== null;
+        const hasAccessToken = user.value?.access_token !== undefined;
+        const hasRefreshToken = user.value?.refresh_token !== undefined;
+        
+        console.log('isLoggedIn check:', {
+            hasUser,
+            hasAccessToken,
+            hasRefreshToken,
+            accessToken: hasAccessToken ? 'present' : 'missing',
+            refreshToken: hasRefreshToken ? 'present' : 'missing'
+        });
 
-        return user.value !== null
+        return hasUser && hasAccessToken;
     });
 
     // actions
-    function init() {
-        userManager.getUser().then(u => u == null ? user.value = null : setUser(u));
+    async function init() {
+        try {
+            const u = await userManager.getUser();
+            if (u == null) {
+                user.value = null;
+            } else {
+                setUser(u);
+            }
+        } catch (error) {
+            console.error("Error during auth initialization:", error);
+            user.value = null;
+        }
+        
         userManager.events.addAccessTokenExpired(() => {
             console.log("Access token expired. Logging out...");
             useAuth().removeSession();
@@ -46,7 +67,20 @@ export const useAuth = defineStore('auth', () => {
     }
 
     function login() {
-        return userManager.signinRedirect();
+        if (isLoggingIn.value) {
+            console.log('Login already in progress, ignoring duplicate login attempt');
+            return Promise.reject(new Error('Login already in progress'));
+        }
+        
+        isLoggingIn.value = true;
+        console.log('Initiating login redirect');
+        
+        return userManager.signinRedirect()
+            .catch(error => {
+                console.error('Login redirect failed:', error);
+                isLoggingIn.value = false;
+                throw error;
+            });
     }
 
     function logout() {
@@ -58,21 +92,39 @@ export const useAuth = defineStore('auth', () => {
     }
 
     function handleLoginRedirect() {
-        return userManager.signinRedirectCallback().then(setUser);
+        return userManager.signinRedirectCallback()
+            .then(user => {
+                console.log('Login redirect callback successful, setting user');
+                setUser(user);
+                isLoggingIn.value = false;
+                return user;
+            })
+            .catch(error => {
+                console.error('Error in login redirect callback:', error);
+                isLoggingIn.value = false;
+                throw error;
+            });
     }
 
     function handleLogoutRedirect() {
-        return userManager.signoutRedirectCallback().then(() => user.value = null);
+        return userManager.signoutRedirectCallback()
+            .then(() => {
+                console.log('Logout redirect callback successful, clearing user');
+                resetUser();
+            })
+            .catch(error => {
+                console.error('Error in logout redirect callback:', error);
+                resetUser();
+                throw error;
+            });
     }
 
     function getUser() {
         return new Promise((resolve, reject) => {
             userManager.getUser()
-                .then(user => {
-                    resolve(user)
-                })
-                .catch(error => reject(error))
-        })
+                .then(resolve)
+                .catch(reject)
+        });
     }
 
     function setUser(value: User) {
@@ -88,6 +140,11 @@ export const useAuth = defineStore('auth', () => {
             return role as Role;
         });
         role.value = roles.at(0);
+    }
+
+    function resetUser() {
+      user.value = null;
+      role.value = undefined;
     }
 
     function getAccessToken() {

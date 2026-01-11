@@ -18,7 +18,9 @@ loadScript("https://kit.fontawesome.com/e168ca8cb0.js")
 const app = createApp(App)
 const pinia = createPinia()
 app.use(pinia)
-useAuth().init();
+
+const auth = useAuth();
+await auth.init();
 
 Log.setLogger(console);
 Log.setLevel(Log.DEBUG);

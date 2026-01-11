@@ -128,49 +128,38 @@ router.beforeEach((to, from, next) => {
     const auth = useAuth();
     const { isLoggedIn } = storeToRefs(auth)
 
-    // This isn't an actual route leading to a component. It is called by the OAuth server once the user logged in.
-    // Handling it here prevents us to have an additional callback.html file. An additional file would lead to a short hiccup after logging in.
-    // So here we handle the login redirect and then send the user to the "/" route.
+    // This is a 'fake' route that doesn't lead anywhere, but is just to catch the auth redirect
     if (to.path === '/authorized') {
-        // Inform the authentication of the login redirect. Afterwards we send the user to the main page
-        console.log('/authorized');
-
         auth.handleLoginRedirect()
             .then(() => next('/'))
             .catch(error => {
-                console.log(error)
+                console.error('Error handling login redirect:', error);
                 next('/')
             })
     } else if (to.path === '/logout') {
-        console.log('/logout');
-
         // This is similar to the "/callback" route not leading to an actual component but only to handle the logout callback from the authentication server.
         auth.handleLogoutRedirect()
             .then(() => next('/'))
             .catch(error => {
-                console.log(error)
+                console.error('Error handling logout redirect:', error);
                 next('/')
             })
     } else if (to.matched.some(record => record.meta.requiresAuth)) {
         if (!isLoggedIn) {
-            console.log('Not logged in');
-            auth.login()
-                .then(() => {
-                    console.log('Login successful');
-                    next()
-                })
+            console.log('Not logged in - initiating login redirect');
+            // Don't call next() here - the login redirect will handle navigation
+            auth.login().catch(error => {
+                console.error('Login redirect failed:', error);
+                next('/'); // Fallback to home if login fails
+            });
+            return;
         } else {
             console.log('Already authenticated');
-
             next()
         }
     } else if (to.matched.some(record => record.meta.forwardWhenAuthenticated) && auth.isLoggedIn) {
-
-        console.log('Forward when authenticated');
         next(to.meta.forwardWhenAuthenticated!)
     } else {
-        console.log('Default next');
-        // Default case. The user is send to the desired route.
         next()
     }
 })
