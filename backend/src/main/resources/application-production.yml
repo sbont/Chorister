@@ -38,7 +38,7 @@ logging:
         http:
           client: ERROR
 zitadel:
-  base-url: https://login.chorister.co/management/v1
+  base-url: https://login.chorister.co
   admin-access-token: ${CHORISTER_ZITADEL_ACCESS_TOKEN}
   project-id: ${CHORISTER_PROJECT_ID}
 s3:
