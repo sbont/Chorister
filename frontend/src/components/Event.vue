@@ -21,8 +21,13 @@
                     </Column>
 
                     <Column field="song.embedded.composer" header="Composer"></Column>
-                    <Column field="song.embedded.songbook.title" header="Songbook"></Column>
-                    <Column field="song.embedded.songbookNumber" header="no."></Column>
+                    <Column field="song.embedded.recordingUrl" header="Recording">
+                      <template #body="slotProps">
+                        <a v-if="(slotProps.data as EventEntry).song?.embedded?.recordingUrl" :href="(slotProps.data as EventEntry).song?.embedded?.recordingUrl" target="_blank">
+                          Link
+                        </a>
+                    </template>
+                    </Column>
                     <Column body-class="delete-btn-cell" v-if="authStore.userCan('delete', 'eventEntry')">
                         <template #body="slotProps">
                             <button class="button is-danger is-inverted is-small"
