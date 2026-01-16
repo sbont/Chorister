@@ -20,7 +20,7 @@ const pinia = createPinia()
 app.use(pinia)
 
 const auth = useAuth();
-await auth.init();
+auth.init();
 
 Log.setLogger(console);
 Log.setLevel(Log.DEBUG);
