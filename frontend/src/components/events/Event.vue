@@ -5,7 +5,7 @@
         </div>
         <div class="songs-container">
             <div class="p-2">
-                <DataTable :expanded-rows="expandedRows" :value="entries" :loading="state == State.Loading" :row-class="rowClass" @row-reorder="reorder">
+                <DataTable :expanded-rows="expandedRows" :value="entries" :loading="state == 'loading'" :row-class="rowClass" @row-reorder="reorder">
                     <Column v-if="authStore.userCan('update', 'eventEntry')" row-reorder class="first-col"></Column>
                     <Column expander class="expander-col"/>
                     <Column body-class="header" header="Title">
@@ -38,8 +38,8 @@
                     <Column v-if="authStore.userCan('delete', 'eventEntry')" body-class="delete-btn-cell">
                         <template #body="slotProps">
                             <button
-                                class="button is-danger is-inverted is-small"
-                                :class="{ 'is-loading': state == State.Deleting }"
+                                class="button is-inverted is-small"
+                                :class="{ 'is-loading': isDeleting(slotProps.data as EventEntry), 'is-danger': !isDeleting(slotProps.data as EventEntry) }"
                                 @click="removeEntryFromEvent(slotProps.data as EventEntry)">
                                 <span class="icon is-small">
                                     <i class="fas fa-times"></i>
@@ -74,10 +74,10 @@ import EventRowDetail from "./EventRowDetail.vue";
 import { useToast } from "primevue/usetoast";
 import { AxiosError } from "axios";
 
-enum State {
-    Ready,
-    Loading,
-    Deleting,
+type State = "ready" | "loading" | DeletingState;
+type DeletingState = {
+  state: "deleting";
+  entryId?: number;
 }
 
 const route = useRoute();
@@ -85,7 +85,7 @@ const authStore = useAuth();
 const eventStore = useEvents();
 const toast = useToast();
 
-const state = ref<State>(State.Loading);
+const state = ref<State>("loading");
 const eventId = Number(route.params.id);
 const { entries: getEntries } = storeToRefs(eventStore);
 const event = ref<Event>();
@@ -97,17 +97,20 @@ eventStore.fetch(eventId)
         event.value = result;
     })
     .finally(() => {
-        state.value = State.Ready;
+        state.value = "ready";
     });
 
 const removeEntryFromEvent = async function (entry: EventEntry) {
-    state.value = State.Deleting;
+    state.value = { 
+      state: "deleting",
+      entryId: entry.id
+    };
     try {
         await eventStore.deleteEntry(entry);
     } catch (e) {
         toast.add({ summary: "Failed to remove entry", detail: (e as AxiosError).message, closable: true, severity: "error" });
     }
-    state.value = State.Ready;
+    state.value = "ready";
 };
 
 const reorder = (reorder: DataTableRowReorderEvent) => {
@@ -117,6 +120,11 @@ const reorder = (reorder: DataTableRowReorderEvent) => {
 
 function rowClass(entry: EventEntry): string {
   return entry.song ? "expandable" : "";
+}
+
+function isDeleting(entry: EventEntry) {
+  const deletingState = state.value as DeletingState;
+  return deletingState.state === "deleting" && deletingState.entryId === entry.id;
 }
 
 </script>
