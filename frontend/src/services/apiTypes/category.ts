@@ -1,8 +1,6 @@
 import { Category as DomainCategory } from "@/entities/category";
 import { Uri } from "@/types";
 import { ApiEntityWith, fromDomain, Identifiable, Link, toDomain, untemplated, WithAssociation } from ".";
-import { EntityRef } from "@/entities/entity";
-import { CategoryType } from "./categoryType";
 
 export interface Category extends Identifiable, ApiEntityWith<ChoirLink & CategoryTypeLink> {
     id: number,
@@ -28,13 +26,6 @@ export function toDomainCategory(category: Category): DomainCategory {
 }
 
 export function fromDomainCategory(category: DomainCategory): Category {
-    console.log(category);
-    console.log({
-        ...fromDomain(category),
-        categoryType: category.categoryType?.uri
-    });
-    
-    
     return {
         ...fromDomain(category),
         categoryType: category.categoryType?.uri

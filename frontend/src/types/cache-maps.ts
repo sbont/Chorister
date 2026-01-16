@@ -12,11 +12,11 @@ export class CacheListMap<K, V> extends CacheMap<K, Array<V>> {
         if (!this.has(key))
             this.set(key, Array<V>())
         
-        this.get(key)!.push(value)
+        this.get(key)?.push(value)
     }
 
     addAllTo(key: K, values: Array<V>): void {
-        let existingArray = this.getOrNone(key);
+        const existingArray = this.getOrNone(key);
         Option.match(existingArray, {
             onNone: () => this.set(key, values),
             onSome: (array) => values.map(value => array.push(value))
@@ -25,13 +25,13 @@ export class CacheListMap<K, V> extends CacheMap<K, Array<V>> {
 
     removeAllFrom(key: K, values: Array<V>): void {
         Option.map(this.getOrNone(key), array => {
-            let remaining = array.filter(e => !values.includes(e))
+            const remaining = array.filter(e => !values.includes(e))
             this.set(key, remaining)
         })
     }
 
     remove(value: V): void {
-        for (const [key, values] of this.entries()) {
+        for (const [, values] of this.entries()) {
             const i = values.findIndex(e => e === value)
             if (i > -1) values.splice(i, 1)
         }
@@ -45,6 +45,7 @@ export class CacheListMap<K, V> extends CacheMap<K, Array<V>> {
         values.splice(i, 1);
     }
 
+    // don't use - not working well with reactivity. TODO: make reactive
     getOrEmpty = (key: K) => this.get(key) ?? new Array<V>
 
     allValues(): Array<V> {
