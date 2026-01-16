@@ -14,11 +14,14 @@
                                 {{ (slotProps.data as EventEntry).label }}
                             </span>
                             <router-link
-                                v-else
+                                v-else-if="(slotProps.data as EventEntry).song"
                                 :to="{ name: 'Song', params: { id: (slotProps.data as EventEntry).song?.embedded?.id } }"
                                 class="has-text-weight-semibold">
                                 {{ (slotProps.data as EventEntry).song?.embedded?.title }}
                             </router-link>
+                            <span v-else>
+                                {{ (slotProps.data as EventEntry).songTitle }}
+                            </span>
                         </template>
                     </Column>
 
@@ -68,6 +71,8 @@ import { Event, EventEntry } from "@/entities/event";
 import { storeToRefs } from "pinia";
 import { useAuth } from "@/application/authStore";
 import EventRowDetail from "./EventRowDetail.vue";
+import { useToast } from "primevue/usetoast";
+import { AxiosError } from "axios";
 
 enum State {
     Ready,
@@ -75,11 +80,13 @@ enum State {
     Deleting,
 }
 
-const state = ref<State>(State.Loading);
 const route = useRoute();
 const authStore = useAuth();
-const eventId = Number(route.params.id);
 const eventStore = useEvents();
+const toast = useToast();
+
+const state = ref<State>(State.Loading);
+const eventId = Number(route.params.id);
 const { entries: getEntries } = storeToRefs(eventStore);
 const event = ref<Event>();
 const entries = computed(() => event.value?.uri ? getEntries.value(event.value.uri) : []);
@@ -95,7 +102,11 @@ eventStore.fetch(eventId)
 
 const removeEntryFromEvent = async function (entry: EventEntry) {
     state.value = State.Deleting;
-    await eventStore.deleteEntry(entry);
+    try {
+        await eventStore.deleteEntry(entry);
+    } catch (e) {
+        toast.add({ summary: "Failed to remove entry", detail: (e as AxiosError).message, closable: true, severity: "error" });
+    }
     state.value = State.Ready;
 };
 

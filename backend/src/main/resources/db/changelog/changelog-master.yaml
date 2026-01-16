@@ -1028,3 +1028,22 @@ databaseChangeLog:
       - dropColumn:
           columnName: added_by_id
           tableName: song
+  - changeSet:
+      id: 1768593776284-4
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addColumn:
+          columns:
+          - column:
+              name: song_title
+              type: VARCHAR(255)
+          tableName: event_entry
+  - changeSet:
+      id: 1768593776284-1
+      author: Steven.Bontenbal (generated)
+      changes:
+      - addNotNullConstraint:
+          columnDataType: timestamp(6)
+          columnName: created_date
+          tableName: song
+          validate: true

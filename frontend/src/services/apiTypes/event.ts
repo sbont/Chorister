@@ -1,4 +1,3 @@
-import { EntityRef } from "@/entities/entity";
 import { ApiEntityWith, fromDomain, Identifiable, Link, toDomain, untemplated, WithAssociation, WithEmbedded } from ".";
 import { SongIn, toDomainSong } from "./song";
 import { Event as DomainEvent, EventEntry as DomainEventEntry } from "@/entities/event";
@@ -23,12 +22,13 @@ export interface EventEntriesLink extends WithAssociation {
 export interface EventEntry extends Identifiable {
     id: number,
     label: string,
-    sequence: number
+    sequence: number,
+    songTitle: string
 }
 
 export interface EventEntryIn extends EventEntry, ApiEntityWith<SongLink & EventLink>, WithEmbedded<"song", SongIn> {
     event: Event,
-    song?: SongIn
+    song?: SongIn,
 }
 
 export interface EventEntryOut extends EventEntry {

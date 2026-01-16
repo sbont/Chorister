@@ -10,6 +10,7 @@ interface EventEntryProjection {
     var id: Long?
     var event: Event?
     var song: SongProjection?
+    var songTitle: String?
     var label: String?
     var sequence: Int
 }

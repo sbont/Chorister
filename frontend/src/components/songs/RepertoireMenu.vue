@@ -1,7 +1,7 @@
 <template>
     <aside class="menu p-2">
         <p class="menu-label">Repertoire</p>
-        <ul class="menu-list" v-if="ready">
+        <ul v-if="ready" class="menu-list">
             <li>
                 <router-link :to="{ name: 'Repertoire' }">All songs</router-link>
             </li>
