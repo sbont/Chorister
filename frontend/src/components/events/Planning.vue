@@ -1,11 +1,11 @@
 <template>
     <div class="columns is-gapless">
-        <div class="column is-one-third-tablet is-one-fifth-desktop has-background-grey-darker" id="menu">
+        <div id="menu" class="column is-one-third-tablet is-one-fifth-desktop has-background-grey-darker">
             <aside class="menu p-2">
-                <p class="menu-label" v-if="authStore.userCan('create', 'event')">Create</p>
-                <ul class="menu-list" v-if="authStore.userCan('create', 'event')">
+                <p v-if="authStore.userCan('create', 'event')" class="menu-label">Create</p>
+                <ul v-if="authStore.userCan('create', 'event')" class="menu-list">
                     <li>
-                        <router-link :to="{ name: 'NewEvent' }" append>
+                        <router-link :to="{ name: 'NewEvent' }">
                             <span class="icon">
                                 <i class="fas fa-plus-square"></i>
                             </span>
@@ -24,8 +24,8 @@
                             <span>Loading...</span>
                         </span>
                     </li>
-                    <li v-else v-for="event in futureEvents" :key="event.id">
-                        <router-link :to="{ name: 'Event', params: { id: event.id } }" append>
+                    <li v-for="event in futureEvents" v-else :key="event.id">
+                        <router-link :to="{ name: 'Event', params: { id: event.id } }">
                             {{ event.name }}
                         </router-link>
                     </li>
@@ -41,8 +41,8 @@
                             <span>Loading...</span>
                         </span>
                     </li>
-                    <li v-else v-for="event in pastEvents" :key="event.id">
-                        <router-link :to="{ name: 'Event', params: { id: event.id } }" append>
+                    <li v-for="event in pastEvents" v-else :key="event.id">
+                        <router-link :to="{ name: 'Event', params: { id: event.id } }">
                             {{ event.name }}
                         </router-link>
                     </li>
@@ -59,7 +59,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import { useEvents } from "@/application/eventStore";
 import { storeToRefs } from "pinia";
 import { useAuth } from "@/application/authStore";
@@ -70,9 +69,5 @@ eventStore.initialize();
 
 // State
 const { futureEvents, pastEvents, isLoading } = storeToRefs(eventStore);
-
-// Computed
-const ready = computed(() => !!futureEvents);
-
 
 </script>

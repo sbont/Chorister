@@ -19,9 +19,7 @@
                             @click="toggleCategorizeMenu" />
                         <TieredMenu ref="customizeMenu" :model="categorizeMenuEntries" popup />
 
-                        <router-link
-                            v-if="authStore.userCan('create', 'song')" class="button is-primary" :to="{ name: 'NewSong' }" append
-                            tag="button">
+                        <router-link v-if="authStore.userCan('create', 'song')" class="button is-primary" :to="{ name: 'NewSong' }">
                             <span class=" icon is-small">
                                 <i class="fas fa-plus"></i>
                             </span>
@@ -37,7 +35,7 @@
             <Column field="title" header="Title" body-class="col-title" sortable>
                 <template #body="slotProps">
                     <router-link
-                        :to="{ name: 'Song', params: { id: (slotProps.data as Song).id } }" append
+                        :to="{ name: 'Song', params: { id: (slotProps.data as Song).id } }"
                         class="has-text-weight-semibold">
                         {{ (slotProps.data as Song).title }}
                     </router-link>

@@ -5,11 +5,11 @@
             <li>
                 <router-link :to="{ name: 'Repertoire' }">All songs</router-link>
             </li>
-            <li v-for="entry in categories.entries()">
+            <li v-for="entry in categories.entries()" :key="entry[0]">
                 <div class="menu-header">By {{ categoryTypes.get(entry[0])?.name.toLowerCase() }}</div>
                 <ul v-if="!!categories">
                     <li v-for="category in entry[1]" :key="category.id">
-                        <router-link :to="{ name: 'Category', params: { id: category.id } }" append>{{
+                        <router-link :to="{ name: 'Category', params: { id: category.id } }">{{
                             category.name
                             }}
                         </router-link>
@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import { useCategories } from "@/application/categoryStore";
 import { storeToRefs } from "pinia";
-import { computed, onMounted } from 'vue';
+import { computed } from 'vue';
 
 const categoryStore = useCategories();
 

@@ -5,17 +5,18 @@
         </div>
         <div class="songs-container">
             <div class="p-2">
-                <DataTable :value="entries" @row-reorder="reorder" :loading="state == State.Loading" v-model:expandedRows="expandedRows" :row-class="rowClass">
-                    <Column row-reorder class="first-col" v-if="authStore.userCan('update', 'eventEntry')"></Column>
+                <DataTable :expanded-rows="expandedRows" :value="entries" :loading="state == State.Loading" :row-class="rowClass" @row-reorder="reorder">
+                    <Column v-if="authStore.userCan('update', 'eventEntry')" row-reorder class="first-col"></Column>
                     <Column expander class="expander-col"/>
                     <Column body-class="header" header="Title">
                         <template #body="slotProps">
                             <span v-if="(slotProps.data as EventEntry).label" class="has-text-weight-semibold">
                                 {{ (slotProps.data as EventEntry).label }}
                             </span>
-                            <router-link v-else
+                            <router-link
+                                v-else
                                 :to="{ name: 'Song', params: { id: (slotProps.data as EventEntry).song?.embedded?.id } }"
-                                append class="has-text-weight-semibold">
+                                class="has-text-weight-semibold">
                                 {{ (slotProps.data as EventEntry).song?.embedded?.title }}
                             </router-link>
                         </template>
@@ -24,15 +25,17 @@
                     <Column field="song.embedded.composer" header="Composer"></Column>
                     <Column field="song.embedded.recordingUrl" header="Recording">
                         <template #body="slotProps">
-                            <a v-if="(slotProps.data as EventEntry).song?.embedded?.recordingUrl"
+                            <a
+                                v-if="(slotProps.data as EventEntry).song?.embedded?.recordingUrl"
                                 :href="(slotProps.data as EventEntry).song?.embedded?.recordingUrl" target="_blank">
                                 Link
                             </a>
                         </template>
                     </Column>
-                    <Column body-class="delete-btn-cell" v-if="authStore.userCan('delete', 'eventEntry')">
+                    <Column v-if="authStore.userCan('delete', 'eventEntry')" body-class="delete-btn-cell">
                         <template #body="slotProps">
-                            <button class="button is-danger is-inverted is-small"
+                            <button
+                                class="button is-danger is-inverted is-small"
                                 :class="{ 'is-loading': state == State.Deleting }"
                                 @click="removeEntryFromEvent(slotProps.data as EventEntry)">
                                 <span class="icon is-small">
@@ -42,7 +45,7 @@
                         </template>
                     </Column>
                     <template #footer>
-                        <AddEventEntry :event-id="eventId" v-if="authStore.userCan('create', 'eventEntry')" />
+                        <AddEventEntry v-if="authStore.userCan('create', 'eventEntry')" :event-id="eventId" />
                     </template>
                     <template #expansion="slotProps">
                       <EventRowDetail :entry="slotProps.data" />
@@ -79,7 +82,7 @@ const eventId = Number(route.params.id);
 const eventStore = useEvents();
 const { entries: getEntries } = storeToRefs(eventStore);
 const event = ref<Event>();
-const entries = computed(() => event.value ? getEntries.value(event.value.uri!) : []);
+const entries = computed(() => event.value?.uri ? getEntries.value(event.value.uri) : []);
 const expandedRows = ref<EventEntry[]>([]);
 
 eventStore.fetch(eventId)

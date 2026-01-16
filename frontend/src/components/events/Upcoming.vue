@@ -10,7 +10,7 @@
     <div v-else-if="state == State.NotFound" class="p-3">
         <h3>
             No upcoming events planned.
-            <router-link :to="{ name: 'NewEvent' }" append v-if="authStore.userCan('create', 'event')">
+            <router-link v-if="authStore.userCan('create', 'event')" :to="{ name: 'NewEvent' }">
                 <span class="icon">
                     <i class="fas fa-plus-square"></i>
                 </span>
