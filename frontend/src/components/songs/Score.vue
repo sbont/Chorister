@@ -9,15 +9,15 @@
         <td>
             {{ score.key ? keyLabelMapping[score.key] : "" }}
         </td>
-        <td class="shrink" v-if="authStore.userCan('update', 'score')">
+        <td v-if="authStore.userCan('update', 'score')" class="shrink">
             <button class="button is-info is-inverted is-small" @click.prevent="edit">
                 <span class="icon is-small">
                     <i class="fas fa-pen"></i>
                 </span>
             </button>
         </td>
-        <td class="shrink" v-if="authStore.userCan('delete', 'score')">
-            <button class="button is-danger is-inverted is-small" @click="$emit('remove')">
+        <td v-if="authStore.userCan('delete', 'score')" class="shrink">
+            <button class="button is-danger is-inverted is-small" @click="remove">
                 <span class="icon is-small">
                     <i class="fas fa-times"></i>
                 </span>
@@ -27,14 +27,16 @@
     <tr v-else>
         <td colspan="2">
             <div class="is-flex">
-                <FileUpload name="file[]" :disabled="uploadDisabled()" @uploader="onUpload" @select="selectFile"
-                    @remove="removeFile" :multiple="false" :file-limit="1" accept="application/pdf,image/*"
-                    :maxFileSize="2000000" invalidFileSizeMessage="File exceeds maximum size of 2GB."
-                    choose-label="Browse" customUpload>
+                <FileUpload
+                    name="file[]" :disabled="uploadDisabled()" :multiple="false" :file-limit="1"
+                    accept="application/pdf,image/*" :max-file-size="2000000" invalid-file-size-message="File exceeds maximum size of 2GB." choose-label="Browse"
+                    custom-upload @uploader="onUpload"
+                    @select="selectFile" @remove="removeFile()">
                 </FileUpload>
                 <div class="field is-flex-grow-1 ml-3">
                     <div class="control">
-                        <input class="input" type="text" v-model="draftValues!.description"
+                        <input
+                            v-model="draftValues!.description" class="input" type="text"
                             placeholder="Version name, instrument, tonality..." />
                     </div>
                 </div>
@@ -50,9 +52,10 @@
                 <div class="control">
                     <div class="select">
                         <select v-model="draftValues!.key">
-                            <option v-bind:value="undefined" disabled>Select...</option>
-                            <option v-for="(key, i) in keyOptions" class="song" :key="key" draggable="true"
-                                v-bind:value="key">{{ keyLabelMapping[key] }}
+                            <option :value="undefined" disabled>Select...</option>
+                            <option
+                                v-for="(key, ) in keyOptions" :key="key" class="song" draggable="true"
+                                :value="key">{{ keyLabelMapping[key] }}
                             </option>
                         </select>
                     </div>
@@ -60,16 +63,18 @@
             </div>
         </td>
         <td class="shrink">
-            <button class="button is-info is-small" @click.prevent="save"
-                :class="{ 'is-loading': state == State.Saving, 'is-inverted': state == State.Editing }">
+            <button
+                class="button is-info is-small" :class="{ 'is-loading': state == State.Saving, 'is-inverted': state == State.Editing }"
+                @click.prevent="save">
                 <span class="icon is-small">
                     <i class="fas fa-check"></i>
                 </span>
             </button>
         </td>
         <td class="shrink">
-            <button class="button is-danger is-inverted is-small" @click.prevent="cancelEdit"
-                :disabled="state == State.Saving">
+            <button
+                class="button is-danger is-inverted is-small" :disabled="state == State.Saving"
+                @click.prevent="cancelEdit">
                 <span class="icon is-small">
                     <i class="fas fa-times"></i>
                 </span>
@@ -85,14 +90,13 @@ import { useScores } from "@/application/scoreStore";
 import { EntityRef } from '@/entities/entity';
 import { Score } from '@/entities/score';
 import { Song } from '@/entities/song';
-import { downloadFile } from '@/services/fileService';
 import { Key, KeyLabelMapping } from '@/types/key';
 import { isNew } from "@/utils";
 import { AxiosError } from 'axios';
-import { extension } from 'mime-types';
-import FileUpload, { FileUploadRemoveEvent, FileUploadSelectEvent, FileUploadUploaderEvent } from 'primevue/fileupload';
+import FileUpload, { FileUploadSelectEvent, FileUploadUploaderEvent } from 'primevue/fileupload';
 import { PropType, onMounted, ref } from 'vue';
 import FileLink from './FileLink.vue';
+import { useConfirm } from 'primevue/useconfirm';
 
 type DraftScore = Partial<Score> & {
     song: EntityRef<Song>
@@ -119,6 +123,7 @@ const emit = defineEmits(["remove", "cancel", "added"])
 const scoreStore = useScores();
 const fileStore = useFiles();
 const authStore = useAuth();
+const confirm = useConfirm();
 
 // state
 const score = ref(props.value);
@@ -140,7 +145,7 @@ onMounted(() => {
 const uploadDisabled = () => !!selectedFile.value;
 
 // Methods
-const selectFile = (event: FileUploadSelectEvent) => {
+function selectFile(event: FileUploadSelectEvent) {
     selectedFile.value = (event.files as File[])[0];
     if (draftValues.value && !draftValues.value.description) {
         const name = selectedFile.value.name;
@@ -148,16 +153,16 @@ const selectFile = (event: FileUploadSelectEvent) => {
     }
 }
 
-const removeFile = (_: FileUploadRemoveEvent) => {
+function removeFile() {
     selectedFile.value = undefined;
 }
 
-const edit = async () => {
+async function edit() {
     draftValues.value = score.value as DraftScore;
     state.value = State.Editing;
 }
 
-const onUpload = async (event: FileUploadUploaderEvent) => {
+async function onUpload(event: FileUploadUploaderEvent) {
     const files = event.files as File[];
     if (files.length !== 1) {
         error.value = "Number of selected files is not equal to 1."
@@ -166,7 +171,7 @@ const onUpload = async (event: FileUploadUploaderEvent) => {
     await upload(files[0]);
 }
 
-const upload = async (file: File) => {
+async function upload(file: File) {
     const envelope = await fileStore.getUploadEnvelope(score.value?.file?.id);
     if (!envelope?.uploadUrl)
         return;
@@ -180,7 +185,7 @@ const upload = async (file: File) => {
     return envelope.file;
 }
 
-const save = async () => {
+async function save(){
     error.value = undefined;
     const wasNew = isNew(draftValues.value);
     if (!selectedFile.value && wasNew) {
@@ -200,9 +205,9 @@ const save = async () => {
     }
 
     const savedScore = await scoreStore.save(draftValues.value as Score)
-    if (fileInfo && wasNew) {
+    if (fileInfo?.id && wasNew) {
         savedScore.file = fileInfo;
-        await scoreStore.linkFile(savedScore, fileInfo.id!!);
+        await scoreStore.linkFile(savedScore, fileInfo.id);
     }
     score.value = savedScore;
 
@@ -212,7 +217,29 @@ const save = async () => {
     state.value = State.Ready;
 }
 
-const cancelEdit = () => {
+function remove(event: MouseEvent) {
+    confirm.require({
+        target: event.currentTarget as HTMLElement,
+        message: 'Are you sure you want to delete this score?',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            emit("remove");
+        },
+        reject: () => {},
+        group: "popups"
+    });
+}
+
+function cancelEdit() {
     state.value = State.Ready;
     draftValues.value = undefined;
     emit("cancel")

@@ -3,94 +3,107 @@
         <div class="hero-body">
             <div class="is-flex">
                 <div class="is-flex-grow-1">
-                    <p class="subtitle" v-if="subtitle && subtitleOnTop">
+                    <p v-if="subtitle && subtitleOnTop" class="subtitle">
                         {{ mode == "view" ? subtitle : "&nbsp;" }}
                     </p>
                     <p class="title">
                         {{ mode == "view" ? title : mode == "create" ? "Create new" : "Edit" }}
                     </p>
-                    <p class="subtitle" v-if="subtitle && !subtitleOnTop">
+                    <p v-if="subtitle && !subtitleOnTop" class="subtitle">
                         {{ mode == "view" ? subtitle : "&nbsp;" }}
                     </p>
                 </div>
                 <div class="is-flex my-3 is-flex field is-grouped">
-                    <p v-if="mode == 'view'" v-for="button in accessibleActions" class="control">
-                        <button @click="button.action" class="button is-link is-inverted">{{ button.label }}</button>
-                    </p>
+                    <div v-if="mode == 'view'">
+                        <p v-for="button in accessibleActions" :key="button.label" class="control">
+                            <button class="button is-link is-inverted" @click="button.action">{{ button.label
+                            }}</button>
+                        </p>
+                    </div>
+                    
                     <p v-if="onEdit && mode == 'view' && authStore.userCan('update', entity)" class="control">
-                        <button @click="$emit('edit')" class="button is-link is-inverted"
-                            :disabled="editDisabled">Edit</button>
+                        <button 
+                        class="button is-link is-inverted" 
+                        :disabled="editDisabled"
+                        @click="$emit('edit')">Edit</button>
                     </p>
                     <p v-if="onCancelEdit && mode == 'edit'" class="control">
-                        <button @click="$emit('cancelEdit')" class="button">Cancel</button>
+                        <button class="button" @click="$emit('cancelEdit')">Cancel</button>
                     </p>
                     <p v-if="onDelete && mode == 'view' && authStore.userCan('delete', entity)" class="control">
-                        <button @click="confirmDelete()" class="button is-danger is-inverted"
-                            :disabled="deleteDisabled">Delete</button>
-                    </p>
-                </div>
+                        <button 
+                        class="button is-danger is-inverted" 
+                        :disabled="deleteDisabled"
+                        @click="confirmDelete()">
+                        Delete
+                    </button>
+                </p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+<ConfirmDialog key="delete"></ConfirmDialog>
 </template>
 
 <script setup lang="ts">
-import { EntityType } from '@/application/authorization';
-import { useAuth } from '@/application/authStore';
-import { PageMode } from '@/types';
-import { Role } from '@/types/role';
-import { storeToRefs } from 'pinia';
-import { useConfirm } from 'primevue/useconfirm';
-
-const emit = defineEmits(["edit", "delete", "cancelEdit"]);
-
-interface Props {
-    title?: string
-    subtitle?: string
-    subtitleOnTop?: boolean
-    mode?: PageMode
-    entity: EntityType
-    onEdit?: (_: MouseEvent) => void
-    editDisabled?: boolean
-    onDelete?: (_: MouseEvent) => void
-    deleteDisabled?: boolean
-    onCancelEdit?: (_: MouseEvent) => void
-    customActions?: Array<{ action: () => void, label: string, disabled?: boolean, accessLevel: Role }>
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    subtitleOnTop: () => false,
-    mode: "view",
-    editDisabled: false,
-    deleteDisabled: false
-});
-
-const authStore = useAuth();
-const { role } = storeToRefs(authStore);
-
-const confirm = useConfirm();
-
-const accessibleActions = props.customActions?.filter(action => !role.value || action.accessLevel <= role.value);
-
-function confirmDelete() {
-  confirm.require({
-    message: 'Are you sure you want to delete this record?',
-    header: 'Confirm deletion',
-    icon: 'pi pi-exclamation-triangle',
-    rejectProps: {
-      label: 'Cancel',
-      severity: 'secondary',
-      outlined: true
-    },
-    acceptProps: {
-      label: 'Delete',
-      severity: 'danger'
-    },
-    accept: () => {
-      emit('delete');
-    },
-    reject: () => {}
-  });
-}
-
+    import { EntityType } from '@/application/authorization';
+    import { useAuth } from '@/application/authStore';
+    import { PageMode } from '@/types';
+    import { Role } from '@/types/role';
+    import { storeToRefs } from 'pinia';
+    import { useConfirm } from 'primevue/useconfirm';
+    import ConfirmDialog from 'primevue/confirmdialog';
+    
+    const emit = defineEmits(["edit", "delete", "cancelEdit"]);
+    
+    interface Props {
+        title?: string
+        subtitle?: string
+        subtitleOnTop?: boolean
+        mode?: PageMode
+        entity: EntityType
+        onEdit?: (_: MouseEvent) => void
+        editDisabled?: boolean
+        onDelete?: (_: MouseEvent) => void
+        deleteDisabled?: boolean
+        onCancelEdit?: (_: MouseEvent) => void
+        customActions?: Array<{ action: () => void, label: string, disabled?: boolean, accessLevel: Role }>
+    }
+    
+    const props = withDefaults(defineProps<Props>(), {
+        subtitleOnTop: () => false,
+        mode: "view",
+        editDisabled: false,
+        deleteDisabled: false
+    });
+    
+    const authStore = useAuth();
+    const { role } = storeToRefs(authStore);
+    
+    const confirm = useConfirm();
+    
+    const accessibleActions = props.customActions?.filter(action => !role.value || action.accessLevel <= role.value);
+    
+    function confirmDelete() {
+        confirm.require({
+            message: 'Are you sure you want to delete this record?',
+            header: 'Confirm deletion',
+            icon: 'pi pi-exclamation-triangle',
+            rejectProps: {
+                label: 'Cancel',
+                severity: 'secondary',
+                outlined: true
+            },
+            acceptProps: {
+                label: 'Delete',
+                severity: 'danger'
+            },
+            accept: () => {
+                emit('delete');
+            },
+            reject: () => { },
+            group: "dialogs"
+        });
+    }
+    
 </script>

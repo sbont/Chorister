@@ -3,22 +3,25 @@
         <div v-if="error" class="error" @click="handleErrorClick">
             ERROR: {{ error }}
         </div>
-        <DataTable :value="songs" ref="datatable" v-model:selection="selectedRows" size="small" :loading="loading"
-            paginator :rows="page.size" :first="first" :rowsPerPageOptions="[25, 50, 100]" @page="onPaged">
+        <DataTable
+            ref="datatable" v-model:selection="selectedRows" :value="songs" size="small" :loading="loading"
+            paginator :rows="page.size" :first="first" :rows-per-page-options="[25, 50, 100]" @page="onPaged">
             <template #header>
                 <div class="is-flex is-justify-content-space-between">
                     <div class="is-flex title">
                         {{ header }}
                     </div>
                     <div class="is-flex is-gap-2">
-                        <Button type="button" class="button mr-2" label="Categorise" @click="toggleCategorizeMenu"
+                        <Button
+                            v-if="authStore.userCan('update', 'song')" type="button" class="button mr-2" label="Categorise"
                             :disabled="!selectedRows.length" :class="{ 'is-loading': isSavingCategories }"
                             aria-haspopup="true" aria-controls="overlay_tmenu" unstyled
-                            v-if="authStore.userCan('update', 'song')" />
-                        <TieredMenu ref="customizeMenu" id="overlay_tmenu" :model="categorizeMenuEntries" popup />
+                            @click="toggleCategorizeMenu" />
+                        <TieredMenu ref="customizeMenu" :model="categorizeMenuEntries" popup />
 
-                        <router-link class="button is-primary" :to="{ name: 'NewSong' }" append tag="button"
-                            v-if="authStore.userCan('create', 'song')">
+                        <router-link
+                            v-if="authStore.userCan('create', 'song')" class="button is-primary" :to="{ name: 'NewSong' }" append
+                            tag="button">
                             <span class=" icon is-small">
                                 <i class="fas fa-plus"></i>
                             </span>
@@ -28,12 +31,13 @@
                     </div>
                 </div>
             </template>
-            <template #empty v-if="loading == false"> No songs found. </template>
+            <template v-if="loading == false" #empty> No songs found. </template>
 
             <Column body-class="col-select" selection-mode="multiple"></Column>
             <Column field="title" header="Title" body-class="col-title" sortable>
                 <template #body="slotProps">
-                    <router-link :to="{ name: 'Song', params: { id: (slotProps.data as Song).id } }" append
+                    <router-link
+                        :to="{ name: 'Song', params: { id: (slotProps.data as Song).id } }" append
                         class="has-text-weight-semibold">
                         {{ (slotProps.data as Song).title }}
                     </router-link>
@@ -48,8 +52,9 @@
             <Column header="Categories" body-class="col-category">
                 <template #body="slotProps">
                     <div class="tags">
-                        <span v-for="(category, index) in categoryStore.songCategories(slotProps.data.id)"
-                            class="song-category tag is-normal" :key="index">
+                        <span
+                            v-for="(category, index) in categoryStore.songCategories(slotProps.data.id)"
+                            :key="index" class="song-category tag is-normal">
                             {{ category.name }}
                         </span>
                     </div>
@@ -65,7 +70,6 @@
 <script setup lang="ts">
 import { useAuth } from '@/application/authStore';
 import { useCategories } from '@/application/categoryStore';
-import { StoreState } from '@/application/entityStore';
 import { useSongs } from "@/application/songStore.js";
 import { Category } from '@/entities/category';
 import { Song } from "@/entities/song";
@@ -74,7 +78,7 @@ import { storeToRefs } from 'pinia';
 import Button from "primevue/button";
 import Column from "primevue/column";
 import DataTable, { DataTablePageEvent } from "primevue/datatable";
-import type { MenuItem, MenuItemCommandEvent } from 'primevue/menuitem';
+import type { MenuItem } from 'primevue/menuitem';
 import TieredMenu from "primevue/tieredmenu";
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from "vue-router";
@@ -121,14 +125,14 @@ const loadingCategorySongs = ref(false);
 const loading = computed(() => loadingCategorySongs.value || isLoading.value);
 
 switch (route.name) {
-
-    case "Repertoire":
+    case "Repertoire": {
+        // eslint-disable-next-line vue/no-ref-as-operand
         songs = allSongs;
         break;
-
-    case "Category":
+    }
+    case "Category": {
         loadingCategorySongs.value = true;
-        const categoryId = Number(route.params.id);
+        const categoryId = parseInt(route.params.id as string);
         categoryStore.get(categoryId).then((data) => {
             header.value = data?.name ?? "Category";
         });
@@ -136,6 +140,7 @@ switch (route.name) {
             songs.value = data;
         }).finally(() => (loadingCategorySongs.value = false));
         break;
+    }
 }
 
 const categorizeMenuEntries = computed(() => {
@@ -173,13 +178,13 @@ function toggleCategorizeMenu(event: Event) {
 }
 
 function categorizeFn(category: Category) {
-    return async (_: MenuItemCommandEvent) => {
+    return async () => {
         isSavingCategories.value = true;
         try {
             await categoryStore.addForSongs(selectedRows.value, category);
         } catch (e) {
             console.log(e);
-            error.value = `${error}`;
+            error.value = `${error.value}`;
         }
         isSavingCategories.value = false;
     }
