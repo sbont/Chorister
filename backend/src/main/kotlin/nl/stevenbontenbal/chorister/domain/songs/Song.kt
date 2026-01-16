@@ -26,7 +26,7 @@ class Song(
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "song")
     var chords: MutableList<Chords>? = mutableListOf(),
     var slug: String = title.toSlug(),
-    @ManyToMany(cascade = [CascadeType.REMOVE])
+    @ManyToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH])
     @JoinTable(
         name = "SONG_CATEGORY",
         joinColumns = [JoinColumn(name = "SONG_ID")],
@@ -37,7 +37,13 @@ class Song(
     var eventEntries: MutableList<EventEntry>? = mutableListOf(),
     @Column(length = 32000)
     var text: String?,
-) : EntityBase(), ChoirOwnedEntity {
+) : EntityBase(), ChoirOwnedEntity
+{
+    @PreRemove
+    fun preRemove() {
+        categories?.clear()
+    }
+
     companion object {
         fun String.toSlug() = lowercase(Locale.getDefault())
             .replace("\n", " ")
