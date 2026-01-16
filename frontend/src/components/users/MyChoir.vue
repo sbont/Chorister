@@ -29,11 +29,11 @@
 
 <script setup lang="ts">
 import { Choir } from "@/entities/choir";
-import ChoirMembers from "../components/ChoirMembers.vue";
+import ChoirMembers from "./ChoirMembers.vue";
 import { ref } from "vue";
-import Categories from "@/components/Categories.vue";
+import Categories from "./Categories.vue";
 import { useChoir } from "@/application/choirStore";
-import DetailHeader from "./ui/DetailHeader.vue";
+import DetailHeader from "../ui/DetailHeader.vue";
 
 // state
 const choirStore = useChoir();

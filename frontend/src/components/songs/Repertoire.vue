@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import RepertoireMenu from '@/components/RepertoireMenu.vue'
+import RepertoireMenu from './RepertoireMenu.vue';
 
 </script>
 

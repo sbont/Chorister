@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useCategories } from "@/application/categoryStore";
-import CategoriesByType from "@/components/CategoriesByType.vue";
+import CategoriesByType from "./CategoriesByType.vue";
 import { AxiosError } from "axios";
 import { Category } from "@/entities/category";
 

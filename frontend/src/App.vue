@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import AppHeader from './components/AppHeader.vue'
+import AppHeader from './components/ui/AppHeader.vue'
 import { useRoute } from "vue-router";
 import Toast from 'primevue/toast';
 

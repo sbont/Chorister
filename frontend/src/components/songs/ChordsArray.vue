@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { useAuth } from "@/application/authStore";
 import { useChords } from "@/application/chordsStore";
-import ChordsComponent from "@/components/Chords.vue";
+import ChordsComponent from "./Chords.vue" ;
 import { Chords } from "@/entities/chords";
 import { EntityRef } from "@/entities/entity";
 import { Song } from "@/entities/song";

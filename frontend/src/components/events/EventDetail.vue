@@ -51,7 +51,7 @@ import { Event } from "@/entities/event";
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { isNew } from "@/entities/entity";
-import DetailHeader from "./ui/DetailHeader.vue";
+import DetailHeader from "../ui/DetailHeader.vue";
 import { PageMode, PageState } from "@/types";
 
 type DraftEvent = Partial<Event>;

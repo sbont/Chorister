@@ -154,7 +154,7 @@
         </div>
 
         <div v-if="state.mode === PageState.Ready">
-            <ScoreArray :song="state.song" />
+            <ScoreArray :song="state.song" :show-add="true"/>
             <ChordsArray :song="state.song" />
         </div>
 
@@ -162,8 +162,8 @@
 </template>
 
 <script setup lang="ts">
-import ScoreArray from "@/components/ScoreArray.vue"
-import ChordsArray from "@/components/ChordsArray.vue";
+import ScoreArray from "./ScoreArray.vue";
+import ChordsArray from "./ChordsArray.vue";
 import VueMultiselect from 'vue-multiselect'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
@@ -177,7 +177,7 @@ import { useRoute, useRouter } from "vue-router";
 import { Song, Songbook } from "@/entities/song"
 import { isNew, notNullOrUndefined } from "@/utils"
 import { Category } from "@/entities/category";
-import DetailHeader from "./ui/DetailHeader.vue";
+import DetailHeader from "../ui/DetailHeader.vue";
 import { PageState, Uri } from "@/types";
 import { CacheListMap } from "@/types/cache-maps";
 import { useToast } from 'primevue/usetoast';

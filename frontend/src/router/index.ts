@@ -10,16 +10,16 @@ const routes = [
             hideHeader: true,
             forwardWhenAuthenticated: '/planning/upcoming'
         },
-        component: () => import('../components/Landing.vue'),
+        component: () => import('../components/ui/Landing.vue'),
     },
     {
         path: '/signup',
         name: 'SignUp',
-        component: () => import('../components/SignUp.vue')
+        component: () => import('../components/users/SignUp.vue')
     },
     {
         path: '/repertoire',
-        component: () => import('../components/Repertoire.vue'),
+        component: () => import('../components/songs/Repertoire.vue'),
         meta: {
             requiresAuth: true
         },
@@ -27,7 +27,7 @@ const routes = [
             {
                 path: '',
                 name: 'Repertoire',
-                component: () => import('../components/Songs.vue'),
+                component: () => import('../components/songs/Songs.vue'),
                 meta: {
                     requiresAuth: true
                 },
@@ -35,7 +35,7 @@ const routes = [
             {
                 path: 'category/:id',
                 name: 'Category',
-                component: () => import('../components/Songs.vue'),
+                component: () => import('../components/songs/Songs.vue'),
                 meta: {
                     requiresAuth: true
                 },
@@ -43,7 +43,7 @@ const routes = [
             {
                 path: 'song/new',
                 name: 'NewSong',
-                component: () => import('../components/SongDetail.vue'),
+                component: () => import('../components/songs/SongDetail.vue'),
                 meta: {
                     requiresAuth: true
                 },
@@ -51,7 +51,7 @@ const routes = [
             {
                 path: 'song/:id',
                 name: 'Song',
-                component: () => import('../components/SongDetail.vue'),
+                component: () => import('../components/songs/SongDetail.vue'),
                 meta: {
                     requiresAuth: true
                 },
@@ -61,12 +61,12 @@ const routes = [
     {
         path: '/planning',
         name: 'Planning',
-        component: () => import('../components/Planning.vue'),
+        component: () => import('../components/events/Planning.vue'),
         children: [
             {
                 path: 'event/new',
                 name: 'NewEvent',
-                component: () => import('../components/EventDetail.vue'),
+                component: () => import('../components/events/EventDetail.vue'),
                 meta: {
                     requiresAuth: true
                 },
@@ -74,7 +74,7 @@ const routes = [
             {
                 path: 'event/:id',
                 name: 'Event',
-                component: () => import('../components/Event.vue'),
+                component: () => import('../components/events/Event.vue'),
                 meta: {
                     requiresAuth: true
                 }
@@ -82,7 +82,7 @@ const routes = [
             {
                 path: 'upcoming',
                 name: ' Upcoming event',
-                component: () => import('../components/Upcoming.vue'),
+                component: () => import('../components/events/Upcoming.vue'),
                 meta: {
                     requiresAuth: true
                 }
@@ -95,17 +95,17 @@ const routes = [
     {
         path: '/mychoir',
         name: 'My Choir',
-        component: () => import('../components/MyChoir.vue')
+        component: () => import('../components/users/MyChoir.vue')
     },
     {
         path: '/profile',
         name: 'Profile',
-        component: () => import('../components/Profile.vue')
+        component: () => import('../components/users/Profile.vue')
     },
     {
         path: '/planning/event/:id/texts',
         name: 'Export',
-        component: () => import('../components/EventTextExport.vue'),
+        component: () => import('../components/events/EventTextExport.vue'),
         meta: {
             requiresAuth: true,
             hideHeader: true
@@ -114,7 +114,7 @@ const routes = [
     {
         path: '/authorized',
         name: 'Authorized',
-        component: () => import('../components/Authorized.vue')
+        component: () => import('../components/ui/Authorized.vue')
     }
 ]
 

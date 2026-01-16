@@ -16,7 +16,7 @@
             <tbody>
                 <ScoreCopy v-for="(score, index) in scores" :key="score.id" :value="(score as Score)" :song="song"
                     :number="oneBased(index)" />
-                <tr v-if="!draftValues && authStore.userCan('create', 'score')">
+                <tr v-if="showAdd && !draftValues && authStore.userCan('create', 'score')">
                     <td colspan="2">
                         <button class="button is-primary" @click="addScore">
                             Add
@@ -47,7 +47,8 @@ type DraftScore = Partial<Score> & {
 }
 
 const props = defineProps<{
-    song: Song
+    song: Song,
+    showAdd: boolean
 }>();
 
 const authStore = useAuth();
@@ -55,6 +56,8 @@ const loading = ref(true)
 const error = ref<string>()
 const scoreStore = useScores();
 const scores = ref<Array<Score>>([]);
+  console.log(props.song);
+  
 const link = props.song.scores
 if (link)
     scoreStore.getAllRelated(link)

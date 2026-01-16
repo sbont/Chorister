@@ -42,7 +42,7 @@
 import { useUsers } from "@/application/userStore";
 import { onMounted, ref } from "vue";
 import { User } from "@/entities/user";
-import DetailHeader from "./ui/DetailHeader.vue";
+import DetailHeader from "../ui/DetailHeader.vue";
 
 const userStore = useUsers();
 

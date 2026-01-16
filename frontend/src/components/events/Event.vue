@@ -5,8 +5,9 @@
         </div>
         <div class="songs-container">
             <div class="p-2">
-                <DataTable :value="entries" @row-reorder="reorder" :loading="state == State.Loading">
+                <DataTable :value="entries" @row-reorder="reorder" :loading="state == State.Loading" v-model:expandedRows="expandedRows" :row-class="rowClass">
                     <Column row-reorder class="first-col" v-if="authStore.userCan('update', 'eventEntry')"></Column>
+                    <Column expander class="expander-col"/>
                     <Column body-class="header" header="Title">
                         <template #body="slotProps">
                             <span v-if="(slotProps.data as EventEntry).label" class="has-text-weight-semibold">
@@ -22,11 +23,12 @@
 
                     <Column field="song.embedded.composer" header="Composer"></Column>
                     <Column field="song.embedded.recordingUrl" header="Recording">
-                      <template #body="slotProps">
-                        <a v-if="(slotProps.data as EventEntry).song?.embedded?.recordingUrl" :href="(slotProps.data as EventEntry).song?.embedded?.recordingUrl" target="_blank">
-                          Link
-                        </a>
-                    </template>
+                        <template #body="slotProps">
+                            <a v-if="(slotProps.data as EventEntry).song?.embedded?.recordingUrl"
+                                :href="(slotProps.data as EventEntry).song?.embedded?.recordingUrl" target="_blank">
+                                Link
+                            </a>
+                        </template>
                     </Column>
                     <Column body-class="delete-btn-cell" v-if="authStore.userCan('delete', 'eventEntry')">
                         <template #body="slotProps">
@@ -42,14 +44,17 @@
                     <template #footer>
                         <AddEventEntry :event-id="eventId" v-if="authStore.userCan('create', 'eventEntry')" />
                     </template>
-                </DataTable>                
+                    <template #expansion="slotProps">
+                      <EventRowDetail :entry="slotProps.data" />
+                    </template>
+                </DataTable>
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import EventDetail from "@/components/EventDetail.vue";
+import EventDetail from "./EventDetail.vue";
 import { useRoute } from "vue-router";
 import { useEvents } from "@/application/eventStore";
 import { computed, ref } from "vue";
@@ -59,6 +64,7 @@ import AddEventEntry from "./AddEventEntry.vue";
 import { Event, EventEntry } from "@/entities/event";
 import { storeToRefs } from "pinia";
 import { useAuth } from "@/application/authStore";
+import EventRowDetail from "./EventRowDetail.vue";
 
 enum State {
     Ready,
@@ -74,6 +80,7 @@ const eventStore = useEvents();
 const { entries: getEntries } = storeToRefs(eventStore);
 const event = ref<Event>();
 const entries = computed(() => event.value ? getEntries.value(event.value.uri!) : []);
+const expandedRows = ref<EventEntry[]>([]);
 
 eventStore.fetch(eventId)
     .then((result) => {
@@ -94,6 +101,10 @@ const reorder = (reorder: DataTableRowReorderEvent) => {
         eventStore.reorder(event.value, reorder.dragIndex, reorder.dropIndex)
 };
 
+function rowClass(entry: EventEntry): string {
+  return entry.song ? "expandable" : "";
+}
+
 </script>
 
 <style>
@@ -101,10 +112,22 @@ const reorder = (reorder: DataTableRowReorderEvent) => {
     display: none;
 }
 
-table td.col0 {
-    padding: 0.25em 0.75em;
+.p-datatable .first-col {
+  line-height: 10pt;
+  vertical-align: middle;
 }
 
+.p-datatable .expander-col {
+  line-height: 10pt;
+  vertical-align: middle;
+}
+
+.p-datatable tr:not(.expandable) .p-datatable-row-toggle-button {
+  display: none !important;
+}
+
+.p-datatable-tbody>tr>td.first-col, 
+.p-datatable-tbody>tr>td.expander-col,
 .p-datatable-tbody>tr>td.delete-btn-cell {
     padding: 0.5em 0.75em;
 }
@@ -113,7 +136,16 @@ table td.col0 {
     padding: 0;
 }
 
-.first-col {
-    width: 6%;
+.first-col, .expander-col {
+    width: 1rem;
 }
+
+.p-datatable-tbody>tr:has(+ .p-datatable-row-expansion) td {
+  border-width: 0;
+}
+
+.p-datatable-tbody tr.p-datatable-row-expansion {
+  background-color: rgb(250, 250, 250);
+}
+
 </style>

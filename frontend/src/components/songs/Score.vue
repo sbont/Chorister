@@ -4,18 +4,7 @@
             {{ number }}
         </td>
         <td>
-            <a v-if="score.file?.fileInfoUri" @click.prevent="openFile" @auxclick.prevent="openFile"
-                @mousedown.middle.prevent="openFile" href="#" class="icon-text has-text-link">
-                <span class="icon">
-                    <i class="fas fa-cloud-download-alt"></i>
-                </span>
-                <span>
-                    {{ score.description }}
-                </span>
-            </a>
-            <span v-else>
-                {{ score.description }}
-            </span>
+            <FileLink :file-info-uri="score.file?.fileInfoUri" :description="score.description" :file-name="song?.title + ' - ' + score.description" />
         </td>
         <td>
             {{ score.key ? keyLabelMapping[score.key] : "" }}
@@ -103,6 +92,7 @@ import { AxiosError } from 'axios';
 import { extension } from 'mime-types';
 import FileUpload, { FileUploadRemoveEvent, FileUploadSelectEvent, FileUploadUploaderEvent } from 'primevue/fileupload';
 import { PropType, onMounted, ref } from 'vue';
+import FileLink from './FileLink.vue';
 
 type DraftScore = Partial<Score> & {
     song: EntityRef<Song>
@@ -226,34 +216,6 @@ const cancelEdit = () => {
     state.value = State.Ready;
     draftValues.value = undefined;
     emit("cancel")
-}
-
-const openFile = async (event: MouseEvent) => {
-    const fileUri = score.value.file?.fileInfoUri;
-    if (!fileUri) {
-        return;
-    }
-
-    try {
-        const location = await fileStore.getDownloadUrl(fileUri);
-        if (event.button == 1)
-            window.open(location, "_blank");
-        else {
-            const response = await downloadFile(location);
-            const contentType = response.headers["content-type"]?.toString() ?? "";
-
-            const blob = new Blob([response.data], { type: contentType });
-            const link = document.createElement('a')
-            link.href = URL.createObjectURL(blob)
-
-            const ext = extension(contentType)
-            link.download = `${props.song?.title} - ${score.value?.description}.${ext}`;
-            link.click()
-            URL.revokeObjectURL(link.href)
-        }
-    } catch (e) {
-        error.value = JSON.stringify(e);
-    }
 }
 
 </script>
