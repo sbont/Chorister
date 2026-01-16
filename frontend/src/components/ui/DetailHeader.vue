@@ -25,7 +25,7 @@
                         <button @click="$emit('cancelEdit')" class="button">Cancel</button>
                     </p>
                     <p v-if="onDelete && mode == 'view' && authStore.userCan('delete', entity)" class="control">
-                        <button @click="$emit('delete')" class="button is-danger is-inverted"
+                        <button @click="confirmDelete()" class="button is-danger is-inverted"
                             :disabled="deleteDisabled">Delete</button>
                     </p>
                 </div>
@@ -40,8 +40,9 @@ import { useAuth } from '@/application/authStore';
 import { PageMode } from '@/types';
 import { Role } from '@/types/role';
 import { storeToRefs } from 'pinia';
+import { useConfirm } from 'primevue/useconfirm';
 
-defineEmits(["edit", "delete", "cancelEdit"]);
+const emit = defineEmits(["edit", "delete", "cancelEdit"]);
 
 interface Props {
     title?: string
@@ -62,11 +63,34 @@ const props = withDefaults(defineProps<Props>(), {
     mode: "view",
     editDisabled: false,
     deleteDisabled: false
-})
+});
 
 const authStore = useAuth();
 const { role } = storeToRefs(authStore);
 
+const confirm = useConfirm();
+
 const accessibleActions = props.customActions?.filter(action => !role.value || action.accessLevel <= role.value);
+
+function confirmDelete() {
+  confirm.require({
+    message: 'Are you sure you want to delete this record?',
+    header: 'Confirm deletion',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Delete',
+      severity: 'danger'
+    },
+    accept: () => {
+      emit('delete');
+    },
+    reject: () => {}
+  });
+}
 
 </script>

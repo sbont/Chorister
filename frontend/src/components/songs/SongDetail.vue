@@ -175,7 +175,6 @@ import { useCategories } from "@/application/categoryStore";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 import { Song, Songbook } from "@/entities/song"
-import { isNew, notNullOrUndefined } from "@/utils"
 import { Category } from "@/entities/category";
 import DetailHeader from "../ui/DetailHeader.vue";
 import { PageState, Uri } from "@/types";
@@ -356,9 +355,12 @@ const save = async () => {
 
 const remove = () => {
     if (state.value.mode === PageState.Ready) {
-        songStore.deleteSong(state.value.song).then((_) => {
-            router.push({ name: "Repertoire" });
-        });
+        songStore.deleteSong(state.value.song)
+            .then((_) => {
+                toast.add({ severity: "info", summary: "Song deleted.", life: 3000 });
+                router.push({ name: "Repertoire" });
+            })
+            .catch(e => toast.add({ severity: "error", summary: "Error while saving song", detail: e.message }));
     }
 }
 

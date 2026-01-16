@@ -1,6 +1,7 @@
 <template>
     <div id="app">
         <Toast />
+        <ConfirmDialog></ConfirmDialog>
         <AppHeader v-if="showHeader" />
         <router-view></router-view>
     </div>
@@ -11,6 +12,7 @@ import { computed } from 'vue';
 import AppHeader from './components/ui/AppHeader.vue'
 import { useRoute } from "vue-router";
 import Toast from 'primevue/toast';
+import ConfirmDialog from 'primevue/confirmdialog';
 
 const route = useRoute();
 const showHeader = computed(() => {
