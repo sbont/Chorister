@@ -25,8 +25,10 @@ import { Category } from "@/entities/category";
 import { useToast } from "primevue/usetoast";
 import { storeToRefs } from "pinia";
 import { Uri } from "@/types";
+import { useConfirm } from "primevue/useconfirm";
 
 const toast = useToast();
+const confirm = useConfirm();
 const categoryStore = useCategories();
 
 // state
@@ -44,7 +46,7 @@ categoryStore.fetchAll()
 const categories = computed(() => (uri: Uri) => categoriesByType.value.get(uri) ?? []);
 
 // Methods
-const onSave = async (category: Category) => {
+async function onSave(category: Category) {
     try {
         await categoryStore.save(category);
     } catch (e) {
@@ -52,12 +54,30 @@ const onSave = async (category: Category) => {
     }
 };
 
-const onDelete = async (category: Category) => {
-    try {
-        await categoryStore.deleteCategory(category);
-    } catch (e) {
-        toast.add({ summary: "Error saving category", detail: (e as AxiosError).message, severity: "error", closable: true })
-    }
+async function onDelete(category: Category) {
+    confirm.require({
+        message: 'Are you sure you want to delete this category?',
+        header: 'Confirm deletion',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: async () => {
+            try {
+                await categoryStore.deleteCategory(category);
+            } catch (e) {
+                toast.add({ summary: "Error saving category", detail: (e as AxiosError).message, severity: "error", closable: true })
+            }
+        },
+        reject: () => { },
+        group: "dialogs"
+    })
 };
 </script>
 
