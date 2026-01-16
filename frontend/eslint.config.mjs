@@ -20,7 +20,7 @@ export default defineConfig(
             "vue/no-undef-components": [
                 "error",
                 {
-                    ignorePatterns: ['router-view'],
+                    ignorePatterns: ['router-view', 'router-link'],
                 },
             ],
             "vue/require-default-prop": "off",
