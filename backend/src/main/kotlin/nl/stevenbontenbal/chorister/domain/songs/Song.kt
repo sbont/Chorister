@@ -1,20 +1,10 @@
 package nl.stevenbontenbal.chorister.domain.songs
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.JoinTable
-import jakarta.persistence.ManyToMany
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToMany
-import jakarta.persistence.PreRemove
+import jakarta.persistence.*
 import nl.stevenbontenbal.chorister.domain.EntityBase
 import nl.stevenbontenbal.chorister.domain.events.EventEntry
 import nl.stevenbontenbal.chorister.domain.users.Choir
 import nl.stevenbontenbal.chorister.domain.users.ChoirOwnedEntity
-import org.hibernate.annotations.Cascade
-import org.hibernate.annotations.CascadeType
 import org.springframework.data.rest.core.annotation.RestResource
 import java.util.*
 
@@ -36,16 +26,14 @@ class Song(
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "song")
     var chords: MutableList<Chords>? = mutableListOf(),
     var slug: String = title.toSlug(),
-    @ManyToMany()
-    @Cascade(CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH)
+    @ManyToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH])
     @JoinTable(
         name = "SONG_CATEGORY",
         joinColumns = [JoinColumn(name = "SONG_ID")],
         inverseJoinColumns = [JoinColumn(name = "CATEGORY_ID")]
     )
     var categories: MutableSet<Category>? = mutableSetOf(),
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "song")
-    @Cascade(CascadeType.SAVE_UPDATE, CascadeType.MERGE, CascadeType.PERSIST)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "song", cascade=[CascadeType.DETACH])
     var eventEntries: MutableList<EventEntry>? = mutableListOf(),
     @Column(length = 32000)
     var text: String?,
