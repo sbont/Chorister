@@ -7,6 +7,7 @@ import org.springframework.data.rest.webmvc.RepositoryRestController
 import org.springframework.hateoas.CollectionModel
 import org.springframework.hateoas.server.ExposesResourceFor
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody
 class EventController(
     private val eventService: EventService
 ) {
+    @PreAuthorize("hasRole('EDITOR')")
     @PutMapping("/events/{id}/list")
     fun putEntryCollection(@PathVariable id: Long?, @RequestBody eventEntries: CollectionModel<EventEntry>): ResponseEntity<Any> {
         if (id == null)
