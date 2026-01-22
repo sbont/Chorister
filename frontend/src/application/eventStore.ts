@@ -204,9 +204,19 @@ export const useEvents = defineStore('events', () => {
 
     async function deleteEntry(eventEntry: EventEntry) {
         const eventUri = eventEntry.event.uri ?? (eventEntry.event.id ? eventEndpoint.getUri(eventEntry.event.id) : undefined);
-        const entries = resequence(eventUri);
+        const values = entriesByEventUri.value.get(eventUri);
+        if (!values) return;
+
+        const newValues = [...values];
+        const i = newValues.findIndex(e => e === eventEntry);
         
-        return eventEndpoint.putEntries(eventUri, entries).then(() => removeFrom(eventUri, eventEntry));
+        newValues.splice(i, 1);
+        newValues.forEach((entry, i) => entry.sequence = i + 1);        
+
+        await eventEndpoint.putEntries(eventUri, newValues);
+
+        removeFrom(eventUri, eventEntry);
+        resequence(eventUri);
     }
 
     function resequence(eventUri: Uri) {
