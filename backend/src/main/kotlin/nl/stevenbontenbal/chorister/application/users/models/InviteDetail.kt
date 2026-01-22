@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.application.models
+package nl.stevenbontenbal.chorister.application.users.models
 
 import nl.stevenbontenbal.chorister.domain.users.Choir
 

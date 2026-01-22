@@ -1,6 +1,6 @@
 package nl.stevenbontenbal.chorister.domain.users
 
-import nl.stevenbontenbal.chorister.application.RegistrationRequest
+import nl.stevenbontenbal.chorister.application.users.RegistrationRequest
 import nl.stevenbontenbal.chorister.authorization.UserRole
 import nl.stevenbontenbal.chorister.authorization.ZitadelUserId
 import org.springframework.security.oauth2.jwt.Jwt

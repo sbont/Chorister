@@ -1,8 +1,10 @@
-package nl.stevenbontenbal.chorister.application
+package nl.stevenbontenbal.chorister.application.users
 
-import nl.stevenbontenbal.chorister.application.models.AcceptInviteRequest
-import nl.stevenbontenbal.chorister.application.models.InviteDetail
-import nl.stevenbontenbal.chorister.application.models.NewChoirRegistrationRequest
+import nl.stevenbontenbal.chorister.application.songs.CategorisationService
+import nl.stevenbontenbal.chorister.application.InvalidInputException
+import nl.stevenbontenbal.chorister.application.users.models.AcceptInviteRequest
+import nl.stevenbontenbal.chorister.application.users.models.InviteDetail
+import nl.stevenbontenbal.chorister.application.users.models.NewChoirRegistrationRequest
 import nl.stevenbontenbal.chorister.domain.users.*
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime

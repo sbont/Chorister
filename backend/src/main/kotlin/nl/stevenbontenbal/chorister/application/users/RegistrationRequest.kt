@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.application
+package nl.stevenbontenbal.chorister.application.users
 
 interface RegistrationRequest {
     var firstName: String

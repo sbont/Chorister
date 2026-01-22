@@ -10,6 +10,7 @@ import nl.stevenbontenbal.chorister.create
 import nl.stevenbontenbal.chorister.domain.songs.Category
 import nl.stevenbontenbal.chorister.domain.users.Choir
 import nl.stevenbontenbal.chorister.api.songs.CategoryRepository
+import nl.stevenbontenbal.chorister.application.songs.CategorisationService
 import org.junit.jupiter.api.Test
 import org.junit.runner.RunWith
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties

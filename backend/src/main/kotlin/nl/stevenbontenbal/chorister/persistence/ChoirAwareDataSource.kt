@@ -1,6 +1,6 @@
 package nl.stevenbontenbal.chorister.persistence
 
-import nl.stevenbontenbal.chorister.application.ChoirContext
+import nl.stevenbontenbal.chorister.application.users.ChoirContext
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.datasource.DelegatingDataSource
 import java.sql.Connection

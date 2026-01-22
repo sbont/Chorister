@@ -1,10 +1,10 @@
 package nl.stevenbontenbal.chorister.api.users
 
-import nl.stevenbontenbal.chorister.application.RegistrationService
-import nl.stevenbontenbal.chorister.application.models.AcceptInviteRequest
-import nl.stevenbontenbal.chorister.application.models.InviteDetail
-import nl.stevenbontenbal.chorister.application.models.NewChoirRegistrationRequest
+import nl.stevenbontenbal.chorister.application.users.RegistrationService
 import nl.stevenbontenbal.chorister.application.config.ChoristerProperties
+import nl.stevenbontenbal.chorister.application.users.models.AcceptInviteRequest
+import nl.stevenbontenbal.chorister.application.users.models.InviteDetail
+import nl.stevenbontenbal.chorister.application.users.models.NewChoirRegistrationRequest
 import nl.stevenbontenbal.chorister.domain.users.User
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*

@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.application
+package nl.stevenbontenbal.chorister.application.users
 
 object ChoirContext {
     private val currentChoirId: ThreadLocal<Long?> = ThreadLocal<Long?>()

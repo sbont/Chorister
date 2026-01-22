@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.application
+package nl.stevenbontenbal.chorister.application.songs
 
 import nl.stevenbontenbal.chorister.domain.songs.Category
 import nl.stevenbontenbal.chorister.domain.songs.CategoryType

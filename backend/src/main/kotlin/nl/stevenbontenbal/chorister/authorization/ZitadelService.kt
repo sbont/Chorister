@@ -1,7 +1,7 @@
 package nl.stevenbontenbal.chorister.authorization
 
 import ZitadelV1Client
-import nl.stevenbontenbal.chorister.application.RegistrationRequest
+import nl.stevenbontenbal.chorister.application.users.RegistrationRequest
 import nl.stevenbontenbal.chorister.application.config.ZitadelProperties
 import nl.stevenbontenbal.chorister.authorization.models.zitadelv1.ZitadelUserEmailPutRequest
 import nl.stevenbontenbal.chorister.authorization.models.zitadelv1.ZitadelUsernamePutRequest

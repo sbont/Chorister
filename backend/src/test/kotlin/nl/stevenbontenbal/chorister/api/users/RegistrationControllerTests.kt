@@ -5,7 +5,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import nl.stevenbontenbal.chorister.application.RegistrationService
+import nl.stevenbontenbal.chorister.application.users.RegistrationService
 import nl.stevenbontenbal.chorister.application.config.ChoristerProperties
 import nl.stevenbontenbal.chorister.application.models.AcceptInviteRequest
 import nl.stevenbontenbal.chorister.application.models.InviteDetail

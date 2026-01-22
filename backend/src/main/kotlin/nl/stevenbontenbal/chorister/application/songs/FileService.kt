@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.application
+package nl.stevenbontenbal.chorister.application.songs
 
 import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
 import aws.sdk.kotlin.services.s3.S3Client

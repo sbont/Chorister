@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import nl.stevenbontenbal.chorister.create
 import nl.stevenbontenbal.chorister.domain.users.Choir
 import nl.stevenbontenbal.chorister.domain.songs.File
-import nl.stevenbontenbal.chorister.application.FileService
+import nl.stevenbontenbal.chorister.application.songs.FileService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

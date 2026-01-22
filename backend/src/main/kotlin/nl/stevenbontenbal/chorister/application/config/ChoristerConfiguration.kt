@@ -4,16 +4,15 @@ import com.zaxxer.hikari.HikariDataSource
 import nl.stevenbontenbal.chorister.api.CanonicalLinkCollector
 import nl.stevenbontenbal.chorister.api.ChoirContextFilter
 import nl.stevenbontenbal.chorister.api.SpaCsrfTokenRequestHandler
-import nl.stevenbontenbal.chorister.application.CategorisationService
-import nl.stevenbontenbal.chorister.application.FileService
-import nl.stevenbontenbal.chorister.application.RegistrationService
+import nl.stevenbontenbal.chorister.application.songs.CategorisationService
+import nl.stevenbontenbal.chorister.application.songs.FileService
+import nl.stevenbontenbal.chorister.application.users.RegistrationService
 import nl.stevenbontenbal.chorister.authorization.ZitadelJwtConverter
 import nl.stevenbontenbal.chorister.domain.events.Event
 import nl.stevenbontenbal.chorister.domain.events.EventEntry
 import nl.stevenbontenbal.chorister.domain.songs.*
 import nl.stevenbontenbal.chorister.domain.users.*
 import nl.stevenbontenbal.chorister.persistence.ChoirAwareDataSource
-import org.modelmapper.Converter
 import org.modelmapper.ModelMapper
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource
@@ -32,7 +31,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter

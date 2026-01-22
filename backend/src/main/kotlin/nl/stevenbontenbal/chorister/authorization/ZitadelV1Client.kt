@@ -1,7 +1,7 @@
 import io.netty.handler.logging.LogLevel
 import nl.stevenbontenbal.chorister.application.InvalidInputException
-import nl.stevenbontenbal.chorister.application.RegistrationRequest
-import nl.stevenbontenbal.chorister.application.UsernameAlreadyExistingException
+import nl.stevenbontenbal.chorister.application.users.RegistrationRequest
+import nl.stevenbontenbal.chorister.application.users.UsernameAlreadyExistingException
 import nl.stevenbontenbal.chorister.application.config.ZitadelProperties
 import nl.stevenbontenbal.chorister.authorization.AuthException
 import nl.stevenbontenbal.chorister.authorization.UserRole
