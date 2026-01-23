@@ -45,6 +45,7 @@ dependencies {
 
     implementation("aws.sdk.kotlin:s3:1.3.56")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("io.arrow-kt:arrow-core:2.2.1.1")
     implementation("org.jboss.logging:jboss-logging")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

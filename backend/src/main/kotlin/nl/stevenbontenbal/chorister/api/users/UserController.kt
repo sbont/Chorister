@@ -1,5 +1,6 @@
 package nl.stevenbontenbal.chorister.api.users
 
+import arrow.core.Either
 import nl.stevenbontenbal.chorister.api.users.models.UpdateUserRolesRequest
 import nl.stevenbontenbal.chorister.api.users.models.UserViewDto
 import nl.stevenbontenbal.chorister.api.users.views.UserViews
@@ -9,6 +10,8 @@ import nl.stevenbontenbal.chorister.domain.users.AccessLevel
 import nl.stevenbontenbal.chorister.domain.users.IUserRepository
 import nl.stevenbontenbal.chorister.domain.users.User
 import nl.stevenbontenbal.chorister.domain.users.UserService
+import nl.stevenbontenbal.chorister.shared.Failure
+import nl.stevenbontenbal.chorister.shared.Validation
 import nl.stevenbontenbal.chorister.shared.toOptional
 import org.springframework.data.rest.webmvc.BasePathAwareController
 import org.springframework.hateoas.server.ExposesResourceFor
@@ -25,7 +28,6 @@ import kotlin.jvm.optionals.getOrElse
 @ExposesResourceFor(User::class)
 class UserController(
     private val userService: UserService,
-    private val userRepository: IUserRepository
 ) {
     @GetMapping("/users/me")
     fun getCurrentUser(): ResponseEntity<User> {
@@ -68,19 +70,20 @@ class UserController(
         if (id == null)
             return ResponseEntity.badRequest().build()
 
-        val user = userRepository.findById(id).getOrElse {
-            return ResponseEntity.notFound().build()
-        }
-
-        if (user.id == userService.currentUser.id)
-            return ResponseEntity.badRequest().body("You can not update your own role")
-
         val accessLevel = request.roles.singleOrNull().toOptional().getOrElse {
             return ResponseEntity.badRequest().body("`roles` should exactly contain one role")
         }
 
-        userService.updateUserRole(user, accessLevel)
-        return ResponseEntity.ok(Result.success(accessLevel))
+        val result = userService.updateUserRole(id, accessLevel)
+        return when (result) {
+            is Either.Left<*> -> when (val v = result.value) {
+                is Validation.NotFound -> ResponseEntity.notFound().build()
+                is Failure.InvalidOperation -> ResponseEntity.badRequest().body(v.message)
+                else -> ResponseEntity.internalServerError().build()
+            }
+
+            is Either.Right<*> -> ResponseEntity.ok(Result.success(accessLevel))
+        }
     }
 
     /**
