@@ -1,11 +1,11 @@
-import { defineStore } from "pinia";
-import { CacheMap } from "@/types/cache-maps";
 import { useSongs } from "@/application/songStore";
+import { EntityRef, isNew } from "@/entities/entity";
+import { Event, EventEntry } from "@/entities/event";
+import { Uri } from "@/types";
+import { CacheMap } from "@/types/cache-maps";
+import { defineStore } from "pinia";
 import { computed, inject, ref } from "vue";
 import { ApiKey } from "./api";
-import { Event, EventEntry } from "@/entities/event";
-import { PageState, Uri } from "@/types";
-import { EntityCollectionRef, EntityRef, isNew } from "@/entities/entity";
 import { StoreState } from "./entityStore";
 
 export const useEvents = defineStore('events', () => {
@@ -112,7 +112,7 @@ export const useEvents = defineStore('events', () => {
     }
 
     function sortEntries(eventUri: Uri) {
-        let entries = entriesByEventUri.value.get(eventUri);
+        const entries = entriesByEventUri.value.get(eventUri);
         if (entries) {
             entriesByEventUri.value.set(eventUri, sort(entries));
         }
@@ -177,7 +177,7 @@ export const useEvents = defineStore('events', () => {
             }
         }
         const sequence = (entriesByEventUri.value.get(uri) ?? []).length + 1;
-        let newEntry: EventEntry = {
+        const newEntry: EventEntry = {
             event: new EntityRef(event),
             sequence,
             label: entry.label,
@@ -232,6 +232,7 @@ export const useEvents = defineStore('events', () => {
         entriesByEventUri2: entriesByEventUri,
         futureEvents,
         pastEvents,
+        allEvents,
         entries: getEntries,
         isLoading,
         initialize,

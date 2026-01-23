@@ -24,7 +24,7 @@
 import { useAuth } from "@/application/authStore";
 import { useEvents } from "@/application/eventStore";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { computed, watch } from "vue";
 import { useRouter } from "vue-router";
 
 // State
@@ -34,20 +34,25 @@ enum State {
     Redirecting
 }
 
-const state = ref<State>(State.Loading);
 const router = useRouter();
 const authStore = useAuth();
 const eventStore = useEvents();
-const { futureEvents, isLoading } = storeToRefs(eventStore);
-eventStore.initialize().then(() => setUpcoming());
 
-function setUpcoming() {
-    const upcoming = futureEvents.value[0];
-    if (upcoming) {
-        state.value = State.Redirecting;
-        router.push({ name: "Event", params: { id: upcoming.id } });
-    } else {
-        state.value = State.NotFound;
+const { futureEvents, isLoading } = storeToRefs(eventStore);
+const state = computed(() => isLoading.value ? State.Loading : (futureEvents.value.length ? State.Redirecting : State.NotFound));
+
+eventStore.initialize().then(() => redirectIfReady(isLoading.value));
+
+watch(isLoading, loading => {
+    redirectIfReady(loading);
+});
+
+function redirectIfReady(loading: boolean) {
+    if (!loading) {
+        const upcoming = futureEvents.value[0];
+        if (upcoming) {
+            router.push({ name: "Event", params: { id: upcoming.id } });
+        } 
     }
 }
 
