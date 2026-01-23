@@ -1,12 +1,13 @@
 <template>
     <div class="song">
-        <DetailHeader :title="title" :subtitle="subtitle"
+        <DetailHeader
+            :title="title" :subtitle="subtitle"
             :mode="state.mode === PageState.Ready ? 'view' : state.mode === PageState.Editing && state.isNew ? 'create' : 'edit'"
-            :onEdit="edit" :edit-disabled="state.mode === PageState.Loading" :onDelete="remove"
+            :on-edit="edit" :edit-disabled="state.mode === PageState.Loading" :on-delete="remove"
             entity="song"
         />
 
-        <div class="song-info m-2 columns" v-if="state.mode !== PageState.Loading">
+        <div v-if="state.mode !== PageState.Loading" class="song-info m-2 columns">
             <div class="column">
                 <div>
                     <div class="field is-horizontal">
@@ -14,13 +15,14 @@
                             <label class="label is-required">Title</label>
                         </div>
                         <div class="field-body">
-                            <div class="field" v-bind:class="{ static: state.mode !== PageState.Editing }">
+                            <div class="field" :class="{ static: state.mode !== PageState.Editing }">
                                 <div class="control">
                                     <span v-if="state.mode === PageState.Ready">
                                         {{ state.song.title }}
                                     </span>
 
-                                    <input v-else="state.mode === PageState.Editing || state.mode === PageState.Saving"
+                                    <input
+                                        v-else-if="state.mode === PageState.Editing"
                                         v-model="state.draft.title" class="input"
                                         :class="{ 'is-danger': v$.title.$error }" type="text"
                                         placeholder="The name of the song or hymn" @blur="v$.title.$touch" />
@@ -33,13 +35,14 @@
                             <label class="label">Composer</label>
                         </div>
                         <div class="field-body">
-                            <div class="field" v-bind:class="{ static: state.mode !== PageState.Editing }">
+                            <div class="field" :class="{ static: state.mode !== PageState.Editing }">
                                 <div class="control">
                                     <span v-if="state.mode === PageState.Ready">
                                         {{ state.song?.composer }}
                                     </span>
 
-                                    <input v-else v-model="state.draft.composer" class="input" type="text"
+                                    <input 
+                                        v-else v-model="state.draft.composer" class="input" type="text"
                                         placeholder="Artist / composer / writer" />
 
                                 </div>
@@ -52,12 +55,13 @@
                         </div>
                         <div class="field-body field-flex">
                             <div class="field-flex-col">
-                                <div class="field" v-bind:class="{ static: state.mode !== PageState.Editing }">
+                                <div class="field" :class="{ static: state.mode !== PageState.Editing }">
                                     <div class="control">
                                         <span v-if="state.mode === PageState.Ready">
                                             {{ state.song.songbook?.title }}
                                         </span>
-                                        <input v-else v-model="state.draft.songbook!.title" class="input" type="text"
+                                        <input
+                                            v-else v-model="state.draft.songbook!.title" class="input" type="text"
                                             placeholder="Songbook, hymnal or collection title" />
                                     </div>
                                 </div>
@@ -68,12 +72,13 @@
                                         <label class="label">Number</label>
                                     </div>
                                     <div class="field-body">
-                                        <div class="field" v-bind:class="{ static: state.mode !== PageState.Editing, }">
+                                        <div class="field" :class="{ static: state.mode !== PageState.Editing, }">
                                             <div class="control">
                                                 <span v-if="state.mode === PageState.Ready">
                                                     {{ state.song?.songbookNumber }}
                                                 </span>
-                                                <input v-else v-model="state.draft.songbookNumber" class="input"
+                                                <input
+                                                    v-else v-model="state.draft.songbookNumber" class="input"
                                                     type="text" placeholder="Song number in the book" />
                                             </div>
                                         </div>
@@ -82,22 +87,24 @@
                             </div>
                         </div>
                     </div>
-                    <div v-for="(categoryType) in categoryTypes.values()" class="field is-horizontal">
+                    <div v-for="(categoryType) in categoryTypes.values()" :key="categoryType.id" class="field is-horizontal">
                         <div class="field-label is-normal">
                             <label class="label">{{ categoryType.name }}</label>
                         </div>
                         <div class="field-body">
-                            <div class="field" v-bind:class="{ static: state.mode !== PageState.Editing }">
+                            <div class="field" :class="{ static: state.mode !== PageState.Editing }">
                                 <div class="control">
                                     <div class="select is-multiple">
-                                        <VueMultiselect v-if="state.mode == PageState.Editing"
-                                            :modelValue="state.categoriesByType.get(categoryType.uri!)!"
-                                            @update:modelValue="updateDraftCategories(categoryType.uri!)($event)"
-                                            :multiple="true" :options="categoriesByType.get(categoryType.uri!)"
-                                            track-by="name" label="name" :close-on-select="false"></VueMultiselect>
+                                        <VueMultiselect
+                                            v-if="state.mode == PageState.Editing"
+                                            :model-value="state.categoriesByType.get(categoryType.uri!)!"
+                                            :multiple="true"
+                                            :options="categoriesByType.get(categoryType.uri!)" track-by="name"
+                                            label="name" :close-on-select="false" @update:model-value="updateDraftCategories(categoryType.uri!)($event)"></VueMultiselect>
 
                                         <div v-else class="tags are-medium">
-                                            <span v-for="(category) in songCategoriesForType(categoryType.uri!)"
+                                            <span
+                                                v-for="(category) in songCategoriesForType(categoryType.uri!)"
                                                 :key="category.id" class="tag">
                                                 {{ category.name }}
                                             </span>
@@ -111,13 +118,14 @@
 
                 <div class="field is-grouped mt-5">
                     <p v-if="state.mode === PageState.Editing" class="control">
-                        <button @click="save" class="button is-link"
-                            :class="{ 'is-loading': state.isSaving, 'is-static': v$.$errors.length }">
+                        <button
+                            class="button is-link" :class="{ 'is-loading': state.isSaving, 'is-static': v$.$errors.length }"
+                            @click="save">
                             Save changes
                         </button>
                     </p>
                     <p v-if="state.mode === PageState.Editing" class="control">
-                        <button @click="cancelEdit" class="button">
+                        <button class="button" @click="cancelEdit">
                             Cancel
                         </button>
                     </p>
@@ -127,7 +135,8 @@
             <div class="column">
                 <div class="is-size-4">Play</div>
                 <div v-if="youtubeId && state.mode !== PageState.Editing" class="yt-wrapper">
-                    <iframe id="ytplayer" type="text/html" :src="'https://www.youtube.com/embed/' +
+                    <iframe 
+                        id="ytplayer" :src="'https://www.youtube.com/embed/' +
                         youtubeId +
                         '?autoplay=0'
                         " frameborder="0"></iframe>
@@ -136,7 +145,8 @@
                     <div class="field-body">
                         <div class="field">
                             <div class="control">
-                                <input v-model="state.draft.recordingUrl" class="input" type="url"
+                                <input
+                                    v-model="state.draft.recordingUrl" class="input" type="url"
                                     placeholder="https://www.youtube.com/watch?v=..." />
                             </div>
                         </div>
@@ -145,6 +155,7 @@
 
                 <div class="text">
                     <div class="is-size-4">Text</div>
+                    <!-- eslint-disable-next-line vue/no-v-html -->
                     <div v-if="state.mode === PageState.Ready" v-html="state.song.text"></div>
                     <div v-else>
                         <editor-content :editor="editor" />
@@ -228,11 +239,7 @@ const toast = useToast();
 const { categoryTypes, categoriesByType } = storeToRefs(categoryStore);
 const state = ref<SongDetailState>({ mode: PageState.Loading });
 
-// const song = ref<Song>()
-// const draftValues = ref<DraftSong>();
-
 const songCategoriesForType = computed(() => (uri: Uri) => (categoryStore.songCategories(songId) ?? []).filter(c => c.categoryType?.uri === uri));
-// const draftCategoriesByType = ref<CacheListMap<Uri, Category>>();
 
 const rules = {
     title: { required },
@@ -356,7 +363,7 @@ const save = async () => {
 const remove = () => {
     if (state.value.mode === PageState.Ready) {
         songStore.deleteSong(state.value.song)
-            .then((_) => {
+            .then(() => {
                 toast.add({ severity: "info", summary: "Song deleted.", life: 3000 });
                 router.push({ name: "Repertoire" });
             })
@@ -370,7 +377,11 @@ const edit = () => {
 
     const song = state.value.song;
     const categoriesByType = new CacheListMap<Uri, Category>();
-    categoryStore.songCategories(songId).forEach(c => categoriesByType.addTo(c.categoryType!.uri, c));
+    categoryStore.songCategories(songId).forEach(c => {
+        if (c.categoryType?.uri)
+            categoriesByType.addTo(c.categoryType.uri, c)
+    });
+
     state.value = {
         mode: PageState.Editing,
         draft: {
@@ -382,7 +393,7 @@ const edit = () => {
         categoriesByType
     }
     state.value.draft.songbook ??= {};
-    editor.value!.commands.setContent(song.text ?? "");
+    editor.value?.commands.setContent(song.text ?? "");
 }
 
 const cancelEdit = () => {
