@@ -3,10 +3,10 @@ package nl.stevenbontenbal.chorister.api.songs
 import io.kotest.matchers.shouldBe
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
-import nl.stevenbontenbal.chorister.create
-import nl.stevenbontenbal.chorister.domain.users.Choir
-import nl.stevenbontenbal.chorister.domain.songs.File
 import nl.stevenbontenbal.chorister.application.songs.FileService
+import nl.stevenbontenbal.chorister.application.users.create
+import nl.stevenbontenbal.chorister.domain.songs.File
+import nl.stevenbontenbal.chorister.domain.users.Choir
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

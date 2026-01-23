@@ -1,16 +1,18 @@
-package nl.stevenbontenbal.chorister.application
+package nl.stevenbontenbal.chorister.application.songs
 
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import nl.stevenbontenbal.chorister.api.songs.CategoryRepository
 import nl.stevenbontenbal.chorister.application.config.ChoristerConfiguration
 import nl.stevenbontenbal.chorister.application.config.ChoristerProperties
+import nl.stevenbontenbal.chorister.application.users.create
 import nl.stevenbontenbal.chorister.create
 import nl.stevenbontenbal.chorister.domain.songs.Category
+import nl.stevenbontenbal.chorister.domain.songs.ICategoryRepository
+import nl.stevenbontenbal.chorister.domain.songs.ICategoryTypeRepository
 import nl.stevenbontenbal.chorister.domain.users.Choir
-import nl.stevenbontenbal.chorister.api.songs.CategoryRepository
-import nl.stevenbontenbal.chorister.application.songs.CategorisationService
 import org.junit.jupiter.api.Test
 import org.junit.runner.RunWith
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
@@ -27,14 +29,14 @@ class CategorisationServiceTests {
             "",
             "",
             "",
-            ChoristerProperties.DefaultCategories(listOf("Test1", "Test2"), listOf("Test3")),
-            ChoristerProperties.DataSource(DataSourceProperties())
+            ChoristerProperties.DataSource(DataSourceProperties(), DataSourceProperties())
         )
-        val choir = Choir.create(null)
+        val choir = Choir.Companion.create(null)
         val slot = slot<Iterable<Category>>()
-        val categoryRepository: CategoryRepository = mockk(relaxed = true)
+        val categoryTypeRepository: ICategoryTypeRepository = mockk(relaxed = true)
+        val categoryRepository: ICategoryRepository = mockk(relaxed = true)
         every { categoryRepository.saveAll(capture(slot)) }.answers { slot.captured }
-        val target = CategorisationService(properties, categoryRepository)
+        val target = CategorisationService(categoryRepository, categoryTypeRepository)
         // Act
         target.createDefaultCategories(choir)
         // Assert

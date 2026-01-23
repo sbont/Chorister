@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.application
+package nl.stevenbontenbal.chorister.application.users
 
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
@@ -6,7 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import nl.stevenbontenbal.chorister.application.config.ZitadelProperties
-import nl.stevenbontenbal.chorister.application.models.AcceptInviteRequest
+import nl.stevenbontenbal.chorister.application.users.models.AcceptInviteRequest
 import nl.stevenbontenbal.chorister.authorization.ZitadelService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,7 +17,6 @@ import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.ExchangeFunction
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-
 
 @RunWith(SpringRunner::class)
 class ZitadelUserServiceTests {
@@ -36,7 +35,8 @@ class ZitadelUserServiceTests {
     fun `when postUser then webclient does request`() {
         // Arrange
         val request = AcceptInviteRequest(
-            displayName = "Test",
+            firstName = "John",
+            lastName = "Doe",
             email = "test@example.com",
             password = "123456",
             token = "qwerty"

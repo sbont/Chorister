@@ -4,7 +4,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
-import nl.stevenbontenbal.chorister.create
+import nl.stevenbontenbal.chorister.application.users.create
 import nl.stevenbontenbal.chorister.domain.users.User
 import nl.stevenbontenbal.chorister.domain.users.UserService
 import org.junit.jupiter.api.BeforeEach

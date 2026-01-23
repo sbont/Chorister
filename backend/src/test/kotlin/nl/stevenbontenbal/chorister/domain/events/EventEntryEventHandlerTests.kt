@@ -6,6 +6,9 @@ import io.mockk.mockk
 import io.mockk.verify
 import nl.stevenbontenbal.chorister.api.events.EventEntryRepository
 import nl.stevenbontenbal.chorister.application.config.ChoristerConfiguration
+import nl.stevenbontenbal.chorister.application.events.create
+import nl.stevenbontenbal.chorister.application.songs.create
+import nl.stevenbontenbal.chorister.application.users.create
 import nl.stevenbontenbal.chorister.create
 import nl.stevenbontenbal.chorister.domain.events.events.EventEntryEventHandler
 import nl.stevenbontenbal.chorister.domain.songs.Song

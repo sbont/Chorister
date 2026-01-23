@@ -1,7 +1,8 @@
 package nl.stevenbontenbal.chorister.api.songs
 
 import io.kotest.matchers.shouldBe
-import nl.stevenbontenbal.chorister.create
+import nl.stevenbontenbal.chorister.application.songs.create
+import nl.stevenbontenbal.chorister.application.users.create
 import nl.stevenbontenbal.chorister.domain.songs.Category
 import nl.stevenbontenbal.chorister.domain.songs.CategoryType
 import nl.stevenbontenbal.chorister.domain.users.Choir
@@ -20,8 +21,12 @@ class CategoryRepositoryTests @Autowired constructor(
         // Arrange
         val choir = Choir.create()
         entityManager.persist(choir)
-        val categoryLiturgical = Category.create(choir, CategoryType.LITURGICAL_MOMENT)
-        val categorySeasonal = Category.create(choir, CategoryType.SEASON)
+        val categoryType1 = CategoryType(choir = choir, name = "Season")
+        val categoryType2 = CategoryType(choir = choir, name = "Liturgy")
+        entityManager.persist(categoryType1)
+        entityManager.persist(categoryType2)
+        val categoryLiturgical = Category.create(choir, categoryType1)
+        val categorySeasonal = Category.create(choir, categoryType2)
         entityManager.persist(categoryLiturgical)
         entityManager.persist(categorySeasonal)
         // Act
@@ -35,8 +40,10 @@ class CategoryRepositoryTests @Autowired constructor(
         // Arrange
         val choir = Choir.create()
         entityManager.persist(choir)
-        val category1 = Category(name = "Advent", categoryType = CategoryType.SEASON, choir = choir)
-        val category2 = Category.create(choir, CategoryType.SEASON)
+        val categoryType = CategoryType.create(choir)
+        entityManager.persist(categoryType)
+        val category1 = Category(name = "Advent", categoryType = categoryType, choir = choir)
+        val category2 = Category.create(choir, categoryType)
         entityManager.persist(category1)
         entityManager.persist(category2)
         // Act
@@ -50,7 +57,9 @@ class CategoryRepositoryTests @Autowired constructor(
         // Arrange
         val choir = Choir.create()
         entityManager.persist(choir)
-        val category1 = Category.create(choir, CategoryType.SEASON)
+        val categoryType = CategoryType.create(choir)
+        entityManager.persist(categoryType)
+        val category1 = Category.create(choir, categoryType)
         entityManager.persist(category1)
         // Act
         val actual = categoryRepository.findByName("Advent")

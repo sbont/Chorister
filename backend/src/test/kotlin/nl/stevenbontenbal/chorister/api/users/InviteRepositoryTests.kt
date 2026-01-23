@@ -4,7 +4,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.beNull
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldNot
-import nl.stevenbontenbal.chorister.create
+import nl.stevenbontenbal.chorister.application.users.create
 import nl.stevenbontenbal.chorister.domain.users.Choir
 import nl.stevenbontenbal.chorister.domain.users.Invite
 import org.junit.jupiter.api.Test

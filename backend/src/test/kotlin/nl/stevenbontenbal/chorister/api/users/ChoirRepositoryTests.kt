@@ -1,8 +1,9 @@
 package nl.stevenbontenbal.chorister.api.users
 
 import io.kotest.matchers.shouldBe
-import nl.stevenbontenbal.chorister.create
+import nl.stevenbontenbal.chorister.application.users.create
 import nl.stevenbontenbal.chorister.domain.users.Choir
+import nl.stevenbontenbal.chorister.domain.users.IChoirRepository
 import nl.stevenbontenbal.chorister.domain.users.User
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,39 +15,8 @@ import org.springframework.test.context.TestPropertySource
 @TestPropertySource(properties = ["spring.jpa.hibernate.ddl-auto=create-drop"])
 class ChoirRepositoryTests @Autowired constructor(
     val entityManager: TestEntityManager,
-    val choirRepository: ChoirRepository,
+    val choirRepository: IChoirRepository,
 ) {
-    @Test
-    fun `When findByName and exists then return Choir`() {
-        // Arrange
-        val manager = User.create()
-        entityManager.persist(manager)
-        val myChoir = Choir(
-            name = "MyChoir",
-            type = "Band",
-            manager = manager)
-        val otherChoir = Choir(
-            name = "OtherChoir",
-            type = "Band",
-            manager = null)
-        entityManager.persist(myChoir)
-        entityManager.persist(otherChoir)
-        // Act
-        val actual = choirRepository.findByName(myChoir.name)
-        // Assert
-        actual!!.id shouldBe myChoir.id
-    }
-
-    @Test
-    fun `When findByName and not exists then return null`() {
-        // Arrange
-        val otherChoir = Choir.create(null)
-        entityManager.persist(otherChoir)
-        // Act
-        val actual = choirRepository.findByName("Non-Existent Choir")
-        // Assert
-        actual shouldBe null
-    }
     @Test
     fun `When findByInviteToken and exists then return Choir`() {
         // Arrange

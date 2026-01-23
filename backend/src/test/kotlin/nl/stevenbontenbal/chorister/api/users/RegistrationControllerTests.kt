@@ -5,11 +5,12 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import nl.stevenbontenbal.chorister.application.users.RegistrationService
 import nl.stevenbontenbal.chorister.application.config.ChoristerProperties
-import nl.stevenbontenbal.chorister.application.models.AcceptInviteRequest
-import nl.stevenbontenbal.chorister.application.models.InviteDetail
-import nl.stevenbontenbal.chorister.application.models.NewChoirRegistrationRequest
+import nl.stevenbontenbal.chorister.application.users.RegistrationService
+import nl.stevenbontenbal.chorister.application.users.create
+import nl.stevenbontenbal.chorister.application.users.models.AcceptInviteRequest
+import nl.stevenbontenbal.chorister.application.users.models.InviteDetail
+import nl.stevenbontenbal.chorister.application.users.models.NewChoirRegistrationRequest
 import nl.stevenbontenbal.chorister.create
 import nl.stevenbontenbal.chorister.domain.users.Choir
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +31,7 @@ class RegistrationControllerTests {
     inner class Register {
         @Test
         fun `when new choir it calls registrationService`() {
-            val request = NewChoirRegistrationRequest("M. Choir", "email@choir.co", "!@#$%^&*()", "MyChoir")
+            val request = NewChoirRegistrationRequest("John", "Doe", "email@choir.co", "!@#$%^&*()", "MyChoir")
             target.register(request)
 
             verify { registrationService.register(request) }
@@ -38,7 +39,7 @@ class RegistrationControllerTests {
 
         @Test
         fun `when accept invite it calls registrationService`() {
-            val request = AcceptInviteRequest("M. Choir", "email@choir.co", "!@#$%^&*()", "5675756-86769-8565765")
+            val request = AcceptInviteRequest("John", "Doe", "email@choir.co", "!@#$%^&*()", "5675756-86769-8565765")
             target.register(request)
 
             verify { registrationService.register(request) }

@@ -1,11 +1,13 @@
 package nl.stevenbontenbal.chorister.api.events
 
 import io.kotest.matchers.collections.shouldHaveSize
-import nl.stevenbontenbal.chorister.create
-import nl.stevenbontenbal.chorister.domain.users.Choir
+import nl.stevenbontenbal.chorister.application.events.create
+import nl.stevenbontenbal.chorister.application.songs.create
+import nl.stevenbontenbal.chorister.application.users.create
 import nl.stevenbontenbal.chorister.domain.events.Event
 import nl.stevenbontenbal.chorister.domain.events.EventEntry
 import nl.stevenbontenbal.chorister.domain.songs.Song
+import nl.stevenbontenbal.chorister.domain.users.Choir
 import nl.stevenbontenbal.chorister.persist
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
