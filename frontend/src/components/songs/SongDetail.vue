@@ -3,8 +3,10 @@
         <DetailHeader
             :title="title" :subtitle="subtitle"
             :mode="state.mode === PageState.Ready ? 'view' : state.mode === PageState.Editing && state.isNew ? 'create' : 'edit'"
-            :on-edit="edit" :edit-disabled="state.mode === PageState.Loading" :on-delete="remove"
-            entity="song"
+            :edit-disabled="state.mode === PageState.Loading" entity="song"
+            @edit="edit"
+            @delete="remove"
+            @cancel-edit="cancelEdit"
         />
 
         <div v-if="state.mode !== PageState.Loading" class="song-info m-2 columns">
@@ -124,11 +126,11 @@
                             Save changes
                         </button>
                     </p>
-                    <p v-if="state.mode === PageState.Editing" class="control">
+                    <!-- <p v-if="state.mode === PageState.Editing" class="control">
                         <button class="button" @click="cancelEdit">
                             Cancel
                         </button>
-                    </p>
+                    </p> -->
                 </div>
             </div>
 

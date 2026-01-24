@@ -1,43 +1,46 @@
 <template>
     <section class="hero is-info">
         <div class="hero-body">
-            <div class="is-flex">
-                <div class="is-flex-grow-1">
+            <div class="is-flex is-flex-wrap-wrap is-gap-1">
+                <div class="is-flex is-flex-grow-1 is-flex-direction-column is-justify-content-center">
                     <p v-if="subtitle && subtitleOnTop" class="subtitle">
                         {{ mode == "view" ? subtitle : "&nbsp;" }}
                     </p>
                     <p class="title">
                         {{ mode == "view" ? title : mode == "create" ? "Create new" : "Edit" }}
                     </p>
-                    <p v-if="subtitle && !subtitleOnTop" class="subtitle">
-                        {{ mode == "view" ? subtitle : "&nbsp;" }}
+                    <p v-if="mode == 'view' && subtitle && !subtitleOnTop" class="subtitle">
+                        {{ subtitle }}
                     </p>
                 </div>
-                <div class="is-flex my-3 is-flex field is-grouped">
-                    <div v-if="mode == 'view'">
-                        <p v-for="button in accessibleActions" :key="button.label" class="control">
-                            <button class="button is-link is-inverted" @click="button.action">{{ button.label
-                            }}</button>
-                        </p>
+                <div class="is-flex is-justify-content-flex-end is-align-items-center	 is-gap-0-5">
+                    <div v-if="mode == 'view'" class="contents">
+                        <div v-for="button in accessibleActions" :key="button.label" class="control">
+                            <button class="button is-link is-inverted" @click="button.action">
+                                {{ button.label }}
+                            </button>
+                        </div>
                     </div>
                     
-                    <p v-if="onEdit && mode == 'view' && authStore.userCan('update', entity)" class="control">
+                    <div v-if="!editDisabled && mode == 'view' && authStore.userCan('update', entity)" class="control">
                         <button 
-                        class="button is-link is-inverted" 
-                        :disabled="editDisabled"
-                        @click="$emit('edit')">Edit</button>
-                    </p>
-                    <p v-if="onCancelEdit && mode == 'edit'" class="control">
-                        <button class="button" @click="$emit('cancelEdit')">Cancel</button>
-                    </p>
-                    <p v-if="onDelete && mode == 'view' && authStore.userCan('delete', entity)" class="control">
+                            class="button is-link is-inverted" 
+                            :disabled="editDisabled"
+                            @click="emit('edit')">
+                            Edit
+                        </button>
+                    </div>
+                    <div v-if="mode == 'edit'" class="control">
+                        <button class="button" @click="emit('cancelEdit')">Cancel</button>
+                    </div>
+                    <div v-if="!deleteDisabled && mode == 'view' && authStore.userCan('delete', entity)" class="control">
                         <button 
-                        class="button is-danger is-inverted" 
-                        :disabled="deleteDisabled"
-                        @click="confirmDelete()">
-                        Delete
-                    </button>
-                </p>
+                            class="button is-danger is-inverted" 
+                            :disabled="deleteDisabled"
+                            @click="confirmDelete()">
+                            Delete
+                        </button>
+                    </div>
             </div>
         </div>
     </div>
@@ -62,9 +65,7 @@
         subtitleOnTop?: boolean
         mode?: PageMode
         entity: EntityType
-        onEdit?: (_: MouseEvent) => void
         editDisabled?: boolean
-        onDelete?: (_: MouseEvent) => void
         deleteDisabled?: boolean
         onCancelEdit?: (_: MouseEvent) => void
         customActions?: Array<{ action: () => void, label: string, disabled?: boolean, accessLevel: Role }>
@@ -107,3 +108,32 @@
     }
     
 </script>
+<style lang="css">
+.mx--1 {
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
+}
+
+.contents {
+    display: contents;
+}
+
+.is-gap-0-5 {
+    gap: 0.5rem;
+}
+
+.is-gap-1 {
+    gap: 1rem;
+}
+
+@media (max-width: 600px) {
+    .hero-body {
+        padding: 1.5rem 1.5rem;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+}
+
+</style>
