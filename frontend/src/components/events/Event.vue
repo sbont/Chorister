@@ -25,13 +25,18 @@
                         </template>
                     </Column>
 
-                    <Column field="song.embedded.composer" header="Composer"></Column>
-                    <Column field="song.embedded.recordingUrl" header="Recording">
+                    <Column :hidden="breakpoints.active().value === 'mobile'" field="song.embedded.composer" header="Composer"></Column>
+                    <Column field="song.embedded.recordingUrl">
+                        <template #header="">
+                            <h2 class="p-datatable-column-title">{{ breakpoints.active().value === "mobile" ? '' : 'Recording' }}</h2>
+                        </template>
                         <template #body="slotProps">
                             <a
                                 v-if="(slotProps.data as EventEntry).song?.embedded?.recordingUrl"
                                 :href="(slotProps.data as EventEntry).song?.embedded?.recordingUrl" target="_blank">
-                                Link
+                                <span class="icon">
+                                    <i class="fab fa-youtube"></i>
+                                </span>
                             </a>
                         </template>
                     </Column>
@@ -73,6 +78,8 @@ import { useAuth } from "@/application/authStore";
 import EventRowDetail from "./EventRowDetail.vue";
 import { useToast } from "primevue/usetoast";
 import { AxiosError } from "axios";
+import { useBreakpoints } from '@vueuse/core'
+
 
 type State = "ready" | "loading" | DeletingState;
 type DeletingState = {
@@ -84,6 +91,12 @@ const route = useRoute();
 const authStore = useAuth();
 const eventStore = useEvents();
 const toast = useToast();
+const breakpoints = useBreakpoints({
+  mobile: 0,
+  tablet: 640,
+  laptop: 1024,
+  desktop: 1280,
+});
 
 const state = ref<State>("loading");
 const eventId = Number(route.params.id);
@@ -160,6 +173,10 @@ function isDeleting(entry: EventEntry) {
 
 .first-col, .expander-col {
     width: 1rem;
+}
+
+.p-datatable-tbody>tr>td.expander-col {
+    padding: 0.5em 0;
 }
 
 .p-datatable-tbody>tr:has(+ .p-datatable-row-expansion) td {
