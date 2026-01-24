@@ -4,9 +4,11 @@
             :title="title" :subtitle="subtitle"
             :mode="state.mode === PageState.Ready ? 'view' : state.mode === PageState.Editing && state.isNew ? 'create' : 'edit'"
             :edit-disabled="state.mode === PageState.Loading" entity="song"
+            :saving="state.mode == PageState.Editing && state.isSaving"
             @edit="edit"
             @delete="remove"
             @cancel-edit="cancelEdit"
+            @save="save"
         />
 
         <div v-if="state.mode !== PageState.Loading" class="song-info m-2 columns">
@@ -116,21 +118,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="field is-grouped mt-5">
-                    <p v-if="state.mode === PageState.Editing" class="control">
-                        <button
-                            class="button is-link" :class="{ 'is-loading': state.isSaving, 'is-static': v$.$errors.length }"
-                            @click="save">
-                            Save changes
-                        </button>
-                    </p>
-                    <!-- <p v-if="state.mode === PageState.Editing" class="control">
-                        <button class="button" @click="cancelEdit">
-                            Cancel
-                        </button>
-                    </p> -->
                 </div>
             </div>
 

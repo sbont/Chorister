@@ -1,44 +1,41 @@
 <template>
     <div class="event-detail">
-        <DetailHeader :mode="pageState" :title="event?.name" :subtitle="event ? format(event?.date) : ''" :onEdit="edit"
-            :onDelete="remove" @cancel-edit="cancelEdit"
-            :customActions="[{ 'label': 'Export texts', action: exportText, accessLevel: 'EDITOR' }]"
-            entity="event" />
+        <DetailHeader
+            :mode="pageState" :title="event?.name" :subtitle="event ? format(event?.date) : ''" :on-edit="edit"
+            :on-delete="remove" :custom-actions="[{ 'label': 'Export texts', action: exportText, accessLevel: 'EDITOR' }]"
+            entity="event"
+            :saving="saving"
+            @edit="edit"
+            @cancel-edit="cancelEdit"
+            @save="save" />
 
         <div v-if="!loading">
-            <div v-if="error">{{ error }}</div>
             <div class="event-info m-3 is-flex is-justify-content-flex-end">
-                <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="pageState != 'view' && draftValues">
+                <div v-if="pageState != 'view' && draftValues" class="field is-horizontal is-flex-grow-1 mr-3">
                     <div class="field-label is-normal">
                         <label class="label">Name</label>
                     </div>
                     <div class="field-body">
-                        <div class="field" v-bind:class="{ static: false }">
+                        <div class="field" :class="{ static: false }">
                             <div class="control">
-                                <input v-model="draftValues.name" class="input" type="text"
+                                <input  
+                                    v-model="draftValues.name" class="input" type="text"
                                     placeholder="Easter Morning Service" />
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="field is-horizontal is-flex-grow-1 mr-3" v-if="pageState != 'view' && draftValues">
+                <div v-if="pageState != 'view' && draftValues" class="field is-horizontal is-flex-grow-1 mr-3">
                     <div class="field-label is-normal">
                         <label class="label">Date</label>
                     </div>
                     <div class="field-body">
-                        <div class="field" v-bind:class="{ static: false }">
+                        <div class="field" :class="{ static: false }">
                             <div class="control">
                                 <input v-model="draftValues.date" class="input" type="date" />
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="field is-grouped">
-                    <p v-if="pageState != 'view'" class="control">
-                        <button @click="save" class="button is-link" :class="{ 'is-loading': saving }">
-                            Save changes
-                        </button>
-                    </p>
                 </div>
             </div>
         </div>
@@ -52,7 +49,7 @@ import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { isNew } from "@/entities/entity";
 import DetailHeader from "../ui/DetailHeader.vue";
-import { PageMode, PageState } from "@/types";
+import { PageMode } from "@/types";
 
 type DraftEvent = Partial<Event>;
 

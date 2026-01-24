@@ -13,7 +13,7 @@
                         {{ subtitle }}
                     </p>
                 </div>
-                <div class="is-flex is-justify-content-flex-end is-align-items-center	 is-gap-0-5">
+                <div class="is-flex is-flex-grow-1 is-justify-content-flex-end is-align-items-center	 is-gap-0-5">
                     <div v-if="mode == 'view'" class="contents">
                         <div v-for="button in accessibleActions" :key="button.label" class="control">
                             <button class="button is-link is-inverted" @click="button.action">
@@ -32,6 +32,15 @@
                     </div>
                     <div v-if="mode == 'edit'" class="control">
                         <button class="button" @click="emit('cancelEdit')">Cancel</button>
+                    </div>
+                    <div v-if="mode == 'edit' && authStore.userCan('update', entity)" class="control">
+                        <button 
+                            class="button" 
+                            :class="{ 'is-loading': saving, 'is-link is-inverted': !saving }"
+                            :disabled="editDisabled"
+                            @click="emit('save')">
+                            Save
+                        </button>
                     </div>
                     <div v-if="!deleteDisabled && mode == 'view' && authStore.userCan('delete', entity)" class="control">
                         <button 
@@ -57,7 +66,7 @@
     import { useConfirm } from 'primevue/useconfirm';
     import ConfirmDialog from 'primevue/confirmdialog';
     
-    const emit = defineEmits(["edit", "delete", "cancelEdit"]);
+    const emit = defineEmits(["edit", "delete", "cancelEdit", "save"]);
     
     interface Props {
         title?: string
@@ -67,7 +76,7 @@
         entity: EntityType
         editDisabled?: boolean
         deleteDisabled?: boolean
-        onCancelEdit?: (_: MouseEvent) => void
+        saving?: boolean
         customActions?: Array<{ action: () => void, label: string, disabled?: boolean, accessLevel: Role }>
     }
     
