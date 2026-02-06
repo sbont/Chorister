@@ -33,7 +33,7 @@
                     <div v-if="mode == 'edit'" class="control">
                         <button class="button" @click="emit('cancelEdit')">Cancel</button>
                     </div>
-                    <div v-if="mode == 'edit' && authStore.userCan('update', entity)" class="control">
+                    <div v-if="mode == 'create' && authStore.userCan('create', entity) || mode == 'edit' && authStore.userCan('update', entity)" class="control">
                         <button 
                             class="button" 
                             :class="{ 'is-loading': saving, 'is-link is-inverted': !saving }"
