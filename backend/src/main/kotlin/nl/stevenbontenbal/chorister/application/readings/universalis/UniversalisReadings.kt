@@ -1,4 +1,4 @@
-package nl.stevenbontenbal.chorister.application.readings
+package nl.stevenbontenbal.chorister.application.readings.universalis
 
 import kotlinx.serialization.Serializable
 

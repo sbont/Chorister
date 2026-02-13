@@ -1,19 +1,18 @@
-package nl.stevenbontenbal.chorister.application.readings
+package nl.stevenbontenbal.chorister.application.readings.universalis
 
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.raise.either
 import arrow.core.right
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.reactor.awaitSingle
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-
+import nl.stevenbontenbal.chorister.application.readings.Copyright
+import nl.stevenbontenbal.chorister.application.readings.Reading
+import nl.stevenbontenbal.chorister.application.readings.Readings
 import nl.stevenbontenbal.chorister.shared.Failure
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
-import reactor.core.publisher.Mono
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -23,10 +22,10 @@ class UniversalisReadingsProvider {
         .build()
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
 
-    public suspend fun getReadings(date: LocalDate) {
+    public suspend fun getReadings(date: LocalDate): Either<Failure.Unexpected, Readings> {
         val englandWales = "/Europe.England.Westminster"
         val dateParam = date.format(dateFormatter)
-        val response = Either.catch {
+        return Either.Companion.catch {
             webClient
                 .get()
                 .uri("/${englandWales}/${dateParam}/jsonpmass.js")
@@ -36,7 +35,8 @@ class UniversalisReadingsProvider {
         }
             .mapLeft { Failure.Unexpected(it.message ?: "Error while retrieving readings from Universalis" ) }
             .flatMap { retrieveJsonFromResponse(it) }
-            .map { Json.decodeFromString(UniversalisReadings.serializer(), it) }
+            .map { Json.Default.decodeFromString(UniversalisReadings.serializer(), it) }
+            .map { map(it) }
 
     }
 
@@ -51,8 +51,30 @@ class UniversalisReadingsProvider {
         }
     }
 
-    private fun map(dto: UniversalisReadings): Readings  {
+    private fun map(dto: UniversalisReadings): Readings {
+        return Readings(
+            date = dto.date,
+            day = dto.day,
+            reading1 = mapReading(dto.Mass_R1),
+            psalm = mapReading(dto.Mass_Ps),
+            reading2 = dto.Mass_R2?.let { mapReading(it) },
+            gospelAcclamation = mapReading(dto.Mass_GA),
+            gospelReading = mapReading(dto.Mass_G),
+            copyright = mapCopyright(dto.copyright)
+        )
+    }
 
+    private fun mapReading(readingDto: nl.stevenbontenbal.chorister.application.readings.universalis.Reading): Reading {
+        return Reading(
+            source = readingDto.source,
+            text = readingDto.text
+        )
+    }
+
+    private fun mapCopyright(copyrightDto: nl.stevenbontenbal.chorister.application.readings.universalis.Copyright): Copyright {
+        return Copyright(
+            text = copyrightDto.text
+        )
     }
 
     companion object {
