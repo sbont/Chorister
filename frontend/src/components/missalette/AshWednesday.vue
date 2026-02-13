@@ -82,6 +82,17 @@
 
     <h2>The Homily</h2>
 
+    <h2>Blessing of Ashes</h2>
+
+    <h2>Distribution of Ashes</h2>
+
+    <div class="distribution-of-ashes">
+      <p><i>The Priest places ashes on the head of all those present who come to him, and says to each one:</i></p>
+      <p>Repent, and believe in the Gospel.<br>
+        Or:<br>
+        Remember that you are dust, and to dust you shall return.</p>
+    </div>
+
     <h2>The Prayer of the Faithful</h2>
 
     <div class="prayer-of-faithful">
@@ -215,6 +226,28 @@
   </div>
 </template>
 
+<script setup lang="ts">
+import { useRoute } from "vue-router";
+import { computed, ref } from "vue";
+import { Event } from "@/entities/event";
+import { useEvents } from "@/application/eventStore";
+import { storeToRefs } from "pinia";
+
+const eventStore = useEvents();
+const route = useRoute();
+
+// state
+const eventId = Number(route.params.id);
+const { entries: getEntries } = storeToRefs(eventStore);
+const event = ref<Event>();
+const entries = computed(() => event.value?.uri ? getEntries.value(event.value.uri) : []);
+eventStore.fetch(eventId).then((result) => {
+    event.value = result;
+});
+
+</script>
+
+
 <style scoped>
 .mass-order {
   font-family: 'Times New Roman', serif;
@@ -270,6 +303,10 @@ h3 {
   margin: 1em 0;
   text-align: center;
   font-weight: bold;
+}
+
+.distribution-of-ashes, .prayer-of-faithful {
+  margin: 1em 0;
 }
 
 .preface {

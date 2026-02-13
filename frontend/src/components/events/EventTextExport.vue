@@ -23,7 +23,7 @@ const route = useRoute();
 const eventId = Number(route.params.id);
 const { entries: getEntries } = storeToRefs(eventStore);
 const event = ref<Event>();
-const entries = computed(() => event.value ? getEntries.value(event.value.uri!) : []);
+const entries = computed(() => event.value?.uri ? getEntries.value(event.value.uri) : []);
 eventStore.fetch(eventId).then((result) => {
     event.value = result;
 });
