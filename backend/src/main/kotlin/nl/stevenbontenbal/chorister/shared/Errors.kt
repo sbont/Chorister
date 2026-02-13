@@ -10,4 +10,8 @@ interface Failure : ChoristerError {
     data class InvalidOperation(
         val message: String
     ) : Failure
+
+    data class Unexpected(
+        val message: String
+    )
 }
