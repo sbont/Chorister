@@ -15,11 +15,9 @@
 
 <script setup lang="ts">
 import { useFiles } from '@/application/fileStore';
-import { Score } from '@/entities/score';
-import { downloadFile } from '@/services/fileService';
+import { downloadFile } from '@/services/file.service';
 import { extension } from 'mime-types';
 import { useToast } from 'primevue/usetoast';
-import { PropType, ref } from 'vue';
 
 const props = defineProps({
     fileInfoUri: {

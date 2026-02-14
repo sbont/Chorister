@@ -9,8 +9,7 @@ import { Score as DomainScore } from "@/entities/score";
 import { Song as DomainSong } from "@/entities/song";
 import { User as DomainUser } from "@/entities/user";
 import { ApiEntityIn, ApiEntityOut } from "@/services/apiTypes";
-import { useAuth } from "@/application/authStore";
-import axios, { AxiosInstance } from "axios";
+import { AxiosInstance } from "axios";
 import { Category, fromDomainCategory, toDomainCategory } from "./apiTypes/category";
 import { CategoryType, fromDomainCategoryType, toDomainCategoryType } from "./apiTypes/categoryType";
 import { Choir, fromDomainChoir, toDomainChoir } from "./apiTypes/choir";
@@ -32,13 +31,12 @@ import { fromDomainSong, SongIn, SongOut, toDomainSong } from "./apiTypes/song";
 import { fromDomainUser, toDomainUser, User } from "./apiTypes/user";
 import { Uri } from "@/types";
 import { SingleInvite, toDomainInvite } from "@/services/apiTypes/invite";
-import { ApiError } from "@/types/api-error";
 import { Role } from "@/types/role";
+import BaseService from "./base.service";
 
 const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + "/api";
 
-export default class ChoristerApi implements IChoristerApi {
-    private readonly instance: AxiosInstance;
+export default class ChoristerApi extends BaseService implements IChoristerApi {
     private choirs: ChoirsEndpoint;
     private registration: RegistrationEndpoint;
     private invite: InviteEndpoint;
@@ -54,23 +52,7 @@ export default class ChoristerApi implements IChoristerApi {
     public readonly categoryTypes: EntityEndpoint<DomainCategoryType, CategoryType, CategoryType>;
 
     constructor() {
-        this.instance = axios.create({
-            baseURL: SERVER_URL,
-            timeout: 12000,
-
-        });
-        const auth = useAuth();
-        this.instance.interceptors.request.use(async (config) => {
-            let accessToken = await auth.getAccessToken();
-            if (accessToken) {
-                config.headers.Authorization = "Bearer " + accessToken;
-            }
-            return config;
-        });
-        this.instance.interceptors.response.use(response => response, error => {
-            const message = error.status >= 500 ? "A server error occurred. Try again or report an issue if the problem keeps reoccurring." : error.message;
-            return Promise.reject({ statusCode: error.status, message } satisfies ApiError)
-        });
+        super();
 
         this.songs = new SongsEndpoint(this.instance, "songs", fromDomainSong, toDomainSong);
         this.events = new EventsEndpoint(this.instance);
@@ -183,6 +165,12 @@ export default class ChoristerApi implements IChoristerApi {
     createEventEntry = async (entry: DomainEventEntry) => this.eventEntries.create(entry);
 
     deleteEventEntry = async (entry: DomainEventEntry) => this.eventEntries.delete(entry);
+
+    // Readings
+
+    getReadingsByDate = async (date: string) => {
+        return this.readings.getReadingsByDate(date);
+    };
 
     // Choir
 

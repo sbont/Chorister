@@ -11,8 +11,10 @@ import { createPinia } from 'pinia'
 import { useAuth } from "@/application/authStore";
 import { ILoggerOptions } from 'vuejs3-logger/dist/interfaces/logger-options';
 import { ApiKey } from './application/api';
-import ChoristerApi from './services/api';
+import ChoristerApi from './services/api.service';
 import { Log } from "oidc-client-ts";
+import ReadingsService from './services/readings.service';
+import { ReadingsServiceKey } from './application/readings-service';
 
 loadScript("https://kit.fontawesome.com/e168ca8cb0.js")
 
@@ -27,22 +29,23 @@ Log.setLogger(console);
 Log.setLevel(Log.DEBUG);
 
 const logOptions = {
-    isEnabled: true,
-    logLevel: 'debug',
-    stringifyArguments: false,
-    showLogLevel: true,
-    showMethodName: false,
-    separator: '|',
-    showConsoleColors: true
+  isEnabled: true,
+  logLevel: 'debug',
+  stringifyArguments: false,
+  showLogLevel: true,
+  showMethodName: false,
+  separator: '|',
+  showConsoleColors: true
 } as ILoggerOptions;
 app.use(VueLogger, logOptions);
 app.use(router);
 app.use(PrimeVue, {
-    theme: {
-        preset: Aura
-    }
+  theme: {
+    preset: Aura
+  }
 });
 app.use(ConfirmationService);
 app.use(ToastService);
 app.provide(ApiKey, new ChoristerApi());
+app.provide(ReadingsServiceKey, new ReadingsService());
 app.mount('#app');
