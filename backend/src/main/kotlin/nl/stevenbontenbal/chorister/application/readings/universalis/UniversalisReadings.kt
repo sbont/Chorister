@@ -9,17 +9,17 @@ data class UniversalisReadings(
     val day: String,
     val Mass_R1: Reading,
     val Mass_Ps: Reading,
-    val Mass_R2: Reading?,
     val Mass_GA: Reading,
     val Mass_G: Reading,
-    val copyright: Copyright
+    val copyright: Copyright,
+    val Mass_R2: Reading? = null,
 )
 
 @Serializable
 data class Reading(
-    val heading: String?,
     val source: String,
-    val text: String
+    val text: String,
+    val heading: String? = null,
 )
 
 @Serializable

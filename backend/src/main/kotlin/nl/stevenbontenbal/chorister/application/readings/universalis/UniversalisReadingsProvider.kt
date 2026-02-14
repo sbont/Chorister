@@ -5,24 +5,39 @@ import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.raise.either
 import arrow.core.right
+import io.netty.handler.logging.LogLevel
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.serialization.json.Json
 import nl.stevenbontenbal.chorister.application.readings.Copyright
+import nl.stevenbontenbal.chorister.application.readings.IReadingsProvider
 import nl.stevenbontenbal.chorister.application.readings.Reading
 import nl.stevenbontenbal.chorister.application.readings.Readings
 import nl.stevenbontenbal.chorister.shared.Failure
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
+import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import reactor.netty.http.client.HttpClient
+import reactor.netty.transport.logging.AdvancedByteBufFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class UniversalisReadingsProvider {
+@Component
+class UniversalisReadingsProvider : IReadingsProvider {
+    private val httpClient: HttpClient = HttpClient
+        .create()
+        .baseUrl("https://universalis.com")
+        .wiretap(
+            "reactor.netty.http.client.HttpClient",
+            LogLevel.DEBUG, AdvancedByteBufFormat.TEXTUAL
+        )
     private val webClient: WebClient = WebClient.builder()
+        .clientConnector(ReactorClientHttpConnector(httpClient))
         .baseUrl("https://universalis.com")
         .build()
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
 
-    public suspend fun getReadings(date: LocalDate): Either<Failure.Unexpected, Readings> {
+    override suspend fun getReadings(date: LocalDate): Either<Failure.Unexpected, Readings> {
         val englandWales = "/Europe.England.Westminster"
         val dateParam = date.format(dateFormatter)
         return Either.Companion.catch {
