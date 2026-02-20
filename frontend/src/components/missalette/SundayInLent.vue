@@ -44,7 +44,7 @@
 
     <div class="collect">
       <p>Let us pray.</p>
-      <p><em>And all pray in silence with the Priest for a moment. Then the Priest, with hands extended, says the Collect prayer, at the end of which the people acclaim:</em></p>
+      <pre>And all pray in silence with the Priest for a moment. Then the Priest, with hands extended, says the Collect prayer, at the end of which the people acclaim:</pre>
       <blockquote>Amen.</blockquote>
     </div>
 
@@ -53,7 +53,7 @@
     <h2>First Reading</h2>
 
     <div class="reading">
-      <p v-html="readings?.reading1.source"></p>
+      <p><i><span v-html="readings?.reading1.source"></span></i></p>
       <p v-html="readings?.reading1.text"></p>
     </div>
 
@@ -65,14 +65,14 @@
     <h2>Psalm</h2>
 
     <div class="psalm">
-      <p v-html="readings?.psalm.source"></p>
-      <p v-html="readings?.psalm.text"></p>
+      <p><i><span v-html="readings?.psalm.source"></span></i></p>
+      <div v-html="readings?.psalm.text"></div>
     </div>
 
     <h2>Second Reading</h2>
 
     <div class="reading">
-      <p v-html="readings?.reading2?.source"></p>
+      <p><i><span v-html="readings?.reading2?.source"></span></i></p>
       <p v-html="readings?.reading2?.text"></p>
     </div>
 
@@ -97,7 +97,7 @@
     </div>
 
     <div class="gospel-reading">
-      <p v-html="readings?.gospelReading.source"></p>
+      <p><i><span v-html="readings?.gospelReading.source"></span></i></p>
       <p v-html="readings?.gospelReading.text"></p>
     </div>
 
@@ -121,12 +121,10 @@
         Amen.</blockquote>
     </div>
 
-    <div class="song"><span class="song-heading">Ash Wednesday hymn: </span><span class="song-title"><strong>{{ songByIndex(2) }}</strong></span></div>
-
     <h2>The Prayer of the Faithful</h2>
 
     <div class="prayer-of-faithful">
-      <p><em>After each intention there is a pause while the faithful pray.</em></p>
+      <pre>After each intention there is a pause while the faithful pray.</pre>
       <p>Lord, in your mercy.</p>
       <blockquote>Hear our prayer.</blockquote>
     </div>
@@ -141,7 +139,7 @@
     </div>
 
     <div class="collect">
-      <p><em>Then the Priest says the Prayer over the Offerings, at the end of which the people acclaim:</em></p>
+      <pre>Then the Priest says the Prayer over the Offerings, at the end of which the people acclaim:</pre>
       <blockquote>Amen.</blockquote>
     </div>
 
@@ -159,7 +157,7 @@
     <h3>The Preface</h3>
 
     <div class="preface">
-      <p><i>The Priest concludes the Preface with the people, singing</i></p>
+      <pre>The Priest concludes the Preface with the people, singing</pre>
       <blockquote>Holy, Holy, Holy Lord God of hosts.<br>
         Heaven and earth are full of your glory.<br>
         Hosanna in the highest.<br>
@@ -178,7 +176,7 @@
     </div>
 
     <div class="dialogue">
-      <p><em>After the words of Consecration the priest says:</em></p>
+      <pre>After the words of Consecration the priest says:</pre>
       <p>The mystery of faith.</p>
       <blockquote>We proclaim your Death, O Lord, and profess your Resurrection until you come again.<br>
         Or:<br>
@@ -188,7 +186,7 @@
     </div>
 
     <div class="doxology">
-      <p><em>At the conclusion of the prayer the Priest takes the chalice and the paten with the host and, raising both, he says:</em></p>
+      <pre>At the conclusion of the prayer the Priest takes the chalice and the paten with the host and, raising both, he says:</pre>
       <p>Through him, and with him, and in him,<br>
         O God, almighty Father,<br>
         in the unity of the Holy Spirit,<br>
@@ -257,7 +255,7 @@
     </div>
 
     <div class="dialogue">
-      <p><em>The communicants come forward in reverent procession, and make a preparatory act of reverence by bowing their head in honour of Christ's presence in the Sacrament.</em></p>
+      <pre>The communicants come forward in reverent procession, and make a preparatory act of reverence by bowing their head in honour of Christ's presence in the Sacrament.</pre>
       <p>The Body of Christ.</p>
       <blockquote>Amen.</blockquote>
     </div>
@@ -269,7 +267,7 @@
 
     <div class="collect">
       <p>Let us pray.</p>
-      <p><em>All pray in silence. Then the Priest says the Prayer after Communion, at the end of which the people acclaim:</em></p>
+      <pre>All pray in silence. Then the Priest says the Prayer after Communion, at the end of which the people acclaim:</pre>
       <blockquote>Amen.</blockquote>
     </div>
 
@@ -315,11 +313,50 @@ const entries = computed(() => event.value?.uri ? getEntries.value(event.value.u
 eventStore.fetch(eventId).then(async (result) => {
     event.value = result;
     if (result.date) {
-      readings.value = await readingsStore.load(result.date);
+      const loadedReadings = await readingsStore.load(result.date);
+      
+      readings.value = loadedReadings;
+      readings.value.psalm.text = transformResponsorial(loadedReadings.psalm.text);
+      readings.value.gospelAcclamation.text = transformResponsorial(loadedReadings.gospelAcclamation.text);
     }
 });
 const gospelAuthor = computed(() => readings.value?.gospelReading.source.split(' ')[0]);
 const songByIndex = computed(() => (index: number) => entries.value[index - 1]?.song?.embedded?.title ?? '');
+
+function transformResponsorial(html: string): string {
+  const parser = new DOMParser().parseFromString(html, "text/html");
+  const divs = parser.getElementsByTagName('div');
+  
+  if (divs.length) {
+    const response = divs[0].innerText;
+    const responseElement = document.createElement('blockquote');
+    responseElement.innerText = response;
+
+    const elements: HTMLElement[] = [ responseElement ];
+    var nextVerseElements: Node[] = [];
+
+    for (var i = 1; i < divs.length; i++) {
+      if (divs[i].innerText === response) {
+
+        const verseElement = document.createElement('p');
+        verseElement.append(...nextVerseElements);
+
+        elements.push(verseElement, responseElement)
+
+        nextVerseElements = [];
+      } else {
+        if (nextVerseElements.length) {
+          nextVerseElements.push(document.createElement('br'));
+        }
+        nextVerseElements.push(document.createTextNode(divs[i].innerText));
+      }
+    } 
+
+    return elements.map(e => e.outerHTML).join('\n');    
+  }
+
+  return html;
+}
 
 </script>
 
@@ -394,10 +431,22 @@ h3 {
   text-align: center;
 }
 
-blockquote {
+blockquote, :deep(blockquote) {
   font-family: "Crimson Text", serif;
   font-weight: 700;
   font-style: normal;
+}
+
+pre {
+  font-family: "Crimson Text", serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 0.8em;
+  -webkit-overflow-scrolling: initial;
+  background-color: initial;
+  padding: 0;
+  white-space: initial;
+  word-wrap: normal;
 }
 
 .song {
@@ -426,11 +475,9 @@ blockquote {
 
 .gospel-acclamation {
   margin: 1em 0;
-  /* text-align: center; */
-  font-weight: bold;
 }
 
-.distribution-of-ashes, .prayer-of-faithful {
+.prayer-of-faithful {
   margin: 1em 0;
 }
 
@@ -440,13 +487,10 @@ blockquote {
 
 .doxology {
   margin: 1em 0;
-  /* text-align: center; */
-  font-style: italic;
 }
 
 .lamb-of-god {
   margin: 1em 0;
-  /* text-align: center; */
 }
 
 </style>
