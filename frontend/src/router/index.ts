@@ -121,6 +121,15 @@ const routes = [
     },
   },
   {
+    path: '/planning/event/:id/lent',
+    name: 'ExportSundayInLent',
+    component: () => import('../components/missalette/SundayInLent.vue'),
+    meta: {
+      requiresAuth: true,
+      hideHeader: true
+    },
+  },
+  {
     path: '/authorized',
     name: 'Authorized',
     component: () => import('../components/ui/Authorized.vue')
