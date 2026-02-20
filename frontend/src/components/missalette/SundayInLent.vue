@@ -169,6 +169,11 @@
       <pre>After each intention there is a pause while the faithful pray.</pre>
       <p>Lord, in your mercy.</p>
       <blockquote>Hear our prayer.</blockquote>
+
+      or
+
+      <p>We pray to the Lord.</p>
+      <blockquote>Lord, hear our prayer.</blockquote>
     </div>
 
     <h1>The Liturgy of the Eucharist</h1>
