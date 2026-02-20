@@ -17,7 +17,10 @@
         Or:<br>
         Grace to you and peace from God our Father and the Lord Jesus Christ.<br>
         Or:<br>
-        The Lord be with you.</p>
+        The Lord be with you.<br>
+        Or:
+      </p>
+        <pre>Then the Priest, extending his hands, greets the people, to which they reply:</pre>
       <blockquote>And with your spirit.</blockquote>
     </div>
 
@@ -108,7 +111,46 @@
 
     <h2>The Homily</h2>
 
-    <h2>The Creed</h2>
+    <h2>The Nicene Creed</h2>
+
+    <div class="creed">
+      <blockquote>I believe in one God, the Father almighty,<br>
+        maker of heaven and earth,
+        of all things visible and invisible.<br>
+        I believe in one Lord Jesus Christ,
+        the Only Begotten Son of God,
+        born of the Father before all ages. <br>
+        God from God, Light from Light,<br> 
+        true God from true God,<br>
+        begotten, not made,
+        consubstantial with the Father;<br>
+        through him all things were made.<br>
+        For us men and for our salvation
+        he came down from heaven,<br>
+        <em>and by the Holy Spirit was incarnate<br>
+        of the Virgin Mary, and became man.</em><br>
+        For our sake he was crucified under 
+        Pontius Pilate, he suffered death and
+        was buried, and rose again on the third day
+        in accordance with the Scriptures.<br>
+        He ascended into heaven and is seated 
+        at the right hand of the Father.
+        He will come again in glory
+        to judge the living and the dead
+        and his kingdom will have no end.<br>
+        I believe in the Holy Spirit, the Lord, the giver of life,
+        who proceeds from the Father and the Son,
+        who with the Father and the Son is adored and glorified,
+        who has spoken through the prophets.<br>
+        I believe in one, holy, catholic and apostolic Church.<br>
+        I confess one baptism for the forgiveness of sins<br>
+        and I look forward to the resurrection of the dead<br>
+        and the life of the world to come.<br>
+        Amen.
+      </blockquote>
+    </div>
+    
+    or
 
     <h3>The Apostles' Creed</h3>
 
