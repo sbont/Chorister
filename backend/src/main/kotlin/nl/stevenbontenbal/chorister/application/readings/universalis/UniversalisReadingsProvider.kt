@@ -12,7 +12,9 @@ import nl.stevenbontenbal.chorister.application.readings.Copyright
 import nl.stevenbontenbal.chorister.application.readings.IReadingsProvider
 import nl.stevenbontenbal.chorister.application.readings.Reading
 import nl.stevenbontenbal.chorister.application.readings.Readings
+import nl.stevenbontenbal.chorister.persistence.ChoirAwareDataSource
 import nl.stevenbontenbal.chorister.shared.Failure
+import org.slf4j.LoggerFactory
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -36,6 +38,7 @@ class UniversalisReadingsProvider : IReadingsProvider {
         .baseUrl("https://universalis.com")
         .build()
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+    private val logger = LoggerFactory.getLogger(UniversalisReadingsProvider::class.java)
 
     override suspend fun getReadings(date: LocalDate): Either<Failure.Unexpected, Readings> {
         val englandWales = "/Europe.England.Westminster"
@@ -50,6 +53,7 @@ class UniversalisReadingsProvider : IReadingsProvider {
         }
             .mapLeft { Failure.Unexpected(it.message ?: "Error while retrieving readings from Universalis" ) }
             .flatMap { retrieveJsonFromResponse(it) }
+            .also { logger.debug(it.getOrNull()) }
             .map { Json.Default.decodeFromString(UniversalisReadings.serializer(), it) }
             .map { map(it) }
 
