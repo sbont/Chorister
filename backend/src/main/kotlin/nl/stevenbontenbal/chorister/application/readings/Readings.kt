@@ -16,7 +16,7 @@ data class Readings(
 
 @Serializable
 data class Reading(
-    val source: String,
+    val source: String?,
     val text: String
 )
 

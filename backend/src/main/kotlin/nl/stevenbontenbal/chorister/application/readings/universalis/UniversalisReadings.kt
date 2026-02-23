@@ -17,7 +17,7 @@ data class UniversalisReadings(
 
 @Serializable
 data class Reading(
-    val source: String,
+    val source: String? = null,
     val text: String,
     val heading: String? = null,
 )

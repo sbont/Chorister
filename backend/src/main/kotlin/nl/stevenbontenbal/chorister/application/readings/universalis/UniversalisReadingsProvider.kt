@@ -38,7 +38,6 @@ class UniversalisReadingsProvider : IReadingsProvider {
         .baseUrl("https://universalis.com")
         .build()
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
-    private val logger = LoggerFactory.getLogger(UniversalisReadingsProvider::class.java)
 
     override suspend fun getReadings(date: LocalDate): Either<Failure.Unexpected, Readings> {
         val englandWales = "/Europe.England.Westminster"
@@ -53,10 +52,12 @@ class UniversalisReadingsProvider : IReadingsProvider {
         }
             .mapLeft { Failure.Unexpected(it.message ?: "Error while retrieving readings from Universalis" ) }
             .flatMap { retrieveJsonFromResponse(it) }
-            .also { logger.debug(it.getOrNull()) }
-            .map { Json.Default.decodeFromString(UniversalisReadings.serializer(), it) }
+            .flatMap {
+                Either.catch {
+                    Json.Default.decodeFromString(UniversalisReadings.serializer(), it)
+                }.mapLeft { e -> Failure.Unexpected("Error while parsing readings: ${e.message}") }
+            }
             .map { map(it) }
-
     }
 
     private fun retrieveJsonFromResponse(rawResponse: String): Either<Failure.Unexpected, String> {
