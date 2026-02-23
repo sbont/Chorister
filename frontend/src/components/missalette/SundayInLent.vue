@@ -3,7 +3,10 @@
   <div class="mass-order">
     <h1>The Introductory Rites</h1>
 
-    <div class="song"><span class="song-heading">Entrance hymn: </span><span class="song-title"><strong>{{ songByIndex(1) }}</strong></span></div>
+    <div class="song">
+      <h3>Entrance hymn</h3>
+      <span class="song-title"><strong>{{ songByIndex(1) }}</strong></span>
+    </div>
 
     <h2>Greeting</h2>
 
@@ -20,7 +23,7 @@
         The Lord be with you.<br>
         Or:
       </p>
-        <pre>Then the Priest, extending his hands, greets the people, to which they reply:</pre>
+        <pre>Then the Priest greets the people, to which they reply:</pre>
       <blockquote>And with your spirit.</blockquote>
     </div>
 
@@ -47,7 +50,7 @@
 
     <div class="collect">
       <p>Let us pray.</p>
-      <pre>And all pray in silence with the Priest for a moment. Then the Priest, with hands extended, says the Collect prayer, at the end of which the people acclaim:</pre>
+      <pre>All pray in silence with the Priest for a moment. Then the Priest says the Collect prayer, after which the people acclaim:</pre>
       <blockquote>Amen.</blockquote>
     </div>
 
@@ -123,7 +126,7 @@
         God from God, Light from Light,<br> 
         true God from true God,<br>
         begotten, not made,
-        consubstantial with the Father;<br>
+        consubstantial with the Father;
         through him all things were made.<br>
         For us men and for our salvation
         he came down from heaven,<br>
@@ -143,8 +146,8 @@
         who with the Father and the Son is adored and glorified,
         who has spoken through the prophets.<br>
         I believe in one, holy, catholic and apostolic Church.<br>
-        I confess one baptism for the forgiveness of sins<br>
-        and I look forward to the resurrection of the dead<br>
+        I confess one baptism for the forgiveness of sins
+        and I look forward to the resurrection of the dead
         and the life of the world to come.<br>
         Amen.
       </blockquote>
@@ -178,7 +181,10 @@
 
     <h1>The Liturgy of the Eucharist</h1>
 
-    <div class="song"><span class="song-heading">Offertory hymn: </span><span class="song-title"><strong>{{ songByIndex(3) }}</strong></span></div>
+    <div class="song">
+      <h3>Offertory hymn</h3>
+      <span class="song-title"><strong>{{ songByIndex(3) }}</strong></span>
+    </div>
 
     <div class="dialogue">
       <p>Pray, brothers and sisters, that my sacrifice and yours may be acceptable to God, the almighty Father.</p>
@@ -275,7 +281,7 @@
       <p>The peace of the Lord be with you always.</p>
       <blockquote>And with your spirit.</blockquote>
       <p>Let us offer each other the sign of peace.</p>
-      <p><i>All offer one another the customary sign of peace.</i></p>
+      <pre>All offer one another the customary sign of peace.</pre>
     </div>
 
     <h2>Breaking of the Bread</h2>
@@ -307,8 +313,15 @@
       <blockquote>Amen.</blockquote>
     </div>
 
-    <div class="song"><span class="song-heading">Communion hymn: </span><span class="song-title"><strong>{{ songByIndex(6) }}</strong></span></div>
-    <div class="song"><span class="song-heading">Thanksgiving hymn: </span><span class="song-title"><strong>{{ songByIndex(7) }}</strong></span></div>
+    <div class="song">
+      <h3>Communion hymn</h3>
+      <span class="song-title"><strong>{{ songByIndex(6) }}</strong></span>
+    </div>
+
+    <div class="song">
+      <h3>Thanksgiving hymn</h3>
+      <span class="song-title"><strong>{{ songByIndex(7) }}</strong></span>
+    </div>
 
     <h2>Prayer after Communion</h2>
 
@@ -330,7 +343,10 @@
       </div>
     </div>
 
-    <div class="song"><span class="song-heading">Recessional hymn: </span><span class="song-title"><strong>{{ songByIndex(8) }}</strong></span></div>
+    <div class="song">
+      <h3>Recessional hymn</h3>
+      <span class="song-title"><strong>{{ songByIndex(8) }}</strong></span>
+    </div>
 
     <div class="copyright">
       <p v-html="readings?.copyright.text"></p>
