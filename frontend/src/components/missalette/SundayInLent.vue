@@ -417,27 +417,34 @@ function transformResponsorial(html: string): string {
   const divs = parser.getElementsByTagName('div');
   
   if (divs.length) {
-    const response = divs[0].innerText;
     const responseElement = document.createElement('blockquote');
-    responseElement.innerText = response;
+    const responseFirstLine = divs[0].innerText;
+    responseElement.appendChild(document.createTextNode(responseFirstLine))
+    
+    var i = 1;
+    while(divs[i].childNodes.item(0).nodeName === 'I') {
+      responseElement.appendChild(document.createElement('br'))
+      responseElement.appendChild(document.createTextNode(divs[i].innerText))
+      i++;
+    } 
 
     const elements: HTMLElement[] = [ responseElement ];
     var nextVerseElements: Node[] = [];
 
-    for (var i = 1; i < divs.length; i++) {
-      if (divs[i].innerText === response) {
+    for (var j = 1; j < divs.length; j++) {
+      if (divs[j].childNodes.item(0).nodeName === 'I') {
+        if (nextVerseElements.length) {
+          const verseElement = document.createElement('p');
+          verseElement.append(...nextVerseElements);
+          elements.push(verseElement, responseElement)
 
-        const verseElement = document.createElement('p');
-        verseElement.append(...nextVerseElements);
-
-        elements.push(verseElement, responseElement)
-
-        nextVerseElements = [];
+          nextVerseElements = [];
+        }
       } else {
         if (nextVerseElements.length) {
           nextVerseElements.push(document.createElement('br'));
         }
-        nextVerseElements.push(document.createTextNode(divs[i].innerText));
+        nextVerseElements.push(document.createTextNode(divs[j].innerText));
       }
     } 
 
@@ -529,6 +536,21 @@ h4 {
   margin: 1em 0 1em 0;
   font-style: italic;
   text-align: right;
+}
+
+/* used as hymn header */
+h5 {
+  font-size: 1em;
+  font-style: italic;
+  text-align: center;
+}
+
+/* used as hymn title */
+h6 {
+  font-size: 1em;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 blockquote, :deep(blockquote) {
