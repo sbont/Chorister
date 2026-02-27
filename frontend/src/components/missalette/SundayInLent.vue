@@ -59,10 +59,16 @@
 
     <h1>The Liturgy of the Word</h1>
 
-    <h2>First Reading</h2>
+    <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
+      <tbody>
+      <tr>
+        <td><h2>First Reading</h2></td>
+        <td><h4 v-html="readings?.reading1.source"></h4></td>
+      </tr>
+      </tbody>
+    </table>
 
     <div class="reading">
-      <p><i><span v-html="readings?.reading1.source"></span></i></p>
       <p v-html="readings?.reading1.text"></p>
     </div>
 
@@ -71,17 +77,29 @@
       <blockquote>Thanks be to God.</blockquote>
     </div>
 
-    <h2>Psalm</h2>
-
+    <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
+      <tbody>
+      <tr>
+        <td><h2>Psalm</h2></td>
+        <td><h4 v-html="readings?.psalm.source"></h4></td>
+      </tr>
+      </tbody>
+    </table>
+   
     <div class="psalm">
-      <p><i><span v-html="readings?.psalm.source"></span></i></p>
       <div v-html="readings?.psalm.text"></div>
     </div>
 
-    <h2>Second Reading</h2>
+    <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
+      <tbody>
+      <tr>
+        <td><h2>Second Reading</h2></td>
+        <td><h4 v-html="readings?.reading2?.source"></h4></td>
+      </tr>
+      </tbody>
+    </table>
 
     <div class="reading">
-      <p><i><span v-html="readings?.reading2?.source"></span></i></p>
       <p v-html="readings?.reading2?.text"></p>
     </div>
 
@@ -96,7 +114,14 @@
       <p v-html="readings?.gospelAcclamation.text"></p>
     </div>
 
-    <h2>Gospel</h2>
+    <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
+      <tbody>
+      <tr>
+        <td><h2>Gospel</h2></td>
+        <td><h4 v-html="readings?.gospelReading.source"></h4></td>
+      </tr>
+      </tbody>
+    </table>
 
     <div class="dialogue">
       <p>The Lord be with you.</p>
@@ -106,7 +131,6 @@
     </div>
 
     <div class="gospel-reading">
-      <p><i><span v-html="readings?.gospelReading.source"></span></i></p>
       <p v-html="readings?.gospelReading.text"></p>
     </div>
 
@@ -156,9 +180,9 @@
       </blockquote>
     </div>
     
-    or
+    <p>or</p>
 
-    <h3>The Apostles' Creed</h3>
+    <h2>The Apostles' Creed</h2>
 
     <div class="creed">
       <blockquote>I believe in God, the Father almighty, Creator of heaven and earth, and in Jesus Christ, his only Son, our Lord, 
@@ -477,23 +501,34 @@ function transformResponsorial(html: string): string {
 
 h1 {
   font-size: 1.3em;
-  margin: 1em 0 0..5em 0;
-  padding-bottom: 0.5em;
+  margin: 1rem 0 0..5rem 0;
+  padding-bottom: 0.5rem;
   text-transform: uppercase;
   text-align: center;
 }
 
 h2 {
   font-size: 1.2em;
-  margin: 1em 0 1em 0;
+  margin: 1rem 0 1rem 0;
   text-align: center;
+}
+
+.reading-header h2 {
+  text-align: left; 
 }
 
 h3 {
   font-size: 1.2em;
-  margin: 1em 0 0.5em 0;
+  margin: 1rem 0 0.5rem 0;
   font-style: italic;
   text-align: center;
+}
+
+/* used as reading's source text */
+h4 {
+  margin: 1em 0 1em 0;
+  font-style: italic;
+  text-align: right;
 }
 
 blockquote, :deep(blockquote) {
@@ -512,6 +547,15 @@ pre {
   padding: 0;
   white-space: initial;
   word-wrap: normal;
+}
+
+table.reading-header {
+  width: 100%;
+  border: none;
+}
+
+table.reading-header td {
+  vertical-align: bottom;
 }
 
 .dialogue {
