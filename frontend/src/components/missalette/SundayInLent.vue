@@ -4,8 +4,8 @@
     <h1>The Introductory Rites</h1>
 
     <div class="song">
-      <h3>Entrance hymn</h3>
-      <span class="song-title"><strong>{{ songByIndex(1) }}</strong></span>
+      <h5>Entrance hymn</h5>
+      <h6>{{ songByIndex(1) }}</h6>
     </div>
 
     <h2>Greeting</h2>
@@ -38,12 +38,15 @@
     </div>
 
     <div class="kyrie">
-      <p>Lord, have mercy. Or: Kyrie, eleison.</p>
-      <blockquote>Lord, have mercy. Or: Kyrie, eleison.</blockquote>
-      <p>Christ, have mercy. Or: Christe, eleison.</p>
-      <blockquote>Christ, have mercy. Or: Christe, eleison.</blockquote>
-      <p>Lord, have mercy. Or: Kyrie, eleison.</p>
-      <blockquote>Lord, have mercy. Or: Kyrie, eleison.</blockquote>
+      <p>Lord, have mercy. <strong>Lord, have mercy.</strong></p>
+      <p>Christ, have mercy. <strong>Christ, have mercy.</strong></p>
+      <p>Lord, have mercy. <strong>Lord, have mercy.</strong></p>
+      
+      <p>or</p>
+
+      <p>Kyrie, eleison. <strong>Kyrie, eleison.</strong></p>
+      <p>Christe, eleison. <strong>Christe, eleison.</strong></p>
+      <p>Kyrie, eleison. <strong>Kyrie, eleison.</strong></p>
     </div>
 
     <h2>The Collect</h2>
@@ -182,8 +185,8 @@
     <h1>The Liturgy of the Eucharist</h1>
 
     <div class="song">
-      <h3>Offertory hymn</h3>
-      <span class="song-title"><strong>{{ songByIndex(3) }}</strong></span>
+      <h5>Offertory hymn</h5>
+      <h6>{{ songByIndex(3) }}</h6>
     </div>
 
     <div class="dialogue">
@@ -309,18 +312,17 @@
 
     <div class="dialogue">
       <pre>The communicants come forward in reverent procession, and make a preparatory act of reverence by bowing their head in honour of Christ's presence in the Sacrament.</pre>
-      <p>The Body of Christ.</p>
-      <blockquote>Amen.</blockquote>
+      <p>The Body of Christ. <strong>Amen.</strong></p>
     </div>
 
     <div class="song">
-      <h3>Communion hymn</h3>
-      <span class="song-title"><strong>{{ songByIndex(6) }}</strong></span>
+      <h5>Communion hymn</h5>
+      <h6>{{ songByIndex(6) }}</h6>
     </div>
 
     <div class="song">
-      <h3>Thanksgiving hymn</h3>
-      <span class="song-title"><strong>{{ songByIndex(7) }}</strong></span>
+      <h5>Thanksgiving hymn</h5>
+      <h6>{{ songByIndex(7) }}</h6>
     </div>
 
     <h2>Prayer after Communion</h2>
@@ -344,8 +346,8 @@
     </div>
 
     <div class="song">
-      <h3>Recessional hymn</h3>
-      <span class="song-title"><strong>{{ songByIndex(8) }}</strong></span>
+      <h5>Recessional hymn</h5>
+      <h6>{{ songByIndex(8) }}</h6>
     </div>
 
     <div class="copyright">
@@ -510,18 +512,6 @@ pre {
   padding: 0;
   white-space: initial;
   word-wrap: normal;
-}
-
-.song {
-  text-align: center;
-}
-
-.song-heading {
-  font-style: italic;
-}
-
-.song-title {
-  font-style: bold;
 }
 
 .dialogue {
