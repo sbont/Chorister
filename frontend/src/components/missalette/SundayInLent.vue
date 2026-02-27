@@ -418,21 +418,27 @@ function transformResponsorial(html: string): string {
   
   if (divs.length) {
     const responseElement = document.createElement('blockquote');
+
+    const firstChildIsItalic = (e: HTMLDivElement) => e.childNodes.item(0).nodeName === 'I';
+
+    const responseIsItalic = firstChildIsItalic(divs[0]);
     const responseFirstLine = divs[0].innerText;
     responseElement.appendChild(document.createTextNode(responseFirstLine))
     
-    var i = 1;
-    while(divs[i].childNodes.item(0).nodeName === 'I') {
-      responseElement.appendChild(document.createElement('br'))
-      responseElement.appendChild(document.createTextNode(divs[i].innerText))
-      i++;
-    } 
+    if (responseIsItalic) {
+      var i = 1;
+      while(divs[i].childNodes.item(0).nodeName === 'I') {
+        responseElement.appendChild(document.createElement('br'))
+        responseElement.appendChild(document.createTextNode(divs[i].innerText))
+        i++;
+      } 
+    }
 
     const elements: HTMLElement[] = [ responseElement ];
     var nextVerseElements: Node[] = [];
 
-    for (var j = 1; j < divs.length; j++) {
-      if (divs[j].childNodes.item(0).nodeName === 'I') {
+    for (var j = 0; j < divs.length; j++) {
+      if (responseIsItalic ? firstChildIsItalic(divs[j]) : divs[j].innerText === responseFirstLine) {
         if (nextVerseElements.length) {
           const verseElement = document.createElement('p');
           verseElement.append(...nextVerseElements);
