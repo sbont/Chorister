@@ -1,6 +1,7 @@
 import { useAuth } from "@/application/authStore";
 import { ApiError } from "@/types/api-error";
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosError, AxiosInstance } from "axios";
+import { ErrorPayload } from "./apiTypes/error";
 
 const SERVER_URL = import.meta.env.VITE_APP_BASE_URL + "/api";
 
@@ -27,7 +28,8 @@ export default class BaseService {
     });
     
     this.instance.interceptors.response.use(response => response, error => {
-      const message = error.status >= 500 ? "A server error occurred. Try again or report an issue if the problem keeps reoccurring." : error.message;
+      const data = (error as AxiosError<ErrorPayload>).response?.data;
+      const message = data?.message ?? (error.status >= 500 ? "A server error occurred. Try again or report an issue if the problem keeps reoccurring." : error.message);
       return Promise.reject({ statusCode: error.status, message } satisfies ApiError)
     });
   }
