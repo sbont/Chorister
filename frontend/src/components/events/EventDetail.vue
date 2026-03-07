@@ -2,7 +2,7 @@
     <div class="event-detail">
         <DetailHeader
             :mode="pageState" :title="event?.name" :subtitle="event ? format(event?.date) : ''" :on-edit="edit"
-            :on-delete="remove" :custom-actions="[{ 'label': 'Export texts', action: exportText, accessLevel: 'EDITOR' }]"
+            :on-delete="remove" :custom-actions="[{ 'label': 'Export texts', action: exportText, accessLevel: 'EDITOR' }, { 'label': 'Get playlist', action: navigateToPlaylist, accessLevel: 'EDITOR' }]"
             entity="event"
             :saving="saving"
             @edit="edit"
@@ -45,11 +45,13 @@
 <script setup lang="ts">
 import { useEvents } from "@/application/eventStore";
 import { Event } from "@/entities/event";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { isNew } from "@/entities/entity";
 import DetailHeader from "../ui/DetailHeader.vue";
 import { PageMode } from "@/types";
+import { storeToRefs } from "pinia";
+import { notNullOrUndefined } from "@/utils";
 
 type DraftEvent = Partial<Event>;
 
@@ -76,6 +78,8 @@ if (route.name === "NewEvent") {
         loading.value = false;
     });
 }
+
+const { entries: getEntries } = storeToRefs(store);
 
 // Methods
 const format = (date: Date) => new Date(date).toLocaleDateString();
@@ -134,5 +138,24 @@ const exportText = () => {
     });
     window.open(link.href, "_blank");
 };
+
+const createPlaylistUrl = () => {
+  const youtubePrefix = 'https://www.youtube.com/watch?v=';
+  const entries = computed(() => event.value?.uri ? getEntries.value(event.value.uri) : []);
+  const youtubeIds = entries.value.sort(e => e.sequence).map(e => e.song?.embedded?.recordingUrl).map(url => {
+    if (url && url.indexOf(youtubePrefix) > -1) {
+      return url.substring(youtubePrefix.length);
+    } else {
+      return null;
+    }
+  }).filter(notNullOrUndefined);
+  const baseUrl = 'https://www.youtube.com/watch_videos?video_ids=';
+  return baseUrl + youtubeIds.join(',');
+}
+
+const navigateToPlaylist = () => {
+  const link = createPlaylistUrl();
+  window.open(link, "_blank");
+}
 
 </script>
