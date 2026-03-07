@@ -29,7 +29,7 @@
             <div class="is-flex">
                 <FileUpload
                     name="file[]" :disabled="uploadDisabled()" :multiple="false" :file-limit="1"
-                    accept="application/pdf,image/*" :max-file-size="2000000" invalid-file-size-message="File exceeds maximum size of 2GB." choose-label="Browse"
+                    accept="application/pdf,image/*" :max-file-size="50000000" invalid-file-size-message="File exceeds maximum size of 50MB." choose-label="Browse"
                     custom-upload @uploader="onUpload"
                     @select="selectFile" @remove="removeFile()">
                 </FileUpload>
@@ -97,6 +97,7 @@ import FileUpload, { FileUploadSelectEvent, FileUploadUploaderEvent } from 'prim
 import { PropType, onMounted, ref } from 'vue';
 import FileLink from './FileLink.vue';
 import { useConfirm } from 'primevue/useconfirm';
+import { useToast } from 'primevue/usetoast';
 
 type DraftScore = Partial<Score> & {
     song: EntityRef<Song>
@@ -124,6 +125,7 @@ const scoreStore = useScores();
 const fileStore = useFiles();
 const authStore = useAuth();
 const confirm = useConfirm();
+const toast = useToast();
 
 // state
 const score = ref(props.value);
@@ -146,7 +148,13 @@ const uploadDisabled = () => !!selectedFile.value;
 
 // Methods
 function selectFile(event: FileUploadSelectEvent) {
-    selectedFile.value = (event.files as File[])[0];
+    const file = (event.files as File[])[0];
+    if (!file) {
+        toast.add({ summary: "Cannot use file", detail: "File not selected. Make sure the file type is supported, and that file size is < 50 MB.", closable: true, severity: "error" });
+        return;
+    }
+
+    selectedFile.value = file;
     if (draftValues.value && !draftValues.value.description) {
         const name = selectedFile.value.name;
         draftValues.value.description = name.substring(0, name.indexOf("."));
