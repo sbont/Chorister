@@ -12,7 +12,7 @@ class EventEntry(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "EVENT_ID")
     var event: Event?,
     @ManyToOne(fetch = FetchType.EAGER)

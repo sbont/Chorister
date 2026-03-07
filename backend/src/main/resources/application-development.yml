@@ -37,7 +37,7 @@ logging:
   level:
     nl.stevenbontenbal.chorister: DEBUG
     org.hibernate.stat: DEBUG
-    org.hibernate.SQL: DEBUG
+#    org.hibernate.SQL: DEBUG
     org.springframework:
       security: WARN
       web: INFO

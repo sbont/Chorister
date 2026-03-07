@@ -10,7 +10,7 @@ import java.util.*
 
 @Entity
 class Song(
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHOIR_ID")
     override var choir: Choir?,
     var title: String,
@@ -21,19 +21,19 @@ class Song(
     @RestResource(exported = false)
     var songbook: Songbook?,
     var songbookNumber: Int?,
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "song")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "song")
     var scores: MutableList<Score>? = mutableListOf(),
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "song")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "song")
     var chords: MutableList<Chords>? = mutableListOf(),
     var slug: String = title.toSlug(),
-    @ManyToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH])
+    @ManyToMany(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH])
     @JoinTable(
         name = "SONG_CATEGORY",
         joinColumns = [JoinColumn(name = "SONG_ID")],
         inverseJoinColumns = [JoinColumn(name = "CATEGORY_ID")]
     )
     var categories: MutableSet<Category>? = mutableSetOf(),
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "song", cascade=[CascadeType.DETACH])
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "song", cascade=[CascadeType.DETACH])
     var eventEntries: MutableList<EventEntry>? = mutableListOf(),
     @Column(length = 32000)
     var text: String?,
