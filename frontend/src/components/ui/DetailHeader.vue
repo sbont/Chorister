@@ -30,8 +30,8 @@
                             Edit
                         </button>
                     </div>
-                    <div v-if="mode == 'edit'" class="control">
-                        <button class="button" @click="emit('cancelEdit')">Cancel</button>
+                    <div v-if="mode == 'edit' || mode == 'create'" class="control">
+                        <button class="button" @click="clickCancel()">Cancel</button>
                     </div>
                     <div v-if="mode == 'create' && authStore.userCan('create', entity) || mode == 'edit' && authStore.userCan('update', entity)" class="control">
                         <button 
@@ -58,63 +58,73 @@
 </template>
 
 <script setup lang="ts">
-    import { EntityType } from '@/application/authorization';
-    import { useAuth } from '@/application/authStore';
-    import { PageMode } from '@/types';
-    import { Role } from '@/types/role';
-    import { storeToRefs } from 'pinia';
-    import { useConfirm } from 'primevue/useconfirm';
-    import ConfirmDialog from 'primevue/confirmdialog';
-    
-    const emit = defineEmits(["edit", "delete", "cancelEdit", "save"]);
-    
-    interface Props {
-        title?: string
-        subtitle?: string
-        subtitleOnTop?: boolean
-        mode?: PageMode
-        entity: EntityType
-        editDisabled?: boolean
-        deleteDisabled?: boolean
-        saving?: boolean
-        customActions?: Array<{ action: () => void, label: string, disabled?: boolean, accessLevel: Role }>
-    }
-    
-    const props = withDefaults(defineProps<Props>(), {
-        subtitleOnTop: () => false,
-        mode: "view",
-        editDisabled: false,
-        deleteDisabled: false
+import { EntityType } from '@/application/authorization';
+import { useAuth } from '@/application/authStore';
+import { PageMode } from '@/types';
+import { Role } from '@/types/role';
+import { storeToRefs } from 'pinia';
+import { useConfirm } from 'primevue/useconfirm';
+import ConfirmDialog from 'primevue/confirmdialog';
+import { useRouter } from 'vue-router';
+
+const emit = defineEmits(["edit", "delete", "cancelEdit", "save"]);
+
+interface Props {
+    title?: string
+    subtitle?: string
+    subtitleOnTop?: boolean
+    mode?: PageMode
+    entity: EntityType
+    editDisabled?: boolean
+    deleteDisabled?: boolean
+    saving?: boolean
+    customActions?: Array<{ action: () => void, label: string, disabled?: boolean, accessLevel: Role }>
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    subtitleOnTop: () => false,
+    mode: "view",
+    editDisabled: false,
+    deleteDisabled: false
+});
+
+const authStore = useAuth();
+const router = useRouter();
+const { role } = storeToRefs(authStore);
+
+const confirm = useConfirm();
+
+const accessibleActions = props.customActions?.filter(action => !role.value || action.accessLevel <= role.value);
+
+function confirmDelete() {
+    confirm.require({
+        message: 'Are you sure you want to delete this record?',
+        header: 'Confirm deletion',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            emit('delete');
+        },
+        reject: () => { },
+        group: "dialogs"
     });
-    
-    const authStore = useAuth();
-    const { role } = storeToRefs(authStore);
-    
-    const confirm = useConfirm();
-    
-    const accessibleActions = props.customActions?.filter(action => !role.value || action.accessLevel <= role.value);
-    
-    function confirmDelete() {
-        confirm.require({
-            message: 'Are you sure you want to delete this record?',
-            header: 'Confirm deletion',
-            icon: 'pi pi-exclamation-triangle',
-            rejectProps: {
-                label: 'Cancel',
-                severity: 'secondary',
-                outlined: true
-            },
-            acceptProps: {
-                label: 'Delete',
-                severity: 'danger'
-            },
-            accept: () => {
-                emit('delete');
-            },
-            reject: () => { },
-            group: "dialogs"
-        });
-    }
+}
+
+function clickCancel() {
+  if (props.mode === 'create') {
+    router.back();
+  } else {
+    emit('cancelEdit');
+  }
+}
     
 </script>
 <style lang="css">

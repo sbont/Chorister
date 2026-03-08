@@ -49,9 +49,17 @@
                 </ul>
             </aside>
         </div>
-        <div class="mobile-menu is-hidden-tablet">
+        <div v-if="!isNew()" class="mobile-menu is-hidden-tablet columns is-mobile px-3">
           <div class="column">
             <Select v-model="selectedEvent" :options="options" option-group-label="label" option-group-children="items" option-label="label" option-value="value" placeholder="Select an event" class="w-full md:w-56" @change="selectEvent" />
+          </div>
+          <div v-if="authStore.userCan('create', 'event')" class="column is-flex is-justify-content-right">
+            <router-link :to="{ name: 'NewEvent' }" class="button is-primary" >
+                <span class="icon">
+                    <i class="fas fa-plus-square"></i>
+                </span>
+                <span>Add event</span>                
+            </router-link>
           </div>
         </div>
         <div class="column">
@@ -69,11 +77,12 @@ import { storeToRefs } from "pinia";
 import { useAuth } from "@/application/authStore";
 import Select, { SelectChangeEvent } from 'primevue/select';
 import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const authStore = useAuth();
 const eventStore = useEvents();
 eventStore.initialize();
+const route = useRoute();
 const router = useRouter();
 
 // State
@@ -89,6 +98,10 @@ const options = computed(() => ([{
 
 function selectEvent(evt: SelectChangeEvent) {
   router.push({ name: 'Event', params: { id: evt.value } })
+}
+
+function isNew() {
+  return route.name === "NewEvent";
 }
 
 </script>
