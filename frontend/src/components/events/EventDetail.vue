@@ -1,8 +1,8 @@
 <template>
     <div class="event-detail">
         <DetailHeader
-            :mode="pageState" :title="event?.name" :subtitle="event ? format(event?.date) : ''" :on-edit="edit"
-            :on-delete="remove" :custom-actions="[{ 'label': 'Export texts', action: exportText, accessLevel: 'EDITOR' }, { 'label': 'Get playlist', action: navigateToPlaylist, accessLevel: 'EDITOR' }]"
+            :mode="pageState" :title="event?.name" :subtitle="event ? format(event?.date) : ''"
+            :custom-actions="[{ 'label': 'Export texts', action: exportText, accessLevel: 'EDITOR' }, { 'label': 'Get playlist', action: navigateToPlaylist, accessLevel: 'EDITOR' }]"
             entity="event"
             :saving="saving"
             @edit="edit"
