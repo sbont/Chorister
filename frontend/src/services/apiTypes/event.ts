@@ -1,4 +1,5 @@
-import { ApiEntityWith, fromDomain, Identifiable, Link, toDomain, untemplated, WithAssociation, WithEmbedded } from ".";
+import { notNullOrUndefined } from "@/utils";
+import { ApiEntityWith, fromDomain, Identifiable, Link, toDomain, toEntityRef, untemplated, WithAssociation, WithEmbedded } from ".";
 import { SongIn, toDomainSong } from "./song";
 import { Event as DomainEvent, EventEntry as DomainEventEntry } from "@/entities/event";
 import { Uri } from "@/types";
@@ -32,7 +33,7 @@ export interface EventEntryIn extends EventEntry, ApiEntityWith<SongLink & Event
 }
 
 export interface EventEntryOut extends EventEntry {
-    event: Uri,
+    event?: Uri,
     song?: Uri,
     label: string
 }
@@ -49,7 +50,7 @@ export function toDomainEvent(apiEvent: EventIn): DomainEvent {
     return {
         ...toDomain(apiEvent),
         entries: {
-            uri: untemplated(apiEvent._links!.entries),
+            uri: untemplated(apiEvent._links?.entries),
             embedded: apiEvent._embedded?.entries.map(toDomainEventEntry)
         }
     };
@@ -58,33 +59,23 @@ export function toDomainEvent(apiEvent: EventIn): DomainEvent {
 export function fromDomainEvent(event: DomainEvent): EventOut {
     return {
         ...fromDomain(event),
-        entries: event.entries?.embedded?.map(e => e.uri!)
-    };
-}
-
-function toRef(link: Link, song?: SongIn) {
-    if (!song)
-        return undefined;
-
-    return {
-        uri: untemplated(link),
-        embedded: toDomainSong(song)
+        entries: event.entries?.embedded?.map(e => e.uri).filter(notNullOrUndefined)
     };
 }
 
 export function toDomainEventEntry(apiEntry: EventEntryIn): DomainEventEntry {
-    const song = toRef(apiEntry._links!.song, apiEntry._embedded?.song) ?? toRef(apiEntry._links!.song, apiEntry.song)
+    const song = toEntityRef(apiEntry._links?.song, apiEntry.song, toDomainSong);
     return {
         ...toDomain(apiEntry),
         song,
-        event: { uri: apiEntry._links?.event!.href! }
+        event: toEntityRef(apiEntry._links?.event)
     };
 }
 
 export function fromDomainEventEntry(entry: DomainEventEntry): EventEntryOut {
     return {
         ...fromDomain(entry),
-        event: entry.event.uri,
+        event: entry.event?.uri,
         song: entry.song?.uri
     };
 }

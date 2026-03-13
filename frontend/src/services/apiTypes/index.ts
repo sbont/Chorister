@@ -1,4 +1,4 @@
-import { Entity } from "@/entities/entity"
+import { Entity, EntityRef } from "@/entities/entity"
 import { Uri } from "@/types"
 
 export interface Identifiable {
@@ -45,17 +45,31 @@ export function getSelfUri(apiEntity: ApiEntityIn): Uri | undefined {
     return link.href;
 }
 
-export function untemplated(link: Link): Uri {
+export function untemplated(link: Link | undefined): Uri | undefined {
+    if (link === undefined) {
+      return undefined;
+    }
+
     if (link.templated)
         return link.href.replace("{?projection}", "");
 
     return link.href;
 }
 
+export function toEntityRef<T extends Entity, TDto>(link: Link | undefined, dto?: TDto | undefined, toDomainFn?: (dto: TDto) => T | undefined): EntityRef<T> | undefined {
+    const uri = untemplated(link);
+    const embedded = dto && toDomainFn ? toDomainFn(dto) : undefined;
+
+    if (!uri)
+        return undefined;
+
+    return { uri, embedded };
+}
+
 export function toDomain<Source extends ApiEntityIn, Target extends Entity>(apiEntity: Source) {
     return Object.assign({
         id: apiEntity.id,
-        uri: apiEntity._links?.self ? untemplated(apiEntity._links?.self!) : undefined
+        uri: untemplated(apiEntity._links?.self)
     }, apiEntity) as Entity as Target;
 }
 

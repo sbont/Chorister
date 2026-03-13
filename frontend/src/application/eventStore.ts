@@ -52,6 +52,7 @@ export const useEvents = defineStore('events', () => {
         try {
             await fetchAll();
         } catch (e) {
+            console.error(e);
             state.value = StoreState.Uninitialized;
             return;
         }
@@ -60,10 +61,11 @@ export const useEvents = defineStore('events', () => {
     }
 
     function addTo(key: Uri, value: EventEntry): void {
-        if (!entriesByEventUri.value.has(key))
+        if (!entriesByEventUri.value.has(key)) {
             entriesByEventUri.value.set(key, []);
+        }
 
-        entriesByEventUri.value.get(key)!.push(value)
+        entriesByEventUri.value.get(key)?.push(value)
     }
 
     function removeFrom(key: Uri, value: EventEntry): void {
@@ -90,12 +92,13 @@ export const useEvents = defineStore('events', () => {
         return data;
     }
 
-    async function fetchEntries(event: Event) {
+  async function fetchEntries(event: Event) {
+        const eventUri = getEventUri(event);
         if (!event.entries.uri)
             return;
 
         const entries = await entriesEndpoint.getAllAssociated(event.entries.uri);
-        putEntries(event.uri!, entries);
+        putEntries(eventUri, entries);
     }
 
     async function get(eventId: number) {
@@ -119,7 +122,7 @@ export const useEvents = defineStore('events', () => {
     }
 
     async function reorder(event: Event, oldIndex: number, newIndex: number): Promise<EventEntry[]> {
-        const uri = event.uri ?? eventEndpoint.getUri(event.id!)
+        const uri = getEventUri(event);
         let entries = entriesByEventUri.value.get(uri)
         if (!entries) return [];
 
@@ -138,7 +141,7 @@ export const useEvents = defineStore('events', () => {
     }
 
     function put(event: Event) {
-        const uri = event.uri ?? eventEndpoint.getUri(event.id!)
+        const uri = getEventUri(event);
         events.value.set(uri, event);
         if (event.entries.embedded) {
             putEntries(uri, event.entries.embedded)
@@ -197,13 +200,24 @@ export const useEvents = defineStore('events', () => {
     }
 
     async function remove(event: Event) {
+        let uri = event.uri;
+        if (!uri) {
+          if (event.id === undefined) {
+            throw new Error();
+          }
+          uri = eventEndpoint.getUri(event.id);
+        } 
         await eventEndpoint.delete(event);
-        const uri = event.uri ?? eventEndpoint.getUri(event.id!)
         events.value.delete(uri);
     }
 
     async function deleteEntry(eventEntry: EventEntry) {
-        const eventUri = eventEntry.event.uri ?? (eventEntry.event.id ? eventEndpoint.getUri(eventEntry.event.id) : undefined);
+        const eventUri = eventEntry.event?.uri ?? (eventEntry.event?.id ? eventEndpoint.getUri(eventEntry.event.id) : undefined);
+        if (!eventUri) {
+          console.log(`Unknown event ID. Entry: ${eventEntry}`);
+          throw new Error(`Event ID unknown for event entry with ID: ${eventEntry.id}`);
+        }
+
         const values = entriesByEventUri.value.get(eventUri);
         if (!values) return;
 
@@ -226,6 +240,17 @@ export const useEvents = defineStore('events', () => {
 
         entries?.forEach((entry, i) => entry.sequence = i + 1);
         return entries;
+    }
+
+    function getEventUri(event: Event): Uri {
+        if (event.uri) {
+          return event.uri;
+        }
+        
+        if (event.id === undefined) {
+            throw new Error("Event unknown: no ID or URI");
+        }
+        return eventEndpoint.getUri(event.id);
     }
 
     return {
