@@ -410,7 +410,10 @@ eventStore.fetch(eventId).then(async (result) => {
     }
 });
 const gospelAuthor = computed(() => readings.value?.gospelReading.source.split(' ')[0]);
-const songByIndex = computed(() => (index: number) => entries.value[index - 1]?.song?.embedded?.title ?? '');
+const songByIndex = computed(() => (index: number) => {
+  const song = entries.value[index - 1]?.song?.embedded;
+  return song ? `${song.songbookNumber ? song.songbookNumber + '. ' : ''}${song.title}` : '';
+});
 
 function transformResponsorial(html: string): string {
   const parser = new DOMParser().parseFromString(html, "text/html");
