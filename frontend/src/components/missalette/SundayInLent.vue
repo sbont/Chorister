@@ -57,87 +57,7 @@
       <blockquote>Amen.</blockquote>
     </div>
 
-    <h1>The Liturgy of the Word</h1>
-
-    <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
-      <tbody>
-      <tr>
-        <td><h2>First Reading</h2></td>
-        <td><h4 v-html="readings?.reading1.source"></h4></td>
-      </tr>
-      </tbody>
-    </table>
-
-    <div class="reading">
-      <p v-html="readings?.reading1.text"></p>
-    </div>
-
-    <div class="dialogue">
-      <p>The word of the Lord.</p>
-      <blockquote>Thanks be to God.</blockquote>
-    </div>
-
-    <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
-      <tbody>
-      <tr>
-        <td><h2>Psalm</h2></td>
-        <td><h4 v-html="readings?.psalm.source"></h4></td>
-      </tr>
-      </tbody>
-    </table>
-   
-    <div class="psalm">
-      <div v-html="readings?.psalm.text"></div>
-    </div>
-
-    <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
-      <tbody>
-      <tr>
-        <td><h2>Second Reading</h2></td>
-        <td><h4 v-html="readings?.reading2?.source"></h4></td>
-      </tr>
-      </tbody>
-    </table>
-
-    <div class="reading">
-      <p v-html="readings?.reading2?.text"></p>
-    </div>
-
-    <div class="dialogue">
-      <p>The word of the Lord.</p>
-      <blockquote>Thanks be to God.</blockquote>
-    </div>
-
-    <h2>Gospel Acclamation</h2>
-
-    <div class="gospel-acclamation">
-      <p v-html="readings?.gospelAcclamation.text"></p>
-    </div>
-
-    <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
-      <tbody>
-      <tr>
-        <td><h2>Gospel</h2></td>
-        <td><h4 v-html="readings?.gospelReading.source"></h4></td>
-      </tr>
-      </tbody>
-    </table>
-
-    <div class="dialogue">
-      <p>The Lord be with you.</p>
-      <blockquote>And with your spirit.</blockquote>
-      <p>A reading from the holy Gospel according to {{ gospelAuthor }}.</p>
-      <blockquote>Glory to you, O Lord.</blockquote>
-    </div>
-
-    <div class="gospel-reading">
-      <p v-html="readings?.gospelReading.text"></p>
-    </div>
-
-    <div class="dialogue">
-      <p>The Gospel of the Lord.</p>
-      <blockquote>Praise to you, Lord Jesus Christ.</blockquote>
-    </div>
+    <ReadingsComponent v-if="event" :event="event" :show-copyright="false" />
 
     <h2>The Homily</h2>
 
@@ -374,9 +294,6 @@
       <h6>{{ songByIndex(8) }}</h6>
     </div>
 
-    <div class="copyright">
-      <p v-html="readings?.copyright.text"></p>
-    </div>
   </div>
 </template>
 
@@ -386,87 +303,28 @@ import { computed, ref } from "vue";
 import { Event } from "@/entities/event";
 import { useEvents } from "@/application/eventStore";
 import { storeToRefs } from "pinia";
-import { useReadings } from "@/application/readings.store";
-import { Readings } from "@/entities/reading";
+import ReadingsComponent from "./Readings.vue";
 
 const eventStore = useEvents();
-const readingsStore = useReadings();
 const route = useRoute();
 
 // state
 const eventId = Number(route.params.id);
 const { entries: getEntries } = storeToRefs(eventStore);
 const event = ref<Event>();
-const readings = ref<Readings>();
 const entries = computed(() => event.value?.uri ? getEntries.value(event.value.uri) : []);
 eventStore.fetch(eventId).then(async (result) => {
     event.value = result;
-    if (result.date) {
-      const loadedReadings = await readingsStore.load(result.date);
-      
-      readings.value = loadedReadings;
-      readings.value.psalm.text = transformResponsorial(loadedReadings.psalm.text);
-      readings.value.gospelAcclamation.text = transformResponsorial(loadedReadings.gospelAcclamation.text);
-    }
 });
-const gospelAuthor = computed(() => readings.value?.gospelReading.source.split(' ')[0]);
 const songByIndex = computed(() => (index: number) => {
   const song = entries.value[index - 1]?.song?.embedded;
   return song ? `${song.songbookNumber ? song.songbookNumber + '. ' : ''}${song.title}` : '';
 });
 
-function transformResponsorial(html: string): string {
-  const parser = new DOMParser().parseFromString(html, "text/html");
-  const divs = parser.getElementsByTagName('div');
-  
-  if (divs.length) {
-    const responseElement = document.createElement('blockquote');
-
-    const firstChildIsItalic = (e: HTMLDivElement) => e.childNodes.item(0).nodeName === 'I';
-
-    const responseIsItalic = firstChildIsItalic(divs[0]);
-    const responseFirstLine = divs[0].innerText;
-    responseElement.appendChild(document.createTextNode(responseFirstLine))
-    
-    if (responseIsItalic) {
-      var i = 1;
-      while(divs[i].childNodes.item(0).nodeName === 'I') {
-        responseElement.appendChild(document.createElement('br'))
-        responseElement.appendChild(document.createTextNode(divs[i].innerText))
-        i++;
-      } 
-    }
-
-    const elements: HTMLElement[] = [ responseElement ];
-    var nextVerseElements: Node[] = [];
-
-    for (var j = 0; j < divs.length; j++) {
-      if (responseIsItalic ? firstChildIsItalic(divs[j]) : divs[j].innerText === responseFirstLine) {
-        if (nextVerseElements.length) {
-          const verseElement = document.createElement('p');
-          verseElement.append(...nextVerseElements);
-          elements.push(verseElement, responseElement)
-
-          nextVerseElements = [];
-        }
-      } else {
-        if (nextVerseElements.length) {
-          nextVerseElements.push(document.createElement('br'));
-        }
-        nextVerseElements.push(document.createTextNode(divs[j].innerText));
-      }
-    } 
-
-    return elements.map(e => e.outerHTML).join('\n');    
-  }
-
-  return html;
-}
-
 </script>
 
 
-<style scoped>
+<style>
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Text');
 
 .crimson-text-regular {
@@ -529,10 +387,6 @@ h2 {
   text-align: center;
 }
 
-.reading-header h2 {
-  text-align: left; 
-}
-
 h3 {
   font-size: 1.2em;
   margin: 1rem 0 0.5rem 0;
@@ -562,7 +416,7 @@ h6 {
   text-transform: uppercase;
 }
 
-blockquote, :deep(blockquote) {
+blockquote {
   font-family: "Crimson Text", serif;
   font-weight: 700;
   font-style: normal;
@@ -580,15 +434,6 @@ pre {
   word-wrap: normal;
 }
 
-table.reading-header {
-  width: 100%;
-  border: none;
-}
-
-table.reading-header td {
-  vertical-align: bottom;
-}
-
 .dialogue {
   margin: 1em 0;
 }
@@ -598,10 +443,6 @@ table.reading-header td {
 }
 
 .collect {
-  margin: 1em 0;
-}
-
-.gospel-acclamation {
   margin: 1em 0;
 }
 
