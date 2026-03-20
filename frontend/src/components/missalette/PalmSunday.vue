@@ -3,11 +3,11 @@
     <PalmProcession :procession-hymn="songByIndex(1)" />
     <LiturgyOfTheWord v-if="event" :event="event" />
     <LiturgyOfTheEucharist
-      :offertory-hymn="songByIndex(3)"
-      :communion-hymn="songByIndex(6)"
-      :thanksgiving-hymn="songByIndex(7)" 
+      :offertory-hymn="songByIndex(2)"
+      :communion-hymn="songByIndex(5)"
+      :thanksgiving-hymn="songByIndex(6)" 
     />
-    <ConcludingRites :recessional-hymn="songByIndex(8)" />
+    <ConcludingRites :recessional-hymn="songByIndex(7)" />
   </div>
 </template>
 
@@ -40,6 +40,7 @@ const songByIndex = computed(() => (index: number) => {
 
 </script>
 
-<style>
+<style >
 @import "./missalette.scss";
+
 </style>
