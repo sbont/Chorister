@@ -103,40 +103,38 @@ const routes = [
     component: () => import('../components/users/Profile.vue')
   },
   {
-    path: '/planning/event/:id/texts',
-    name: 'Export',
-    component: () => import('../components/events/EventTextExport.vue'),
+    path: '/planning/event/:id/',
     meta: {
       requiresAuth: true,
       hideHeader: true
     },
-  },
-  {
-    path: '/planning/event/:id/ashwednesday',
-    name: 'ExportAshWednesday',
-    component: () => import('../components/missalette/AshWednesday.vue'),
-    meta: {
-      requiresAuth: true,
-      hideHeader: true
-    },
-  },
-  {
-    path: '/planning/event/:id/lent',
-    name: 'ExportSundayInLent',
-    component: () => import('../components/missalette/SundayInLent.vue'),
-    meta: {
-      requiresAuth: true,
-      hideHeader: true
-    },
-  },
-  {
-    path: '/planning/event/:id/palms',
-    name: 'ExportPalmSunday',
-    component: () => import('../components/missalette/PalmSunday.vue'),
-    meta: {
-      requiresAuth: true,
-      hideHeader: true
-    },
+    children: [
+      {
+        path: 'texts',
+        name: 'Export',
+        component: () => import('../components/events/EventTextExport.vue'),
+      },
+      {
+        path: 'ashwednesday',
+        name: 'ExportAshWednesday',
+        component: () => import('../components/missalette/AshWednesday.vue'),
+      },
+      {
+        path: 'lent',
+        name: 'ExportSundayInLent',
+        component: () => import('../components/missalette/SundayInLent.vue'),
+      },
+      {
+        path: 'palmsunday',
+        name: 'ExportPalmSunday',
+        component: () => import('../components/missalette/PalmSunday.vue'),
+      },
+      {
+        path: 'maundythursday',
+        name: 'ExportMaundyThursday',
+        component: () => import('../components/missalette/MaundyThursday.vue'),
+      },
+    ]
   },
   {
     path: '/authorized',
