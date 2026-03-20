@@ -6,7 +6,7 @@
 
   <slot name="postHomily"/>
 
-  <PrayerOfTheFaithful />
+  <PrayerOfTheFaithful v-if="omitPrayersOfTheFaithful !== true" />
 </template>
 
 <script setup lang="ts">
@@ -18,6 +18,7 @@ import { Event } from '@/entities/event';
 defineProps<{
   event: Event;
   omitCreed?: boolean;
+  omitPrayersOfTheFaithful?: boolean;
 }>();
 
 </script>
