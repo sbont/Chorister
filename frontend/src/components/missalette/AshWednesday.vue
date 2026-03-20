@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
   <div class="mass-order">
-    <IntroductoryRites :entrance-hymn="songByIndex(1)" :omit-penitential-act="true" :omit-gloria="true" />
+    <IntroductoryRites :entrance-hymn="songByIndex(1)" omit-penitential-act omit-gloria />
     <LiturgyOfTheWord v-if="event" :event="event" :omit-creed="true" >
       <template #postHomily>
         <h2>Blessing of Ashes</h2>

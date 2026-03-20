@@ -1,6 +1,6 @@
 <template>
   <div class="mass-order">
-    <IntroductoryRites :entrance-hymn="songByIndex(1)" :omit-gloria="true"/>
+    <IntroductoryRites :entrance-hymn="songByIndex(1)" omit-gloria />
     <LiturgyOfTheWord v-if="event" :event="event" />
     <LiturgyOfTheEucharist
       :offertory-hymn="songByIndex(3)"
