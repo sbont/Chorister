@@ -130,6 +130,15 @@ const routes = [
     },
   },
   {
+    path: '/planning/event/:id/palms',
+    name: 'ExportPalmSunday',
+    component: () => import('../components/missalette/PalmSunday.vue'),
+    meta: {
+      requiresAuth: true,
+      hideHeader: true
+    },
+  },
+  {
     path: '/authorized',
     name: 'Authorized',
     component: () => import('../components/ui/Authorized.vue')

@@ -1,6 +1,6 @@
 <template>
   <div class="mass-order">
-    <IntroductoryRites :entrance-hymn="songByIndex(1)" />
+    <PalmProcession :procession-hymn="songByIndex(1)" />
     <LiturgyOfTheWord v-if="event" :event="event" />
     <LiturgyOfTheEucharist
       :offertory-hymn="songByIndex(3)"
@@ -18,7 +18,7 @@ import { Event } from "@/entities/event";
 import { useEvents } from "@/application/eventStore";
 import { storeToRefs } from "pinia";
 import ConcludingRites from "./elements/ConcludingRites.vue";
-import IntroductoryRites from "./elements/IntroductoryRites.vue";
+import PalmProcession from "./elements/palm-sunday/PalmProcession.vue";
 import LiturgyOfTheWord from "./elements/LiturgyOfTheWord.vue";
 import LiturgyOfTheEucharist from "./elements/LiturgyOfTheEucharist.vue";
 
@@ -42,5 +42,4 @@ const songByIndex = computed(() => (index: number) => {
 
 <style>
 @import "./missalette.scss";
-
 </style>

@@ -1,7 +1,5 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
-  <h1>The Liturgy of the Word</h1>
-
   <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
     <tbody>
     <tr>

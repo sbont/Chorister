@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text');
+
+.crimson-text-regular {
+  font-family: "Crimson Text", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.crimson-text-semibold {
+  font-family: "Crimson Text", serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.crimson-text-bold {
+  font-family: "Crimson Text", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.crimson-text-regular-italic {
+  font-family: "Crimson Text", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.crimson-text-semibold-italic {
+  font-family: "Crimson Text", serif;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.crimson-text-bold-italic {
+  font-family: "Crimson Text", serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.mass-order {
+  font-family: "Crimson Text", serif;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.6;
+  margin: 0 auto;
+  padding: 20px;
+  max-width: 400px;
+}
+
+h1 {
+  font-size: 1.3em;
+  margin: 1rem 0 0.5rem 0;
+  padding-bottom: 0.5rem;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+h2 {
+  font-size: 1.2em;
+  margin: 1rem 0 1rem 0;
+  text-align: center;
+}
+
+h3 {
+  font-size: 1.2em;
+  margin: 1rem 0 0.5rem 0;
+  font-style: italic;
+  text-align: center;
+}
+
+/* used as reading's source text */
+h4 {
+  margin: 1em 0 1em 0;
+  font-style: italic;
+  text-align: right;
+}
+
+/* used as hymn header */
+h5 {
+  font-size: 1em;
+  font-style: italic;
+  text-align: center;
+}
+
+/* used as hymn title */
+h6 {
+  font-size: 1em;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+blockquote, :deep(blockquote) {
+  font-family: "Crimson Text", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+pre {
+  font-family: "Crimson Text", serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 0.8em;
+  -webkit-overflow-scrolling: initial;
+  background-color: initial;
+  padding: 0;
+  white-space: initial;
+  word-wrap: normal;
+}
+
+.dialogue {
+  margin: 1em 0;
+}
+
+.dialogue p {
+  margin: 0.5em 0;
+}
+
+.collect {
+  margin: 1em 0;
+}
+
+table.reading-header {
+  width: 100%;
+  border: none;
+}
+
+.reading-header h2 {
+  text-align: left; 
+}
+
+table.reading-header td {
+  vertical-align: bottom;
+}
+
+.gospel-acclamation {
+  margin: 1em 0;
+}
+
+.prayer-of-faithful {
+  margin: 1em 0;
+}
+
+.preface {
+  margin: 1em 0;
+}
+
+.doxology {
+  margin: 1em 0;
+}
+
+.lamb-of-god {
+  margin: 1em 0;
+}
+
+pre {
+  font-family: "Crimson Text", serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 0.8em;
+  -webkit-overflow-scrolling: initial;
+  background-color: initial;
+  padding: 0;
+  white-space: initial;
+  word-wrap: normal;
+}
