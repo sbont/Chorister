@@ -2,7 +2,7 @@
   <h1>The Introductory Rites</h1>
   <Song heading="Entrance hymn" :title="entranceHymn" />    
   <Greeting />
-  <PenitentialAct />
+  <PenitentialAct v-if="omitPenitentialAct !== true" />
   <Collect />
 </template>
 
@@ -13,9 +13,12 @@ import PenitentialAct from './introductory-rites/PenitentialAct.vue';
 import Collect from './introductory-rites/Collect.vue';
 
 defineProps<{
-  entranceHymn: string
+  entranceHymn: string;
+  omitPenitentialAct?: boolean;
 }>();
 
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@import "../missalette.scss";
+</style>

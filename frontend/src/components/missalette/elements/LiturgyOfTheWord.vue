@@ -2,7 +2,10 @@
   <h1>The Liturgy of the Word</h1>
   <Readings :event="event" :show-copyright="false" />
   <h2>The Homily</h2>
-  <Creed />
+  <Creed v-if="omitCreed !== true" />
+
+  <slot name="postHomily"/>
+
   <PrayerOfTheFaithful />
 </template>
 
@@ -14,6 +17,7 @@ import { Event } from '@/entities/event';
 
 defineProps<{
   event: Event;
+  omitCreed?: boolean;
 }>();
 
 </script>
