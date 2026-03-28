@@ -11,12 +11,17 @@
     <blockquote>Come, let us adore.</blockquote>
   </div>
 
-  <h2>The Reproaches</h2>
+  <h2>The Adoration of the Holy Cross</h2>
 
-  ///todo
+  <h3>The Reproaches</h3>
+
+  <slot name="venerationHymns"/>
+
 </template>
 
 <script>
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@import "../../missalette.scss";
+</style>
