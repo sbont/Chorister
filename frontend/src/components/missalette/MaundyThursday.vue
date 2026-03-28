@@ -5,7 +5,7 @@
       <template #postHomily>
         <h2>The Washing of Feet</h2>
 
-        <Song heading="Hymn" :title="songByIndex(4)" />
+        <Song heading="Hymn" :title="songByIndex(3)" />
       </template>
     </LiturgyOfTheWord>
     <LiturgyOfTheEucharist
