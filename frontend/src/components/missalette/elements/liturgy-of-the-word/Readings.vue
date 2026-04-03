@@ -1,89 +1,110 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
-  <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
-    <tbody>
-      <tr>
-        <td><h2>First Reading</h2></td>
-        <td><h4 v-html="readings?.reading1.source"></h4></td>
-      </tr>
-    </tbody>
-  </table>
+  <div v-if="readings">
+    <ReadingComponent
+      v-if="readings.reading1"
+      header="First Reading"
+      :reading="readings.reading1"
+    />
+    <Psalm :psalm="readings.psalm" />
 
-  <div class="reading">
-    <p v-html="readings?.reading1.text"></p>
-  </div>
+    <ReadingComponent
+      v-if="readings.reading2"
+      header="Second Reading"
+      :reading="readings.reading2"
+    />
+    <Psalm v-if="readings.psalm2" :psalm="readings.psalm2" />
 
-  <div class="dialogue">
-    <p>The word of the Lord.</p>
-    <blockquote>Thanks be to God.</blockquote>
-  </div>
+    <ReadingComponent
+      v-if="readings.reading3"
+      header="Third Reading"
+      :reading="readings.reading3"
+    />
+    <Psalm v-if="readings.psalm3" :psalm="readings.psalm3" />
 
-  <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
-    <tbody>
-      <tr>
-        <td><h2>Psalm</h2></td>
-        <td><h4 v-html="readings?.psalm.source"></h4></td>
-      </tr>
-    </tbody>
-  </table>
+    <ReadingComponent
+      v-if="readings.reading4"
+      header="Fourth Reading"
+      :reading="readings.reading4"
+    />
+    <Psalm v-if="readings.psalm4" :psalm="readings.psalm4" />
 
-  <div class="psalm">
-    <div v-html="readings?.psalm.text"></div>
-  </div>
+    <ReadingComponent
+      v-if="readings.reading5"
+      header="Fifth Reading"
+      :reading="readings.reading5"
+    />
+    <Psalm v-if="readings.psalm5" :psalm="readings.psalm5" />
 
-  <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
-    <tbody>
-      <tr>
-        <td><h2>Second Reading</h2></td>
-        <td><h4 v-html="readings?.reading2?.source"></h4></td>
-      </tr>
-    </tbody>
-  </table>
+    <ReadingComponent
+      v-if="readings.reading6"
+      header="Sixth Reading"
+      :reading="readings.reading6"
+    />
+    <Psalm v-if="readings.psalm6" :psalm="readings.psalm6" />
 
-  <div class="reading">
-    <p v-html="readings?.reading2?.text"></p>
-  </div>
+    <ReadingComponent
+      v-if="readings.reading7"
+      header="Seventh Reading"
+      :reading="readings.reading7"
+    />
+    <Psalm v-if="readings.psalm7" :psalm="readings.psalm7" />
 
-  <div class="dialogue">
-    <p>The word of the Lord.</p>
-    <blockquote>Thanks be to God.</blockquote>
-  </div>
+    <Gloria v-if="isEaster === true" />
+    <Collect v-if="isEaster === true" />
 
-  <div v-if="readings?.gospelAcclamation">
-    <h2>Gospel Acclamation</h2>
+    <ReadingComponent
+      v-if="readings.reading8"
+      header="Reading from the Epistle"
+      :reading="readings.reading8"
+    />
 
-    <div class="gospel-acclamation">
-      <p v-html="readings?.gospelAcclamation?.text"></p>
+    <div v-if="isEaster === true">
+      <p>
+        Alleluia. <strong>Alleluia.</strong><br />
+        Alleluia. <strong>Alleluia.</strong><br />
+        Alleluia. <strong>Alleluia.</strong>
+      </p>
     </div>
-  </div>
 
-  <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
-    <tbody>
-      <tr>
-        <td><h2>Gospel</h2></td>
-        <td><h4 v-html="readings?.gospelReading.source"></h4></td>
-      </tr>
-    </tbody>
-  </table>
+    <div v-if="readings?.gospelAcclamation">
+      <h2>Gospel Acclamation</h2>
 
-  <div class="dialogue">
-    <p>The Lord be with you.</p>
-    <blockquote>And with your spirit.</blockquote>
-    <p>A reading from the holy Gospel according to {{ gospelAuthor }}.</p>
-    <blockquote>Glory to you, O Lord.</blockquote>
-  </div>
+      <div class="gospel-acclamation">
+        <p v-html="readings?.gospelAcclamation?.text"></p>
+      </div>
+    </div>
 
-  <div class="gospel-reading">
-    <p v-html="readings?.gospelReading.text"></p>
-  </div>
+    <Psalm v-if="readings.psalm8" :psalm="readings.psalm8" />
 
-  <div class="dialogue">
-    <p>The Gospel of the Lord.</p>
-    <blockquote>Praise to you, Lord Jesus Christ.</blockquote>
-  </div>
+    <table cellspacing="0" cellpadding="0" class="reading-header" width="100%">
+      <tbody>
+        <tr>
+          <td><h2>Gospel</h2></td>
+          <td><h4 v-html="readings?.gospelReading.source"></h4></td>
+        </tr>
+      </tbody>
+    </table>
 
-  <div v-if="showCopyright" class="copyright">
-    <p v-html="readings?.copyright.text"></p>
+    <div class="dialogue">
+      <p>The Lord be with you.</p>
+      <blockquote>And with your spirit.</blockquote>
+      <p>A reading from the holy Gospel according to {{ gospelAuthor }}.</p>
+      <blockquote>Glory to you, O Lord.</blockquote>
+    </div>
+
+    <div class="gospel-reading">
+      <p v-html="readings.gospelReading.text"></p>
+    </div>
+
+    <div class="dialogue">
+      <p>The Gospel of the Lord.</p>
+      <blockquote>Praise to you, Lord Jesus Christ.</blockquote>
+    </div>
+
+    <div v-if="showCopyright" class="copyright">
+      <p v-html="readings.copyright.text"></p>
+    </div>
   </div>
 </template>
 
@@ -91,10 +112,15 @@
 import { computed, ref } from "vue";
 import { Event } from "@/entities/event";
 import { useReadings } from "@/application/readings.store";
-import { Readings } from "@/entities/reading";
+import { Reading, Readings } from "@/entities/reading";
+import ReadingComponent from "./Reading.vue";
+import Psalm from "./Psalm.vue";
+import Gloria from "../introductory-rites/Gloria.vue";
+import Collect from "../introductory-rites/Collect.vue";
 
 const props = defineProps<{
   event: Event;
+  isEaster?: boolean;
   showCopyright: boolean;
 }>();
 
@@ -104,17 +130,34 @@ const readingsStore = useReadings();
 const readings = ref<Readings>();
 if (props.event.date) {
   readingsStore.load(props.event.date).then((loadedReadings) => {
-    readings.value = loadedReadings;
-    readings.value.psalm.text = transformResponsorial(loadedReadings.psalm.text);
-    if (readings.value.gospelAcclamation) {
-      readings.value.gospelAcclamation.text = transformResponsorial(
-        readings.value.gospelAcclamation.text
-      );
-    }
+    readings.value = transform(loadedReadings);
   });
 }
 
 const gospelAuthor = computed(() => readings.value?.gospelReading.source.split(" ")[0]);
+
+function transform(readings: Readings): Readings {
+  return {
+    ...readings,
+    psalm: transformReading(readings.psalm),
+    psalm2: readings.psalm2 && transformReading(readings.psalm2),
+    psalm3: readings.psalm3 && transformReading(readings.psalm3),
+    psalm4: readings.psalm4 && transformReading(readings.psalm4),
+    psalm5: readings.psalm5 && transformReading(readings.psalm5),
+    psalm6: readings.psalm6 && transformReading(readings.psalm6),
+    psalm7: readings.psalm7 && transformReading(readings.psalm7),
+    psalm8: readings.psalm8 && transformReading(readings.psalm8),
+    gospelAcclamation:
+      readings.gospelAcclamation && transformReading(readings.gospelAcclamation),
+  };
+}
+
+function transformReading(reading: Reading): Reading {
+  return {
+    ...reading,
+    text: transformResponsorial(reading.text),
+  };
+}
 
 function transformResponsorial(html: string): string {
   const parser = new DOMParser().parseFromString(html, "text/html");

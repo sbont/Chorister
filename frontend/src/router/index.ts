@@ -139,6 +139,11 @@ const routes = [
         name: 'ExportGoodFriday',
         component: () => import('../components/missalette/GoodFriday.vue'),
       },
+      {
+        path: 'eastervigil',
+        name: 'ExportEasterVigil',
+        component: () => import('../components/missalette/EasterVigil.vue'),
+      },
     ]
   },
   {
