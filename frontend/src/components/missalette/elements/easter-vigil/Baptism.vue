@@ -164,7 +164,7 @@
     </tr>
     <tr>
       <td>Christ, hear us.</td>
-      <td><strong>Lord, we ask you, hear our prayer.</strong></td>
+      <td><strong>Christ, hear us.</strong></td>
     </tr>
     <tr>
       <td>Christ, graciously hear us.</td>
@@ -236,8 +236,8 @@
 </template>
 
 <script setup lang="ts">
-import PrayerOfTheFaithful from '../liturgy-of-the-word/PrayerOfTheFaithful.vue';
-import Song from '../Song.vue';
+import PrayerOfTheFaithful from "../liturgy-of-the-word/PrayerOfTheFaithful.vue";
+import Song from "../Song.vue";
 
 defineProps<{
   baptismalHymn: string;
