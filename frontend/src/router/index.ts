@@ -144,6 +144,11 @@ const routes = [
         name: 'ExportEasterVigil',
         component: () => import('../components/missalette/EasterVigil.vue'),
       },
+      {
+        path: 'eastertide',
+        name: 'ExportSundayInEastertide',
+        component: () => import('../components/missalette/SundayInEastertide.vue'),
+      },
     ]
   },
   {
