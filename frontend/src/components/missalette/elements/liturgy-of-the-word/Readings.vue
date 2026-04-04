@@ -168,8 +168,10 @@ function transformResponsorial(html: string): string {
 
     const firstChildIsItalic = (e: HTMLDivElement) =>
       e.childNodes.item(0).nodeName === "I";
-
     const responseIsItalic = firstChildIsItalic(divs[0]);
+    const isResponse = (e: HTMLDivElement) =>
+      responseIsItalic ? firstChildIsItalic(e) : e.innerText === responseFirstLine;
+
     const responseFirstLine = divs[0].innerText;
     responseElement.appendChild(document.createTextNode(responseFirstLine));
 
@@ -186,11 +188,7 @@ function transformResponsorial(html: string): string {
     var nextVerseElements: Node[] = [];
 
     for (var j = 0; j < divs.length; j++) {
-      if (
-        responseIsItalic
-          ? firstChildIsItalic(divs[j])
-          : divs[j].innerText === responseFirstLine
-      ) {
+      if (isResponse(divs[j])) {
         if (nextVerseElements.length) {
           const verseElement = document.createElement("p");
           verseElement.append(...nextVerseElements);
@@ -198,6 +196,12 @@ function transformResponsorial(html: string): string {
 
           nextVerseElements = [];
         }
+      } else if (j === divs.length - 1 && divs[j].innerText.startsWith("Alleluia")) {
+        const verseElement = document.createElement("p");
+        verseElement.append(...nextVerseElements);
+        const responseElement = document.createElement("blockquote");
+        responseElement.appendChild(document.createTextNode(divs[j].innerText));
+        elements.push(verseElement, responseElement);
       } else {
         if (nextVerseElements.length) {
           nextVerseElements.push(document.createElement("br"));
