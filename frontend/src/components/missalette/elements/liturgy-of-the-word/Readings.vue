@@ -129,9 +129,8 @@ const readingsStore = useReadings();
 // state
 const readings = ref<Readings>();
 if (props.event.date) {
-  readingsStore.load(props.event.date).then((loadedReadings) => {
-    readings.value = transform(loadedReadings);
-  });
+  const loadedReadings = await readingsStore.load(props.event.date);
+  readings.value = transform(loadedReadings);
 }
 
 const gospelAuthor = computed(() => readings.value?.gospelReading.source.split(" ")[0]);

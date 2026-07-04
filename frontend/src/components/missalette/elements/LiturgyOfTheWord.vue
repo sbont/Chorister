@@ -1,7 +1,9 @@
 <template>
   <h1>The Liturgy of the Word</h1>
 
-  <Readings :event="event" :show-copyright="false" :is-easter="isEaster" />
+  <Suspense suspensible>
+    <Readings :event="event" :show-copyright="false" :is-easter="isEaster" />
+  </Suspense>
 
   <h2>The Homily</h2>
 

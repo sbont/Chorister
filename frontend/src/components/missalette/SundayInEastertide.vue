@@ -1,7 +1,10 @@
 <template>
   <div class="mass-order">
     <IntroductoryRites :entrance-hymn="songByIndex(1)" />
+      <Suspense suspensible>
     <LiturgyOfTheWord v-if="event" :event="event" />
+      </Suspense>
+
     <LiturgyOfTheEucharist
       :offertory-hymn="songByIndex(4)"
       :communion-hymn="songByIndex(7)"
@@ -32,9 +35,7 @@ const event = ref<Event>();
 const entries = computed(() =>
   event.value?.uri ? getEntries.value(event.value.uri) : []
 );
-eventStore.fetch(eventId).then(async (result) => {
-  event.value = result;
-});
+event.value = await eventStore.fetch(eventId);
 const songByIndex = computed(() => (index: number) => {
   const song = entries.value[index - 1]?.song?.embedded;
   return song
