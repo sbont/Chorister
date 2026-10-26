@@ -3,7 +3,6 @@ package nl.stevenbontenbal.chorister.application.readings.universalis
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.left
-import arrow.core.raise.either
 import arrow.core.right
 import io.netty.handler.logging.LogLevel
 import kotlinx.coroutines.reactor.awaitSingle
@@ -12,7 +11,6 @@ import nl.stevenbontenbal.chorister.application.readings.Copyright
 import nl.stevenbontenbal.chorister.application.readings.IReadingsProvider
 import nl.stevenbontenbal.chorister.application.readings.Reading
 import nl.stevenbontenbal.chorister.application.readings.Readings
-import nl.stevenbontenbal.chorister.persistence.ChoirAwareDataSource
 import nl.stevenbontenbal.chorister.shared.Failure
 import org.slf4j.LoggerFactory
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
@@ -38,9 +36,10 @@ class UniversalisReadingsProvider : IReadingsProvider {
         .baseUrl("https://universalis.com")
         .build()
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+    private val logger = LoggerFactory.getLogger(UniversalisReadingsProvider::class.java)
 
     override suspend fun getReadings(date: LocalDate): Either<Failure.Unexpected, Readings> {
-        val englandWales = "/Europe.England.Westminster"
+        val englandWales = "europe.england.westminster"
         val dateParam = date.format(dateFormatter)
         return Either.Companion.catch {
             webClient
@@ -50,25 +49,145 @@ class UniversalisReadingsProvider : IReadingsProvider {
                 .bodyToMono<String>()
                 .awaitSingle()
         }
-            .mapLeft { Failure.Unexpected(it.message ?: "Error while retrieving readings from Universalis" ) }
+            .mapLeft { logFailure(it) }
             .flatMap { retrieveJsonFromResponse(it) }
-            .flatMap {
-                Either.catch {
-                    Json.Default.decodeFromString(UniversalisReadings.serializer(), it)
-                }.mapLeft { e -> Failure.Unexpected("Error while parsing readings: ${e.message}") }
-            }
+            .flatMap { parseReadings(it) }
             .map { map(it) }
+    }
+
+    private fun logFailure(t: Throwable): Failure.Unexpected {
+        logger.error("Failed to retrieve readings from Universalis: $t")
+        return Failure.Unexpected(t.message ?: "Error while retrieving readings from Universalis" )
     }
 
     private fun retrieveJsonFromResponse(rawResponse: String): Either<Failure.Unexpected, String> {
         val trimmed = rawResponse.trim()
-        val startIndex = if (trimmed.indexOf(RESPONSE_WRAPPER_START) == -1) Failure.Unexpected("Response wrapper start not found")
-            .left() else RESPONSE_WRAPPER_START.length.right()
-        val endIndex = trimmed.indexOf(RESPONSE_WRAPPER_END)
-            .let { if (it == -1) Failure.Unexpected("Response wrapper end not found").left() else it.right() }
-        return either {
-            trimmed.substring(startIndex.bind(), endIndex.bind())
+        val startPos = trimmed.indexOf(RESPONSE_WRAPPER_START)
+        val endPos = trimmed.indexOf(RESPONSE_WRAPPER_END)
+
+        if (startPos == -1) return Failure.Unexpected("Response wrapper start not found").left()
+        if (endPos == -1) return Failure.Unexpected("Response wrapper end not found").left()
+
+        val startIndex = startPos + RESPONSE_WRAPPER_START.length
+        val jsObjectLiteral = trimmed.substring(startIndex, endPos)
+        return deobfuscateObjectLiteral(jsObjectLiteral).right()
+    }
+
+    private fun deobfuscateObjectLiteral(objLiteral: String): String {
+        var result = objLiteral
+        var lastEnd = 0
+        
+        while (true) {
+            val splitMarker = ".split(\""
+            val splitPos = result.indexOf(splitMarker, lastEnd)
+            if (splitPos == -1) break
+            
+            val quoteEnd = findStringEnd(result, splitPos - 1)
+            if (quoteEnd == -1) {
+                lastEnd = splitPos + 1
+                continue
+            }
+            
+            val quoteStart = result.lastIndexOf('"', quoteEnd - 1)
+            if (quoteStart == -1) {
+                lastEnd = splitPos + 1
+                continue
+            }
+            
+            val baseString = result.substring(quoteStart + 1, quoteEnd)
+            
+            val transformations = mutableListOf<Pair<String, String>>()
+            var currentPos = splitPos
+            var chainEnd = splitPos
+            
+            while (currentPos < result.length) {
+                val splitStart = result.indexOf(splitMarker, currentPos)
+                if (splitStart == -1 || splitStart < splitPos) break
+                
+                val splitCharStart = splitStart + splitMarker.length
+                val splitCharEnd = result.indexOf('"', splitCharStart)
+                if (splitCharEnd == -1) break
+                val splitChar = result.substring(splitCharStart, splitCharEnd)
+                
+                val joinMarker = ".join(\""
+                val joinStart = result.indexOf(joinMarker, splitCharEnd)
+                if (joinStart == -1) break
+                
+                val joinCharStart = joinStart + joinMarker.length
+                val joinCharEnd = result.indexOf('"', joinCharStart)
+                if (joinCharEnd == -1) break
+                val joinChar = result.substring(joinCharStart, joinCharEnd)
+                
+                transformations.add(splitChar to joinChar)
+                
+                val closeParen = result.indexOf(')', joinCharEnd)
+                if (closeParen != -1) {
+                    chainEnd = closeParen
+                    currentPos = closeParen + 1
+                } else {
+                    chainEnd = joinCharEnd
+                    currentPos = joinCharEnd + 1
+                }
+            }
+            
+            var deobfuscated = unescapeJavaScriptString(baseString)
+            for ((splitChar, joinChar) in transformations) {
+                deobfuscated = deobfuscated.split(splitChar).joinToString(joinChar)
+            }
+            
+            val replacement = "\"${escapeForJson(deobfuscated)}\""
+            result = result.substring(0, quoteStart) + replacement + result.substring(chainEnd + 1)
+            lastEnd = quoteStart + replacement.length
         }
+        
+        return result
+    }
+
+    private fun findStringEnd(s: String, startIndex: Int): Int {
+        var i = startIndex
+        var escaped = false
+        
+        while (i < s.length) {
+            when (s[i]) {
+                '\\' -> {
+                    escaped = !escaped
+                    i++
+                }
+                '"' -> {
+                    if (!escaped) {
+                        return i
+                    }
+                    escaped = false
+                    i++
+                }
+                else -> {
+                    escaped = false
+                    i++
+                }
+            }
+        }
+        
+        return -1
+    }
+
+    private fun unescapeJavaScriptString(s: String): String {
+        return s.replace("\\b", "\u0008")
+            .replace("\\f", "\u000C")
+            .replace("\\n", "\n")
+            .replace("\\r", "\r")
+            .replace("\\t", "\t")
+            .replace("\\\\", "\\")
+            .replace("\\\"", "\"")
+            .replace("\\'", "'")
+            .replace("\\/", "/")
+    }
+
+    private fun escapeForJson(s: String): String {
+        return s.replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\n", "\\n")
+            .replace("\r", "\\r")
+            .replace("\t", "\\t")
     }
 
     private fun map(dto: UniversalisReadings): Readings {
@@ -109,6 +228,10 @@ class UniversalisReadingsProvider : IReadingsProvider {
             text = copyrightDto.text
         )
     }
+
+    fun parseReadings(json: String): Either<Failure.Unexpected, UniversalisReadings> = Either.catch {
+            Json.Default.decodeFromString(UniversalisReadings.serializer(), json)
+        }.mapLeft { e -> Failure.Unexpected("Error while parsing readings: ${e.message}") }
 
     companion object {
         private const val RESPONSE_WRAPPER_START = "universalisCallback("
