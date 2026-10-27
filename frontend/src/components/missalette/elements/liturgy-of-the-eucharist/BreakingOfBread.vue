@@ -18,5 +18,5 @@
 <script></script>
 
 <style lang="scss" scoped>
-@import "../../missalette.scss";
+@use "../../missalette.scss" as *;
 </style>

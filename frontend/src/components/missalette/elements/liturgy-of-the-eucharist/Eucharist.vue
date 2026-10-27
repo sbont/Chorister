@@ -87,5 +87,5 @@ At the conclusion of the prayer the Priest takes the chalice and the paten with 
 </template>
 
 <style lang="scss" scoped>
-@import "../../missalette.scss";
+@use "../../missalette.scss" as *;
 </style>

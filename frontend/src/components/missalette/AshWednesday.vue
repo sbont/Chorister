@@ -59,7 +59,7 @@ const songByIndex = computed(() => (index: number) => {
 
 
 <style>
-@import "./missalette.scss";
+@use "./missalette.scss" as *;
 
 .distribution-of-ashes, .prayer-of-faithful {
   margin: 1em 0;
