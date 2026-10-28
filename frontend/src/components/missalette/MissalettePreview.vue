@@ -11,33 +11,32 @@ import { Previewer } from "pagedjs";
 
 onMounted(() => {});
 
-function rendered() {
+async function rendered() {
   let paged = new Previewer();
   let pages: number | null = null;
-  let fontSize = 9;
-  let iteration = 0;
+  let fontSize = 15;
+  let iteration = 1;
 
-  // do {
-  paged.preview(DOMContent).then((flow) => {
-    console.log("Rendered", flow.total, "pages.");
+  do {
+    const root = document.documentElement;
+    const fontStyle = `--base-font-size: ${fontSize}pt;`;
+    root.style.setProperty("--base-font-size", `${fontSize}pt`);
+
+    const flow = await paged.preview(undefined, [fontStyle]);
+    console.log("Rendered attempt", iteration, "with", flow.total, "pages.");
     pages = flow.total;
 
     if (pages && pages != 4) {
-      const root = document.documentElement;
-      let delta = (4 - pages) * 0.1;
+      let delta = Math.pow(2.4, Math.abs(4 - pages)) * Math.sign(4 - pages) * 0.1;
+      console.log(Math.pow(2.4, Math.abs(4 - pages)));
+      console.log(delta);
+
       fontSize += delta;
       console.log("new fontsize", fontSize);
 
-      root.style.setProperty("--base-font-size", `${fontSize}pt`);
       iteration++;
-
-      paged.preview().then((flow) => {
-        console.log("Rendered", flow.total, "pages.");
-      });
     }
-  });
-
-  // } while (!pages || (pages != 4 && iteration < 3));
+  } while (!pages || (pages != 4 && iteration <= 12));
 }
 </script>
 
@@ -63,7 +62,12 @@ function rendered() {
   columns: 2;
   gap: 5mm;
 
-  --base-font-size: 8pt;
+  /* --base-font-size: 8pt; */
   --base-line-height: 1.4em;
+
+  font-size: var(--base-font-size);
+  font-family: "Crimson Text", serif;
+  font-weight: 400;
+  font-style: normal;
 }
 </style>

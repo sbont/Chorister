@@ -11,9 +11,9 @@ declare module 'pagedjs' {
     constructor(options?: Record<string, unknown>);
 
     preview(
-      content: DocumentFragment | Node,
-      stylesheets: Array<string | Record<string, string>>,
-      renderTo: HTMLElement,
+      content?: DocumentFragment | Node,
+      stylesheets?: Array<string | Record<string, string>>,
+      renderTo?: HTMLElement,
     ): Promise<FlowResult>;
   }
 

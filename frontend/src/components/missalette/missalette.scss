@@ -9,6 +9,13 @@
     font-size: var(--base-font-size);
 }
 
+.missalette-preview {
+    font-size: var(--base-font-size);
+    font-family: "Crimson Text", serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
 .crimson-text-regular {
     font-family: "Crimson Text", serif;
     font-weight: 400;
@@ -102,6 +109,7 @@ h6 {
 blockquote,
 :deep(blockquote) {
     font-family: "Crimson Text", serif;
+    font-size: calc(1 * var(--base-font-size));
     font-weight: 700;
     font-style: normal;
 }
@@ -120,6 +128,7 @@ pre {
 
 .dialogue {
     margin: 1em 0;
+    font-size: calc(1 * var(--base-font-size));
 }
 
 .dialogue p {
@@ -128,6 +137,10 @@ pre {
 
 .collect {
     margin: 1em 0;
+}
+
+.reading {
+    font-size: calc(1 * var(--base-font-size));
 }
 
 table.reading-header {
@@ -161,17 +174,5 @@ table.reading-header td {
 
 .lamb-of-god {
     margin: 1em 0;
-}
-
-pre {
-    font-family: "Crimson Text", serif;
-    font-weight: 400;
-    font-style: italic;
-    font-size: calc(0.8 * var(--base-font-size));
-    -webkit-overflow-scrolling: initial;
-    background-color: initial;
-    padding: 0;
-    white-space: initial;
-    word-wrap: normal;
 }
 
