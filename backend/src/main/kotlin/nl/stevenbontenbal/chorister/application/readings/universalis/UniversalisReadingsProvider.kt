@@ -15,7 +15,10 @@ import nl.stevenbontenbal.chorister.shared.Failure
 import org.slf4j.LoggerFactory
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.client.ClientRequest
+import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.netty.http.client.HttpClient
 import reactor.netty.transport.logging.AdvancedByteBufFormat
@@ -38,26 +41,49 @@ class UniversalisReadingsProvider : IReadingsProvider {
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
     private val logger = LoggerFactory.getLogger(UniversalisReadingsProvider::class.java)
 
-    override suspend fun getReadings(date: LocalDate): Either<Failure.Unexpected, Readings> {
+    override suspend fun getReadings(date: LocalDate): Either<Failure, Readings> {
         val englandWales = "europe.england.westminster"
         val dateParam = date.format(dateFormatter)
         return Either.Companion.catch {
             webClient
                 .get()
                 .uri("/${englandWales}/${dateParam}/jsonpmass.js")
+                .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36") // Well, yes, I'm not proud of this either
                 .retrieve()
                 .bodyToMono<String>()
                 .awaitSingle()
         }
-            .mapLeft { logFailure(it) }
+            .mapLeft { it.toFailure() }
             .flatMap { retrieveJsonFromResponse(it) }
             .flatMap { parseReadings(it) }
             .map { map(it) }
     }
 
+    private fun Throwable.toFailure(): Failure {
+        if (this is WebClientResponseException && statusCode.value() == 404) {
+            logger.warn("Universalis returned 404 for the requested date")
+            return Failure.DateNotInNearFuture
+        }
+        return logFailure(this)
+    }
+
     private fun logFailure(t: Throwable): Failure.Unexpected {
         logger.error("Failed to retrieve readings from Universalis: $t")
         return Failure.Unexpected(t.message ?: "Error while retrieving readings from Universalis" )
+    }
+
+    private fun logRequest(request: ClientRequest) {
+        logger.info("Outgoing request: {} {}", request.method(), request.url())
+        request.headers().forEach { (name, values) ->
+            logger.info("Request header: {}: {}", name, values.joinToString(", "))
+        }
+    }
+
+    private fun logResponse(response: ClientResponse) {
+        logger.info("Response status: {}", response.statusCode())
+        response.headers().asHttpHeaders().forEach { (name, values) ->
+            logger.info("Response header: {}: {}", name, values.joinToString(", "))
+        }
     }
 
     private fun retrieveJsonFromResponse(rawResponse: String): Either<Failure.Unexpected, String> {
@@ -99,35 +125,32 @@ class UniversalisReadingsProvider : IReadingsProvider {
             val transformations = mutableListOf<Pair<String, String>>()
             var currentPos = splitPos
             var chainEnd = splitPos
-            
-            while (currentPos < result.length) {
-                val splitStart = result.indexOf(splitMarker, currentPos)
-                if (splitStart == -1 || splitStart < splitPos) break
-                
-                val splitCharStart = splitStart + splitMarker.length
+
+            while (result.startsWith(splitMarker, currentPos)) {
+                val splitCharStart = currentPos + splitMarker.length
                 val splitCharEnd = result.indexOf('"', splitCharStart)
                 if (splitCharEnd == -1) break
                 val splitChar = result.substring(splitCharStart, splitCharEnd)
-                
+
                 val joinMarker = ".join(\""
-                val joinStart = result.indexOf(joinMarker, splitCharEnd)
-                if (joinStart == -1) break
-                
-                val joinCharStart = joinStart + joinMarker.length
+                val splitCloseParen = result.indexOf(')', splitCharEnd)
+                if (splitCloseParen == -1 || !result.startsWith(joinMarker, splitCloseParen + 1)) break
+
+                val joinCharStart = splitCloseParen + 1 + joinMarker.length
                 val joinCharEnd = result.indexOf('"', joinCharStart)
                 if (joinCharEnd == -1) break
                 val joinChar = result.substring(joinCharStart, joinCharEnd)
-                
+
                 transformations.add(splitChar to joinChar)
-                
+
                 val closeParen = result.indexOf(')', joinCharEnd)
-                if (closeParen != -1) {
-                    chainEnd = closeParen
-                    currentPos = closeParen + 1
-                } else {
+                if (closeParen == -1) {
                     chainEnd = joinCharEnd
                     currentPos = joinCharEnd + 1
+                    break
                 }
+                chainEnd = closeParen
+                currentPos = closeParen + 1
             }
             
             var deobfuscated = unescapeJavaScriptString(baseString)

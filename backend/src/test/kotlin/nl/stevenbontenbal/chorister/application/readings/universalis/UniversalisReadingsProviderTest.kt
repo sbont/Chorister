@@ -1,9 +1,54 @@
 package nl.stevenbontenbal.chorister.application.readings.universalis
 
+import arrow.core.Either
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 
 class UniversalisReadingsProviderTest {
+
+    @Test
+    fun `retrieveJsonFromResponse handles real universalis response`() {
+        val rawResponse = javaClass.getResourceAsStream("/universalis/jsonpmass-20261101.txt")!!
+            .readBytes()
+            .decodeToString()
+
+        val provider = UniversalisReadingsProvider()
+        val retrieveMethod = UniversalisReadingsProvider::class.java
+            .getDeclaredMethod("retrieveJsonFromResponse", String::class.java)
+        retrieveMethod.isAccessible = true
+        val jsonEither = retrieveMethod.invoke(provider, rawResponse) as Either<Any?, String>
+        val json = jsonEither.fold({ fail<String>("retrieveJsonFromResponse failed: $it") }, { it })
+        println(json)
+
+        val readings = provider.parseReadings(json)
+            .fold({ fail<UniversalisReadings>("parseReadings failed: $it") }, { it })
+
+        assertEquals("Revelation 7:2&#x2010;4, 9&#x2010;14", readings.Mass_R1.source)
+        assertTrue(
+            readings.Mass_R1.text.contains("I, John, saw another angel ascending from the rising of the sun"),
+            "Mass_R1 text should be deobfuscated: ${readings.Mass_R1.text}"
+        )
+        assertFalse(readings.Mass_R1.text.contains(".split("), "Mass_R1 still contains obfuscation")
+        assertTrue(
+            readings.Mass_Ps.text.contains("Such are the people who seek your face"),
+            "Mass_Ps text should be deobfuscated: ${readings.Mass_Ps.text}"
+        )
+        assertTrue(
+            readings.Mass_R2?.text?.contains("See what kind of love the Father") == true,
+            "Mass_R2 text should be deobfuscated: ${readings.Mass_R2?.text}"
+        )
+        assertTrue(
+            readings.Mass_G.text.contains("Blessed are the poor in spirit, for theirs is the kingdom of heaven"),
+            "Mass_G text should be deobfuscated: ${readings.Mass_G.text}"
+        )
+        assertTrue(
+            readings.copyright.text.contains("the English Standard Version of the Bible, Catholic Edition"),
+            "copyright text should be deobfuscated: ${readings.copyright.text}"
+        )
+    }
 
     @Test
     fun `deobfuscateObjectLiteral handles simple split join`() {
