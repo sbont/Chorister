@@ -5,6 +5,16 @@
         <slot></slot>
       </div>
     </div>
+    <div class="paged-content-toolbar">
+      <button
+        class="print-button"
+        type="button"
+        :disabled="!isReady"
+        @click="printResult"
+      >
+        Print…
+      </button>
+    </div>
     <div v-if="!isReady" class="loading">Generating preview...</div>
     <div
       ref="previewContainer"
@@ -259,6 +269,73 @@ watch(
   }
 );
 
+function printResult() {
+  console.log("[PagedContent] printResult");
+  if (!previewContainer.value || !isReady.value) return;
+
+  // Must run synchronously in the click handler so popup blockers
+  // attribute it to the user gesture.
+  const printWindow = window.open("", "paged-content-print", "width=900,height=1100");
+  if (!printWindow) {
+    console.error("[PagedContent] popup blocked — allow popups for this site to print");
+    return;
+  }
+
+  // The popup must be a self-contained snapshot: copy every stylesheet
+  // the rendered pages depend on — the app's own styles (content
+  // typography, fonts) plus the base and processed page styles the
+  // Paged.js Polisher inserted into <head>.
+  const styles = Array.from(
+    document.head.querySelectorAll("style, link[rel='stylesheet']")
+  )
+    .map((element) => element.outerHTML)
+    .join("\n");
+
+  const fontSize =
+    document.documentElement.style.getPropertyValue("--base-font-size") ||
+    "16pt";
+  const title = props.pageTitle || "Paged content";
+
+  printWindow.document.open();
+  printWindow.document.write(`<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>${title}</title>
+    ${styles}
+    <style>
+      :root { --base-font-size: ${fontSize}; }
+
+      /* Paged.js builds the page margins INTO its page boxes, so the
+         physical sheet itself needs no margin. */
+      @page { size: ${props.pageWidth || "148mm"} ${props.pageHeight || "210mm"}; margin: 0; }
+
+      body { background: #808080; margin: 0; padding: 24px 0; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+      .pagedjs_page { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); background: white; }
+
+      .print-toolbar {
+        position: fixed; top: 12px; right: 12px; z-index: 1000;
+        padding: 8px 20px; font: 14px sans-serif;
+        border: none; border-radius: 4px; cursor: pointer;
+        background: #2563eb; color: white;
+      }
+
+      @media print {
+        body { background: white; padding: 0; gap: 0; display: block; }
+        .pagedjs_page { box-shadow: none; break-after: page; }
+        .pagedjs_page:last-child { break-after: auto; }
+        .print-toolbar { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="print-toolbar" type="button" onclick="window.print()">Print</button>
+    ${previewContainer.value.innerHTML}
+  </body>
+</html>`);
+  printWindow.document.close();
+}
+
 onMounted(() => {
   console.log("[PagedContent] mounted");
   adjustFontSize();
@@ -274,6 +351,26 @@ onUnmounted(() => {
 <style lang="scss">
 .paged-content-container {
   position: relative;
+}
+
+.paged-content-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.print-button {
+  padding: 8px 20px;
+  font: 14px sans-serif;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #2563eb;
+  color: white;
+
+  &:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+  }
 }
 
 .hidden-content {
