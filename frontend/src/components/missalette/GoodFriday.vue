@@ -52,5 +52,5 @@ const songByIndex = computed(() => (index: number) => {
 </script>
 
 <style>
-@use "./missalette.scss" as *;
+@import "./missalette.scss";
 </style>

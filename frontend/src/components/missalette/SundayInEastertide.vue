@@ -1,9 +1,9 @@
 <template>
   <div class="mass-order">
     <IntroductoryRites :entrance-hymn="songByIndex(1)" />
-      <Suspense suspensible>
-    <LiturgyOfTheWord v-if="event" :event="event" />
-      </Suspense>
+    <Suspense suspensible>
+      <LiturgyOfTheWord v-if="event" :event="event" />
+    </Suspense>
 
     <LiturgyOfTheEucharist
       :offertory-hymn="songByIndex(4)"
@@ -45,5 +45,5 @@ const songByIndex = computed(() => (index: number) => {
 </script>
 
 <style>
-@use "./missalette.scss" as *;
+@import "./missalette.scss";
 </style>

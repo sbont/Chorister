@@ -23,5 +23,5 @@
 </script>
 
 <style lang="scss" scoped>
-@use "../../missalette.scss" as *;
+@use "../../missalette.scss";
 </style>
