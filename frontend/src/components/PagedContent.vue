@@ -6,7 +6,11 @@
       </div>
     </div>
     <div v-if="!isReady" class="loading">Generating preview...</div>
-    <div ref="previewContainer" class="pagedjs-output" :class="{ 'is-ready': isReady }"></div>
+    <div
+      ref="previewContainer"
+      class="pagedjs-output"
+      :class="{ 'is-ready': isReady }"
+    ></div>
   </div>
 </template>
 
@@ -28,6 +32,11 @@ const previewContainer = ref<HTMLElement | null>(null);
 let paged: Previewer | null = null;
 const isReady = ref(false);
 
+// The adjustment loop is async and long-running. Only the most recent run
+// may render: prop changes supersede earlier runs, unmounting stops them.
+let runToken = 0;
+let disposed = false;
+
 const pageCss = computed(
   () => `
 @page {
@@ -42,7 +51,7 @@ const pageCss = computed(
   }
 
   @bottom-center {
-    content: string(title);
+    content: ${props.pageTitle ? `"${props.pageTitle}"` : "string(title)"};
     text-transform: uppercase;
   }
   `
@@ -120,30 +129,126 @@ async function adjustFontSize() {
   console.log("[PagedContent] adjustFontSize, targetPages:", props.targetPages);
   if (!previewContainer.value) return;
 
+  const token = ++runToken;
   isReady.value = false;
 
-  let fontSize = 20;
-  let pages: number | null = null;
-  let iteration = 0;
-  const maxIterations = 20;
+  let fontSize = 30;
+  let lastRendered: number | null = null;
 
-  do {
-    console.log(`[PagedContent] iteration ${iteration}, fontSize ${fontSize}`);
-    pages = await renderWithSize(fontSize);
+  // Bounds learned from renders. Once both are known, the fit/spill
+  // boundary is bracketed and bisection pins it down deterministically.
+  //   minFont: pages <= target — the content fits, the font can grow
+  //   maxFont: pages > target — the content spills, the font must shrink
+  let minFont: number | null = null;
+  let maxFont: number | null = null;
 
-    if (pages && pages !== props.targetPages) {
-      const diff = props.targetPages - pages;
-      const delta = Math.pow(2.2, Math.abs(diff)) * Math.sign(diff) * 0.1;
-      console.log(`[PagedContent] pages: ${pages}, diff: ${diff}, delta: ${delta}`);
-      fontSize += delta;
-      fontSize = Math.max(4, Math.min(100, fontSize));
+  // Objective: the LARGEST font size that still fits within targetPages
+  // (bigger font = fuller pages = most readable). An exact page count is
+  // therefore NOT a stop condition — a slightly larger font may produce
+  // the same count with a fuller final page. The search continues until
+  // the boundary is exhausted.
+  let bestExactFont: number | null = null; // exact count, largest font seen
+  // Fallback if the exact count is unreachable (the page count is a
+  // discrete step function, e.g. it may jump 3 → 5 with no 4 in between).
+  let bestFallbackFont = fontSize;
+  let bestFallbackPages = -Infinity;
+
+  const isBetterFallback = (candidate: number) =>
+    Math.abs(candidate - props.targetPages) <
+      Math.abs(bestFallbackPages - props.targetPages) ||
+    (Math.abs(candidate - props.targetPages) ===
+      Math.abs(bestFallbackPages - props.targetPages) &&
+      // On a tie prefer fitting within the target over spilling.
+      candidate <= props.targetPages);
+
+  for (let iteration = 0; iteration < 20; iteration++) {
+    if (disposed || token !== runToken) {
+      console.log("[PagedContent] adjustment superseded, aborting");
+      return;
     }
 
-    iteration++;
-  } while ((!pages || pages !== props.targetPages) && iteration < maxIterations);
+    console.log(
+      `[PagedContent] iteration ${iteration}, fontSize ${fontSize.toFixed(2)},` +
+        ` bracket [${minFont?.toFixed(2) ?? "-"}, ${maxFont?.toFixed(2) ?? "-"}]`
+    );
+    const pages = await renderWithSize(fontSize);
+    lastRendered = fontSize;
 
-  console.log("[PagedContent] adjustment done, final pages:", pages);
-  isReady.value = true;
+    if (!pages) {
+      console.error("[PagedContent] render failed, stopping adjustment");
+      break;
+    }
+
+    if (pages === props.targetPages) {
+      if (bestExactFont === null || fontSize > bestExactFont) {
+        bestExactFont = fontSize;
+      }
+    } else if (isBetterFallback(pages)) {
+      bestFallbackFont = fontSize;
+      bestFallbackPages = pages;
+    }
+
+    if (pages > props.targetPages) {
+      maxFont = fontSize;
+    } else {
+      minFont = fontSize;
+    }
+
+    if (minFont !== null && maxFont !== null) {
+      // Bracketed: halve the interval. The step function guarantees a
+      // decision in O(log) renders regardless of any model error.
+      if (maxFont - minFont < 0.05) {
+        // The fit/spill boundary is pinned as finely as font sizes are
+        // meaningful; the best render is restored after the loop.
+        break;
+      }
+      fontSize = (minFont + maxFont) / 2;
+    } else if (pages === props.targetPages) {
+      // Fits exactly: probe upward for an even fuller fit at the same
+      // page count.
+      fontSize *= 1.05;
+    } else {
+      // Unbracketed: scale along pages ∝ fontSize² (a page's capacity
+      // shrinks with the square of the font: fewer chars per line AND
+      // fewer lines per page). This lands near the optimum in one step
+      // from any distance, e.g. 10 pages at 30pt → ×√(4/10) → 19pt.
+      const estimate = fontSize * Math.sqrt(props.targetPages / pages);
+
+      // Plateau guard: if the estimate barely moved, jump toward the
+      // unknown side so every render teaches us something new.
+      fontSize =
+        Math.abs(estimate - fontSize) < 0.05
+          ? minFont !== null
+            ? fontSize * 1.25
+            : fontSize * 0.8
+          : estimate;
+    }
+
+    fontSize = Math.max(4, Math.min(100, fontSize));
+  }
+
+  const chosenFont = bestExactFont ?? bestFallbackFont;
+  console.log(
+    "[PagedContent] adjustment done, chosen font:",
+    chosenFont.toFixed(2),
+    bestExactFont !== null
+      ? `(exact ${props.targetPages} pages, fullest fit)`
+      : `(closest reachable: ${bestFallbackPages} pages)`
+  );
+
+  if (disposed || token !== runToken) return;
+
+  // Restore the chosen render if the loop's final state is not it.
+  if (bestFallbackPages > 0 || bestExactFont !== null) {
+    if (lastRendered !== chosenFont) {
+      console.log("[PagedContent] restoring chosen render at", chosenFont.toFixed(2));
+      await renderWithSize(chosenFont);
+    }
+  }
+
+  if (token === runToken && !disposed) {
+    isReady.value = true;
+  }
 }
 
 watch(
@@ -151,8 +256,7 @@ watch(
   () => {
     console.log("[PagedContent] props changed, re-adjusting");
     adjustFontSize();
-  },
-  { deep: true }
+  }
 );
 
 onMounted(() => {
@@ -161,6 +265,8 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  disposed = true;
+  runToken++; // invalidate any in-flight adjustment loop
   cleanupPreview();
 });
 </script>
