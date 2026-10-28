@@ -1,0 +1,21 @@
+diff --git a/src/chunker/layout.js b/src/chunker/layout.js
+index 31b319c8d3d330cab9b67183623ad4eb0558bdfb..aa761be8d8d924d04e8da933cf6b2a2d72a6e68f 100644
+--- a/src/chunker/layout.js
++++ b/src/chunker/layout.js
+@@ -718,8 +718,16 @@ class Layout {
+ 			}
+ 		}
+ 
++		if (!lastChild) {
++			return;
++		}
++
+ 		let original = findElement(lastChild, source);
+ 
++		if (!original) {
++			return;
++		}
++
+ 		if (lastNodeIndex) {
+ 			original = original.childNodes[lastNodeIndex];
+ 		}

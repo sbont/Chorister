@@ -1,4 +1,7 @@
 packages:
-  - "src/**"
-  - "style/**"
-  - "!public/"
+  - src/**
+  - style/**
+  - '!public/'
+
+patchedDependencies:
+  pagedjs@0.4.3: patches/pagedjs@0.4.3.patch

@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  pagedjs@0.4.3:
+    hash: 663dd215a53ded9ce7b1e4ebed06ad40af45768ced6f8ee7d578efcfa3e3af4c
+    path: patches/pagedjs@0.4.3.patch
+
 importers:
 
   .:
@@ -85,7 +90,7 @@ importers:
         version: 3.3.0
       pagedjs:
         specifier: ^0.4.3
-        version: 0.4.3
+        version: 0.4.3(patch_hash=663dd215a53ded9ce7b1e4ebed06ad40af45768ced6f8ee7d578efcfa3e3af4c)
       pinia:
         specifier: ^2.0.23
         version: 2.3.1(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3))
@@ -5722,7 +5727,7 @@ snapshots:
 
   p-try@2.2.0: {}
 
-  pagedjs@0.4.3:
+  pagedjs@0.4.3(patch_hash=663dd215a53ded9ce7b1e4ebed06ad40af45768ced6f8ee7d578efcfa3e3af4c):
     dependencies:
       '@babel/polyfill': 7.12.1
       '@babel/runtime': 7.29.2
