@@ -5,5 +5,5 @@ import nl.stevenbontenbal.chorister.shared.Failure
 import java.time.LocalDate
 
 interface IReadingsProvider {
-    suspend fun getReadings(date: LocalDate): Either<Failure.Unexpected, Readings>
+    suspend fun getReadings(date: LocalDate): Either<Failure, Readings>
 }

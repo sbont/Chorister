@@ -23,13 +23,23 @@ class ReadingsController(
             val localDate = LocalDate.parse(date)
             when (val result = readingsProvider.getReadings(localDate)) {
                 is Either.Left<*> -> when (val failure = result.value) {
-                    is Failure.Unexpected -> ResponseEntity.internalServerError().body(failure.message)
-                    else -> ResponseEntity.internalServerError().build()
+                    is Failure.Unexpected -> ResponseEntity.internalServerError()
+                        .body(ReadingsError(ReadingsError.CODE_UNEXPECTED, failure.message))
+                    is Failure.DateNotInNearFuture -> ResponseEntity.badRequest()
+                        .body(
+                            ReadingsError(
+                                ReadingsError.CODE_DATE_NOT_IN_NEAR_FUTURE,
+                                "Readings can only be retrieved for dates in the near future."
+                            )
+                        )
+                    else -> ResponseEntity.internalServerError()
+                        .body(ReadingsError(ReadingsError.CODE_UNEXPECTED, "An unexpected error occurred."))
                 }
                 is Either.Right<*> -> ResponseEntity.ok(result.value)
             }
         } catch (_: DateTimeParseException) {
-            ResponseEntity.badRequest().body("Invalid date format. Please use YYYY-MM-DD format.")
+            ResponseEntity.badRequest()
+                .body(ReadingsError(ReadingsError.CODE_INVALID_DATE, "Invalid date format. Please use YYYY-MM-DD format."))
         }
     }
 }

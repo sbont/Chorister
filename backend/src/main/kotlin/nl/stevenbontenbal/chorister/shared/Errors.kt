@@ -13,5 +13,7 @@ interface Failure : ChoristerError {
 
     data class Unexpected(
         val message: String
-    )
+    ) : Failure
+
+    data object DateNotInNearFuture : Failure
 }

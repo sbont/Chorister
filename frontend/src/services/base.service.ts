@@ -30,7 +30,7 @@ export default class BaseService {
     this.instance.interceptors.response.use(response => response, error => {
       const data = (error as AxiosError<ErrorPayload>).response?.data;
       const message = data?.message ?? (error.status >= 500 ? "A server error occurred. Try again or report an issue if the problem keeps reoccurring." : error.message);
-      return Promise.reject({ statusCode: error.status, message } satisfies ApiError)
+      return Promise.reject({ statusCode: error.status, code: data?.code, message } satisfies ApiError)
     });
   }
 }

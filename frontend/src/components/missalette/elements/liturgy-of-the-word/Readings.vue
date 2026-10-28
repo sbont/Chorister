@@ -106,6 +106,9 @@
       <p v-html="readings.copyright.text"></p>
     </div>
   </div>
+  <div v-else-if="warning" class="readings-warning">
+    <p>{{ warning }}</p>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -113,6 +116,7 @@ import { computed, ref } from "vue";
 import { Event } from "@/entities/event";
 import { useReadings } from "@/application/readings.store";
 import { Reading, Readings } from "@/entities/reading";
+import { ApiError } from "@/types/api-error";
 import ReadingComponent from "./Reading.vue";
 import Psalm from "./Psalm.vue";
 import Gloria from "../introductory-rites/Gloria.vue";
@@ -128,9 +132,18 @@ const readingsStore = useReadings();
 
 // state
 const readings = ref<Readings>();
+const warning = ref("");
 if (props.event.date) {
-  const loadedReadings = await readingsStore.load(props.event.date);
-  readings.value = transform(loadedReadings);
+  try {
+    const loadedReadings = await readingsStore.load(props.event.date);
+    readings.value = transform(loadedReadings);
+  } catch (e) {
+    const error = e as ApiError;
+    warning.value =
+      error.code === "DATE_NOT_IN_NEAR_FUTURE"
+        ? error.message
+        : "The readings for this date could not be loaded.";
+  }
 }
 
 const gospelAuthor = computed(() => readings.value?.gospelReading.source.split(" ")[0]);
@@ -253,5 +266,11 @@ table.reading-header td {
 
 .gospel-acclamation {
   margin: 1em 0;
+}
+
+.readings-warning {
+  border: 1px solid #c8a415;
+  background-color: #fff8e1;
+  padding: 0.5em 1em;
 }
 </style>
