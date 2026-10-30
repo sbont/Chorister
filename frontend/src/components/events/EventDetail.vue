@@ -2,7 +2,7 @@
     <div class="event-detail">
         <DetailHeader
             :mode="pageState" :title="event?.name" :subtitle="event ? format(event?.date) : ''"
-            :custom-actions="[{ 'label': 'Export texts', action: exportText, accessLevel: 'EDITOR' }, { 'label': 'Get playlist', action: navigateToPlaylist, accessLevel: 'EDITOR' }]"
+            :custom-actions="[{ 'label': 'Export texts', action: exportText, accessLevel: 'EDITOR' }, { 'label': 'Get playlist', action: navigateToPlaylist, accessLevel: 'EDITOR' }, { 'label': 'Missalette', action: navigateToMissalette, accessLevel: 'EDITOR' }]"
             entity="event"
             :saving="saving"
             @edit="edit"
@@ -137,6 +137,13 @@ const exportText = () => {
         params: { id: event.value?.id },
     });
     window.open(link.href, "_blank");
+};
+
+const navigateToMissalette = () => {
+    router.push({
+        name: "EventMissalette",
+        params: { id: event.value?.id },
+    });
 };
 
 const createPlaylistUrl = () => {

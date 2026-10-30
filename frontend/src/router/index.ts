@@ -77,7 +77,17 @@ const routes = [
         component: () => import('../components/events/Event.vue'),
         meta: {
           requiresAuth: true
-        }
+        },
+        children: [
+          {
+            path: 'missalette',
+            name: 'EventMissalette',
+            component: () => import('../components/missalette/MissalettePreview.vue'),
+            meta: {
+              requiresAuth: true
+            }
+          }
+        ]
       },
       {
         path: 'upcoming',
@@ -148,11 +158,6 @@ const routes = [
         path: 'eastertide',
         name: 'ExportSundayInEastertide',
         component: () => import('../components/missalette/SundayInEastertide.vue'),
-      },
-      {
-        path: 'missalette',
-        name: 'ExportMissalette',
-        component: () => import('../components/missalette/MissalettePreview.vue'),
       },
     ]
   },

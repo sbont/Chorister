@@ -5,16 +5,6 @@
         <slot></slot>
       </div>
     </div>
-    <div class="paged-content-toolbar">
-      <button
-        class="print-button"
-        type="button"
-        :disabled="!isReady"
-        @click="printResult"
-      >
-        Print…
-      </button>
-    </div>
     <div v-if="!isReady" class="loading">Generating preview...</div>
     <div
       ref="previewContainer"
@@ -346,31 +336,15 @@ onUnmounted(() => {
   runToken++; // invalidate any in-flight adjustment loop
   cleanupPreview();
 });
+
+// The host page owns the toolbar (e.g. Back / pages / Print header), so the
+// print flow and readiness are exposed instead of rendered here.
+defineExpose({ printResult, isReady });
 </script>
 
 <style lang="scss">
 .paged-content-container {
   position: relative;
-}
-
-.paged-content-toolbar {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.print-button {
-  padding: 8px 20px;
-  font: 14px sans-serif;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  background: #2563eb;
-  color: white;
-
-  &:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-  }
 }
 
 .hidden-content {
