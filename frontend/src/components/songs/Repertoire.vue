@@ -1,6 +1,6 @@
 <template>
     <div class="columns is-gapless">
-        <div class="column is-one-third-tablet is-one-fifth-desktop has-background-grey-darker" id="menu">
+        <div id="menu" class="column is-one-third-tablet is-one-fifth-desktop has-background-grey-darker">
             <RepertoireMenu />
         </div>
         <div class="column">

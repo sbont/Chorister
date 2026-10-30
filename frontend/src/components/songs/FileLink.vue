@@ -1,6 +1,7 @@
 <template>
-    <a v-if="fileInfoUri" @click.prevent="openFile" @auxclick.prevent="openFile"
-        @mousedown.middle.prevent="openFile" href="#" class="icon-text has-text-link">
+    <a
+v-if="fileInfoUri" href="#" class="icon-text has-text-link"
+        @click.prevent="openFile" @auxclick.prevent="openFile" @mousedown.middle.prevent="openFile">
         <span class="icon">
             <i class="fas fa-cloud-download-alt"></i>
         </span>

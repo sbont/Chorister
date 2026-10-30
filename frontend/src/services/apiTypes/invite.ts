@@ -16,7 +16,7 @@ export interface SingleInvite extends Invite, Identifiable, ApiEntityIn {
     token: string
     createdDate: Date
     acceptedDate: Date
-    expired: Boolean
+    expired: boolean
     choir: Choir
 }
 

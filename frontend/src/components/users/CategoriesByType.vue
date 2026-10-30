@@ -1,6 +1,6 @@
 <template>
     <div class="category-table">
-        <table class="table is-hoverable is-fullwidth" v-cloak>
+        <table v-cloak class="table is-hoverable is-fullwidth">
             <thead>
                 <tr>
                     <th>Category</th>
@@ -8,10 +8,10 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="category in props.categories" class="category" :key="category.id">
+                <tr v-for="category in props.categories" :key="category.id" class="category">
                     <td class="grow">{{ category.name }}</td>
                     <td class="p-1">
-                        <button class="button is-danger is-inverted is-small" @click="$emit('remove', category)" v-if="authStore.userCan('delete', 'category')">
+                        <button v-if="authStore.userCan('delete', 'category')" class="button is-danger is-inverted is-small" @click="$emit('remove', category)">
                             <span class="icon is-small">
                                 <i class="fas fa-times"></i>
                             </span>
@@ -22,12 +22,12 @@
             <tfoot>
                 <tr v-if="authStore.userCan('create', 'category')">
                     <td v-if="!editing">
-                        <a @click.prevent="create" href="#" class="card-footer-item">Add...</a>
+                        <a href="#" class="card-footer-item" @click.prevent="create">Add...</a>
                     </td>
                     <td v-else>
                         <div class="field">
                             <div class="control">
-                                <input class="input" type="text" v-model="draftValue" />
+                                <input v-model="draftValue" class="input" type="text" />
                             </div>
                         </div>
                     </td>
@@ -61,7 +61,7 @@ const emit = defineEmits(["remove", "save"])
 
 // state
 const authStore = useAuth();
-const draftValue = ref<String | undefined>(undefined)
+const draftValue = ref<string | undefined>(undefined)
 const editing = ref(false)
 
 // methods

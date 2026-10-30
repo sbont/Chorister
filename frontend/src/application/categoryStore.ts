@@ -70,9 +70,9 @@ export const useCategories = defineStore("categories", () => {
     }
 
     async function putForSong(songId: number, newCategories: Category[]) {
-        let previousCategories = categoriesBySongId.value.get(songId) ?? [];
-        let categoriesToAdd = newCategories.filter(draftCategory => !previousCategories.some(previousCategory => draftCategory.id === previousCategory));
-        let categoriesToDelete = previousCategories.filter(previousCategory => !newCategories.some(draftCategory => previousCategory === draftCategory.id));
+        const previousCategories = categoriesBySongId.value.get(songId) ?? [];
+        const categoriesToAdd = newCategories.filter(draftCategory => !previousCategories.some(previousCategory => draftCategory.id === previousCategory));
+        const categoriesToDelete = previousCategories.filter(previousCategory => !newCategories.some(draftCategory => previousCategory === draftCategory.id));
         const promises = [];
         if (categoriesToAdd.length) {
             const posted = api.postSongCategories(songId, categoriesToAdd);

@@ -1,25 +1,25 @@
 <template>
     <div class="mychoir">
         <div>
-            <DetailHeader :title="choir.name" subtitle="My choir" subtitle-on-top v-if="choir" entity="choir"/>
+            <DetailHeader v-if="choir" :title="choir.name" subtitle="My choir" subtitle-on-top entity="choir"/>
 
-            <div class="p-3" v-if="!loading">
+            <div v-if="!loading" class="p-3">
                 <div class="tabs">
                     <ul>
                         <li :class="{ 'is-active': activeTab == 'members' }">
-                            <a v-on:click="activeTab = 'members'">Members</a>
+                            <a @click="activeTab = 'members'">Members</a>
                         </li>
                         <li :class="{ 'is-active': activeTab == 'categories' }">
-                            <a v-on:click="activeTab = 'categories'">Categories</a>
+                            <a @click="activeTab = 'categories'">Categories</a>
                         </li>
                     </ul>
                 </div>
 
-                <div class="new-members" v-if="activeTab == 'members'">
+                <div v-if="activeTab == 'members'" class="new-members">
                     <ChoirMembers />
                 </div>
 
-                <div class="categories" v-if="activeTab == 'categories'">
+                <div v-if="activeTab == 'categories'" class="categories">
                     <Categories />
                 </div>
             </div>

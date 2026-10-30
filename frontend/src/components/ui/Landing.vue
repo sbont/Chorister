@@ -38,7 +38,8 @@
                     <div class="column is-half">
                         <p class="is-size-7">
                             <i>Chorister is currently in beta and your
-                                <a href="https://github.com/sbont/Chorister/issues"
+                                <a
+                                    href="https://github.com/sbont/Chorister/issues"
                                     class="has-text-link-light">feedback</a>
                                 is most welcome.</i>
                         </p>

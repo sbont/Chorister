@@ -11,10 +11,10 @@
                 <div class="content mono" v-html="chords.chords"></div>
             </div>
             <footer class="card-footer">
-                <a @click.prevent="edit" href="#" class="card-footer-item" v-if="authStore.userCan('update', 'chords')">
+                <a v-if="authStore.userCan('update', 'chords')" href="#" class="card-footer-item" @click.prevent="edit">
                     Edit
                 </a>
-                <a @click.prevent="$emit('remove')" href="#" class="card-footer-item has-text-danger" v-if="authStore.userCan('delete', 'chords')">
+                <a v-if="authStore.userCan('delete', 'chords')" href="#" class="card-footer-item has-text-danger" @click.prevent="$emit('remove')">
                     Delete
                 </a>
             </footer>
@@ -29,9 +29,10 @@
                                 <div class="control">
                                     <div class="select">
                                         <select v-model="draftValues.key">
-                                            <option v-bind:value="undefined" disabled>Select...</option>
-                                            <option v-for="(key, i) in keyOptions" class="song" :key="key"
-                                                draggable="true" v-bind:value="key">{{ keyLabelMapping[key] }}
+                                            <option :value="undefined" disabled>Select...</option>
+                                            <option
+v-for="(key, i) in keyOptions" :key="key" class="song"
+                                                draggable="true" :value="key">{{ keyLabelMapping[key] }}
                                             </option>
                                         </select>
                                     </div>
@@ -42,7 +43,8 @@
                             <div class="field">
                                 <label class="label">Description</label>
                                 <div class="control">
-                                    <input class="input" type="text" v-model="draftValues.description"
+                                    <input
+v-model="draftValues.description" class="input" type="text"
                                         placeholder="Version name, instrument, ..." />
                                 </div>
                             </div>

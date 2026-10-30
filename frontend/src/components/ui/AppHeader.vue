@@ -8,7 +8,7 @@
                 beta
             </div>
         </template>
-        <template #start v-if="isLoggedIn">
+        <template v-if="isLoggedIn" #start>
             <b-navbar-item tag="router-link" :to="{ path: '/planning/upcoming' }"> Planning </b-navbar-item>
             <b-navbar-item tag="router-link" :to="{ path: '/repertoire' }"> Repertoire </b-navbar-item>
             <b-navbar-item tag="router-link" :to="{ path: '/mychoir' }"> My Choir </b-navbar-item>

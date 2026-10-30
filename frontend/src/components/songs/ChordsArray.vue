@@ -1,9 +1,10 @@
 <template>
-    <div class="m-2 p-3" v-if="authStore.userCan('read', 'chords')">
+    <div v-if="authStore.userCan('read', 'chords')" class="m-2 p-3">
         <div class="is-size-4">Chords</div>
         <div>{{ error }}</div>
         <div class="is-flex is-flex-direction-row is-flex-wrap-wrap">
-            <ChordsComponent v-for="chords in chordses" :key="chords.id" :value="(chords as Chords)"
+            <ChordsComponent
+v-for="chords in chordses" :key="chords.id" :value="(chords as Chords)"
                 @remove="removeChords(chords)">
             </ChordsComponent>
             <div v-if="authStore.userCan('create', 'chords')">
