@@ -3,7 +3,7 @@ export { }
 declare module 'vue-router' {
     interface RouteMeta {
         hideHeader?: boolean
-        requiresAuth?: boolean
+        allowAnonymous?: boolean
         forwardWhenAuthenticated?: string
     }
 }

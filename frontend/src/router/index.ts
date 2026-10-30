@@ -7,6 +7,7 @@ const routes = [
     path: '/',
     name: 'Landing',
     meta: {
+      allowAnonymous: true,
       hideHeader: true,
       forwardWhenAuthenticated: '/planning/upcoming'
     },
@@ -15,46 +16,34 @@ const routes = [
   {
     path: '/signup',
     name: 'SignUp',
-    component: () => import('../components/users/SignUp.vue')
+    component: () => import('../components/users/SignUp.vue'),
+    meta: {
+      allowAnonymous: true
+    }
   },
   {
     path: '/repertoire',
     component: () => import('../components/songs/Repertoire.vue'),
-    meta: {
-      requiresAuth: true
-    },
     children: [
       {
         path: '',
         name: 'Repertoire',
         component: () => import('../components/songs/Songs.vue'),
-        meta: {
-          requiresAuth: true
-        },
       },
       {
         path: 'category/:id',
         name: 'Category',
         component: () => import('../components/songs/Songs.vue'),
-        meta: {
-          requiresAuth: true
-        },
       },
       {
         path: 'song/new',
         name: 'NewSong',
         component: () => import('../components/songs/SongDetail.vue'),
-        meta: {
-          requiresAuth: true
-        },
       },
       {
         path: 'song/:id',
         name: 'Song',
         component: () => import('../components/songs/SongDetail.vue'),
-        meta: {
-          requiresAuth: true
-        },
       }
     ]
   },
@@ -67,25 +56,16 @@ const routes = [
         path: 'event/new',
         name: 'NewEvent',
         component: () => import('../components/events/EventDetail.vue'),
-        meta: {
-          requiresAuth: true
-        },
       },
       {
         path: 'event/:id',
         name: 'Event',
         component: () => import('../components/events/Event.vue'),
-        meta: {
-          requiresAuth: true
-        },
         children: [
           {
             path: 'missalette',
             name: 'EventMissalette',
             component: () => import('../components/missalette/MissalettePreview.vue'),
-            meta: {
-              requiresAuth: true
-            }
           }
         ]
       },
@@ -93,14 +73,8 @@ const routes = [
         path: 'upcoming',
         name: ' Upcoming event',
         component: () => import('../components/events/Upcoming.vue'),
-        meta: {
-          requiresAuth: true
-        }
       }
-    ],
-    meta: {
-      requiresAuth: true
-    }
+    ]
   },
   {
     path: '/mychoir',
@@ -115,7 +89,6 @@ const routes = [
   {
     path: '/planning/event/:id/',
     meta: {
-      requiresAuth: true,
       hideHeader: true
     },
     children: [
@@ -164,7 +137,10 @@ const routes = [
   {
     path: '/authorized',
     name: 'Authorized',
-    component: () => import('../components/ui/Authorized.vue')
+    component: () => import('../components/ui/Authorized.vue'),
+    meta: {
+      allowAnonymous: true
+    }
   }
 ]
 
@@ -194,7 +170,7 @@ router.beforeEach((to, from, next) => {
         console.error('Error handling logout redirect:', error);
         next('/')
       })
-  } else if (to.matched.some(record => record.meta.requiresAuth)) {
+  } else if (to.matched.some(record => !record.meta.allowAnonymous)) {
     if (!isLoggedIn) {
       console.log('Not logged in - initiating login redirect');
       // Don't call next() here - the login redirect will handle navigation
