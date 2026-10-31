@@ -1057,3 +1057,23 @@ databaseChangeLog:
               name: part
               type: VARCHAR(255)
           tableName: event_entry
+  - changeSet:
+      id: song-category-composite-pk
+      author: Steven.Bontenbal
+      changes:
+        - sql:
+            sql: >-
+              CREATE TABLE song_category_new (
+                song_id BIGINT NOT NULL,
+                category_id BIGINT NOT NULL,
+                CONSTRAINT song_categoryPK PRIMARY KEY (song_id, category_id)
+              );
+              INSERT INTO song_category_new (song_id, category_id)
+                SELECT DISTINCT song_id, category_id FROM song_category;
+              ALTER TABLE song_category RENAME TO song_category_old;
+              ALTER TABLE song_category_new RENAME TO song_category;
+              ALTER TABLE song_category ADD CONSTRAINT FK5nbpf87jlbfsw5jft5ltkkob4
+                FOREIGN KEY (song_id) REFERENCES song (id);
+              ALTER TABLE song_category ADD CONSTRAINT FKhekaoilgunoajdf3310ai5yk3
+                FOREIGN KEY (category_id) REFERENCES category (id);
+              DROP TABLE song_category_old;
