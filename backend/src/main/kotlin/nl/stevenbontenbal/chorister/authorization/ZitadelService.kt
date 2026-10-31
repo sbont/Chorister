@@ -18,9 +18,9 @@ private const val RolesClaim = "urn:zitadel:iam:org:project:roles"
 @Component
 class ZitadelService(
     zitadelConfiguration: ZitadelProperties,
+    private val zitadelV1Client: ZitadelV1Client = ZitadelV1Client(zitadelConfiguration),
+    private val zitadelV2Client: ZitadelV2Client = ZitadelV2Client(zitadelConfiguration),
 ) : IUserAuthorizationService {
-    private val zitadelV1Client = ZitadelV1Client(zitadelConfiguration)
-    private val zitadelV2Client = ZitadelV2Client(zitadelConfiguration)
 
     override fun postUser(registrationRequest: RegistrationRequest): Result<String?> {
         val result = zitadelV1Client.postUser(registrationRequest)

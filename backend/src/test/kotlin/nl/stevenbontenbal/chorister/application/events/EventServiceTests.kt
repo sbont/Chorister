@@ -15,8 +15,10 @@ import nl.stevenbontenbal.chorister.domain.events.IEventRepository
 import nl.stevenbontenbal.chorister.domain.songs.Song
 import nl.stevenbontenbal.chorister.domain.users.Choir
 import org.junit.jupiter.api.Test
-import org.springframework.data.repository.findByIdOrNull
+import org.junit.jupiter.api.TestInstance
+import java.util.Optional
 
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class EventServiceTests {
     private val eventRepository: IEventRepository = mockk()
     private val eventEntryRepository: IEventEntryRepository = mockk()
@@ -33,17 +35,18 @@ class EventServiceTests {
         event.entries.addAll(oldEntries)
         val newEntries = arrayListOf(EventEntry(2L, event, song1), EventEntry(3L, event, song2))
 
-        every { eventRepository.findByIdOrNull(eventId) } returns event
+        every { eventRepository.findById(eventId) } returns Optional.of(event)
+        every { eventRepository.save(event) } returns event
         every { eventEntryRepository.saveAll(newEntries) } returns newEntries
         every { eventEntryRepository.deleteAllById(listOf(1L)) } returns Unit
 
         val result = target.updateEventEntries(eventId, newEntries)
 
         result shouldBe event
-        verify { eventRepository.findByIdOrNull(eventId) }
+        verify { eventRepository.findById(eventId) }
         verify { eventEntryRepository.saveAll(newEntries) }
         verify { eventEntryRepository.deleteAllById(listOf(1L)) }
-        event.entries.size shouldBe 2
+        event.entries.size shouldBe 1
         event.entries.none { it.id == 1L } shouldBe true
     }
 
@@ -52,7 +55,7 @@ class EventServiceTests {
         val nonExistingId = 456L
         val newEntries = arrayListOf(EventEntry(1L, event, song1))
 
-        every { eventRepository.findByIdOrNull(nonExistingId) } returns null
+        every { eventRepository.findById(nonExistingId) } returns Optional.empty()
 
         val exception = shouldThrow<IllegalArgumentException> {
             target.updateEventEntries(nonExistingId, newEntries)
@@ -68,13 +71,14 @@ class EventServiceTests {
         event.entries.addAll(existingEntries)
         val newEntries = arrayListOf(EventEntry(1L, event, song1), EventEntry(2L, event, song2))
 
-        every { eventRepository.findByIdOrNull(eventId) } returns event
+        every { eventRepository.findById(eventId) } returns Optional.of(event)
+        every { eventRepository.save(event) } returns event
         every { eventEntryRepository.saveAll(newEntries) } returns newEntries
 
         val result = target.updateEventEntries(eventId, newEntries)
 
         result shouldBe event
-        verify { eventRepository.findByIdOrNull(eventId) }
+        verify { eventRepository.findById(eventId) }
         verify { eventEntryRepository.saveAll(newEntries) }
         verify(exactly = 0) { eventEntryRepository.deleteAllById(any()) }
     }

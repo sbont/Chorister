@@ -56,7 +56,7 @@ class RegistrationControllerTests {
 
             val actual = target.getInviteByToken(token)
 
-            actual shouldBe inviteDetail
+            actual.body shouldBe inviteDetail
         }
     }
 
@@ -68,7 +68,7 @@ class RegistrationControllerTests {
             val expected = "https://chorister.co/signup?invite=123456"
             val actual = target.getInviteUrl()
 
-            actual shouldBe expected
+            actual.body shouldBe expected
         }
     }
 

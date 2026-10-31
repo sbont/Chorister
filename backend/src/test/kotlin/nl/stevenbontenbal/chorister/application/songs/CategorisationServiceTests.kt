@@ -35,6 +35,7 @@ class CategorisationServiceTests {
         val slot = slot<Iterable<Category>>()
         val categoryTypeRepository: ICategoryTypeRepository = mockk(relaxed = true)
         val categoryRepository: ICategoryRepository = mockk(relaxed = true)
+        every { categoryTypeRepository.save(any()) } answers { firstArg() }
         every { categoryRepository.saveAll(capture(slot)) }.answers { slot.captured }
         val target = CategorisationService(categoryRepository, categoryTypeRepository)
         // Act

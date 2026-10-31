@@ -18,13 +18,13 @@ class UserControllerTests {
     @BeforeEach
     fun init() {
         clearAllMocks()
-        every { userService.currentUser } returns mockCurrentUser
+        every { userService.retrieveCurrentUser() } returns mockCurrentUser
     }
 
     @Test
     fun `when getCurrentUser then return current user`() {
         val actual = target.getCurrentUser()
 
-        actual shouldBe mockCurrentUser
+        actual.body shouldBe mockCurrentUser
     }
 }
