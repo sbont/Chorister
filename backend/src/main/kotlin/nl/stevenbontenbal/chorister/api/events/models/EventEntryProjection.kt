@@ -3,6 +3,7 @@ package nl.stevenbontenbal.chorister.api.events.models
 import nl.stevenbontenbal.chorister.api.songs.models.SongProjection
 import nl.stevenbontenbal.chorister.domain.events.Event
 import nl.stevenbontenbal.chorister.domain.events.EventEntry
+import nl.stevenbontenbal.chorister.domain.rites.MassPart
 import org.springframework.data.rest.core.config.Projection
 
 @Projection(name = "defaultProjection", types = [EventEntry::class])
@@ -13,4 +14,5 @@ interface EventEntryProjection {
     var songTitle: String?
     var label: String?
     var sequence: Int
+    var part: MassPart?
 }

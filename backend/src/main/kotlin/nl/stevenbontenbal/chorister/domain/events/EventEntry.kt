@@ -1,6 +1,7 @@
 package nl.stevenbontenbal.chorister.domain.events
 
 import jakarta.persistence.*
+import nl.stevenbontenbal.chorister.domain.rites.MassPart
 import nl.stevenbontenbal.chorister.domain.songs.Song
 import org.hibernate.annotations.Cascade
 import org.hibernate.annotations.CascadeType
@@ -22,7 +23,9 @@ class EventEntry(
     var song: Song?,
     var songTitle: String? = null,
     var label: String? = null,
-    var sequence: Int = event?.entries?.size?.plus(1) ?: 0
+    var sequence: Int = event?.entries?.size?.plus(1) ?: 0,
+    @Enumerated(EnumType.STRING)
+    var part: MassPart? = null,
 ) {
     @PrePersist
     @PreUpdate
