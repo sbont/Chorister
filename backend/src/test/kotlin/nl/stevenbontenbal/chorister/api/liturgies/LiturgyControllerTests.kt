@@ -25,6 +25,7 @@ class LiturgyControllerTests {
         val liturgy = Liturgy(
             date = date,
             languageTag = "en",
+            dayReference = "england-wales:day:all-saints",
             dayInfo = LiturgicalDayInfo(name = "All Saints"),
             items = listOf(LiturgyItem(part = MassPart.ENTRANCE)),
         )
@@ -42,6 +43,7 @@ class LiturgyControllerTests {
         val liturgy = Liturgy(
             date = date,
             languageTag = "nl",
+            dayReference = "england-wales:day:all-saints",
             dayInfo = LiturgicalDayInfo(name = "Allerheiligen"),
             items = emptyList(),
         )

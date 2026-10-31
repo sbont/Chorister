@@ -66,6 +66,15 @@ class LiturgicalCalendarTests {
     }
 
     @Test
+    fun `resolves Advent weekdays into the week following that Sunday`() {
+        val firstWeekday = calendar.resolve(LocalDate.of(2026, 12, 1))
+        val secondWeekday = calendar.resolve(LocalDate.of(2026, 12, 9))
+
+        firstWeekday.name shouldBe "Tuesday of the First Week of Advent"
+        secondWeekday.name shouldBe "Wednesday of the Second Week of Advent"
+    }
+
+    @Test
     fun `resolves a Lent weekday without Gloria, Creed or second reading`() {
         val info = calendar.resolve(LocalDate.of(2026, 2, 24))
 
@@ -260,5 +269,60 @@ class LiturgicalCalendarTests {
 
         saintGeorge.massType shouldBe MassType.SOLEMNITY
         saintGeorge.name shouldBe "Saint George"
+    }
+
+    @Test
+    fun `references Sundays by cycle year, season and ordinal`() {
+        calendar.referenceFor(LocalDate.of(2025, 9, 7)).value shouldBe "england-wales:sunday:year-c:ordinary-time:23"
+        calendar.referenceFor(LocalDate.of(2026, 3, 15)).value shouldBe "england-wales:sunday:year-a:lent:4"
+        calendar.referenceFor(LocalDate.of(2026, 3, 29)).value shouldBe "england-wales:sunday:year-a:lent:6"
+        calendar.referenceFor(LocalDate.of(2026, 12, 13)).value shouldBe "england-wales:sunday:year-b:advent:3"
+        calendar.referenceFor(LocalDate.of(2026, 4, 12)).value shouldBe "england-wales:sunday:year-a:easter:2"
+    }
+
+    @Test
+    fun `references Ordinary Time weekdays with the two-year cycle`() {
+        calendar.referenceFor(LocalDate.of(2026, 1, 12)).value shouldBe "england-wales:weekday:year-ii:ordinary-time:1:1"
+        calendar.referenceFor(LocalDate.of(2025, 11, 1)).value shouldBe "england-wales:weekday:year-i:ordinary-time:30:6"
+        calendar.referenceFor(LocalDate.of(2027, 6, 14)).value shouldBe "england-wales:weekday:year-i:ordinary-time:11:1"
+    }
+
+    @Test
+    fun `references season weekdays by season, week and weekday`() {
+        calendar.referenceFor(LocalDate.of(2026, 2, 24)).value shouldBe "england-wales:weekday:lent:1:2"
+        calendar.referenceFor(LocalDate.of(2026, 2, 19)).value shouldBe "england-wales:weekday:lent:0:4"
+        calendar.referenceFor(LocalDate.of(2026, 3, 30)).value shouldBe "england-wales:weekday:lent:6:1"
+        calendar.referenceFor(LocalDate.of(2026, 4, 6)).value shouldBe "england-wales:weekday:easter:1:1"
+        calendar.referenceFor(LocalDate.of(2026, 12, 1)).value shouldBe "england-wales:weekday:advent:1:2"
+    }
+
+    @Test
+    fun `references fixed days by slug`() {
+        calendar.referenceFor(LocalDate.of(2026, 11, 1)).value shouldBe "england-wales:day:all-saints"
+        calendar.referenceFor(LocalDate.of(2026, 5, 24)).value shouldBe "england-wales:day:pentecost"
+        calendar.referenceFor(LocalDate.of(2026, 4, 2)).value shouldBe "england-wales:day:holy-thursday"
+        calendar.referenceFor(LocalDate.of(2026, 2, 18)).value shouldBe "england-wales:day:ash-wednesday"
+        calendar.referenceFor(LocalDate.of(2025, 11, 2)).value shouldBe "england-wales:day:all-saints"
+    }
+
+    @Test
+    fun `references year-cycled days with the Sunday cycle`() {
+        val yearA = LocalDate.of(2026, 4, 3)
+        calendar.referenceFor(yearA).value shouldBe "england-wales:day:year-a:good-friday"
+        calendar.referenceFor(LocalDate.of(2026, 4, 4)).value shouldBe "england-wales:day:year-a:easter-vigil"
+        calendar.referenceFor(LocalDate.of(2026, 1, 4)).value shouldBe "england-wales:day:year-a:epiphany"
+        calendar.referenceFor(LocalDate.of(2026, 1, 11)).value shouldBe "england-wales:day:year-a:baptism-of-the-lord"
+        calendar.referenceFor(LocalDate.of(2026, 5, 17)).value shouldBe "england-wales:day:year-a:ascension"
+    }
+
+    @Test
+    fun `day composes the resolved info with the reference`() {
+        val day = calendar.day(LocalDate.of(2026, 11, 1))
+
+        day.reference.value shouldBe "england-wales:day:all-saints"
+        day.info.massType shouldBe MassType.SOLEMNITY
+        day.info.name shouldBe "All Saints"
+        day.calendar shouldBe LiturgicalCalendarRegion.ENGLAND_WALES
+        day.date shouldBe LocalDate.of(2026, 11, 1)
     }
 }

@@ -36,12 +36,13 @@ class LiturgyComposer(
         }
 
     private fun buildLiturgy(date: LocalDate, languageTag: String, readings: Readings): Liturgy {
-        val dayInfo = calendar.resolve(date)
+        val day = calendar.day(date)
         return Liturgy(
             date = date,
             languageTag = languageTag,
-            dayInfo = dayInfo,
-            items = partsFor(dayInfo, readings).map { part -> itemFor(part, languageTag, readings) },
+            dayReference = day.reference.value,
+            dayInfo = day.info,
+            items = partsFor(day.info, readings).map { part -> itemFor(part, languageTag, readings) },
         )
     }
 

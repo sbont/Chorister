@@ -64,6 +64,7 @@ class LiturgyComposerTests {
         )
         liturgy.dayInfo.name shouldBe "All Saints"
         liturgy.dayInfo.massType shouldBe nl.stevenbontenbal.chorister.domain.rites.MassType.SOLEMNITY
+        liturgy.dayReference shouldBe "england-wales:day:all-saints"
     }
 
     @Test
@@ -82,6 +83,7 @@ class LiturgyComposerTests {
             MassPart.SANCTUS, MassPart.PATER_NOSTER,
         )
         liturgy.dayInfo.name shouldBe "Tuesday of the First Week of Lent"
+        liturgy.dayReference shouldBe "england-wales:weekday:lent:1:2"
     }
 
     @Test

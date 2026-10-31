@@ -20,7 +20,13 @@ enum class MassType {
     EASTER_VIGIL,
 }
 
-enum class Season { ADVENT, CHRISTMAS, LENT, EASTER, ORDINARY_TIME }
+enum class Season(val key: String) {
+    ADVENT("advent"),
+    CHRISTMAS("christmas"),
+    LENT("lent"),
+    EASTER("easter"),
+    ORDINARY_TIME("ordinary-time"),
+}
 
 enum class LiturgicalColor { PURPLE, WHITE, GREEN, RED }
 

@@ -1077,3 +1077,61 @@ databaseChangeLog:
               ALTER TABLE song_category ADD CONSTRAINT FKhekaoilgunoajdf3310ai5yk3
                 FOREIGN KEY (category_id) REFERENCES category (id);
               DROP TABLE song_category_old;
+  - changeSet:
+      id: 1793460696826-1
+      author: test (generated)
+      changes:
+      - createTable:
+          columns:
+          - column:
+              autoIncrement: true
+              constraints:
+                nullable: false
+                primaryKey: true
+                primaryKeyName: properPK
+              name: id
+              type: BIGINT
+          - column:
+              name: day_reference
+              type: VARCHAR(255)
+          - column:
+              name: text
+              type: VARCHAR(32000)
+          - column:
+              name: translation
+              type: VARCHAR(255)
+          - column:
+              name: type
+              type: VARCHAR(255)
+          tableName: proper
+  - changeSet:
+      id: 1793460696826-2
+      author: test (generated)
+      changes:
+      - createTable:
+          columns:
+          - column:
+              autoIncrement: true
+              constraints:
+                nullable: false
+                primaryKey: true
+                primaryKeyName: readingPK
+              name: id
+              type: BIGINT
+          - column:
+              name: day_reference
+              type: VARCHAR(255)
+          - column:
+              name: part
+              type: VARCHAR(255)
+          - column:
+              name: reference
+              type: VARCHAR(255)
+          - column:
+              name: text
+              type: VARCHAR(32000)
+          - column:
+              name: translation
+              type: VARCHAR(255)
+          tableName: reading
+

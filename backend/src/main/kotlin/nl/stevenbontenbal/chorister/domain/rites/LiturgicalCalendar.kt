@@ -9,10 +9,22 @@ import java.time.temporal.TemporalAdjusters
 import java.util.Locale
 
 /**
+ * A solemnity: its canonical slug (used in [LiturgicalDayReference] day keys)
+ * and display name. Year-cycled solemnities have different readings per
+ * Sunday cycle (Year A/B/C).
+ */
+private data class Solemnity(
+    val slug: String,
+    val name: String,
+    val yearCycled: Boolean = false,
+)
+
+/**
  * The liturgical calendar of England and Wales (Roman rite, Novus Ordo, as
  * published for the province of Westminster): resolves season, colour, day
- * name and the type of Mass for a date, which in turn determines which
- * elements belong to the liturgy (Gloria, Creed, second reading).
+ * name, the type of Mass and the canonical [LiturgicalDayReference] for a
+ * date. The day is always determined on the fly; liturgical content
+ * (readings, propers) is keyed by the reference instead of by a date.
  *
  * Rules specific to England and Wales:
  * - the Epiphany of the Lord is transferred to the Sunday between 2 and 8
@@ -27,8 +39,10 @@ import java.util.Locale
  *
  * Remaining simplifications, to be refined when readings move to our own
  * repository: other feasts and memorials are treated as ordinary weekdays,
- * and the Sunday precedence rules for solemnities falling in Advent and Lent
- * are not applied (a solemnity always wins).
+ * the Sunday precedence rules for solemnities falling in Advent and Lent are
+ * not applied (a solemnity always wins), and weekdays of the Christmas season
+ * are keyed by season week and weekday rather than by their proper
+ * (date-derived) lectionary entries.
  */
 @Component
 class LiturgicalCalendar {
@@ -36,7 +50,6 @@ class LiturgicalCalendar {
     fun resolve(date: LocalDate): LiturgicalDayInfo {
         val easter = easterSunday(date.year)
         val ashWednesday = easter.minusDays(46)
-        val palmSunday = easter.minusDays(7)
         val holyThursday = easter.minusDays(3)
         val goodFriday = easter.minusDays(2)
         val holySaturday = easter.minusDays(1)
@@ -58,27 +71,107 @@ class LiturgicalCalendar {
             )
             else -> {
                 val season = seasonOf(date, easter, ashWednesday, pentecost, baptismOfTheLord)
-                val solemnity = solemnityName(date, easter)
+                val solemnity = solemnityFor(date, easter)
                 if (solemnity != null) {
                     LiturgicalDayInfo(
-                        solemnity, season,
+                        solemnity.name, season,
                         if (date == pentecost) LiturgicalColor.RED else LiturgicalColor.WHITE,
                         MassType.SOLEMNITY
                     )
                 } else if (date.dayOfWeek == DayOfWeek.SUNDAY) {
                     LiturgicalDayInfo(
-                        sundayName(date, easter, ashWednesday, palmSunday, season),
+                        sundayName(date, easter, ashWednesday, easter.minusDays(7), season),
                         season, seasonColor(season), MassType.SUNDAY
                     )
                 } else {
                     LiturgicalDayInfo(
-                        weekdayName(date, easter, ashWednesday, palmSunday, season),
+                        weekdayName(date, easter, ashWednesday, easter.minusDays(7), season),
                         season, seasonColor(season), MassType.FERIA
                     )
                 }
             }
         }
     }
+
+    fun day(date: LocalDate): LiturgicalDay =
+        LiturgicalDay(
+            date = date,
+            info = resolve(date),
+            reference = referenceFor(date),
+        )
+
+    fun referenceFor(date: LocalDate): LiturgicalDayReference =
+        LiturgicalDayReference(LiturgicalCalendarRegion.ENGLAND_WALES, dayKey(date))
+
+    private fun dayKey(date: LocalDate): String {
+        val easter = easterSunday(date.year)
+        val ashWednesday = easter.minusDays(46)
+        val holyThursday = easter.minusDays(3)
+        val goodFriday = easter.minusDays(2)
+        val holySaturday = easter.minusDays(1)
+        val baptismOfTheLord = baptismOfTheLord(date.year)
+        val epiphany = epiphanySunday(date.year)
+        val season = season(date, easter)
+        val dow = date.dayOfWeek.value
+        val sundayCycle = sundayCycle(date)
+
+        return when {
+            date == holyThursday -> "day:holy-thursday"
+            date == goodFriday -> "day:year-$sundayCycle:good-friday"
+            date == holySaturday -> "day:year-$sundayCycle:easter-vigil"
+            date == baptismOfTheLord -> "day:year-$sundayCycle:baptism-of-the-lord"
+            date == epiphany -> "day:year-$sundayCycle:epiphany"
+            date == ashWednesday -> "day:ash-wednesday"
+            else -> {
+                val solemnity = solemnityFor(date, easter)
+                when {
+                    solemnity != null ->
+                        if (solemnity.yearCycled) "day:year-$sundayCycle:${solemnity.slug}"
+                        else "day:${solemnity.slug}"
+                    date.dayOfWeek == DayOfWeek.SUNDAY ->
+                        "sunday:year-$sundayCycle:${season.key}:${sundayOrdinal(date, easter, ashWednesday, season)}"
+                    season == Season.ORDINARY_TIME -> {
+                        val weekdayCycle = if (date.year % 2 == 1) "year-i" else "year-ii"
+                        "weekday:$weekdayCycle:ordinary-time:${ordinaryTimeWeekNumber(date, easter, ashWednesday) ?: 0}:$dow"
+                    }
+                    else ->
+                        "weekday:${season.key}:${weekdayWeekNumber(date, easter, ashWednesday, season)}:$dow"
+                }
+            }
+        }
+    }
+
+    /** Year A, B or C of the liturgical year the date belongs to. */
+    private fun sundayCycle(date: LocalDate): String {
+        val liturgicalYear =
+            if (date >= firstAdventSunday(date.year)) date.year + 1 else date.year
+        return when (Math.floorMod(liturgicalYear - 2026, 3)) {
+            0 -> "a"
+            1 -> "b"
+            else -> "c"
+        }
+    }
+
+    private fun sundayOrdinal(date: LocalDate, easter: LocalDate, ashWednesday: LocalDate, season: Season): Int {
+        val firstSundayOfLent = ashWednesday.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+        val adventStart = firstAdventSunday(date.year)
+        return when (season) {
+            Season.ADVENT -> weeksBetween(adventStart, date) + 1
+            Season.LENT -> weeksBetween(firstSundayOfLent, date) + 1
+            Season.EASTER -> weeksBetween(easter, date) + 1
+            Season.CHRISTMAS -> 1
+            Season.ORDINARY_TIME -> ordinaryTimeSundayNumber(date, easter, ashWednesday, season) ?: 0
+        }
+    }
+
+    private fun weekdayWeekNumber(date: LocalDate, easter: LocalDate, ashWednesday: LocalDate, season: Season): Int =
+        when (season) {
+            Season.LENT -> sundaysSince(ashWednesday, date)
+            Season.ADVENT -> sundaysSince(firstAdventSunday(date.year), date)
+            Season.EASTER -> weeksBetween(easter, date) + 1
+            Season.CHRISTMAS -> if (date.monthValue == 12) 1 else 2
+            Season.ORDINARY_TIME -> ordinaryTimeWeekNumber(date, easter, ashWednesday) ?: 0
+        }
 
     private fun seasonOf(
         date: LocalDate,
@@ -103,34 +196,34 @@ class LiturgicalCalendar {
         Season.ORDINARY_TIME -> LiturgicalColor.GREEN
     }
 
-    private fun solemnityName(date: LocalDate, easter: LocalDate): String? {
-        transferredHolydayName(date)?.let { return it }
-        holydayName(date)?.let { return it }
-        if (date == epiphanySunday(date.year)) return "The Epiphany of the Lord"
+    private fun solemnityFor(date: LocalDate, easter: LocalDate): Solemnity? {
+        transferredHolydayFor(date)?.let { return it }
+        holydayFor(date)?.let { return it }
+        if (date == epiphanySunday(date.year)) return Solemnity("epiphany", "The Epiphany of the Lord", yearCycled = true)
         movableSolemnities[date.toEpochDay() - easter.toEpochDay()]?.let { return it }
         return fixedSolemnities[date.monthValue to date.dayOfMonth]
-    }
-
-    /** A holyday of obligation kept on its own date, i.e. not transferred to a Sunday. */
-    private fun holydayName(date: LocalDate): String? {
-        val name = transferableHolydays[date.monthValue to date.dayOfMonth] ?: return null
-        val dayOfWeek = LocalDate.of(date.year, date.monthValue, date.dayOfMonth).dayOfWeek
-        return if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.MONDAY) null else name
     }
 
     /**
      * England and Wales: Saints Peter and Paul, the Assumption and All Saints
      * are transferred to the adjacent Sunday when they fall on a Saturday or
-     * Monday. Returns the solemnity name when [date] is such a Sunday.
+     * Monday. Returns the solemnity when [date] is such a Sunday.
      */
-    private fun transferredHolydayName(date: LocalDate): String? {
+    private fun transferredHolydayFor(date: LocalDate): Solemnity? {
         if (date.dayOfWeek != DayOfWeek.SUNDAY) return null
-        for ((monthDay, name) in transferableHolydays) {
+        for ((monthDay, solemnity) in transferableHolydays) {
             val holyday = LocalDate.of(date.year, monthDay.first, monthDay.second)
-            if (holyday.dayOfWeek == DayOfWeek.SATURDAY && holyday.plusDays(1) == date) return name
-            if (holyday.dayOfWeek == DayOfWeek.MONDAY && holyday.minusDays(1) == date) return name
+            if (holyday.dayOfWeek == DayOfWeek.SATURDAY && holyday.plusDays(1) == date) return solemnity
+            if (holyday.dayOfWeek == DayOfWeek.MONDAY && holyday.minusDays(1) == date) return solemnity
         }
         return null
+    }
+
+    /** A holyday of obligation kept on its own date, i.e. not transferred to a Sunday. */
+    private fun holydayFor(date: LocalDate): Solemnity? {
+        val solemnity = transferableHolydays[date.monthValue to date.dayOfMonth] ?: return null
+        val dayOfWeek = LocalDate.of(date.year, date.monthValue, date.dayOfMonth).dayOfWeek
+        return if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.MONDAY) null else solemnity
     }
 
     private fun sundayName(
@@ -171,7 +264,7 @@ class LiturgicalCalendar {
             season == Season.LENT ->
                 "$weekday of the ${ordinal(sundaysSince(ashWednesday, date))} Week of Lent"
             season == Season.ADVENT ->
-                "$weekday of the ${ordinal(sundaysSince(firstAdventSunday(date.year), date) + 1)} Week of Advent"
+                "$weekday of the ${ordinal(sundaysSince(firstAdventSunday(date.year), date))} Week of Advent"
             season == Season.EASTER && weeksBetween(easter, date) == 0 ->
                 "$weekday of the Octave of Easter"
             season == Season.EASTER ->
@@ -197,7 +290,7 @@ class LiturgicalCalendar {
         ashWednesday: LocalDate,
         season: Season,
     ): Int? {
-        if (season != Season.ORDINARY_TIME || solemnityName(date, easter) != null) return null
+        if (season != Season.ORDINARY_TIME || solemnityFor(date, easter) != null) return null
         val pentecost = easter.plusDays(49)
         val baptismOfTheLord = baptismOfTheLord(date.year)
         return when {
@@ -275,41 +368,41 @@ class LiturgicalCalendar {
         ) before else after
     }
 
-    /** The Baptism of the Lord: the Sunday after the Epiphany. */
-    private fun baptismOfTheLord(year: Int): LocalDate =
-        epiphanySunday(year).plusDays(7)
-
     /** England and Wales: the Epiphany is transferred to the Sunday between 2 and 8 January. */
     private fun epiphanySunday(year: Int): LocalDate =
         LocalDate.of(year, 1, 2).with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
 
+    /** The Baptism of the Lord: the Sunday after the Epiphany. */
+    private fun baptismOfTheLord(year: Int): LocalDate =
+        epiphanySunday(year).plusDays(7)
+
     /** Easter-based solemnities, keyed by the number of days after Easter. */
-    private val movableSolemnities: Map<Long, String> = mapOf(
-        0L to "Easter Sunday",
+    private val movableSolemnities: Map<Long, Solemnity> = mapOf(
+        0L to Solemnity("easter", "Easter Sunday"),
         // England and Wales: the Ascension is kept on the following Sunday.
-        42L to "The Ascension of the Lord",
-        49L to "Pentecost",
-        56L to "The Most Holy Trinity",
+        42L to Solemnity("ascension", "The Ascension of the Lord", yearCycled = true),
+        49L to Solemnity("pentecost", "Pentecost"),
+        56L to Solemnity("trinity", "The Most Holy Trinity"),
         // England and Wales: Corpus Christi is kept on the Sunday after Trinity,
         // and the Sacred Heart on the Friday after that Sunday.
-        63L to "The Most Holy Body and Blood of Christ",
-        68L to "The Most Sacred Heart of Jesus",
+        63L to Solemnity("corpus-christi", "The Most Holy Body and Blood of Christ"),
+        68L to Solemnity("sacred-heart", "The Most Sacred Heart of Jesus"),
     )
 
     /** Solemnities with fixed dates that are transferred to a Sunday in England and Wales. */
-    private val transferableHolydays: Map<Pair<Int, Int>, String> = mapOf(
-        6 to 29 to "Saints Peter and Paul",
-        8 to 15 to "The Assumption of the Blessed Virgin Mary",
-        11 to 1 to "All Saints",
+    private val transferableHolydays: Map<Pair<Int, Int>, Solemnity> = mapOf(
+        6 to 29 to Solemnity("peter-and-paul", "Saints Peter and Paul"),
+        8 to 15 to Solemnity("assumption", "The Assumption of the Blessed Virgin Mary"),
+        11 to 1 to Solemnity("all-saints", "All Saints"),
     )
 
-    private val fixedSolemnities: Map<Pair<Int, Int>, String> = mapOf(
-        1 to 1 to "Mary, the Mother of God",
+    private val fixedSolemnities: Map<Pair<Int, Int>, Solemnity> = mapOf(
+        1 to 1 to Solemnity("mary-mother-of-god", "Mary, the Mother of God"),
         // Patron of England: solemnity in England, feast in Wales.
-        4 to 23 to "Saint George",
-        3 to 19 to "Saint Joseph",
-        12 to 8 to "The Immaculate Conception of the Blessed Virgin Mary",
-        12 to 25 to "The Nativity of the Lord",
+        4 to 23 to Solemnity("saint-george", "Saint George"),
+        3 to 19 to Solemnity("saint-joseph", "Saint Joseph"),
+        12 to 8 to Solemnity("immaculate-conception", "The Immaculate Conception of the Blessed Virgin Mary"),
+        12 to 25 to Solemnity("nativity", "The Nativity of the Lord"),
     )
 
     companion object {
