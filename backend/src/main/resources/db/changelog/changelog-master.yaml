@@ -1047,3 +1047,13 @@ databaseChangeLog:
           columnName: created_date
           tableName: song
           validate: true
+  - changeSet:
+      id: 1793457618369-3
+      author: test (generated)
+      changes:
+      - addColumn:
+          columns:
+          - column:
+              name: part
+              type: VARCHAR(255)
+          tableName: event_entry
