@@ -101,69 +101,91 @@ class UniversalisReadingsProvider : IReadingsProvider {
 
     private fun deobfuscateObjectLiteral(objLiteral: String): String {
         var result = objLiteral
-        var lastEnd = 0
-        
+        var searchFrom = 0
+
         while (true) {
-            val splitMarker = ".split(\""
-            val splitPos = result.indexOf(splitMarker, lastEnd)
+            val splitPos = result.indexOf(SPLIT_MARKER, searchFrom)
             if (splitPos == -1) break
-            
-            val quoteEnd = findStringEnd(result, splitPos - 1)
-            if (quoteEnd == -1) {
-                lastEnd = splitPos + 1
+
+            // The base string's closing quote must directly precede ".split(",
+            // otherwise this ".split(" is part of an already-consumed chain or plain text.
+            val quoteEnd = splitPos - 1
+            if (quoteEnd < 0 || result[quoteEnd] != '"') {
+                searchFrom = splitPos + 1
                 continue
             }
-            
-            val quoteStart = result.lastIndexOf('"', quoteEnd - 1)
+            val quoteStart = findStringStart(result, quoteEnd)
             if (quoteStart == -1) {
-                lastEnd = splitPos + 1
+                searchFrom = splitPos + 1
                 continue
             }
-            
+
             val baseString = result.substring(quoteStart + 1, quoteEnd)
-            
+
             val transformations = mutableListOf<Pair<String, String>>()
             var currentPos = splitPos
             var chainEnd = splitPos
 
-            while (result.startsWith(splitMarker, currentPos)) {
-                val splitCharStart = currentPos + splitMarker.length
-                val splitCharEnd = result.indexOf('"', splitCharStart)
-                if (splitCharEnd == -1) break
-                val splitChar = result.substring(splitCharStart, splitCharEnd)
-
-                val joinMarker = ".join(\""
-                val splitCloseParen = result.indexOf(')', splitCharEnd)
-                if (splitCloseParen == -1 || !result.startsWith(joinMarker, splitCloseParen + 1)) break
-
-                val joinCharStart = splitCloseParen + 1 + joinMarker.length
-                val joinCharEnd = result.indexOf('"', joinCharStart)
-                if (joinCharEnd == -1) break
-                val joinChar = result.substring(joinCharStart, joinCharEnd)
-
-                transformations.add(splitChar to joinChar)
-
-                val closeParen = result.indexOf(')', joinCharEnd)
-                if (closeParen == -1) {
-                    chainEnd = joinCharEnd
-                    currentPos = joinCharEnd + 1
-                    break
-                }
-                chainEnd = closeParen
-                currentPos = closeParen + 1
+            while (result.startsWith(SPLIT_MARKER, currentPos)) {
+                val splitArg = parseArgument(result, currentPos + SPLIT_MARKER.length) ?: break
+                if (!result.startsWith(JOIN_MARKER, splitArg.second)) break
+                val joinArg = parseArgument(result, splitArg.second + JOIN_MARKER.length) ?: break
+                transformations.add(splitArg.first to joinArg.first)
+                chainEnd = joinArg.second - 1
+                currentPos = joinArg.second
             }
-            
+
+            if (transformations.isEmpty()) {
+                searchFrom = splitPos + 1
+                continue
+            }
+
             var deobfuscated = unescapeJavaScriptString(baseString)
             for ((splitChar, joinChar) in transformations) {
-                deobfuscated = deobfuscated.split(splitChar).joinToString(joinChar)
+                if (splitChar.isNotEmpty()) {
+                    deobfuscated = deobfuscated.split(splitChar).joinToString(joinChar)
+                }
             }
-            
+
             val replacement = "\"${escapeForJson(deobfuscated)}\""
             result = result.substring(0, quoteStart) + replacement + result.substring(chainEnd + 1)
-            lastEnd = quoteStart + replacement.length
+            searchFrom = quoteStart + replacement.length
         }
-        
+
         return result
+    }
+
+    private fun findStringStart(s: String, closingQuoteIndex: Int): Int {
+        var i = closingQuoteIndex - 1
+        while (i >= 0) {
+            if (s[i] == '"') {
+                var backslashes = 0
+                var j = i - 1
+                while (j >= 0 && s[j] == '\\') {
+                    backslashes++
+                    j--
+                }
+                if (backslashes % 2 == 0) return i
+            }
+            i--
+        }
+        return -1
+    }
+
+    // Returns a .split()/.join() argument value and the index just after its
+    // closing parenthesis. Accepts a quoted string or a numeric literal.
+    private fun parseArgument(s: String, startIndex: Int): Pair<String, Int>? {
+        if (startIndex >= s.length) return null
+        if (s[startIndex] == '"') {
+            val end = findStringEnd(s, startIndex + 1)
+            if (end == -1 || end + 1 >= s.length || s[end + 1] != ')') return null
+            return s.substring(startIndex + 1, end) to end + 2
+        }
+        val close = s.indexOf(')', startIndex)
+        if (close == -1) return null
+        val token = s.substring(startIndex, close)
+        if (token.isEmpty() || token.any { it !in '0'..'9' }) return null
+        return token to close + 1
     }
 
     private fun findStringEnd(s: String, startIndex: Int): Int {
@@ -258,6 +280,8 @@ class UniversalisReadingsProvider : IReadingsProvider {
 
     companion object {
         private const val RESPONSE_WRAPPER_START = "universalisCallback("
+        private const val SPLIT_MARKER = ".split("
+        private const val JOIN_MARKER = ".join("
         private const val RESPONSE_WRAPPER_END = ");"
     }
 }

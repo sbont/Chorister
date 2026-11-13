@@ -150,4 +150,30 @@ class UniversalisReadingsProviderTest {
         // Verify it returns a Right with valid JSON
         assert(result != null)
     }
+
+    @Test
+    fun `deobfuscateObjectLiteral handles numeric split argument`() {
+        val provider = UniversalisReadingsProvider()
+        val input = """{"text": "a2b2c".split(2).join("s ")}"""
+        val expected = """{"text": "as bs c"}"""
+
+        val method = UniversalisReadingsProvider::class.java.getDeclaredMethod("deobfuscateObjectLiteral", String::class.java)
+        method.isAccessible = true
+        val result = method.invoke(provider, input) as String
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `deobfuscateObjectLiteral handles numeric split in mixed chain`() {
+        val provider = UniversalisReadingsProvider()
+        val input = """{"text": "x2y".split(2).join(" and ").split("x").join("X")}"""
+        val expected = """{"text": "X and y"}"""
+
+        val method = UniversalisReadingsProvider::class.java.getDeclaredMethod("deobfuscateObjectLiteral", String::class.java)
+        method.isAccessible = true
+        val result = method.invoke(provider, input) as String
+
+        assertEquals(expected, result)
+    }
 }
